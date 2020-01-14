@@ -103,6 +103,7 @@
       ];
 
       var geoField = "postcode";
+      var pieField = "volume";
 
       function tooltipText(e) {
         var tooltip = "<b> Postcode: </b> " + e.key +"<br>" ;
@@ -382,7 +383,7 @@
 
       var pie = d3.pie()
           .sort(null)
-          .value(d => d.value[geoField] ); // assumption Volume only!!
+          .value(d => d.value[pieField] ); // assumption Volume only!!
 
       var arc = d3.arc() 
         .innerRadius(innerRadius) 
