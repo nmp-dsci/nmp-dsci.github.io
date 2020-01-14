@@ -201,8 +201,8 @@
       // --------------------------------------------------------------------------
       // push data into function
       d3.queue()
-        .defer(d3.json , "../d3_examples/data/POA_2016_NSW_reduced.geojson")
-        .defer(d3.csv, "../d3_examples/data/property_poa.csv")
+        .defer(d3.json , "../data/POA_2016_NSW_reduced.geojson")
+        .defer(d3.csv, "../data/property_poa.csv")
         .await(drawMaps);
 
       function drawMaps(error, map_json,poa_df) {
