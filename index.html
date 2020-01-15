@@ -93,8 +93,8 @@
 
       // customisable features coming from dataset
       var attrCols = [
-        {class:"y", name:"Mean Sale Price",column:"sales",format:e=>d3.format(",")(Math.round(e.value.sales,0))},
-        {class:"y", name:"Properties Sold",column:"volume",format:e=>d3.format(",")(Math.round(e.value.volume,0))},
+        {class:"y", name:"Mean Sale Price",column:"sales",format:e=>d3.format(",")},
+        {class:"y", name:"Properties Sold",column:"volume",format:e=>d3.format(",")},
         {class:"x", name:"Year",column:"year"},
         {class:"x", name:"Property Type",column:"propertyType"},
         {class:"x", name:"Bedrooms",column:"beds"},
@@ -110,12 +110,14 @@
         //
         attrCols.forEach(function(d){
           if (d.class == "y" ) {
-            tooltipLine = "<b> "+d.name+": </b>" +d3.format(",")(Math.round(e.value[d.column],0))   +"<br>" ;
+            tooltipLine = "<b> "+d.name+": </b>"+ d.format()(e.value[d.column])  +"<br>" ;
             tooltip = tooltip + tooltipLine;
           }
         });
         return tooltip ;
       }
+
+
       function summFunc(data, agg){
         var summDF = d3.nest()
           .key(d=>d[agg])
@@ -263,6 +265,7 @@
         
         //  Initialise Legend Scale and drawLegend AND CHANGE listener!!
         var buckets = colorSubUnits(poa_lvl, $("#response #breaks").val(), $("#response #count").val(), $("#response #colors").val(), $("#response #column").val());
+        
         drawLegend(buckets, $("#response #colors").val());
         drawTooltip(poa_lvl,div,poa_df);
 
@@ -491,8 +494,7 @@
 
       // -------------------------------------------------------
       function updatePie(data ,xAttr,divID){
-        console.log("ATTRIBUTE")
-        console.log(xAttr)
+
         // update title
         poas = d3.nest()
           .key(d=> d[geoField])
