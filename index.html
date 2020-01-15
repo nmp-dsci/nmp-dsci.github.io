@@ -93,8 +93,8 @@
 
       // customisable features coming from dataset
       var attrCols = [
-        {class:"y", name:"Mean Sale Price",column:"sales",format:e=>d3.format(",")},
-        {class:"y", name:"Properties Sold",column:"volume",format:e=>d3.format(",")},
+        {class:"y", name:"Mean Sale Price",column:"sales",format:e=>d3.format("$.2s"),scale:"e",color:"YlOrRd"},
+        {class:"y", name:"Properties Sold",column:"volume",format:e=>d3.format(".2s"),scale:"k",color:"YlGnBu"},
         {class:"x", name:"Year",column:"year"},
         {class:"x", name:"Property Type",column:"propertyType"},
         {class:"x", name:"Bedrooms",column:"beds"},
@@ -266,7 +266,7 @@
         //  Initialise Legend Scale and drawLegend AND CHANGE listener!!
         var buckets = colorSubUnits(poa_lvl, $("#response #breaks").val(), $("#response #count").val(), $("#response #colors").val(), $("#response #column").val());
         
-        drawLegend(buckets, $("#response #colors").val());
+        drawLegend(buckets, $("#response #column").val());
         drawTooltip(poa_lvl,div,poa_df);
 
         // Initialise Pie charts
@@ -284,6 +284,22 @@
           }
         });
 
+        // Default setting as per Response
+        $("#response #column").change(function(){
+          attrID = $("#response #column").val();
+          attrCols.forEach( function(attr){
+            if (attr.column == attrID){
+              attrDF = attr;
+            }// end IF 
+          }); // end FOR
+          // Apply specificd filters if they exist
+          if ( "scale" in attrDF){
+            $("#response #breaks").val(attrDF.scale);
+          }
+          if ("color" in attrDF) {
+            $("#response #colors").val(attrDF.color);
+          }
+        });
 
         // SELECT ACTION on CHANGE
         $("select").change(function(){
@@ -310,7 +326,7 @@
           poa_lvl = summFunc(selectDF, geoField);
           // Apply DAta
 			    buckets = colorSubUnits(poa_lvl, $("#response #breaks").val(), $("#response #count").val(), $("#response #colors").val(), $("#response #column").val());
-          drawLegend(buckets, $("#response #colors").val());
+          drawLegend(buckets, $("#response #column").val());
           drawTooltip(poa_lvl,div,selectDF);
 
           // Update dashboard
@@ -517,11 +533,9 @@
         var aggDF2 = [];
 
         var fsum = fields_req.forEach(function(v) { 
-          console.log(v); 
           found = false;
           aggDF.forEach(function(r){
             if (r.key == v){
-              console.log('found value')
               aggDF2.push(r);
               found = true;
             } // end if statement
@@ -530,9 +544,6 @@
             aggDF2.push({key:v,value:{"volume":0}});
           }
         });
-
-
-
 
         // get into 'g' element
         path = d3.select(divID)
@@ -543,11 +554,6 @@
         // old / new data
         data0 = path.data() , 
         data1 = pie(aggDF2);
-
-        // console.log("data0")
-        // console.log(data0);
-        // console.log("data1")
-        // console.log(data1);
 
         function keyf(d) {
           return d.data[xAttr.column]
@@ -561,17 +567,11 @@
           .duration(myDuration)
           .attrTween("d",arcTween )
 
-        // console.log("path pre transitioning")
-        // console.log(path)
-
-        path
+         path
           .enter()
           .append("path")
           .each(function(d, i) {
-              // console.log("Applying findNeighborArc "+xAttr.column)
-              // console.log(d)
               var narc = findNeighborArc(i, data0, data1,keyf) ;
-              // console.log(narc)
               if(narc) {          
                 this._current = narc;
                 this._previous = narc;
@@ -586,25 +586,18 @@
             .duration(myDuration)
             .attrTween("d", arcTween);
       
-          // console.log('this')
-          // console.log(this);
-
-
-          path
+           path
             .exit()
             .transition()
             .duration(myDuration)
             .attrTween("d", function(d, index) {
-              // console.log("previous data")
-              // console.log(this._previous)
-              var i = d3.interpolateObject(d,this._previous);
+                 var i = d3.interpolateObject(d,this._previous);
               return function(t) {
                 return arc(i(t))
               }
             })
             .remove()
 
-          // console.log("done")
 
       }// end update of pieChart
 
@@ -655,11 +648,7 @@
           .on("click",function(d){
             // Update dashboard
             targetDF = base_lvl.filter(f=>f[geoField] ===d.properties.POA_CODE16 );
-            console.log("TARGET DF")
-            console.log(targetDF)
             poa_lvl = summFunc(targetDF, geoField);
-            console.log("OUTCOME")
-            console.log(poa_lvl)
             attrCols.forEach(function(attr){
               if (attr.class =="x"){
                 updatePie(targetDF , attr, "#drivers2")
@@ -670,7 +659,16 @@
 
 
       // -------------------------------------------------------
-			function drawLegend(buckets, colorScheme){
+			function drawLegend(buckets,response){
+
+        // pull response info
+        var responseDF = {};
+        attrCols.forEach(function(attr){
+          if (attr.column == response) {
+            console.log('response found')
+            responseDF = attr;
+          }
+        })
 
         // update legendX domain
         legendX.domain([buckets[0].x, buckets[buckets.length - 1].x + buckets[buckets.length - 1].width]);
@@ -706,11 +704,11 @@
         legendNumber
           .transition(t)
             .attr("x", function(d){ return legendX(d.x); })
-            .text(function(d){ return d3.format(".2s")(d.x); });
+            .text(function(d){ return responseDF.format()(d.x); });
 
         legendMax
             .attr("x", function(d){ return legendX(d); })
-            .text(function(d){ return d3.format(".2s")(d); })
+            .text(function(d){ return responseDF.format()(d); })
 
         // ENTER
         legendRect.enter().append("rect")
@@ -725,14 +723,14 @@
             .attr("class", "legend-number")
             .attr("y", legend_h)
             .attr("x", function(d){ return legendX(d.x); })
-            .text(function(d){ return d3.format(".2s")(d.x); });
+            .text(function(d){ return responseDF.format()(d.x); });
             
         legendMax.enter().append("text")
             .attr("class", "legend-max")
             .attr("y", legend_h)
             .attr("x", function(d){ return legendX(d); })
             .style("text-anchor", "end")
-            .text(function(d){ return d3.format(".2s")(d); });
+            .text(function(d){return responseDF.format()(d); });
 
       }
 
@@ -753,7 +751,6 @@
                   return i;
                 }
               })); // end map
-              // console.log(colors[colorScheme][breakCount][bucketNumber - 1])
               return colors[colorScheme][breakCount][bucketNumber - 1];
             } else {
               return "#DCDCDC"
