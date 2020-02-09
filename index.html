@@ -53,9 +53,51 @@
         font-size: 14px;
       }
       h2 { display: inline }
+
+      #map {    
+        position:absolute;
+        top:150px;
+        left:10px;
+        width:600px;
+        height: 600px; 
+      }
+      #controls {
+        position:absolute;
+        top:850px;
+        left:10px; 
+      }
+      /* Pie chart plots */
+      #drivers1 {	
+        position:absolute;
+        top:100px;
+        left:850px;
+        height:300px;
+      }
+      #drivers2 {	
+        position:absolute;
+        top:400px;
+        left:850px;
+        height: 300px;
+      }
+      /* Pie chart Title */
+      #drivers1 h2 {	
+        position:absolute;
+        top:-50px;
+        left:10px;
+        width: 500px;
+      }
+      #drivers2 h2 {	
+        position:absolute;
+        top:-50px;
+        left:10px;
+        width: 800px;
+      }
     </style>
   </head>
   <body>
+
+    
+    <div class="row">
       <div id="response">
         <h2>Response Visualisation</h2>
         <select id="column"></select>
@@ -63,10 +105,13 @@
         <select id="count"></select>
         <select id="colors"></select>
       </div>
+    </div>
 
+    <div class="row">
       <div id="attribute">
         <h2>Attribute Filter</h2>
       </div>
+    </div>
 
       <div>
         <h2>Response Legend </h2>
@@ -83,10 +128,15 @@
       </div>
 
       <div id="drivers2">
-          <div>
-            <h2> Postcode of Focus</h2>
-          </div>
+        <div>
+          <h2> Postcode of Focus</h2>
         </div>
+      </div>
+
+      <div id="tb_avgs">
+      </div>
+
+      <script type="text/javascript" src="../data/poa_suburb.json"></script>
 
     <script>
 
@@ -133,7 +183,7 @@
 
       // --------------------------------------------------------------------------------
       // margins required
-      var width_b = 1100, 
+      var width_b = 800, 
         height_b = 700, 
         legend_w = width_b *1 ,
         legend_h = 22
@@ -160,7 +210,7 @@
 
       // ----------------------------------------------------------------------
       //  SET THE DROP DOWNS
-      // 0. set the FILTER fields 
+      // 0. set all the filters 
       attrCols.forEach(function(d){
         if (d.class == "x" ) {
           d3.select("#attribute")
@@ -203,6 +253,11 @@
     
       // --------------------------------------------------------------------------
       // push data into function
+      // poa_suburb = JSON.parse(poa_sub);
+
+      poa_suburb = JSON.parse(poa_sub);
+      console.log(poa_suburb.filter(d => d.postcode == 2076).map(d => d.suburb));
+
       d3.queue()
         .defer(d3.json , "../data/POA_2016_NSW_reduced.geojson")
         .defer(d3.csv, "../data/property_poa.csv")
@@ -239,8 +294,8 @@
         // STEP 1: DRAW Map
         var projection = d3
         .geoMercator() 
-        .scale(30000)	  // zoom in 
-        .center([150.0, -33.5]); // where to center SVG on  
+        .scale(29000)	  // zoom in 
+        .center([150.6, -33.7]); // where to center SVG on  
 
         var path = d3.geoPath().projection(projection);
         
@@ -270,10 +325,19 @@
         drawTooltip(poa_lvl,div,poa_df);
 
         // Initialise Pie charts
+        var  pieMargins = {pie_w:250,pie_h:250,pieLegend_h:230,outerRadius:100,innerRadius:100 - 30};
+
+        var arc = d3.arc() 
+          .innerRadius(pieMargins.innerRadius) 
+          .outerRadius(pieMargins.outerRadius)
+          .startAngle( d => d.startAngle) 
+          .endAngle(d => d.endAngle) ;
+
+
         attrCols.forEach(function(attr){
           if (attr.class =="x"){
-            innitPie( attr,"#drivers1")
-            innitPie( attr,"#drivers2")
+            innitPie( attr,"#drivers1",pieMargins,false)
+            innitPie( attr,"#drivers2",pieMargins,true)
           }
         });
         //  set the piezs
@@ -303,7 +367,6 @@
 
         // SELECT ACTION on CHANGE
         $("select").change(function(){
-          // console.log("CHANGE in Selection")
           // Generate Dat to visualise
           selectDF = poa_df;
 
@@ -393,27 +456,19 @@
       // Innitialise PIE
 
       // globals for pie generation
-      var  pie_w  = 250, 
-        pie_h  = 250,
-        pieLegend_h = 150,
-        outerRadius = 100,
-        innerRadius = outerRadius - 30,
-        radius = outerRadius + 25;
+      var myDuration = 600;
+      var  pieMargins = {pie_w:250,pie_h:250,pieLegend_h:230,outerRadius:100,innerRadius:100 - 30};
 
       var pie = d3.pie()
           .sort(null)
           .value(d => d.value[pieField] ); // assumption Volume only!!
 
       var arc = d3.arc() 
-        .innerRadius(innerRadius) 
-        .outerRadius(outerRadius)
+        .innerRadius(pieMargins.innerRadius) 
+        .outerRadius(pieMargins.outerRadius)
         .startAngle( d => d.startAngle) 
         .endAngle(d => d.endAngle) ;
 
-
-
-      //  Generating the Transition
-      var myDuration = 600;
       // 1.
       function arcTween(d) {
         var i = d3.interpolate(this._current, d);
@@ -470,18 +525,19 @@
       
 
       // init SVG
-      function innitPie(xAttr, divID ) {
+      function innitPie(xAttr, divID ,pieMargins,legendTrue) {
+
         // initialise components of PIE
         var pie_svg = d3.select(divID)
           .append("svg")
-          .attr("width", pie_w)
-          .attr("height",pie_h+pieLegend_h )
+          .attr("width", pieMargins.pie_w)
+          .attr("height",pieMargins.pie_h+pieMargins.pieLegend_h )
           .attr("id","pie_" + xAttr.column)
 
         // Add title
         pie_svg
           .append("text")
-          .attr("x", (pie_w / 2))             
+          .attr("x", (pieMargins.pie_w / 2))             
           .attr("y", 15 )
           .attr("text-anchor", "middle")  
           .style("font-size", "16px") 
@@ -490,26 +546,34 @@
 
         var pie_area = pie_svg
           .append("g")
-          .attr("transform", `translate(${pie_w/2},${pie_h/2})`)
+          .attr("transform", `translate(${pieMargins.pie_w/2},${pieMargins.pie_h/2})`)
           .attr("id","pie_" + xAttr.column+"_g")
 
-        var pie_legend = pie_svg
-          .append("g")
-          .attr("transform", `translate(${pie_w*0.3},${pie_h})`)
-          .attr("id","pie_"+ xAttr.column+"_l");
+          if (legendTrue){
+          var pie_legend = pie_svg
+            .append("g")
+            .attr("transform", `translate(${pieMargins.pie_w*0.3},${pieMargins.pie_h})`)
+            .attr("id","pie_"+ xAttr.column+"_l");
 
-        const colorLegend = d3.legendColor()
-        .scale(xAttr.colorScale)
-        .shape('circle');
+          const colorLegend = d3.legendColor()
+          .scale(xAttr.colorScale)
+          .shape('circle');
 
-        pie_legend.call(colorLegend)
-          .selectAll(".cell text")
-          .attr("dy", "0.1em");
+          pie_legend.call(colorLegend)
+            .selectAll(".cell text")
+            .attr("dy", "0.1em");
+        }
 
       } // end innitPIE
 
       // -------------------------------------------------------
       function updatePie(data ,xAttr,divID){
+
+        var myDuration = 600;
+
+        var pie = d3.pie()
+          .sort(null)
+          .value(d => d.value[pieField] ); // assumption Volume only!!
 
         // update title
         poas = d3.nest()
@@ -517,13 +581,21 @@
           .entries(data); 
         
         if (poas.length == 1){
+
+          sub_list = poa_suburb.filter(d => d.postcode == poas[0].key)
+            .sort(function(x,y){ return d3.descending(x.population, y.population ) } )
+            .map(d => d.suburb)
+            .slice(0,3)
+            .join(", ");
+
           d3.select("#drivers2")
           .select("h2")
-          .text(`Postcode of focus: ${poas[0].key}`);
+          .text(`Postcode Selected: ${poas[0].key} [${sub_list}]`);
+
         } else {
           d3.select("#drivers2")
           .select("h2")
-          .text("All Postcodes for Selection");
+          .text("All Postcodes");
         }
 
         // 
@@ -618,9 +690,7 @@
             } else {
               e = e[0]
             }
-
             tooltip = tooltipText(e);
-
             // tooltip type
             div.transition()
               .duration(200)
@@ -628,7 +698,6 @@
             div.html(tooltip)
               .style("left",(d3.event.pageX + 30) + "px")
               .style("top", (d3.event.pageY - 30) + "px");
-            
           })
           .on("mouseout", function(d) { 
             div.transition()
@@ -665,7 +734,6 @@
         var responseDF = {};
         attrCols.forEach(function(attr){
           if (attr.column == response) {
-            console.log('response found')
             responseDF = attr;
           }
         })
