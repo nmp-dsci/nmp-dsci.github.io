@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<!-- check -->
+<head>
+
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <title>Hexbin Map</title>
+
+  <!-- Leaflet -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+  integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+  crossorigin=""/>
+  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+  integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+  crossorigin=""></script>
+
+  <!-- CSS  -->
+  <style>
+
+  </style>
+
+  <!-- ancillary data -->
+  <!-- <script type="text/javascript" src="data/SA4_2016_NSW_reduced.geojson"></script>  -->
+  <script type="text/javascript" src="data/POA_2016_NSW_reduced.geojson"></script> 
+  <script type="text/javascript" src="data/pins_df.json"></script>
+  <script type="text/javascript" src="data/postcode_df.json"></script>
+
+
+
+</head>
+
+<body id="page-top">
+
+
+  <!-- Content Wrapper -->
+  <div id="content-wrapper" class="d-flex flex-column">
+    <h1>Average Sale Price</h1>
+    <svg id='clegend' width='1400' height='80'></svg>
+    <div id="map" style="width: 1400px; height: 800px">
+    </div>
+  </div>  <!-- END tabcontent -->
+    
+
+
+  <!-- Leaflet javascript -->
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-legend/2.25.6/d3-legend.min.js"></script>
+  <script src="https://d3js.org/d3-hexbin.v0.2.min.js"></script>
+  <script src="https://unpkg.com/@asymmetrik/leaflet-d3@4/dist/leaflet-d3.js" charset="utf-8"></script>
+
+  <!-- Web app  -->
+  <script>
+   // ###########################################
+  // URLS to leverage 
+  // https://jsfiddle.net/mcneela86/2g87muqe/
+  // http://bl.ocks.org/tnightingale/4668062
+  
+
+
+
+  // ###########################################
+  // Default map
+  mapLink = '<a href="http://openstreetmap.org">OpenStreetMap</a>';
+
+  map_layer = L.tileLayer(
+      'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; ' + mapLink + ' Contributors',
+      maxZoom: 20,
+      });
+				
+  // ###########################################
+  // View data 
+
+  const pins_df  = JSON.parse(pins_json); 
+  // const map_json = JSON.parse(map_json_r); 
+  const postcode_df  = JSON.parse(postcode_json); 
+
+
+  // map
+  var map = L.map('map',{
+      center: [d3.median(pins_df.map(r=>r['lat'])), d3.median(pins_df.map(r=>r['lng']))] , 
+      zoom: 10, 
+      layers:[map_layer]
+    })
+
+  // ###########################################
+  // hexbin boins
+    var options = {
+      radius : 20,
+      opacity: 0.2,
+      duration: 500
+  };
+
+  var hexLayer = L.hexbinLayer(options).addTo(map);
+  hexLayer.colorScale().range(['white', 'blue']);
+
+  hexLayer
+    .radiusRange([20, 20])
+    .lng(function(d) { return d['lng']; })
+    .lat(function(d) { return d['lat']; })
+    .colorValue(function(d) { 
+        return d3.mean(d.map(r=>r['o']['price_n_v'])) })
+    .radiusValue(function(d) { return d.length; });
+
+  hexLayer.data(pins_df);
+
+  //  controls
+  // L.control.layers({'Open Street Map':map_layer}, {'Properties':pins}).addTo(map);
+
+
+  </script>
+
+<!-- `attrCols` generation -->
+
+</body>
+</html>

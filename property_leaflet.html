@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<!-- check -->
+<head>
+
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <title>Map Demo 1.0</title>
+
+  <!-- Leaflet -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+  integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+  crossorigin=""/>
+  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+  integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+  crossorigin=""></script>
+
+  <!-- CSS  -->
+  <style>
+
+  </style>
+
+  <!-- ancillary data -->
+  <!-- <script type="text/javascript" src="data/SA4_2016_NSW_reduced.geojson"></script>  -->
+  <script type="text/javascript" src="data/POA_2016_NSW_reduced.geojson"></script> 
+  <script type="text/javascript" src="data/suburb_df.json"></script>
+  <script type="text/javascript" src="data/postcode_df.json"></script>
+
+
+
+</head>
+
+<body id="page-top">
+
+
+  <!-- Content Wrapper -->
+  <div id="content-wrapper" class="d-flex flex-column">
+    <h1>Average Sale Price</h1>
+    <svg id='clegend' width='1400' height='80'></svg>
+    <div id="map" style="width: 1400px; height: 800px">
+    </div>
+  </div>  <!-- END tabcontent -->
+    
+
+
+  <!-- Leaflet javascript -->
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-legend/2.25.6/d3-legend.min.js"></script>
+
+
+  <!-- Web app  -->
+  <script>
+ 
+  // ###########################################
+  // Default map
+  mapLink = '<a href="http://openstreetmap.org">OpenStreetMap</a>';
+
+  map_layer = L.tileLayer(
+      'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; ' + mapLink + ' Contributors',
+      maxZoom: 20,
+      });
+				
+  // ###########################################
+  // View data 
+
+  const suburb_df  = JSON.parse(suburb_json); 
+  const map_json = JSON.parse(map_json_r); 
+  const postcode_df  = JSON.parse(postcode_json); 
+
+  // pins
+  var pins = L.layerGroup();
+  suburb_df.forEach(row =>{
+    L.marker([row['latitude'], row['longitude']]
+      ).bindPopup(`Street: "${row['street']} Date: ${row.dateID} Price: ${d3.format('$.3s')(row.price_n_v)}`
+      ).addTo(pins);
+  })
+  
+  // map
+  var map = L.map('map',{
+      center: [d3.median(suburb_df.map(r=>r['latitude'])), d3.median(suburb_df.map(r=>r['longitude']))] , 
+      zoom: 15, 
+      layers:[map_layer, pins]
+    })
+
+
+
+  // ################
+
+  colorScale = d3.scaleSequential(d3.interpolateSinebow).domain(d3.extent(postcode_df.map(r=>r['mean'])))
+
+  // drawScale (ref: http://using-d3js.com/04_05_sequential_scales.html)
+  function drawScale(id,cScale) {
+    var legendRange = Array.from(Array(100).keys());
+
+    var lScale = d3.scaleLinear()
+      .domain([0,99])
+      .range(cScale.domain());
+
+    var xScale = d3.scaleLinear()
+        .domain(cScale.domain())
+        .range([0, 1400]);   // min/max pixels for legend
+
+    // Draw Legend: colour scale
+    d3.select("#" + id)
+        .selectAll(`rect_${id}`)
+        .data(legendRange)
+        .enter()
+        .append("rect")
+        .attr('id',`rect_${id}`)
+        .attr("x", (d) => Math.floor(xScale(lScale(d))))
+        .attr("y", 0)
+        .attr("height", 40)
+        .attr("width", (d) => {
+            if (d == 99) {
+                return 6;
+            }
+            return Math.floor(xScale(lScale(d+1))) - Math.floor(xScale(lScale(d))) + 1;
+         })
+        .attr("fill", (d) => cScale(lScale(d)));
+
+
+    d3.select("#" + id)
+      .selectAll(`text_${id}`)
+      .data(legendRange)
+      .enter()
+      .append('text')
+      .attr("x", (d) => Math.floor(xScale(lScale(d))))
+      .attr("y", 60)
+      .text((d,idx)=> {
+        if (idx % 10 === 0 ){
+          return d3.format('$.3s')(lScale(d))
+        }
+      })
+    //  Draw test : 
+    
+
+  } // end function 'drawScale'
+
+  drawScale( "clegend",colorScale)
+
+  // ##############################################
+  //  Style of each polygon
+  function geoStyle(feature){
+    //  Pull throught metric to color code
+    postcode_metric = postcode_df.filter(f=> Number(f['postcode']) === Number(feature.properties['POA_CODE16']))
+    if (postcode_metric.length === 0) {
+      postcode_metric = 0
+    } else { 
+      postcode_metric = postcode_metric[0]['mean']
+    }
+    return {
+      weight: 2,
+			opacity: 0.9 ,
+			color: 'white',
+			dashArray: '3',
+			fillOpacity: 0.4,
+			fillColor: colorScale(postcode_metric)
+    }
+  }
+
+
+  geojson = L.geoJson(map_json,{
+    style:geoStyle
+  });
+  geojson.eachLayer(layer => {
+    layer.bindPopup(layer.feature.properties.POA_NAME16)
+  })
+  
+  geojson.addTo(map)
+
+
+  //  controls
+  L.control.layers({'Open Street Map':map_layer}, {'Properties':pins,'Postcodes':geojson}).addTo(map);
+
+
+  </script>
+
+<!-- `attrCols` generation -->
+
+</body>
+</html>
