@@ -9,7 +9,7 @@
   <meta name="description" content="">
   <meta name="author" content="">
 
-  <title>Bar Chart Race</title>
+  <title>Arc Diagram</title>
 
 
 
@@ -18,7 +18,7 @@
 
   </style>
 
-  <script type="text/javascript" src="data/calendar_data.json"></script>
+  <script type="text/javascript" src="data/arc_diagram.json"></script>
   
 
 </head>
@@ -28,7 +28,7 @@
 
   <div id="content-wrapper" class="d-flex flex-column">
 
-    <h1>Bar Chart Race</h1>
+    <h1>Arc Diagram</h1>
 
 
 
@@ -38,8 +38,11 @@
 
   <!-- Web app  -->
   <script>
-   // ###########################################
-  // inspiration:  https://observablehq.com/@d3/arc-diagram
+    // ###########################################
+    // inspiration:  https://observablehq.com/@d3/arc-diagram
+    const data = JSON.parse(data_json); 
+
+    
 
 
 

@@ -53,7 +53,7 @@
   // https://bl.ocks.org/mbostock/4063318 ## secondary
   // https://gist.github.com/matehuszarik/b1a8004c52334d8efcd0f9aaad195cf9 ## eg
 
-  const data_raw = JSON.parse(calendar_json); 
+  const data_raw = JSON.parse(data_json); 
 
   parseDT = d3.timeParse('%Y-%m-%dT%H:%M:%S.%LZ')
   data_raw.map(d=> d['date'] = parseDT(d['date']))
