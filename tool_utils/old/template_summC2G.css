@@ -1,0 +1,19 @@
+    /* table format */
+    h2 { display: inline }
+    #map {    
+      border:1px solid black;
+    }
+    #line1 {    
+      border:1px solid black;
+    }
+    #map_tool {    
+      border:1px solid black;
+    }
+    table {
+        position: absolute;
+        font-family: sans-serif;
+        font-size: 16px;
+    }
+    tr:nth-child(even) {
+      background-color: #d9d9d9;
+    }
