@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<!-- check -->
+<head>
+
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/10.4.1/math.js" type="text/JavaScript"></script>
+
+
+  <title>Surname Culture</title>
+
+
+  <!-- Profile data -->
+  <script type="text/javascript" src="datafeed/surname_json.json"></script>
+
+</head>
+
+<body id="page-top">
+
+  <label for="site_search">Search the site:</label>
+  <input type="search" id="site_search" name="q">
+  
+  <button id="get_culture">Search Culture</button>
+
+  <p><strong>Predicted Culture:</strong> </p>
+  <p id="pred_culture">  </p>
+
+
+
+<script>
+
+  function model_input(surnames = [''], model = {}){
+    input_set = surnames.map(s => '$' + s.toUpperCase() + '&' )
+    input_set = input_set.map(surname => model.pred.map(p=> surname.includes(p) ? 1 : 0))
+    return input_set
+  }
+
+  
+  function matrix_dotprod(input, weights , bias , relu = true){
+    var pred_weights = []
+    for (pred of input){
+      pred_score = []
+      for (position = 0 ; position < weights[0].length ;position ++ ){
+        pred_score.push(math.dot(pred , weights.map(r=>r[position])) + bias[position])
+      }
+      if (relu)  pred_score = pred_score.map(r=> r = r > 0 ? r : 0)
+      pred_weights.push(pred_score)
+    }
+    return pred_weights
+  }
+
+  function output_layer(hidden_layer=[]){
+    var score_output = []
+    for (i=0;i<hidden_layer.length; i++){
+      score_l2_exp = hidden_layer[i].map(r=> math.exp(r))
+      score_output.push(score_l2_exp.map(c=>c / math.sum(score_l2_exp) ))
+    }
+    return score_output
+  }
+
+function layer_uplift(layer_output=[], response_df =[]){
+  var weights = response_df.map(r=>r.pctn)
+  var uplift_output = []
+  for (i=0;i<layer_output.length; i++){
+    output_weighted = []
+    for (w=0;w<weights.length;w++){
+      output_weighted.push(layer_output[i][w] / weights[w] )
+    }
+    uplift_output.push(response_df[output_weighted.indexOf(math.max(output_weighted))])
+  }
+  return uplift_output
+}
+
+
+
+score_surnames = ['bonpain','phillips','zhoa','rafat','chen','claremont','el-hage','georgelos']
+// score_surnames = ['phillips']
+
+function surname_prediction(score_surnames){
+  score_input = model_input(score_surnames,surname_model)
+  score_layer1 = matrix_dotprod(score_input,surname_model.l1_w,surname_model.l1_b,relu = true)
+  score_layer2 = matrix_dotprod(score_layer1,surname_model.l2_w,surname_model.l2_b,relu = false)
+  score_output = output_layer(score_layer2) 
+  score_uplift = layer_uplift(score_output,surname_model.response) 
+  return score_uplift
+}
+
+pred_surname = surname_prediction(score_surnames)
+console.log('predictions')
+
+for (w=0;w<pred_surname.length;w++){
+  console.log(`${score_surnames[w]} => ${pred_surname[w].culture}`)
+}
+
+
+document.querySelector('#get_culture').onclick = function() {
+  console.log('Get Culture')
+  var surname_input = []
+  surname_input.push(document.querySelector('#site_search').value)
+  pred_surname = surname_prediction(surname_input)
+  document.querySelector('#pred_culture').innerHTML = `${surname_input[0]} => ${pred_surname[0].culture}`
+}
+
+
+</script>
+
+</body>
+</html>
