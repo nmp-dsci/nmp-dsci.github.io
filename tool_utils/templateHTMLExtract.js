@@ -28,7 +28,7 @@ templateHTMLExtract = [
     },
     {       element:'table'
         ,   parent:'#extract_template #column1 #table_dictionary'
-        ,   setAttr:[{'tag':'width','value':"95%" }]
+        // ,   setAttr:[{'tag':'width','value':"95%" }]
     },
     // column 2: Download data
     {       element:'div'
@@ -51,6 +51,7 @@ templateHTMLExtract = [
         ,   parent:'#extract_template #column2 '
         ,   setAttr:[{'tag':'id','value':'extract_downloadSummary'},
             {'tag':'class','value':'btn btn-primary btn-lg btn-block'}]
+        ,   innerHTML:'Extract Data'
     },
     // Alert
     {       element:'div'
@@ -58,7 +59,7 @@ templateHTMLExtract = [
         ,   setAttr:[{'tag':'class','value':"alertextract" }]
     },
     {       element:'span'
-        ,   parent:'#extract_template #column2 .alertprofile'
+        ,   parent:'#extract_template #column2 .alertextract'
         ,   setAttr:[
                 {'tag':'class','value':'alertclosebtn'},
             ,   {'tag':'style','value':'display:none'},

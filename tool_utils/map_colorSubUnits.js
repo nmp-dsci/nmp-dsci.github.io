@@ -5,21 +5,14 @@ function colorSubUnits(data, breakType='q', breakCount='5', colorScheme='RdGn', 
     valueAttr = attrCols.filter(r=> r.column === value)[0]
     if (Object.keys(valueAttr).includes('raw_metric')) value = valueAttr.raw_metric
 
-    // // update for redemption: BESPOKE to 'Engagement 1' tool for Profiling
-    // redemp_checkbox = $("input#redemptions_t").is(":checked");
-    // if (redemp_checkbox){
-    //     value = value + '_redemp'
-    // };
-
     var nums = data.filter(d => isFinite(+d[value])).map(d => +d[value] );
     var buckets = chroma.limits(nums, breakType, breakCount);
     var t = d3.transition().duration(750);
 
-    // d3.select("#poa"+e.key)
     d3.selectAll(".path_geo")
         .transition(t)
         .style("fill", function(d){
-        e = data.filter(f => +f[primaryCols['geo_field']] === +d.properties[absCode16]); 
+        e = data.filter(f => +f[primaryCols[geoCol]] === +d.properties[absCode16]); 
         if ( e.length === 1 && !isNaN(e[0][value])  ){
             var bucketNumber = d3.min(buckets.map(function(bucket, i){
             if (e[0][value] <= bucket){
@@ -31,8 +24,6 @@ function colorSubUnits(data, breakType='q', breakCount='5', colorScheme='RdGn', 
             return "#DCDCDC"
         };
         });
-    // };
-        // .attr("class", "sa4 q"+quantile(Math.sqrt(+e.value.sales))+"-9")
 
     // an array to return for drawing the legend
     var arr = [];

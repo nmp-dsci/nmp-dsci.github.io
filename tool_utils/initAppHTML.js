@@ -7,9 +7,6 @@ function initAppHTML(appName = 'trend', appID = 1, templateHTML= []){
 
     templateHTML.map(element=> {
 
-        // console.log('element')
-        // console.log(element)
-
         parentObj = document.querySelector(element['parent'].replace(replaceFrom,replaceTo)); 
         newObj = document.createElement(element['element'].replace(replaceFrom,replaceTo));
 

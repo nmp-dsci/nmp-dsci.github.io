@@ -21,10 +21,8 @@ function draw_stackedbar(chartContext,tagID,cCol ,chartDim) {
 
     // ####################################################################################
     // Get unique variable, apply filter if exists
-    uniqcCol = Array.from([new Set(chartContext[`${tagID}_${cCol}`]['chartData'].map(r=> r[chartContext[`${tagID}_${cCol}`].cColRef_v]))][0])
-
-    if (uniqcCol.length !== chartContext[`${tagID}_${cCol}`].cColDF['order'].length & chartContext[`${tagID}_${cCol}`].cColDF['order'].length > 0){
-      chartContext[`${tagID}_${cCol}`]['chartData'] = chartContext[`${tagID}_${cCol}`]['chartData'].filter(f=>  chartContext[`${tagID}_${cCol}`].cColDF['order'].includes(f[chartContext[`${tagID}_${cCol}`].cColRef_v]))
+    if (chartContext[`${tagID}_${cCol}`]['uniqcColsAdj'].length !== chartContext[`${tagID}_${cCol}`].cColDF['order'].length & chartContext[`${tagID}_${cCol}`].cColDF['order'].length > 0){
+      chartContext[`${tagID}_${cCol}`]['chartData'] = chartContext[`${tagID}_${cCol}`]['chartData'].filter(f=>  chartContext[`${tagID}_${cCol}`]['uniqcColsAdj'].includes(f[chartContext[`${tagID}_${cCol}`].cColRef_v]))
     }
 
     var xScale = d3.scaleBand()
@@ -49,7 +47,7 @@ function draw_stackedbar(chartContext,tagID,cCol ,chartDim) {
       .style("font-size", "20px");
 
     svg_chart.select(".plot_title")
-      .text(`Bar chart: '${chartContext[`${tagID}_${cCol}`].cColDF.name}' by '${chartContext[tagID].xCol1DF.name}'` )
+      .text(`'${chartContext[`${tagID}`].yColDF['n'].name}' by '${chartContext[`${tagID}_${cCol}`].cColDF.name}' & '${chartContext[tagID].xCol1DF.name}'` )
       .style("font-size", "26px");
 
     // X-axis

@@ -1,5 +1,8 @@
 function drawLine_multiC(chartContext,tagID,cCol,chartDim) {
 
+
+  chartContext[`${tagID}_${cCol}`]['chartData'] = chartContext[`${tagID}_${cCol}`]['chartData'].filter(f => f[chartContext[tagID].yCol['n']] !== 0 )
+
   // ####################################################################################
   // Sort by x1 And x2 
   if (chartContext[tagID].xCol1DF.order){
@@ -9,13 +12,6 @@ function drawLine_multiC(chartContext,tagID,cCol,chartDim) {
     chartContext[`${tagID}_${cCol}`]['chartData'].sort((a , b) => d3.ascending(a[chartContext[`${tagID}_${cCol}`].xCol1Ref.replace("_c","_v")], b[chartContext[`${tagID}_${cCol}`].xCol1Ref.replace("_c","_v")]))
   }
   
-  // Get unique variable, apply filter if exists
-  uniqcCols = Array.from([new Set(chartContext[`${tagID}_${cCol}`]['chartData'].map(r=> r[chartContext[`${tagID}_${cCol}`].cColRef.replace("_c","_v")]))][0])
-
-  if (uniqcCols.length !== chartContext[`${tagID}_${cCol}`].legendValues.length ){
-    console.log("drawLine_multiC: Apply filter on 'cCol'")
-    chartContext[`${tagID}_${cCol}`]['chartData'].filter(f=>  chartContext[`${tagID}_${cCol}`].legendValues.map(r=>r.value).includes(f[chartContext[`${tagID}_${cCol}`].cColRef.replace("_c","_v")]))
-  }
 
   // ###############################
 
@@ -39,7 +35,7 @@ function drawLine_multiC(chartContext,tagID,cCol,chartDim) {
     .style("font-size", "20px");
 
   svg_chart.select(".plot_title")
-    .text(`Line chart: '${chartContext[`${tagID}_${cCol}`].cColDF.name}' by '${chartContext[tagID].xCol1DF.name}'` )
+    .text(`'${chartContext[`${tagID}`].yColDF['n'].name}' by '${chartContext[`${tagID}_${cCol}`].cColDF.name}' & '${chartContext[tagID].xCol1DF.name}'` )
     .style("font-size", "26px")
 
   // X-axis
@@ -73,7 +69,6 @@ function drawLine_multiC(chartContext,tagID,cCol,chartDim) {
   svg_chart.selectAll("text.tile").remove()
   svg_chart.selectAll("rect.stackedBar").remove()
 
-  chartContext[`${tagID}_${cCol}`]['chartData'] = chartContext[`${tagID}_${cCol}`]['chartData'].filter(f => f[chartContext[tagID].yCol['n']] !== 0 )
 
   if (chartContext[tagID].xCol1 !== chartContext[`${tagID}_${cCol}`].cCol){
     var cCol_paths = d3.group(chartContext[`${tagID}_${cCol}`]['chartData'], d => d[chartContext[`${tagID}_${cCol}`].cColRef_v]);

@@ -1,6 +1,7 @@
 // What is this? 
 // Return filters applied in Selection 
 // function queryData(data_df,yCol={}, xCol=[''],calc_lvl='n',tagID = 'profile1'){
+
 function dataFetch(data_df,chartContext,tagID, cCol){
 
       // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 

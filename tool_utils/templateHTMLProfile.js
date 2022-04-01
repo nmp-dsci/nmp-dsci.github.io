@@ -38,7 +38,8 @@ templateHTMLProfile = [
         ,   parent:'#$profileID$ #column2'
         ,   setAttr:[
                 {'tag':'id','value':'spinner_$profileID$'},
-                {'tag':'src','value':"assets/ajax-loader.gif"}
+                {'tag':'src','value':"assets/ajax-loader.gif"},
+                {'tag':'style','value':"display: none"},
         ]
     },
     {       element:'button'
@@ -148,7 +149,7 @@ templateHTMLProfile = [
     },
     {       element:'table'
         ,   parent:'#$profileID$ #column2 #table_topline'
-        ,   setAttr:[{'tag':'width','value':"95%" }]
+        // ,   setAttr:[{'tag':'width','value':"95%" }]
     },
     // 2. Filtered Data summary
     {       element:'h4'
@@ -161,7 +162,7 @@ templateHTMLProfile = [
     },
     {       element:'table'
         ,   parent:'#$profileID$ #column2 #table_totals'
-        ,   setAttr:[{'tag':'width','value':"95%" }]
+        // ,   setAttr:[{'tag':'width','value':"95%" }]
     },
     // 3.  Data Filters
     {       element:'h4'
@@ -174,7 +175,7 @@ templateHTMLProfile = [
     },
     {       element:'table'
         ,   parent:'#$profileID$ #column2 #table_filter'
-        ,   setAttr:[{'tag':'width','value':"95%" }]
+        // ,   setAttr:[{'tag':'width','value':"95%" }]
     },
     // Top Uplifts
     {       element:'h4'
@@ -187,7 +188,7 @@ templateHTMLProfile = [
     },
     {       element:'table'
         ,   parent:'#$profileID$ #column2 #table_top'
-        ,   setAttr:[{'tag':'width','value':"95%" }]
+        // ,   setAttr:[{'tag':'width','value':"95%" }]
     },
     // bottom Uplifts
     {       element:'h4'
@@ -200,6 +201,6 @@ templateHTMLProfile = [
     },
     {       element:'table'
         ,   parent:'#$profileID$ #column2 #table_bottom'
-        ,   setAttr:[{'tag':'width','value':"95%" }]
+        // ,   setAttr:[{'tag':'width','value':"95%" }]
     },
 ]

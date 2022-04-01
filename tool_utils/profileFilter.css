@@ -51,21 +51,6 @@
     display: inline-block;
 }
 /* loader */
-#spinner_trend  {
-    display: none;
-}
-#spinner_trend1  {
-    display: none;
-}
-#spinner_trend2  {
-    display: none;
-}
-#spinner_profile1 {
-    display: none;
-}
-#spinner_extract {
-    display: none;
-}
 /* alert button */
 .alertprofile {
     padding: 20px;

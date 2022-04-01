@@ -3,7 +3,7 @@
 function tooltipText_sa4(e) {
 var tooltip = "<b> Region: </b> " + e.name +"<br>" ;
 
-metricCols = Object.keys(e).map(m => ['name',primaryCols['geo_field']].includes(m) ? undefined : m).filter(f=>f);
+metricCols = Object.keys(e).map(m => ['name',primaryCols[geoCol]].includes(m) ? undefined : m).filter(f=>f);
 
 metricCols.map(metricCol => {
   metricDF = attrCols.filter(f=>f.column === metricCol)[0]
@@ -31,7 +31,7 @@ function drawTooltip(mapDF,tooltip_Yoffset=0){
       .on("mouseover", function(event) {
         // 
         eventDF = event.target.__data__.properties
-        mapObj = mapDF.filter(f => +f[primaryCols['geo_field']] === +eventDF[absCode16]); 
+        mapObj = mapDF.filter(f => +f[primaryCols[geoCol]] === +eventDF[absCode16]); 
 
         if (mapObj.length === 0){
           mapObj = {  key:eventDF[absCode16]

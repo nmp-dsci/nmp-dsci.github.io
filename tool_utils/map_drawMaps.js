@@ -1,11 +1,11 @@
 // drawMaps
-function drawMaps( map_json,data_df, geoField) {
+function drawMaps( chartContext,tagID, cCol, map_json) {
 
-    if (['member_sa4','loc_sa4','sa4_code_2016'].includes(geoField.toLowerCase())){
+    if (['member_sa4','loc_sa4','sa4_code_2016'].includes(cCol.toLowerCase())){
         absCode16 = 'SA4_CODE16'
         absName16 = 'SA4_NAME16'
         absCode = 'sa4'
-    } else if (['postcode'].includes(geoField)){
+    } else if (['postcode'].includes(cCol)){
         absCode16 = 'POA_CODE16'
         absName16 = 'POA_NAME16'
         absCode = 'poa'
@@ -54,31 +54,27 @@ function drawMaps( map_json,data_df, geoField) {
     // renewal_map / acquisition_map
 
     yCol=varProfile('profile1');
-    [mapInputDF,mapFilter] = queryData(data_df,yCol, [geoField],'n','profile');
+
+    chartContext[`${tagID}_${cCol}`]['mapInputDF'] = chartContext[`${tagID}_${cCol}`]['chartData'].filter(r=>r.profile==='n')
 
     // reneame 
     aggCols.map(aggCol => {
-        if (mapInputDF[0][aggCol] === geoField ){
-            mapInputDF.map(r=> r[geoField] = r[aggCol.replace('_c','_v')])
+        if (chartContext[`${tagID}_${cCol}`]['mapInputDF'][0][aggCol] === cCol ){
+            chartContext[`${tagID}_${cCol}`]['mapInputDF'].map(r=> r[cCol] = r[aggCol.replace('_c','_v')])
         } 
     })
 
-    console.log('$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$')
-    console.log('$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$')
-    console.log('profile:mapInputDF')
-    console.log(mapInputDF)
-
     // restrict results for tooltip only to 'tooltip==true' in 'attrCols'
 
-    headerCols = [geoField].concat(attrCols.filter(d=>d.profile_y===true & d.class==='y').map(d=> d['raw_metric'])); 
+    headerCols = [cCol].concat(attrCols.filter(d=>d.profile_y===true & d.class==='y').map(d=> d['raw_metric'])); 
 
-    let result_df = mapInputDF.map(e => {
+    let result_df = chartContext[`${tagID}_${cCol}`]['mapInputDF'].map(e => {
         const obj = {};
         headerCols.map(k => obj[k] = e[k])
         return obj;
     });
 
-    var buckets = colorSubUnits(mapInputDF);
+    var buckets = colorSubUnits(chartContext[`${tagID}_${cCol}`]['mapInputDF']);
     drawLegend(buckets);
     drawTooltip(result_df);
 

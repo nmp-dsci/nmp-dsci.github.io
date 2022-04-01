@@ -22,7 +22,8 @@ templateHTMLTrend = [
         ,   parent:'#$trendID$' 
         ,   setAttr:[
                 {'tag':'id','value':'spinner_$trendID$'},
-                {'tag':'src','value':"assets/ajax-loader.gif"}
+                {'tag':'src','value':"assets/ajax-loader.gif"},
+                {'tag':'style','value':"display: none"},
         ]
     },
     {       element:'button'
@@ -94,7 +95,7 @@ templateHTMLTrend = [
     },
     {       element:'table'
         ,   parent:'#$trendID$ #table_topline' 
-        ,   setAttr:[{'tag':'width','value':"95%" }]
+        // ,   setAttr:[{'tag':'width','value':"95%" }]
     },
     // Filters applied
     {       element:'h4'
@@ -107,7 +108,7 @@ templateHTMLTrend = [
     },
     {       element:'table'
         ,   parent:'#$trendID$ #table_filter' 
-        ,   setAttr:[{'tag':'width','value':"95%" }]
+        // ,   setAttr:[{'tag':'width','value':"95%" }]
     },
 
     // column 1

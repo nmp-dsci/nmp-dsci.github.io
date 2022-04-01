@@ -24,7 +24,7 @@ function drawTable(data, divID,tableHead){
     // Select HTML DOM object
     table_t10 = d3.select(divID);
 
-    //  Set height
+    // //  Set height
     table_t10
         .style('height',(50 + data.length * 30 ) + 'px')
 

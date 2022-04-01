@@ -4,7 +4,7 @@ function drawLegend(buckets,response=$("#target #profile").val()){
     // pull response info
     responseDF = attrCols.filter(r=> r.column === response)[0]
 
-    var map_p = {width_b:400,height_b:600,legend_w:400,legend_h:30,legendbar_h:15};      
+    var map_p = {width_b:900,height_b:600,legend_w:400,legend_h:30,legendbar_h:15};      
     var legendX = d3.scaleLinear().range([0, map_p.legend_w]);
     var t = d3.transition().duration(750);
 
