@@ -1,5 +1,5 @@
 
-async function trendRun(trendID ,cCol,callback=()=>{}, new_div=false){
+function trendRun(trendID ,cCol,callback=()=>{}, new_div=false){
 
   tagID = `trend${trendID}`;
 

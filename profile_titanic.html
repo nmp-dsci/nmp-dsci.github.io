@@ -13,23 +13,23 @@
 
   <!-- external JS libraries-->
   <script src="resources/d3.6.5.0.min.js" type="text/JavaScript"></script>
-  <script src="https://cdn.jsdelivr.net/pako/1.0.3/pako.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 
   <!-- Custom styles for this template-->
-  <link href="css/bootstrap.min.css" rel="stylesheet">
+  <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
   <link href="tool_utils/openTab.css" rel="stylesheet">
   <link href="tool_utils/map_format.css" rel="stylesheet">
   <link href="tool_utils/profileFilter.css" rel="stylesheet">
   <link href="tool_utils/profileDefaults.css" rel="stylesheet">
 
   <!-- ancillary data -->
-  <script type="text/javascript" src="assets/SA4_2016_NSW_reduced.geojson"></script>
+  <!-- <script type="text/javascript" src="assets/SA4_2016_NSW_reduced.geojson"></script> -->
   <script type="text/javascript" src="tool_utils/util_dt_yyyymm.json"></script>
   <script type="text/javascript" src="tool_utils/util_loc_sa4.json"></script>
   <script type="text/javascript" src="tool_utils/util_attrCols_lookup.js"></script>
 
   <!-- Profile data -->
-  <script type="text/javascript" src="datafeed/profile_titanic_pako.json"></script>
+  <script type="text/javascript" src="datafeed/profile_titanic.json"></script>
   <script type="text/javascript" src="datafeed/profile_titanic_lookup.json"></script>
 
   <!-- Interactive Tool Functions -->
@@ -56,6 +56,8 @@
   <script type="text/javascript" src="tool_utils/map_drawLegend.js"></script>
   <script type="text/javascript" src="tool_utils/openTab.js"></script>
   <script type="text/javascript" src="tool_utils/initChart.js"></script>
+  <script type="text/javascript" src="tool_utils/getContextTrend.js"></script>
+  <script type="text/javascript" src="tool_utils/getContextProfile.js"></script>
   <script type="text/javascript" src="tool_utils/profileCalc.js"></script>
   <script type="text/javascript" src="tool_utils/profileMetrics.js"></script>
   <script type="text/javascript" src="tool_utils/profileChart.js"></script>
@@ -106,29 +108,17 @@
   <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 
   <script>
-    // --------------------------------------------------------------------------
-    //  GET DATA 
-    // -------------------------------------------------------------------------- 
-    // Decode base64 (convert ascii to binary)
-    const strData     = atob(zipped);
-    const charData    = strData.split('').map(function(x){return x.charCodeAt(0);});
-    const binData     = new Uint8Array(charData);
-    const data        = pako.inflate(binData, { to: 'string' });
-
-
-    const data_df = JSON.parse(JSON.parse(data));
-    const map_json = JSON.parse(map_json_r); 
-    const lookup_df = JSON.parse(lookup_json);
 
     document.getElementById("defaultOpen").click();
 
       // ######################################################
       // Defaults
-      const profileWidth = 670; 
-      const trendWidth = 600; 
+      const profileWidth = 800; 
+      const trendWidth = 650; 
       var xAxisLabelText_gap = 1;
 
       const aggCols = ['agg0_c','agg1_c','agg2_c','agg3_c'];
+      const geoCol = undefined
       const primaryCols = undefined; 
      
       const appDefaults = {
@@ -161,30 +151,32 @@
     return aggFuncs;        
   }
 
+  const derivedFunction  = [ 
+    {'c':'survived_r_v' ,'f': r => r['survived_n_v'] / r['passengers_n_v']   },
+    // {'c':'price_a_v' ,'f': r => r['price_n_v'] / r['renewal_n_v']   },
+  ]
 
-      const derivedFunction  = [ 
-        {'c':'survived_r_v' ,'f': r => r['survived_n_v'] / r['passengers_n_v']   },
-        // {'c':'price_a_v' ,'f': r => r['price_n_v'] / r['renewal_n_v']   },
-      ]
+  derivedFunction.map(derivedY =>{
+    attrCols.push({class:"y",column:derivedY['c'],profile_y:true,trend_y:true  })
+  })
 
-      derivedFunction.map(derivedY =>{
-        attrCols.push({class:"y",column:derivedY['c'],profile_y:true,trend_y:true  })
-      })
+  initAppHTML(appName = 'extact', appID = '' , templateHTML=templateHTMLExtract);
 
-      initAppHTML(appName = 'extact', appID = '' , templateHTML=templateHTMLExtract);
-</script>
+  </script>
 
   <!-- `attrCols` enrich -->
   <script type="text/javascript" src="tool_utils/util_attrCols_enrich.js" ></script>
   <script type="text/javascript" src="tool_utils/template_extract.js" ></script>
 
-<!--  Load  templates for 'Tools' to visualise-->
-<script type="text/javascript" src="tool_utils/profileFilter.js" ></script>
-<script type="text/javascript" src="tool_utils/profileRun.js" ></script>
+  <!--  Load  templates for 'Tools' to visualise-->
+  <script type="text/javascript" src="tool_utils/profileFilter.js" ></script>
+  <script type="text/javascript" src="tool_utils/profileRun.js" ></script>
 
-<script type="text/javascript" src="tool_utils/trendFilter.js" ></script>
-<script type="text/javascript" src="tool_utils/trendRun.js" ></script>
+  <script type="text/javascript" src="tool_utils/trendFilter.js" ></script>
+  <script type="text/javascript" src="tool_utils/trendRun.js" ></script>
 
+  <script type="text/javascript" src="tool_utils/profileApp.js" ></script>
+  <script type="text/javascript" src="tool_utils/trendApp.js" ></script>
 
 </body>
 </html>

@@ -1,7 +1,7 @@
 
 
 
-async function getContextTrend(chartContext,tagID, cCol){
+function getContextTrend(chartContext,tagID, cCol){
       
     // ##########################
     // Set Context Dictionary 
