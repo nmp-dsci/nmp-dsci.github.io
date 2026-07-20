@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agentic Coding Evaluation — 3 Agent Setups</title>
+<style>
+:root{color-scheme:dark}
+body{font-family:Arial,sans-serif;line-height:1.45;margin:0;color:#dbe4ef;background:#0f141b}
+header{padding:20px 28px;background:#151c26;color:#f6f8fb;border-bottom:1px solid #2d3745}
+main{padding:24px 28px}
+a{color:#8cc8ff}
+table{border-collapse:collapse;width:100%;margin:16px 0;background:#151c26}
+th,td{border:1px solid #2d3745;padding:8px;text-align:left;vertical-align:top}
+th{background:#202a36;color:#f6f8fb;white-space:normal;word-break:break-word}
+td{overflow-wrap:anywhere}
+td.num{text-align:right;font-family:ui-monospace,Menlo,monospace}
+input,select{background:#10161f;border:1px solid #2d3745;color:#dbe4ef;padding:6px 8px}
+article{border-top:2px solid #2d3745;margin-top:28px;padding-top:16px}
+pre{white-space:pre-wrap;background:#10161f;border:1px solid #2d3745;color:#e7edf5;padding:12px;overflow:auto}
+details{margin:8px 0;padding:8px;border:1px solid #2d3745;background:#151c26}
+summary{cursor:pointer;font-weight:bold;color:#f6f8fb}
+code{font-family:ui-monospace,Menlo,monospace;font-size:12px;color:#c7e1ff}
+.metric{font-family:ui-monospace,Menlo,monospace}
+.metric-grid{display:grid;grid-template-columns:repeat(4,minmax(140px,1fr));gap:12px;margin-bottom:18px}
+.metric-grid .metric{background:#151c26;border:1px solid #2d3745;padding:12px}
+.metric strong{display:block;font-size:24px;color:#f6f8fb}
+.tabs{display:flex;gap:8px;margin-bottom:16px}
+.tab{border:1px solid #2d3745;background:#151c26;color:#dbe4ef;padding:8px 12px;cursor:pointer}
+.tab.active{background:#2f81f7;color:white;border-color:#2f81f7}
+.panel{display:none}.panel.active{display:block}
+td.summary{min-width:280px}
+.transcripts-table col:nth-child(1){width:10%}
+.transcripts-table col:nth-child(2){width:14%}
+.transcripts-table col:nth-child(3){width:14%}
+.transcripts-table col:nth-child(4){width:12%}
+.transcripts-table col:nth-child(5){width:14%}
+.transcripts-table col:nth-child(6){width:18%}
+.transcripts-table col:nth-child(7){width:8%}
+.transcripts-table col:nth-child(8){width:8%}
+.transcripts-table col:nth-child(9){width:6%}
+.transcripts-table col:nth-child(10){width:10%}
+.filters{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:12px 0}
+.scatter{width:100%;height:auto;background:#10161f;border:1px solid #2d3745}
+.failed{color:#ffb4a8}
+</style>
+<style>
+.question-box{background:#151c26;border:1px solid #2d3745;padding:16px 20px;margin-bottom:20px}
+.question-box p{margin:8px 0 0;font-size:16px;color:#e7edf5}
+.answer-columns{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;align-items:start}
+.answer-col{border:1px solid #2d3745;background:#151c26;padding:16px;min-width:0}
+.answer-col h2{margin:0 0 10px;font-size:14px;color:#f6f8fb;font-family:ui-monospace,Menlo,monospace;word-break:break-word}
+.answer-col .answer{white-space:pre-wrap;background:#10161f;border:1px solid #2d3745;color:#e7edf5;padding:12px;overflow:auto}
+.col-meta{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0;font-family:ui-monospace,Menlo,monospace;font-size:12px;color:#9fb3c8}
+.col-meta span{background:#10161f;border:1px solid #2d3745;padding:4px 8px}
+@media(max-width:980px){.answer-columns{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header><h1>Agentic Coding Evaluation — 3 Agent Setups</h1></header>
+<main>
+<div class="question-box">
+<strong>Question</strong>
+<p>what does this corpus say about how AI engineers leverage agentic coding to fully 
+  develop features, what is the best workflow for agentic coding</p>
+</div>
+<div class="answer-columns">
+<section class="answer-col">
+<h2>--rag_llm --top-k 30</h2>
+<details><summary>Command</summary>
+<pre><code>uv run python -m src.cli rag-ask &quot;$question&quot; --rag_llm --top-k 30</code></pre>
+</details>
+<div class="col-meta">
+<span>tokens ~9599</span>
+<span>chunks 30</span>
+<span>answer 2079 chars</span>
+<span>LLM calls 1</span>
+</div>
+<h3>Answer</h3>
+<pre class="answer">The corpus describes several emerging patterns and workflows for agentic coding, though no single authoritative best workflow is established. Key points include:
+
+- **Building on minimal agents**: Pi is a minimal coding agent meant to be built upon and adapted to personal workflows, rather than using bloated tools [15].
+- **Development lifecycle**: A common pattern involves a build phase (define use case, develop models, tools, and a simple agent, test prompts, add tools like web search), followed by optimization, then deployment and governance [8].
+- **Maturity progression**: Engineers start by using agents for everything, then automate work into skills, refine skill writing, and finally optimize the environment for agents [9].
+- **Problem-oriented vs task-oriented**: Give agents problems (describing the goal) and let them figure out which skills to invoke, rather than prescribing exact tasks [11].
+- **Heavy on specification**: A workflow with detailed lightweight design documents (spec-first approach) and using agents for low-level code reviews (style, variable names) to free engineers for higher-level concerns [13].
+- **Tool types matter**: Agents use three types of tools – custom (user-defined), provider-defined (e.g., Anthropic bash tool), and provider-executed (e.g., web search) – and understanding these helps structure agent capabilities [27].
+- **Context and evaluation**: Clean codebases amplify AI gains [24], and agents are non-deterministic, requiring evaluation (traces and evals) that should be treated as living, adaptive systems [20][22].
+- **Real-world examples**: Intercom doubled PR throughput by having agents automatically handle incidents using well-written internal skills [29][9].
+
+Overall, engineers leverage agentic coding by starting with a minimal, extensible agent, designing clear skills and tools, focusing on problems not tasks, using a spec-driven approach, and continuously evaluating outputs. No single “best workflow” is given; instead, the corpus advocates for iterative, adaptable patterns tailored to the organization.</pre>
+<details><summary>References (10)</summary><ul><li>[8] <a href="https://www.youtube.com/watch?v=iOXM3zE-2dk&amp;t=2218s">open at timestamp</a> <span class="metric">iOXM3zE-2dk</span></li><li>[9] <a href="https://www.youtube.com/watch?v=4_VQBbs2iQA&amp;t=922s">open at timestamp</a> <span class="metric">4_VQBbs2iQA</span></li><li>[11] <a href="https://www.youtube.com/watch?v=4_VQBbs2iQA&amp;t=806s">open at timestamp</a> <span class="metric">4_VQBbs2iQA</span></li><li>[13] <a href="https://www.youtube.com/watch?v=VMemhtlsoNk&amp;t=622s">open at timestamp</a> <span class="metric">VMemhtlsoNk</span></li><li>[15] <a href="https://www.youtube.com/watch?v=lK9o5Wu2upU&amp;t=0s">open at timestamp</a> <span class="metric">lK9o5Wu2upU</span></li><li>[20] <a href="https://www.youtube.com/watch?v=Xfl50508LZM&amp;t=1931s">open at timestamp</a> <span class="metric">Xfl50508LZM</span></li><li>[22] <a href="https://www.youtube.com/watch?v=4VhbYlfC7Gs&amp;t=816s">open at timestamp</a> <span class="metric">4VhbYlfC7Gs</span></li><li>[24] <a href="https://www.youtube.com/watch?v=FWEInOtngmM&amp;t=101s">open at timestamp</a> <span class="metric">FWEInOtngmM</span></li><li>[27] <a href="https://www.youtube.com/watch?v=wflNENRSUb4&amp;t=1176s">open at timestamp</a> <span class="metric">wflNENRSUb4</span></li><li>[29] <a href="https://www.youtube.com/watch?v=4_VQBbs2iQA&amp;t=869s">open at timestamp</a> <span class="metric">4_VQBbs2iQA</span></li></ul></details>
+</section>
+<section class="answer-col">
+<h2>--rag_llm --recursive --top-k 10</h2>
+<details><summary>Command</summary>
+<pre><code>uv run python -m src.cli rag-ask &quot;$question&quot; --rag_llm --recursive --top-k 10</code></pre>
+</details>
+<div class="col-meta">
+<span>tokens ~12615</span>
+<span>chunks 29</span>
+<span>answer 4742 chars</span>
+<span>LLM calls 2</span>
+<span>completed</span>
+</div>
+<h3>Answer</h3>
+<pre class="answer">## First-Pass Answer
+
+The retrieved chunks do not define a single best workflow, but they describe emerging patterns. The core concept is an agent as an LM that runs tools in a loop [1]. Engineers are advised to &#x27;make it easy for coding agents&#x27; by considering what agents are good at and designing systems accordingly [6]. A practical progression is to &#x27;use Claude code for everything, automate your work, then move that to a skill, then get really good at writing skills&#x27; and finally &#x27;optimize the environment for agents&#x27; [9]. This approach has been linked to doubling PR throughput [9]. Another suggested lifecycle is &#x27;build phase, then optimize it and then deploy and govern it&#x27; [8]. Overall, the corpus points to an iterative, skill-based workflow where engineers leverage agentic loops and progressively build and optimize specialized skills, but no authoritative best workflow is yet established.
+
+## Subtopic 1: Building and composing reusable skills for coding agents
+
+*Follow-up query:* How to design and implement reusable skills for AI coding agents?
+
+Skills are folders containing instructions, scripts, and resources that agents discover progressively via front matter (name and description). The main instruction file is `skill.md` with optional bundled scripts and reference files [s1.1]. A key design pattern is to create a feedback loop where the agent builds, runs, and evaluates code, then for any repeatable task it makes a standalone script and injects its description into a memory file (e.g., `memories.md`) so the agent can reuse it later [s1.2]. Instead of assigning rigid tasks, engineers should describe the problem and let the agent decide which skills to invoke; skills can be automatically discovered and applied, as when Claude Code automatically fetched a data-breach skill during a security incident [s1.3]. These patterns can be composed into complex agent systems with sub-agents, durable workflows, and retry mechanisms [s1.4]. A dissenting view warns that skills are a short-term band-aid and that open-source approaches may ultimately solve context assembly better [s1.5].
+
+## Subtopic 2: Context engineering in agentic development workflows
+
+*Follow-up query:* What are the principles and techniques of context engineering for agentic coding?
+
+Context engineering is the strategic selection of what the model sees, not just fitting under the token limit. The best context strategy lets agents remember what they need and forget what they don&#x27;t [s2.3]. Key principles are: context engineering matters, memory matters, and evaluation matters; agents fail because of context, not prompts [s2.1]. A common context assembly includes the agent system prompt, optional agent MD file, tool definitions (read/write, custom tools), the codebase, and the conversation history [s2.6]. Techniques for managing context include using context graphs to structure related information [s2.2][s2.7], passing runtime state through tool context arguments so tools can access the sandbox or other resources [s2.5], and leveraging memory systems like Hermes agents that persist and retrieve information [s2.4]. The overall approach is iterative—engineers should continuously optimize context management as the field evolves [s2.1].
+
+## Subtopic 3: CI/CD integration for agentic coding
+
+*Follow-up query:* What are emerging CI/CD patterns for microservice-based agentic software?
+
+Traditional CI/CD is being disrupted as agentic software moves toward continuous, incremental validation. Validation becomes part of the inner loop: every code iteration is tested immediately, so CI no longer enforces coordination across changes; those invariants are enforced on a continuous basis [s3.5]. The pipeline becomes &#x27;agent all the way down&#x27; with machines handling code generation and evaluation behind the scenes, making work more continuous and forcing evaluation into the inner loop [s3.1]. New patterns include: using cache layers and intelligent routing to the right infrastructure, agentic identity for software, and retries at scale [s3.2]; deploying agents per customer with a gateway that forwards requests to specialized agents [s3.3]; leveraging inference providers and local agents for model diversity [s3.4]; instrumenting all agents with OpenTelemetry tracing for monitoring and debugging across heterogeneous systems [s3.6]; and treating agents as internet-connected server programs that speak HTTP and are deployed on the edge with public URLs, acknowledging that current security is still immature [s3.7]. Overall, the emerging pattern is microservice-like, with many agents cooperating, each with its own lifecycle and monitoring, and CI/CD shifting from a separate phase to an integrated, continuous validation loop.</pre>
+<details><summary>References (23)</summary><ul><li>[1] <a href="https://www.youtube.com/watch?v=vAIDdLKB6-w&amp;t=311s">open at timestamp</a> <span class="metric">vAIDdLKB6-w</span></li><li>[6] <a href="https://www.youtube.com/watch?v=vAIDdLKB6-w&amp;t=161s">open at timestamp</a> <span class="metric">vAIDdLKB6-w</span></li><li>[8] <a href="https://www.youtube.com/watch?v=iOXM3zE-2dk&amp;t=2218s">open at timestamp</a> <span class="metric">iOXM3zE-2dk</span></li><li>[9] <a href="https://www.youtube.com/watch?v=4_VQBbs2iQA&amp;t=922s">open at timestamp</a> <span class="metric">4_VQBbs2iQA</span></li><li>[s1.1] <a href="https://www.youtube.com/watch?v=JT3OzDKrucU&amp;t=160s">open at timestamp</a> <span class="metric">JT3OzDKrucU</span></li><li>[s1.2] <a href="https://www.youtube.com/watch?v=wflNENRSUb4&amp;t=3794s">open at timestamp</a> <span class="metric">wflNENRSUb4</span></li><li>[s1.3] <a href="https://www.youtube.com/watch?v=4_VQBbs2iQA&amp;t=806s">open at timestamp</a> <span class="metric">4_VQBbs2iQA</span></li><li>[s1.4] <a href="https://www.youtube.com/watch?v=wflNENRSUb4&amp;t=3945s">open at timestamp</a> <span class="metric">wflNENRSUb4</span></li><li>[s1.5] <a href="https://www.youtube.com/watch?v=KYOg81dfac8&amp;t=55s">open at timestamp</a> <span class="metric">KYOg81dfac8</span></li><li>[s2.1] <a href="https://www.youtube.com/watch?v=esY99nYXxR4&amp;t=825s">open at timestamp</a> <span class="metric">esY99nYXxR4</span></li><li>[s2.2] <a href="https://www.youtube.com/watch?v=eW_vxrjvERk&amp;t=1009s">open at timestamp</a> <span class="metric">eW_vxrjvERk</span></li><li>[s2.3] <a href="https://www.youtube.com/watch?v=esY99nYXxR4&amp;t=120s">open at timestamp</a> <span class="metric">esY99nYXxR4</span></li><li>[s2.4] <a href="https://www.youtube.com/watch?v=OV56RddyFuU&amp;t=393s">open at timestamp</a> <span class="metric">OV56RddyFuU</span></li><li>[s2.5] <a href="https://www.youtube.com/watch?v=wflNENRSUb4&amp;t=3116s">open at timestamp</a> <span class="metric">wflNENRSUb4</span></li><li>[s2.6] <a href="https://www.youtube.com/watch?v=KYOg81dfac8&amp;t=169s">open at timestamp</a> <span class="metric">KYOg81dfac8</span></li><li>[s2.7] <a href="https://www.youtube.com/watch?v=eW_vxrjvERk&amp;t=944s">open at timestamp</a> <span class="metric">eW_vxrjvERk</span></li><li>[s3.1] <a href="https://www.youtube.com/watch?v=VktrqzQgytY&amp;t=365s">open at timestamp</a> <span class="metric">VktrqzQgytY</span></li><li>[s3.2] <a href="https://www.youtube.com/watch?v=VktrqzQgytY&amp;t=293s">open at timestamp</a> <span class="metric">VktrqzQgytY</span></li><li>[s3.3] <a href="https://www.youtube.com/watch?v=vAIDdLKB6-w&amp;t=891s">open at timestamp</a> <span class="metric">vAIDdLKB6-w</span></li><li>[s3.4] <a href="https://www.youtube.com/watch?v=OV56RddyFuU&amp;t=318s">open at timestamp</a> <span class="metric">OV56RddyFuU</span></li><li>[s3.5] <a href="https://www.youtube.com/watch?v=VktrqzQgytY&amp;t=994s">open at timestamp</a> <span class="metric">VktrqzQgytY</span></li><li>[s3.6] <a href="https://www.youtube.com/watch?v=iOXM3zE-2dk&amp;t=448s">open at timestamp</a> <span class="metric">iOXM3zE-2dk</span></li><li>[s3.7] <a href="https://www.youtube.com/watch?v=vi-2nasppAg&amp;t=180s">open at timestamp</a> <span class="metric">vi-2nasppAg</span></li></ul></details>
+</section>
+<section class="answer-col">
+<h2>--rag_agent --top-k 10</h2>
+<details><summary>Command</summary>
+<pre><code>uv run python -m src.cli rag-ask &quot;$question&quot; --rag_agent --top-k 10</code></pre>
+</details>
+<div class="col-meta">
+<span>tokens ~35152</span>
+<span>chunks 63</span>
+<span>answer 6925 chars</span>
+<span>iterations 11</span>
+<span>completed</span>
+</div>
+<h3>Answer</h3>
+<pre class="answer">## Key Findings
+
+1. The best workflow for agentic feature development starts with a heavy upfront spec and lightweight design document (LDD), then lets the agent execute while engineers review the big picture [1].
+2. AI engineers should give agents problems, not tasks — describing the goal and letting the agent figure out which skills to invoke produces better results [1].
+3. The agentic coding loop — build, run code, evaluate the output, and iterate — works so well because compilers and type checkers provide the perfect built-in feedback environment [2].
+4. The three core building blocks for agentic systems in 2026 are an agent runtime (to manage the loop and context), tools, and a computer/sandbox file system for persistence and code execution [2].
+5. Human-in-the-loop oversight is essential because agents can regress and over-optimize; humans must decide when to stop and which version to keep [3].
+6. Agentic code review should be used for the tedious, opinionated checks (variable names, style) that engineers dislike, freeing them to focus on system design and architecture [1].
+7. The end-to-end development lifecycle for agentic systems follows three phases: build, optimize, then deploy and govern [4].
+8. Evaluation must shift from &quot;vibe checking&quot; to systematic experiments — using datasets, traces, and regression evals to confirm improvements without breaking existing behavior [5].
+
+## Finding 1: Start with a Spec, Not Code
+
+The most effective teams build features by being &quot;really heavy on the spec, really heavy on the LDD, the lightweight design document where you figure out how we&#x27;re going to build this&quot; first [1]. After that spec is established, the agent executes the implementation. Engineers still stay involved, but they focus on the big picture — agents handle the mechanical coding work [1]. The recurring principle is to &quot;make it easy for coding agents&quot; by building your system in small, accessible pieces — small CLIs, modular tools, and clear interfaces — rather than complex monolithic architectures [4].
+
+## Finding 2: Give Agents Problems, Not Tasks
+
+A key shift in effective agentic coding is moving from &quot;run this skill to do a thing&quot; toward &quot;describing the problem or describing the task and let the agent figure out what skills to invoke and what to do here&quot; [1]. In one example from the corpus, an engineer opened Claude Code during a security incident without even knowing a dedicated skill existed for data breach policies — the agent automatically discovered and used the right skill on its own [1]. This pattern of progressive discovery is also the core design of &quot;skills&quot;: folders containing instructions, scripts, and resources that agents discover via front-matter name and description fields, deciding when to load them based on context [2].
+
+## Finding 3: The Build-Run-Evaluate-Iterate Loop is the Core Workflow
+
+The fundamental agentic coding workflow is a tight feedback loop: the agent builds code, runs it, evaluates the output, and iterates [2]. This has proven especially powerful for coding because &quot;we&#x27;ve got compilers, we&#x27;ve got type checkers — it is the perfect environment for that ripple loop&quot; [2]. One effective pattern within this loop is having the agent create a plan file at the start of each session — with the objective at the top and check-off items below — so it stays on track rather than losing context in an ever-growing conversation window [3]. Additionally, when the agent encounters repeatable tasks, it should turn them into reusable scripts and inject them into a memory file, building its own toolkit over time [2].
+
+## Finding 4: Three Core Building Blocks — Runtime, Tools, and a Computer
+
+The recommended architecture for agentic systems rests on three building blocks: an agent runtime (the harness managing the tool loop and context across turns), tools (custom, provider-defined, or provider-executed), and a computer or sandbox file system for the agent to persist state, store scratch plans, and execute code [2]. The file system pattern proved transformative in practice — one internal agent went from hallucinated answers to reliably completing entire tasks once it had access to a sandbox with a plan file, a research directory, and instructions to follow the plan to the letter [3]. Memory itself is best implemented as files stored in that sandbox — &quot;core memories.md&quot; injected into the system prompt, conversation logs stored as JSON lines — because agents are naturally good at using bash commands like find, ls, and grep to navigate them [3].
+
+## Finding 5: Human-in-the-Loop Prevents Over-Optimization Regression
+
+When agents autonomously optimize prompts and code, they can regress — improving one metric while breaking something else. In one example, an agent iterated through versions 1 through 10, seeing scores bounce between 5 and 8, and eventually reported that &quot;version five is the best&quot; [3]. At this point, &quot;human in the loop makes a difference&quot; because the human can say &quot;you need to stop&quot; and pick the right version [3]. The broader principle is that agents should be used for the code reviews &quot;that engineers hate getting any feedback from&quot; — variable names, style violations — removing the emotional aspect and letting humans focus on design-level decisions [1].
+
+## Finding 6: Systematic Evaluation Replaces Vibes-Based Testing
+
+A critical part of the agentic workflow is moving away from &quot;vibe checking&quot; — running the agent on a couple of examples and eyeballing the result — toward systematic experiments using datasets and regression evals [5]. After capturing traces, finding failures, and reading explanations, engineers need to know: &quot;How do you know that your fix actually worked? How do you know that you didn&#x27;t break something that was working before?&quot; [5] The recommended approach is to start small with one capability eval, get it reliable, then add LM-as-a-judge evals one at a time, turning passing capability evals into regression evals that guard against future breakage [5]. This closes the full loop: instrument → trace → eval → annotate → analyze → improve → repeat [5].
+
+## Finding 7: The Build-Optimize-Deploy-Govern Lifecycle
+
+The end-to-end development lifecycle for agentic systems follows three phases: build, optimize, and deploy-and-govern [4]. In the build phase, engineers start with a simple agent (model + instructions), add function tools (e.g., flight search, hotel search, car search), then compose specialized agents into a workflow orchestrator — for example, a concierge agent that coordinates a flight agent, hotel agent, and car rental agent [4]. The optimize phase uses tracing and evaluation to pinpoint which sub-agent is underperforming and at what cost, so only the problematic agent needs retuning [4]. This composability is essential: complex features emerge from composing many small, specialized agents rather than one monolithic agent doing everything [4].</pre>
+<details><summary>References (5)</summary><ul><li>[1] <a href="https://www.youtube.com/watch?v=vAIDdLKB6-w&amp;t=311s">open at timestamp</a> <span class="metric">vAIDdLKB6-w</span></li><li>[2] <a href="https://www.youtube.com/watch?v=Xfl50508LZM&amp;t=1486s">open at timestamp</a> <span class="metric">Xfl50508LZM</span></li><li>[3] <a href="https://www.youtube.com/watch?v=iOXM3zE-2dk&amp;t=2218s">open at timestamp</a> <span class="metric">iOXM3zE-2dk</span></li><li>[4] <a href="https://www.youtube.com/watch?v=wflNENRSUb4&amp;t=3945s">open at timestamp</a> <span class="metric">wflNENRSUb4</span></li><li>[5] <a href="https://www.youtube.com/watch?v=vAIDdLKB6-w&amp;t=161s">open at timestamp</a> <span class="metric">vAIDdLKB6-w</span></li></ul></details>
+</section>
+</div>
+</main>
+</body>
+</html>

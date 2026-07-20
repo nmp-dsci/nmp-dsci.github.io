@@ -1,0 +1,15 @@
+<a class="card" href="{{ include.project.url | relative_url }}"
+   data-tags="{% for t in include.project.tags %}{{ t | slugify }} {% endfor %}">
+  <div class="card-top">
+    <h3>{{ include.project.title }}</h3>
+    <div class="card-metric">
+      <span class="met-n">{{ include.project.metric }}</span>
+      <span class="met-l">{{ include.project.metric_label }}</span>
+    </div>
+  </div>
+  <p class="card-summary">{{ include.project.summary }}</p>
+  <div class="card-foot">
+    <span class="card-tags">{% for t in include.project.tags %}<span class="tag">{{ t }}</span>{% endfor %}</span>
+    <span class="card-go">Case study →</span>
+  </div>
+</a>

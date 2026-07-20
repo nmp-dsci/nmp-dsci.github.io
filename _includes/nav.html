@@ -1,0 +1,29 @@
+<header class="nav">
+  <div class="nav-inner">
+    <a class="brand" href="{{ '/' | relative_url }}" aria-label="{{ site.data.site.name }} — home">
+      <span class="wordmark">nathan<span class="cursor" aria-hidden="true"></span>phillips</span>
+      <span class="brand-role">// applied-ai</span>
+    </a>
+    <nav class="nav-links">
+      <a href="{{ '/#work' | relative_url }}">Work</a>
+      <a href="{{ '/about/' | relative_url }}">About</a>
+      <a href="{{ site.data.site.github }}" target="_blank" rel="noopener">GitHub</a>
+      {% if site.data.site.linkedin != "" %}<a href="{{ site.data.site.linkedin }}" target="_blank" rel="noopener">LinkedIn</a>{% endif %}
+      {% if site.data.site.resume != "" %}<a class="nav-cta" href="{{ site.data.site.resume | relative_url }}">Résumé</a>{% endif %}
+      <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Toggle dark mode">☾</button>
+    </nav>
+  </div>
+</header>
+<script>
+  (function(){
+    var b=document.getElementById('theme-toggle'),r=document.documentElement;
+    function paint(){b.textContent=r.getAttribute('data-theme')==='dark'?'☀':'☾'}
+    b.addEventListener('click',function(){
+      var next=r.getAttribute('data-theme')==='dark'?'light':'dark';
+      r.setAttribute('data-theme',next);
+      try{localStorage.setItem('theme',next)}catch(e){}
+      paint();
+    });
+    paint();
+  })();
+</script>
