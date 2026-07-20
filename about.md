@@ -20,8 +20,7 @@ actually works — and I treat the eval as part of the product, not an afterthou
 ## Links
 
 - GitHub — [github.com/nmp-dsci](https://github.com/nmp-dsci)
-- LinkedIn — [linkedin.com/in/nmp-dsci](https://www.linkedin.com/in/nmp-dsci)
-- Résumé — [download PDF](/assets/resume.pdf)
+- LinkedIn — [linkedin.com/in/nmp-dsci](https://www.linkedin.com/in/nmp-dsci) — the fastest way to reach me directly
 
 *This site itself is a Jekyll collection — every case study is one Markdown file,
 version-controlled and rebuilt automatically on merge.*
