@@ -9,8 +9,9 @@ and served by GitHub Pages, showcasing shipped agent/RAG/eval systems as case st
   home-page card (title, summary, metric, tags, skills) and the project-page
   layout (stack, links, media, evidence). Add a project by dropping a new file
   here — no template or code changes needed.
-- `_data/site.yml` — name, role, tagline, and the GitHub/LinkedIn/résumé links
-  used in the nav, footer, and About page.
+- `_data/site.yml` — name, role, tagline, and the GitHub/LinkedIn links used
+  in the nav, footer, and About page (LinkedIn is the sole contact/résumé
+  channel — no separate résumé link/file).
 - `_data/skills.yml` — the AI-engineering skills taxonomy (with market-frequency
   labels) used to render each project's "skills demonstrated" chip row.
 - `_layouts/` — `default` (shell + nav/footer/theme toggle), `home` (capability
