@@ -1,0 +1,10 @@
+<footer class="footer">
+  <div class="footer-inner">
+    <span>{{ site.data.site.name }} · {{ site.data.site.role }}</span>
+    <span class="footer-links">
+      <a href="{{ site.data.site.github }}" target="_blank" rel="noopener">GitHub</a>
+      {% if site.data.site.linkedin != "" %}<a href="{{ site.data.site.linkedin }}" target="_blank" rel="noopener">LinkedIn</a>{% endif %}
+      {% if site.data.site.resume != "" %}<a href="{{ site.data.site.resume | relative_url }}">Résumé</a>{% endif %}
+    </span>
+  </div>
+</footer>

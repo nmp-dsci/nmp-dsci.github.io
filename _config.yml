@@ -1,0 +1,26 @@
+title: Nathan Phillips — Applied AI
+description: >-
+  Applied-AI engineer — agents, RAG systems and the evals that prove they work.
+url: "https://nmp-dsci.github.io"
+baseurl: ""
+
+collections:
+  projects:
+    output: true
+    permalink: /projects/:name/
+
+defaults:
+  - scope:
+      path: ""
+      type: projects
+    values:
+      layout: project
+
+markdown: kramdown
+
+exclude:
+  - vendor
+  - .lavish
+  - Gemfile
+  - Gemfile.lock
+  - readme.md

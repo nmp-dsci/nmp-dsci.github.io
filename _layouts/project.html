@@ -1,0 +1,83 @@
+---
+layout: default
+---
+<article class="study">
+  <div class="study-inner">
+    <p class="crumb"><a href="{{ '/#work' | relative_url }}">← All systems</a></p>
+    <p class="kicker">{% for t in page.tags %}{{ t }}{% unless forloop.last %} · {% endunless %}{% endfor %} · case study</p>
+    <h1>{{ page.title }}</h1>
+    <p class="study-summary">{{ page.summary }}</p>
+
+    {% if page.skills %}
+    <div class="skillrow" aria-label="AI-engineering skills demonstrated">
+      <span class="skillrow-k">Skills demonstrated</span>
+      {% for s in page.skills %}{% assign sk = site.data.skills[s] %}
+      <span class="skill"{% if sk.market %} title="Asked for in {{ sk.market }} of AI-engineer roles"{% endif %}>{{ sk.label | default: s }}{% if sk.market %}<em>{{ sk.market }}</em>{% endif %}</span>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="study-cols">
+      <div class="study-main">
+        <div class="mediaframe">
+          {% if page.media.walkthrough %}
+          <video class="walkthrough" controls preload="metadata"
+            {% if page.media.poster %}poster="{{ page.media.poster | relative_url }}"{% endif %}
+            src="{{ page.media.walkthrough | relative_url }}"></video>
+          {% else %}
+          <div class="media-placeholder" role="img" aria-label="App walkthrough video coming soon">
+            <span class="mp-label">app walkthrough</span>
+            <span class="mp-play" aria-hidden="true">▶</span>
+            <span class="mp-note">video coming — being recorded</span>
+          </div>
+          {% endif %}
+        </div>
+
+        <div class="study-body">
+          {{ content }}
+
+          {% if page.evidence %}
+          <h2>Evidence</h2>
+          {% for ev in page.evidence %}
+          <figure class="evidence">
+            {% if ev.type == "dashboard" %}
+            <div class="dash-embed"><iframe src="{{ ev.src | relative_url }}" loading="lazy" title="{{ ev.caption }}"></iframe></div>
+            <figcaption>{{ ev.caption }} · <a href="{{ ev.src | relative_url }}" target="_blank" rel="noopener">open full-screen ↗</a></figcaption>
+            {% else %}
+            <img src="{{ ev.src | relative_url }}" alt="{{ ev.caption }}" loading="lazy">
+            <figcaption>{{ ev.caption }}</figcaption>
+            {% endif %}
+          </figure>
+          {% endfor %}
+          {% endif %}
+        </div>
+      </div>
+
+      <aside class="study-facts">
+        <div class="fact-box">
+          <div class="fact-metric">
+            <span class="met-n">{{ page.metric }}</span>
+            <span class="met-l">{{ page.metric_label }}</span>
+          </div>
+          {% if page.stack %}
+          <div class="fact-row"><span class="fact-k">Stack</span>
+            <span>{% for s in page.stack %}{{ s }}{% unless forloop.last %} · {% endunless %}{% endfor %}</span></div>
+          {% endif %}
+          {% if page.links.repo %}
+          <div class="fact-row"><span class="fact-k">Code</span>
+            <a href="{{ page.links.repo }}" target="_blank" rel="noopener">Repository ↗</a></div>
+          {% endif %}
+          {% if page.links.demo %}
+          <div class="fact-row"><span class="fact-k">Demo</span>
+            <a href="{{ page.links.demo }}" target="_blank" rel="noopener">Live demo ↗</a></div>
+          {% endif %}
+        </div>
+        {% if page.media.reel and page.media.reel != "planned" %}
+        <video class="reel" controls preload="metadata" src="{{ page.media.reel | relative_url }}"></video>
+        {% elsif page.media.reel == "planned" %}
+        <div class="reel reel-placeholder"><span>9:16 reel<br>coming</span></div>
+        {% endif %}
+      </aside>
+    </div>
+  </div>
+</article>

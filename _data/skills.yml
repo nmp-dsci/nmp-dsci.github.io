@@ -1,0 +1,25 @@
+# AI-engineering skills taxonomy — one source of truth for every skill chip on the site.
+# Labels use the market vocabulary from ai-engineer-fit/ai-engineer-skills-analysis.md
+# (~25 AU AI Engineer postings, March 2026). `market` = share of postings asking for it.
+python:            {label: "Python",               market: "100%"}
+rag:               {label: "RAG",                  market: "88%"}
+llms:              {label: "LLMs",                 market: "88%"}
+agentic-ai:        {label: "Agentic AI",           market: "80%"}
+prompt-engineering: {label: "Prompt Engineering",  market: "72%"}
+docker:            {label: "Docker",               market: "64%"}
+vector-databases:  {label: "Vector Databases",     market: "56%"}
+mlops:             {label: "MLOps",                market: "56%"}
+sql:               {label: "SQL",                  market: "48%"}
+embeddings:        {label: "Embeddings",           market: "48%"}
+model-evaluation:  {label: "Model Evaluation",     market: "40%"}
+fine-tuning:       {label: "Fine-tuning",          market: "36%"}
+typescript:        {label: "TypeScript",           market: "32%"}
+data-pipelines:    {label: "Data Pipelines / ETL", market: "32%"}
+responsible-ai:    {label: "Responsible AI",       market: "32%"}
+api-design:        {label: "API / Microservices",  market: "32%"}
+multi-agent:       {label: "Multi-agent Systems"}
+vision:            {label: "Vision / Multimodal"}
+governance:        {label: "Governance & RBAC"}
+prompt-versioning: {label: "Prompt Versioning"}
+product-ui:        {label: "Product UI"}
+data-viz:          {label: "Data Visualization"}
