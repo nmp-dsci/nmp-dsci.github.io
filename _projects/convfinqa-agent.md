@@ -20,6 +20,8 @@ skills_detail:
     proof: v2's prompts came from GEPA optimisation (DSPy) — 1,964 metric calls moved the validation baseline 56.5 → 65.3 (+8.8 pts) before the held-out test confirmed the gain (runs/gepa_real_20260502/dspy_summary.json).
   - skill: llms
     proof: Deliberate two-tier DeepSeek split — every production stage runs on flash; the pro tier is reserved for the diagnose→propose→verify optimisation harness where reasoning depth pays (backends/pydantic.py).
+links:
+  repo: https://github.com/nmp-dsci/ConvFinQA-agent
 media:
   reel: planned
 ---

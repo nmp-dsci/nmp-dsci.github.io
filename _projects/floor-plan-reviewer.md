@@ -20,6 +20,8 @@ skills_detail:
     proof: FastAPI review/edit endpoints stream agent progress over SSE into the React + d3 canvas workspace (backend-api).
   - skill: python
     proof: Everything after the LLM is deterministic and local — geometry validation, compliance flags, and the Pillow renderers that draw delta overlays and listing-style redraws (render_overlay.py, render_plan.py).
+links:
+  repo: https://github.com/nmp-dsci/floor-plan-reviewer
 media:
   walkthrough: /assets/video/floor-plan-reviewer/walkthrough.mp4
   poster: /assets/img/floor-plan/app-review.png

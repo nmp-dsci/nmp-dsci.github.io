@@ -22,6 +22,8 @@ skills_detail:
     proof: Golden Examples are authored inside the product; deterministic graders plus a cross-family LLM judge — Claude grading the DeepSeek agent against a frozen rubric (agent/eval_judge.py).
   - skill: product-ui
     proof: React 19 product with 10+ screens in light and dark, plus a three-rung Slack integration — webhook, slash command, and an @mention bot that answers in-thread (frontend/, routers/integrations.py).
+links:
+  repo: https://github.com/nmp-dsci/data-qa-agent
 media:
   reel: planned
 ---

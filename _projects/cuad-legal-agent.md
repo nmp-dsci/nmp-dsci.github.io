@@ -20,6 +20,8 @@ skills_detail:
     proof: v1 → v2 → autoresearch prompt generations compared on the identical grid, with an autonomous prompt-optimisation loop (prompts/system_prompts_v2.py, autoresearch.py).
   - skill: data-pipelines
     proof: Chunk → index → coverage → answer pipeline with persistent caches, resumable incremental JSONL results, and a no-LLM dry-run mode (outputs/rag_cache/, README).
+links:
+  repo: https://github.com/nmp-dsci/CUAD-agent
 media:
   reel: planned
 ---

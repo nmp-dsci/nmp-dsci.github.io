@@ -22,6 +22,8 @@ skills_detail:
     proof: A LangGraph ReAct agent decides its own retrieval calls — and live runs show it costing 3–5× single-hop tokens with no measured quality gain, a caution the dashboard makes visible (src/agents/rag_agent.py, dashboard/chat_history.json).
   - skill: llms
     proof: DeepSeek flash behind an OpenAI-compatible client — the LLM is the only remote dependency in the stack (src/config.py).
+links:
+  repo: https://github.com/nmp-dsci/transcript-rag-agent
 media:
   walkthrough: /assets/video/transcript-rag/walkthrough.mp4
   captions: /assets/video/transcript-rag/walkthrough.vtt
