@@ -4,8 +4,8 @@ summary: A GAN-inspired coding harness — planner, generator and evaluator agen
 tags: [Multi-agent, Agents]
 metric: "2 SDKs"
 metric_label: "Claude + Codex, same harness"
-featured: true
-order: 6
+featured: false
+order: 9
 stack: [TypeScript + Bun, Claude Agent SDK, OpenAI Codex SDK, File-mediated orchestration]
 skills: [typescript, multi-agent, agentic-ai, llms, prompt-engineering, model-evaluation]
 links:
