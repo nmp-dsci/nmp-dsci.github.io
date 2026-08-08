@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Admin Runbook — Backend Architecture</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F6F6F3; --panel:#FFFFFF; --ink:#16181B; --ink-soft:#4A4F55;
+    --faint:#8A9099; --line:#E3E4DF; --line-2:#D3D5CE;
+    --ui:#4B4DED; --ui-soft:#ECECFC; --good:#1E845F; --good-soft:#E7F3ED;
+    --warn:#B26A12; --warn-soft:#F7EFE2;
+    --shadow:0 1px 2px rgba(20,24,28,.04),0 8px 24px -12px rgba(20,24,28,.14);
+    --mono:'JetBrains Mono',ui-monospace,monospace;
+    --sans:'Inter',system-ui,sans-serif;
+    --display:'Space Grotesk','Inter',sans-serif;
+  }
+  *,*::before,*::after{box-sizing:border-box;min-width:0}
+  html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);
+    line-height:1.55;font-size:16px;letter-spacing:-.005em;
+    background-image:radial-gradient(circle at 1px 1px,rgba(20,24,28,.045) 1px,transparent 0);
+    background-size:26px 26px}
+  :where(p,h1,h2,h3,li,td,th,figcaption){overflow-wrap:anywhere}
+  .wrap{max-width:1120px;margin:0 auto;padding:40px 22px 120px}
+  .eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--faint);margin:0 0 10px}
+  h1{font-family:var(--display);font-weight:700;font-size:clamp(30px,5vw,50px);
+    line-height:1.14;letter-spacing:-.025em;margin:0 0 10px;padding:.04em 0 .08em}
+  h1 em{font-style:normal;color:var(--ui)}
+  .lead{font-size:clamp(15px,2vw,18px);color:var(--ink-soft);max-width:72ch;margin:0}
+  .rule{height:1px;background:var(--line);margin:40px 0}
+  section{scroll-margin-top:20px}
+  .sec-head{display:flex;gap:14px;align-items:baseline;flex-wrap:wrap;margin:0 0 6px}
+  .sec-num{font-family:var(--mono);font-size:12px;color:var(--ui);font-weight:600;
+    border:1px solid var(--line-2);border-radius:6px;padding:3px 8px;white-space:nowrap}
+  h2{font-family:var(--display);font-weight:600;font-size:clamp(21px,3vw,27px);
+    letter-spacing:-.02em;margin:0;line-height:1.25}
+  .sec-sub{color:var(--ink-soft);margin:8px 0 24px;max-width:76ch;font-size:15px}
+  code{font-family:var(--mono);font-size:.92em;background:var(--ui-soft);color:#3634c7;
+    padding:1px 5px;border-radius:5px}
+
+  /* mental-model tiles */
+  .tiles{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr))}
+  .tile{background:var(--panel);border:1px solid var(--line);border-radius:12px;
+    padding:16px;box-shadow:var(--shadow)}
+  .tile .k{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;
+    color:var(--faint);margin:0 0 6px}
+  .tile h3{font-family:var(--display);font-size:16px;margin:0 0 5px;line-height:1.3}
+  .tile p{margin:0;font-size:13px;color:var(--ink-soft)}
+
+  /* mermaid panel */
+  .diagram{background:var(--panel);border:1px solid var(--line);border-radius:14px;
+    box-shadow:var(--shadow);padding:18px;overflow-x:auto}
+  .mermaid{display:flex;justify-content:center;min-height:120px}
+
+  /* file tree */
+  .tree{background:var(--panel);border:1px solid var(--line);border-radius:14px;
+    box-shadow:var(--shadow);overflow:hidden}
+  .trow{display:flex;gap:14px;align-items:baseline;padding:9px 18px;border-top:1px solid var(--line);
+    flex-wrap:wrap}
+  .trow:first-child{border-top:0}
+  .trow.head{background:#FBFBFA}
+  .tpath{font-family:var(--mono);font-size:12.5px;white-space:pre;flex:0 1 auto}
+  .trole{font-size:12.5px;color:var(--ink-soft);flex:1 1 220px}
+  .tag{font-family:var(--mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;
+    border-radius:999px;padding:2px 9px;white-space:nowrap;flex:0 0 auto}
+  .tag.content{background:var(--good-soft);color:#166a4c}
+  .tag.design{background:var(--ui-soft);color:#3634c7}
+  .tag.rare{background:var(--warn-soft);color:#8a5410}
+  .tag.auto{background:#EFEFED;color:var(--faint)}
+  .legend{display:flex;gap:10px;flex-wrap:wrap;margin:0 0 12px;font-size:12.5px;color:var(--ink-soft);align-items:center}
+  .star{color:var(--ui);font-weight:700}
+
+  /* code panels (@pierre/diffs mounts) */
+  .codewrap{background:var(--panel);border:1px solid var(--line);border-radius:14px;
+    box-shadow:var(--shadow);overflow:hidden}
+  .codewrap .cap{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;
+    padding:11px 16px;border-bottom:1px solid var(--line);background:#FBFBFA}
+  .codewrap .cap b{font-family:var(--mono);font-size:12.5px;font-weight:600}
+  .codewrap .cap span{font-size:12.5px;color:var(--ink-soft)}
+  .codebody{overflow-x:auto}
+
+  /* runbook cards */
+  .steps{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));align-items:start}
+  .step{background:var(--panel);border:1px solid var(--line);border-radius:12px;
+    box-shadow:var(--shadow);padding:16px;display:flex;flex-direction:column;gap:8px}
+  .step .n{font-family:var(--mono);font-size:11px;color:var(--ui);font-weight:600}
+  .step h3{font-family:var(--display);font-size:16px;margin:0;line-height:1.3}
+  .step p{margin:0;font-size:13px;color:var(--ink-soft)}
+
+  /* alt edit paths */
+  .paths{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(min(100%,270px),1fr));margin-top:14px}
+  .path{border:1px dashed var(--line-2);border-radius:12px;padding:14px 16px;background:#FCFCFB}
+  .path h4{font-family:var(--display);font-size:14.5px;margin:0 0 4px;line-height:1.3}
+  .path p{margin:0;font-size:12.5px;color:var(--ink-soft)}
+
+  /* task table */
+  .tblwrap{overflow-x:auto;background:var(--panel);border:1px solid var(--line);
+    border-radius:14px;box-shadow:var(--shadow)}
+  table.tasks{border-collapse:collapse;width:100%;font-size:13.5px;min-width:560px}
+  .tasks th{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--faint);text-align:left;font-weight:500;padding:12px 16px;border-bottom:1px solid var(--line);background:#FBFBFA}
+  .tasks td{padding:11px 16px;border-bottom:1px solid var(--line);vertical-align:top}
+  .tasks tr:last-child td{border-bottom:0}
+  .tasks td:first-child{font-weight:600;font-family:var(--display);font-size:13.5px}
+  .tasks .m{font-family:var(--mono);font-size:12px;background:#F3F3F1;border-radius:5px;padding:1px 6px;white-space:nowrap}
+  .tasks td small{display:block;color:var(--faint);font-size:11.5px;margin-top:2px}
+
+  .facts{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr))}
+  .fact{background:var(--panel);border-left:3px solid var(--good);border-radius:0 10px 10px 0;
+    padding:12px 15px;font-size:13px;color:var(--ink-soft);box-shadow:var(--shadow)}
+  .fact b{color:var(--ink)}
+
+  .foot{margin-top:60px;font-family:var(--mono);font-size:11.5px;color:var(--faint);
+    display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;border-top:1px solid var(--line);padding-top:16px}
+  a{color:var(--ui);text-decoration:none;border-bottom:1px solid rgba(75,77,237,.3)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <p class="eyebrow">nmp-dsci.github.io · build console · admin runbook</p>
+  <h1>You run it with <em>one command.</em><br>You update it by <em>editing one file.</em></h1>
+  <p class="lead">This documents the recommended backend from the options page — <b>Markdown per project</b> (Jekyll collection). There is no server, no database, no deploy pipeline to babysit: <b>the git repo is the backend</b>, and GitHub Pages rebuilds the site automatically every time <code>master</code> changes. If you pick a different backend on the options page, tell me and I'll redraw this.</p>
+
+  <div class="rule"></div>
+
+  <section>
+    <div class="sec-head"><span class="sec-num">00</span><h2>The mental model — four things, cleanly separated</h2></div>
+    <div class="tiles">
+      <div class="tile"><p class="k">Content · you, often</p><h3>_projects/*.md</h3>
+        <p>One Markdown file per project. Front-matter feeds the cards and grid; the body is the case-study page. Adding a project = adding a file.</p></div>
+      <div class="tile"><p class="k">Look · rarely</p><h3>_layouts/ · _includes/ · assets/css</h3>
+        <p>Templates and styles every project shares. Restyle here once, every page changes. You mostly never touch these — or ask me to.</p></div>
+      <div class="tile"><p class="k">Builder · automatic</p><h3>GitHub Pages</h3>
+        <p>Runs Jekyll on every push to <code>master</code> and publishes the result. Nothing to configure after the first setup, nothing to maintain.</p></div>
+      <div class="tile"><p class="k">Production · = master</p><h3>nmp-dsci.github.io</h3>
+        <p>Whatever is on <code>master</code> is the live site, usually within a minute of merging. Branches (like <code>portfolio-rebuild</code>) are free staging.</p></div>
+    </div>
+  </section>
+
+  <div class="rule"></div>
+
+  <section>
+    <div class="sec-head"><span class="sec-num">01</span><h2>The update loop</h2></div>
+    <p class="sec-sub">Two ways in — edit files yourself, or tell me and review the result live — both funnel through the same preview → merge → live path.</p>
+    <div class="diagram">
+      <pre class="mermaid">
+flowchart TD
+  A["You edit a file directly<br>(local editor, or github.com from any device)"]
+  B["You tell me the change —<br>I edit, you review a live page like this one"]
+  P["Local preview<br>bundle exec jekyll serve --livereload<br>http://localhost:4000"]
+  C["git commit + push<br>(branch: portfolio-rebuild)"]
+  M["Merge to master"]
+  G["GitHub Pages builds Jekyll<br>(automatic, ~1 min)"]
+  L["Live at nmp-dsci.github.io"]
+  A --> P
+  B --> P
+  P -- "looks right" --> C
+  P -. "tweak again" .-> A
+  C --> M --> G --> L
+      </pre>
+    </div>
+  </section>
+
+  <div class="rule"></div>
+
+  <section>
+    <div class="sec-head"><span class="sec-num">02</span><h2>The file tree — what you touch, what you don't</h2></div>
+    <div class="legend">
+      <span class="tag content">content — edit often</span>
+      <span class="tag design">design — edit to restyle</span>
+      <span class="tag rare">setup — edit once, then rarely</span>
+      <span class="tag auto">auto — never touch</span>
+    </div>
+    <div class="tree">
+      <div class="trow head"><span class="tpath">nmp-dsci.github.io/</span><span class="trole">the repo <b>is</b> the whole backend</span></div>
+      <div class="trow"><span class="tpath">├─ _projects/ <span class="star">★</span></span><span class="trole">one <code>.md</code> per project — the portfolio itself. <code>data-pilot.md</code>, <code>floor-plan.md</code>, <code>convfinqa.md</code>, <code>cuad.md</code>, <code>transcript-rag.md</code>, <code>adversarial-dev.md</code></span><span class="tag content">content</span></div>
+      <div class="trow"><span class="tpath">├─ _data/site.yml</span><span class="trole">your name, bio line, GitHub / LinkedIn links, résumé path — one small file</span><span class="tag content">content</span></div>
+      <div class="trow"><span class="tpath">├─ about.md</span><span class="trole">the /about page body</span><span class="tag content">content</span></div>
+      <div class="trow"><span class="tpath">├─ assets/img/&lt;slug&gt;/</span><span class="trole">screenshots per project — drop files in, reference from front-matter</span><span class="tag content">content</span></div>
+      <div class="trow"><span class="tpath">├─ assets/video/</span><span class="trole">walkthrough MP4/WebM (&lt;100&nbsp;MB each), served by Pages as-is</span><span class="tag content">content</span></div>
+      <div class="trow"><span class="tpath">├─ assets/resume.pdf</span><span class="trole">the downloadable résumé — replace the file to update it</span><span class="tag content">content</span></div>
+      <div class="trow"><span class="tpath">├─ _layouts/</span><span class="trole"><code>default.html</code> (page chrome), <code>home.html</code>, <code>project.html</code> (the case-study skeleton all projects render through)</span><span class="tag design">design</span></div>
+      <div class="trow"><span class="tpath">├─ _includes/</span><span class="trole">nav, footer, project-card, metric-chip partials reused across pages</span><span class="tag design">design</span></div>
+      <div class="trow"><span class="tpath">├─ assets/css/</span><span class="trole">site styles — change once, every page updates</span><span class="tag design">design</span></div>
+      <div class="trow"><span class="tpath">├─ index.html</span><span class="trole">home page — a loop over the projects collection, almost no content of its own</span><span class="tag design">design</span></div>
+      <div class="trow"><span class="tpath">├─ _config.yml</span><span class="trole">site title, URL, declares the <code>projects</code> collection — set up once</span><span class="tag rare">setup</span></div>
+      <div class="trow"><span class="tpath">├─ Gemfile</span><span class="trole">pins the <code>github-pages</code> gem so local preview matches production exactly</span><span class="tag rare">setup</span></div>
+      <div class="trow"><span class="tpath">└─ _site/</span><span class="trole">Jekyll's generated output — local only, gitignored, regenerated on every build</span><span class="tag auto">auto</span></div>
+    </div>
+  </section>
+
+  <div class="rule"></div>
+
+  <section>
+    <div class="sec-head"><span class="sec-num">03</span><h2>Anatomy of a project file</h2></div>
+    <p class="sec-sub">Everything about one project lives in one file. The front-matter (between the <code>---</code> fences) is structured data the templates read — card metric, tags, ordering, media paths. The Markdown body below it becomes the case-study page. Change a field, save, done.</p>
+    <div class="codewrap">
+      <div class="cap"><b>_projects/data-pilot.md</b><span>· the only file you touch to change everything about Data Pilot</span></div>
+      <div class="codebody" id="file-project"></div>
+    </div>
+  </section>
+
+  <div class="rule"></div>
+
+  <section>
+    <div class="sec-head"><span class="sec-num">04</span><h2>Runbook — the three commands that matter</h2></div>
+    <div class="steps">
+      <div class="step"><span class="n">once, ever</span><h3>Set up local preview</h3>
+        <p>Needs Ruby ≥ 3.1 (macOS system Ruby is too old — <code>rbenv</code> shown). Skip entirely if you're happy previewing via branch + editing on github.com or through me.</p></div>
+      <div class="step"><span class="n">each edit session</span><h3>Run the site locally</h3>
+        <p>One command. Serves at <code>http://127.0.0.1:4000</code>, rebuilds and reloads the browser on every save.</p></div>
+      <div class="step"><span class="n">to publish</span><h3>Commit → merge to master</h3>
+        <p>Push to <code>portfolio-rebuild</code> to stage; merging to <code>master</code> <b>is</b> the deploy. Pages rebuilds automatically — no other action exists.</p></div>
+    </div>
+    <div class="codewrap" style="margin-top:14px">
+      <div class="cap"><b>runbook.sh</b><span>· the full admin surface, top to bottom</span></div>
+      <div class="codebody" id="file-runbook"></div>
+    </div>
+    <div class="paths">
+      <div class="path"><h4>No-setup path</h4><p>Edit <code>_projects/*.md</code> directly on github.com from any device — commit in the browser, Pages rebuilds. No Ruby, no clone.</p></div>
+      <div class="path"><h4>Agent path</h4><p>Tell me the change in plain English. I edit, serve you a live preview to annotate (this loop), then commit what you approve.</p></div>
+      <div class="path"><h4>Safety net</h4><p>Pages publishes <code>master</code> only — anything on a branch is invisible to visitors, and <code>git revert</code> un-ships a bad merge in seconds.</p></div>
+    </div>
+  </section>
+
+  <div class="rule"></div>
+
+  <section>
+    <div class="sec-head"><span class="sec-num">05</span><h2>"I want to…" — the admin cheat sheet</h2></div>
+    <div class="tblwrap">
+      <table class="tasks">
+        <thead><tr><th>I want to…</th><th>Touch this</th><th>Then</th></tr></thead>
+        <tbody>
+          <tr><td>Add a new project</td><td>add <span class="m">_projects/&lt;slug&gt;.md</span> + images in <span class="m">assets/img/&lt;slug&gt;/</span><small>copy an existing file as the template</small></td><td>commit → merge</td></tr>
+          <tr><td>Rewrite a case study</td><td>that project's <span class="m">.md</span> body</td><td>preview → merge</td></tr>
+          <tr><td>Change a card's headline metric</td><td><span class="m">metric:</span> field in that file's front-matter</td><td>merge</td></tr>
+          <tr><td>Reorder the home grid</td><td><span class="m">order:</span> numbers across project files</td><td>merge</td></tr>
+          <tr><td>Hide a project without deleting it</td><td><span class="m">published: false</span> in its front-matter</td><td>merge</td></tr>
+          <tr><td>Update bio, links or résumé</td><td><span class="m">_data/site.yml</span> · replace <span class="m">assets/resume.pdf</span></td><td>merge</td></tr>
+          <tr><td>Restyle the whole site</td><td><span class="m">assets/css/</span> + <span class="m">_layouts/</span><small>or describe the change to me</small></td><td>preview → merge</td></tr>
+          <tr><td>Experiment without risk</td><td>any branch — visitors never see it</td><td>merge only when happy</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <div class="rule"></div>
+
+  <section>
+    <div class="sec-head"><span class="sec-num">06</span><h2>Facts worth pinning</h2></div>
+    <div class="facts">
+      <div class="fact"><b>No CI to maintain.</b> GitHub Pages runs Jekyll itself on every push to master — the build step is GitHub's problem, permanently.</div>
+      <div class="fact"><b>Merge = deploy.</b> There is no second publish action. If a page looks wrong live, check the repo's Pages/Actions tab for the build, or just revert the merge.</div>
+      <div class="fact"><b>Content never breaks design.</b> Write-ups are Markdown; templates render them. You cannot corrupt the site's look from a content edit.</div>
+      <div class="fact"><b>Everything is versioned.</b> Every write-up edit is a commit — full history, diffs, and rollback for free, because the backend is git.</div>
+    </div>
+  </section>
+
+  <div class="foot">
+    <span>nmp-dsci.github.io · build console · admin runbook</span>
+    <span>backend: Jekyll collection (recommended default) · annotate anything to change it</span>
+  </div>
+
+</div>
+
+<script type="module">
+  import { File } from "https://esm.sh/@pierre/diffs@1.2.10?bundle";
+
+  const options = { theme: { light: "github-light", dark: "github-light" }, themeType: "light", overflow: "wrap" };
+
+  const projectFile = {
+    name: "_projects/data-pilot.md",
+    contents: `---
+title: Data Pilot
+tags: [Agents, Text-to-SQL]
+metric: "77.1% acc"        # headline number shown on the card
+summary: Natural language → governed SQL, with login & admin
+featured: true             # appears on the home grid
+order: 1                   # position in the grid
+hero: /assets/img/data-pilot/hero-dark.png
+repo: https://github.com/nmp-dsci/data-pilot
+video: /assets/video/data-pilot-walkthrough.mp4
+---
+
+## The problem
+Business users can't self-serve data questions without SQL,
+and ungoverned text-to-SQL leaks data they shouldn't see.
+
+## The build
+An agent translates questions into governed SQL — scoped to
+the tables the signed-in user is allowed to query, with an
+admin surface for managing access.
+
+## The result
+77.1% accuracy on the eval set. 10+ polished screens,
+light and dark, desktop and mobile.
+`,
+  };
+
+  const runbookFile = {
+    name: "runbook.sh",
+    contents: `# ---- one-time setup (only needed for local preview) ----
+brew install rbenv ruby-build
+rbenv install 3.3.4 && rbenv global 3.3.4
+gem install bundler
+cd ~/git/nmp-ai-portfolio/nmp-dsci.github.io
+bundle install                  # installs the github-pages gem from Gemfile
+
+# ---- every edit session ----
+bundle exec jekyll serve --livereload
+# -> http://127.0.0.1:4000  · every save rebuilds + reloads the browser
+
+# ---- publish ----
+git add -A
+git commit -m "update data-pilot write-up"
+git push origin portfolio-rebuild   # stage on the branch (not public)
+# merge portfolio-rebuild -> master (PR or local merge)
+# GitHub Pages rebuilds automatically; live in ~1 minute
+`,
+  };
+
+  new File(options).render({ containerWrapper: document.querySelector("#file-project"), file: projectFile });
+  new File(options).render({ containerWrapper: document.querySelector("#file-runbook"), file: runbookFile });
+</script>
+
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.15.0/dist/mermaid.esm.min.mjs";
+
+  // Render Mermaid in a theme that matches the artifact page, and re-render when
+  // the viewer flips the page theme - Mermaid never restyles an already-rendered
+  // SVG on its own, so a fixed theme clashes in either light or dark mode.
+  const darkQuery = window.matchMedia("(prefers-color-scheme: dark)");
+
+  const paint = document.createElement("canvas").getContext("2d");
+  function toRgba(color) {
+    paint.clearRect(0, 0, 1, 1);
+    paint.fillStyle = "#000";
+    paint.fillStyle = color;
+    paint.fillRect(0, 0, 1, 1);
+    return paint.getImageData(0, 0, 1, 1).data;
+  }
+
+  function compositeRgba(foreground, background) {
+    const foregroundAlpha = foreground[3] / 255;
+    const backgroundAlpha = background[3] / 255;
+    const alpha = foregroundAlpha + backgroundAlpha * (1 - foregroundAlpha);
+    if (alpha === 0) return [0, 0, 0, 0];
+    return [
+      (foreground[0] * foregroundAlpha + background[0] * backgroundAlpha * (1 - foregroundAlpha)) / alpha,
+      (foreground[1] * foregroundAlpha + background[1] * backgroundAlpha * (1 - foregroundAlpha)) / alpha,
+      (foreground[2] * foregroundAlpha + background[2] * backgroundAlpha * (1 - foregroundAlpha)) / alpha,
+      alpha * 255,
+    ];
+  }
+
+  function pageIsDark() {
+    const root = document.documentElement;
+    const rootBackground = toRgba(getComputedStyle(root).backgroundColor);
+    const bodyBackground = document.body ? toRgba(getComputedStyle(document.body).backgroundColor) : [0, 0, 0, 0];
+    const [r, g, b, a] = compositeRgba(bodyBackground, rootBackground);
+    if (a > 0) {
+      return (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255 < 0.5;
+    }
+    const colorScheme = getComputedStyle(root).colorScheme;
+    if (colorScheme.includes("dark") && !colorScheme.includes("light")) return true;
+    if (colorScheme.includes("light") && !colorScheme.includes("dark")) return false;
+    return darkQuery.matches;
+  }
+
+  const diagrams = [...document.querySelectorAll(".mermaid")].map((el) => ({ el, src: el.textContent }));
+  let applied;
+  let rendering = false;
+  let queued = false;
+  function queueRender() {
+    queued = true;
+    if (rendering) return;
+    void render();
+  }
+  async function render() {
+    rendering = true;
+    try {
+      while (queued) {
+        queued = false;
+        const theme = pageIsDark() ? "dark" : "default";
+        if (theme === applied) continue;
+        mermaid.initialize({ startOnLoad: false, theme, securityLevel: "strict" });
+        for (const { el, src } of diagrams) {
+          el.removeAttribute("data-processed");
+          el.textContent = src;
+        }
+        try {
+          await mermaid.run({ nodes: diagrams.map((d) => d.el) });
+        } catch (error) {
+          console.error("Mermaid diagram render failed:", error);
+          return;
+        }
+        applied = theme;
+      }
+    } finally {
+      rendering = false;
+      if (queued) queueRender();
+    }
+  }
+
+  if (document.readyState === "complete") queueRender();
+  else window.addEventListener("load", queueRender, { once: true });
+  const themeObserver = new MutationObserver(queueRender);
+  for (const el of [document.documentElement, document.body]) {
+    if (!el) continue;
+    themeObserver.observe(el, {
+      attributes: true,
+      attributeFilter: ["data-theme", "class", "style"],
+    });
+  }
+  document.addEventListener("change", queueRender, true);
+  document.addEventListener(
+    "transitionend",
+    ({ propertyName }) => {
+      if (propertyName === "background-color") queueRender();
+    },
+    true,
+  );
+  darkQuery.addEventListener("change", queueRender);
+</script>
+</body>
+</html>

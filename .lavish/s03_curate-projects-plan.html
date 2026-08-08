@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Curate — Five Employer-Facing Write-ups</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script>
+  (function(){
+    var t;try{t=localStorage.getItem('console-theme')}catch(e){}
+    if(t!=='light'&&t!=='dark'){t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'}
+    document.documentElement.setAttribute('data-theme',t);
+  })();
+</script>
+<style>
+  :root{
+    --bg:#F6F6F3; --panel:#FFFFFF; --ink:#16181B; --ink-soft:#4A4F55;
+    --faint:#8A9099; --line:#E3E4DF; --line-2:#D3D5CE;
+    --ui:#4B4DED; --ui-soft:#ECECFC; --good:#1E845F; --good-soft:#E7F3ED;
+    --warn:#B26A12; --warn-soft:#F7EFE2; --bad:#B3362B; --bad-soft:#F9E9E7;
+    --shadow:0 1px 2px rgba(20,24,28,.04),0 8px 24px -12px rgba(20,24,28,.14);
+    --mono:'JetBrains Mono',ui-monospace,monospace;
+    --sans:'Inter',system-ui,sans-serif;
+    --display:'Space Grotesk','Inter',sans-serif;
+  }
+  :root[data-theme="dark"]{
+    --bg:#131417; --panel:#1B1D22; --ink:#E8E9EC; --ink-soft:#B6BAC2;
+    --faint:#7E8590; --line:#2A2D34; --line-2:#3A3E47;
+    --ui:#8B8DF5; --ui-soft:#26284A; --good:#4CC392; --good-soft:#17342A;
+    --warn:#D19243; --warn-soft:#3A2C15; --bad:#E0685C; --bad-soft:#3A1D1A;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -12px rgba(0,0,0,.6);
+  }
+  *,*::before,*::after{box-sizing:border-box;min-width:0}
+  html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);
+    line-height:1.55;font-size:16px;letter-spacing:-.005em;
+    background-image:radial-gradient(circle at 1px 1px,rgba(20,24,28,.045) 1px,transparent 0);
+    background-size:26px 26px;transition:background-color .2s,color .2s}
+  :root[data-theme="dark"] body{background-image:radial-gradient(circle at 1px 1px,rgba(232,233,236,.05) 1px,transparent 0)}
+  :root[data-theme="dark"] code{color:#B3B4F8}
+  :root[data-theme="dark"] .map th{background:#17191E}
+  :root[data-theme="dark"] .map .repo{background:#24262C}
+  :root[data-theme="dark"] .notes{background:#17191E}
+  :root[data-theme="dark"] .mock-title{background:#17191E}
+  :where(p,h1,h2,h3,h4,li,td,th){overflow-wrap:anywhere}
+  .wrap{max-width:1120px;margin:0 auto;padding:40px 22px 120px;position:relative}
+  .console-toggle{position:absolute;top:40px;right:22px;width:34px;height:34px;border-radius:999px;
+    border:1px solid var(--line-2);background:var(--panel);color:var(--ink-soft);cursor:pointer;
+    font-size:15px;line-height:1;display:flex;align-items:center;justify-content:center;padding:0}
+  .console-toggle:hover{border-color:var(--ui);color:var(--ui)}
+  .eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--faint);margin:0 0 10px}
+  h1{font-family:var(--display);font-weight:700;font-size:clamp(30px,5vw,48px);
+    line-height:1.14;letter-spacing:-.025em;margin:0 0 10px;padding:.04em 0 .08em}
+  h1 em{font-style:normal;color:var(--ui)}
+  .lead{font-size:clamp(15px,2vw,18px);color:var(--ink-soft);max-width:76ch;margin:0}
+  .rule{height:1px;background:var(--line);margin:40px 0}
+  section{scroll-margin-top:20px}
+  .sec-head{display:flex;gap:14px;align-items:baseline;flex-wrap:wrap;margin:0 0 6px}
+  .sec-num{font-family:var(--mono);font-size:12px;color:var(--ui);font-weight:600;
+    border:1px solid var(--line-2);border-radius:6px;padding:3px 8px;white-space:nowrap}
+  h2{font-family:var(--display);font-weight:600;font-size:clamp(21px,3vw,27px);
+    letter-spacing:-.02em;margin:0;line-height:1.25}
+  h3{font-family:var(--display);font-weight:600;font-size:16px;margin:0;line-height:1.3}
+  .sec-sub{color:var(--ink-soft);margin:8px 0 24px;max-width:78ch;font-size:15px}
+  code{font-family:var(--mono);font-size:.9em;background:var(--ui-soft);color:#3634c7;
+    padding:1px 5px;border-radius:5px}
+
+  /* delta cards */
+  .deltas{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr))}
+  .delta{background:var(--panel);border:1px solid var(--line);border-radius:12px;
+    padding:15px 16px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:6px}
+  .pill-tag{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;
+    border-radius:5px;padding:2px 7px;font-weight:600;align-self:flex-start}
+  .pill-tag.new{background:var(--good-soft);color:var(--good)}
+  .pill-tag.gone{background:var(--bad-soft);color:var(--bad)}
+  .pill-tag.changed{background:var(--warn-soft);color:var(--warn)}
+  .delta p{margin:0;font-size:13.5px;color:var(--ink-soft)}
+
+  /* mapping table */
+  .tblwrap{overflow-x:auto;background:var(--panel);border:1px solid var(--line);
+    border-radius:14px;box-shadow:var(--shadow)}
+  table.map{border-collapse:collapse;width:100%;font-size:13px;min-width:820px}
+  .map th{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--faint);text-align:left;font-weight:500;padding:11px 14px;
+    border-bottom:1px solid var(--line);background:#FBFBFA;white-space:nowrap}
+  .map td{padding:11px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+  .map tr:last-child td{border-bottom:0}
+  .map td:first-child{font-weight:600;font-family:var(--display);white-space:nowrap}
+  .map .repo{font-family:var(--mono);font-size:11.5px;background:#F3F3F1;border-radius:5px;
+    padding:1px 6px;white-space:nowrap}
+  .map .fresh{font-family:var(--mono);font-size:11px;white-space:nowrap}
+  .map .fresh.hot{color:var(--good);font-weight:600}
+  .map td small{display:block;color:var(--faint);font-size:11px;margin-top:3px}
+
+  /* decision blocks */
+  .q{margin:0 0 26px}
+  .opts{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr))}
+  .opt{position:relative;display:block;background:var(--panel);border:1px solid var(--line);
+    border-radius:12px;padding:16px;cursor:pointer;box-shadow:var(--shadow);
+    transition:border-color .13s,box-shadow .13s}
+  .opt:hover{border-color:var(--line-2)}
+  .opt input{position:absolute;opacity:0;pointer-events:none}
+  .opt .tick{position:absolute;top:16px;right:16px;width:19px;height:19px;border-radius:999px;
+    border:1.6px solid var(--line-2);background:var(--panel);transition:.13s}
+  .opt:has(input:checked){border-color:var(--ui);box-shadow:0 0 0 1px var(--ui),var(--shadow)}
+  .opt:has(input:checked) .tick{border-color:var(--ui);background:var(--ui)
+    radial-gradient(circle,#fff 32%,transparent 34%)}
+  .opt:has(input:focus-visible){outline:2px solid var(--ui);outline-offset:2px}
+  .opt .ttl{font-family:var(--display);font-weight:600;font-size:15px;margin:0 26px 5px 0;
+    display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+  .opt .desc{font-size:13px;color:var(--ink-soft);margin:0}
+  .opt .cost{font-family:var(--mono);font-size:11px;color:var(--warn);margin-top:8px;display:block}
+  .rec{font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;
+    background:var(--ui);color:#fff;padding:2px 6px;border-radius:5px;font-weight:600}
+  .qgo{display:flex;gap:10px;align-items:center;margin-top:12px;flex-wrap:wrap}
+  button.qbtn{font-family:var(--display);font-weight:600;font-size:13.5px;background:var(--panel);
+    color:var(--ink);border:1px solid var(--line-2);border-radius:9px;padding:9px 16px;cursor:pointer}
+  button.qbtn:hover{border-color:var(--ui);color:var(--ui)}
+  .qstatus{font-family:var(--mono);font-size:11.5px;color:var(--good)}
+
+  /* format mocks */
+  .fmt-mock{border:1px solid #DDE4DC;border-radius:9px;overflow:hidden;margin-top:10px;
+    font-family:'IBM Plex Sans',sans-serif;background:#F4F6F3;color:#14181C}
+  .fm-row{padding:7px 10px;font-size:10px;border-bottom:1px solid #DDE4DC;color:#5A655D}
+  .fm-row:last-child{border-bottom:0}
+  .fm-row.hl{background:#E4F1EC;color:#11674F;font-weight:600;
+    font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.06em}
+  .fm-row.med{background:#14181C;color:#B9C9C0;font-family:'IBM Plex Mono',monospace;font-size:9.5px}
+
+  /* big mock */
+  .mockframe{background:var(--panel);border:1px solid var(--line-2);border-radius:14px;
+    box-shadow:var(--shadow);overflow:hidden}
+  .mock-title{display:flex;gap:8px;align-items:center;background:#FBFBFA;
+    border-bottom:1px solid var(--line);padding:10px 14px;font-family:var(--mono);
+    font-size:11px;color:var(--faint)}
+  .dot{width:9px;height:9px;border-radius:99px;background:var(--line-2)}
+  .mock{padding:22px;background:#F4F6F3;font-family:'IBM Plex Sans',sans-serif;color:#14181C}
+  .tldr{background:#fff;border:1px solid #C9E2D8;border-left:4px solid #17876B;border-radius:10px;
+    padding:14px 16px;margin-bottom:16px}
+  .tldr .k{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.14em;
+    text-transform:uppercase;color:#17876B;margin:0 0 7px;font-weight:600}
+  .tldr-grid{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(min(100%,160px),1fr))}
+  .tldr-cell .l{font-family:'IBM Plex Mono',monospace;font-size:8.5px;letter-spacing:.1em;
+    text-transform:uppercase;color:#77837A;margin-bottom:2px}
+  .tldr-cell .v{font-size:12px;color:#14181C;font-weight:500;line-height:1.45}
+  .tldr-cell .v b{color:#17876B;font-family:'IBM Plex Mono',monospace}
+  .mk-kick{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;
+    text-transform:uppercase;color:#77837A;margin:0 0 5px}
+  .mk-h1{font-size:22px;font-weight:600;letter-spacing:-.02em;margin:0 0 10px}
+  .mk-skills{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 14px}
+  .mk-skill{font-family:'IBM Plex Mono',monospace;font-size:9.5px;background:#E4F1EC;
+    color:#11674F;border:1px solid #C9E2D8;border-radius:999px;padding:3px 9px}
+  .mk-media{aspect-ratio:16/6;border-radius:9px;background:
+    linear-gradient(140deg,#14181C,#1E2A24 70%,#17876B);display:flex;align-items:center;
+    justify-content:center;color:#B9C9C0;font-family:'IBM Plex Mono',monospace;font-size:10px;
+    letter-spacing:.08em;margin-bottom:12px}
+  .mk-body{font-size:11px;color:#5A655D;line-height:1.6}
+
+  /* phases */
+  .phases{display:flex;flex-direction:column;gap:10px}
+  .phase{display:flex;gap:14px;background:var(--panel);border:1px solid var(--line);
+    border-radius:12px;padding:14px 16px;box-shadow:var(--shadow);align-items:baseline;flex-wrap:wrap}
+  .phase .pn{font-family:var(--mono);font-size:11px;color:var(--ui);font-weight:600;
+    border:1px solid var(--line-2);border-radius:6px;padding:2px 8px;white-space:nowrap}
+  .phase .pt{font-family:var(--display);font-weight:600;font-size:15px;flex:0 0 auto}
+  .phase .pd{font-size:13px;color:var(--ink-soft);flex:1 1 340px}
+  .phase .pe{font-family:var(--mono);font-size:10.5px;color:var(--faint);white-space:nowrap}
+
+  /* risks */
+  .risks{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr))}
+  .risk{background:var(--panel);border-left:3px solid var(--warn);border-radius:0 10px 10px 0;
+    padding:11px 14px;font-size:13px;color:var(--ink-soft);box-shadow:var(--shadow)}
+  .risk b{color:var(--ink)}
+
+  /* approve */
+  .assemble{margin-top:36px;background:var(--panel);border:1px solid var(--line-2);
+    border-radius:16px;padding:22px;box-shadow:var(--shadow)}
+  .notes{width:100%;margin-top:14px;border:1px solid var(--line-2);border-radius:10px;
+    padding:11px 13px;font-family:var(--sans);font-size:14px;resize:vertical;min-height:60px;
+    background:#FCFCFB;color:var(--ink)}
+  .notes:focus{outline:2px solid var(--ui);outline-offset:1px;border-color:var(--ui)}
+  .go{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-top:14px}
+  button.primary{font-family:var(--display);font-weight:600;font-size:15px;background:var(--ink);
+    color:var(--bg);border:0;border-radius:10px;padding:12px 22px;cursor:pointer}
+  button.primary:hover{opacity:.88}
+  .status{font-family:var(--mono);font-size:12px;color:var(--good)}
+  .mini{font-size:12.5px;color:var(--faint);margin-top:9px}
+  .foot{margin-top:60px;font-family:var(--mono);font-size:11.5px;color:var(--faint);
+    display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;
+    border-top:1px solid var(--line);padding-top:16px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <button class="console-toggle" id="console-toggle" type="button" aria-label="Toggle dark mode">☾</button>
+  <p class="eyebrow">nmp-dsci.github.io · build console · 03 · branch: curate</p>
+  <h1>Curate: <em>five write-ups, aimed at employers.</em></h1>
+  <p class="lead">Your brief: the site's audience is employers, and the featured projects become
+  <b>Data Pilot · Transcript RAG · CUAD · ConvFinQA · V2V Prod Agent</b> — each with a write-up
+  that makes the AI-engineering skill signal unmistakable. I've re-scanned the sibling folder:
+  one repo is new and strong, one has vanished, two have moved since their write-ups. Decide the
+  four questions in section 02, annotate anything, approve at the bottom.</p>
+
+  <div class="rule"></div>
+
+  <!-- ============ CURRENT STATE ============ -->
+  <section>
+    <div class="sec-head"><span class="sec-num">00</span><h2>What changed since the July build</h2></div>
+    <p class="sec-sub">Verified against <code>~/git/nmp-ai-portfolio/</code> today. These deltas drive the plan.</p>
+    <div class="deltas">
+      <div class="delta"><span class="pill-tag new">New · flagship material</span>
+        <h3>v2v-prod-agent</h3>
+        <p>A voice-to-voice banking agent built to production standard: STT → Claude agent core → TTS,
+        with a <b>deterministic guardrail gate between the LLM and every tool call</b> (identity, action
+        matrix, confirmation, confidence, PII), RAG knowledge base, OTel → Langfuse online evals with
+        LLM judges, offline + promptfoo eval suites, Docker/CI. Last commit Aug 6 — it even ships
+        through no-mistakes. Not on the site yet; likely your strongest employer story.</p></div>
+      <div class="delta"><span class="pill-tag gone">Gone locally</span>
+        <h3>adversarial-dev-test</h3>
+        <p>The local repo no longer exists in the sibling folder. The site's Adversarial Dev page still
+        works (its diagram was vendored into this repo), but the "Repository ↗" link may now 404 and the
+        facts can't be re-verified. It's also not in your curated five.</p></div>
+      <div class="delta"><span class="pill-tag changed">Deployed since write-up</span>
+        <h3>data-qa-agent (Data Pilot)</h3>
+        <p>Active <em>today</em>: AWS App Runner infra and a Slack integration landed since July. The
+        current write-up doesn't mention a live deployment — that's a big employer signal going unclaimed.</p></div>
+      <div class="delta"><span class="pill-tag changed">Moved since write-up</span>
+        <h3>transcript-rag-agent</h3>
+        <p>Merged <code>feature/retrieval-variants</code> on Aug 1 — the write-up's "three strategies"
+        framing is probably stale and its numbers need re-verification.</p></div>
+    </div>
+  </section>
+
+  <div class="rule"></div>
+
+  <!-- ============ THE FIVE ============ -->
+  <section>
+    <div class="sec-head"><span class="sec-num">01</span><h2>The five — freshness, material, and the skill each one sells</h2></div>
+    <div class="tblwrap">
+      <table class="map">
+        <thead><tr><th>Write-up</th><th>Repo</th><th>Last commit</th><th>What's there to mine</th><th>Employer skill signal</th></tr></thead>
+        <tbody>
+          <tr><td>V2V Prod Agent</td><td><span class="repo">v2v-prod-agent</span></td>
+            <td class="fresh hot">Aug 6</td>
+            <td>architecture.md, evals/ (offline · online · promptfoo · scenarios), built React frontend, Docker/compose<small>full deep-read needed — nothing verified yet</small></td>
+            <td>Production agent lifecycle in a regulated domain: guardrails, voice pipeline, online eval, observability</td></tr>
+          <tr><td>Data Pilot</td><td><span class="repo">data-qa-agent</span></td>
+            <td class="fresh hot">Aug 8 · today</td>
+            <td>Existing verified write-up + new AWS App Runner deployment + Slack integration to document</td>
+            <td>Governed agents (RLS, guardrails) — now with "deployed and running in AWS" attached</td></tr>
+          <tr><td>CUAD</td><td><span class="repo">CUAD-agent</span></td>
+            <td class="fresh">Jul 26</td>
+            <td>Verified write-up + comparison dashboard already embedded; Jul changes were lint-only</td>
+            <td>Eval rigor and honest findings — full-context beat RAG, measured (84.5% vs 79.9% F1)</td></tr>
+          <tr><td>ConvFinQA</td><td><span class="repo">ConvFinQA-agent</span></td>
+            <td class="fresh">May 25 · unchanged</td>
+            <td>Verified write-up + v2 eval dashboard already embedded; facts still current</td>
+            <td>Prompt versioning as engineering discipline: 73.0% → 77.1%, regression caught by evals</td></tr>
+          <tr><td>Transcript RAG</td><td><span class="repo">transcript-rag-agent</span></td>
+            <td class="fresh changed">Aug 1</td>
+            <td>Existing dashboards + <em>new retrieval-variants work to read and fold in</em></td>
+            <td>Retrieval strategy design with cost honesty — 6.1× fewer tokens at answer parity</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <div class="rule"></div>
+
+  <!-- ============ DECISIONS ============ -->
+  <section>
+    <div class="sec-head"><span class="sec-num">02</span><h2>Decisions — locked from your answers</h2></div>
+    <p class="sec-sub">Folded in from your queued answers and comments. Annotate any card to change it —
+    the only thing still open is the approval at the bottom.</p>
+    <style>#q1,#q2,#q3,#q4{display:none}</style>
+    <div class="deltas">
+      <div class="delta"><span class="pill-tag new">Decided</span>
+        <h3>2.1 · Six featured cards</h3>
+        <p><b>Floor Plan Reviewer stays featured</b> alongside the curated five — it keeps the site's
+        only real walkthrough video and its verified worked example. Only <b>Adversarial Dev moves to
+        Earlier work</b>; its page and diagram stay live at the same URL.</p></div>
+      <div class="delta"><span class="pill-tag new">Decided</span>
+        <h3>2.2 · Production-first order</h3>
+        <p>V2V Prod Agent → Data Pilot → CUAD → ConvFinQA → Transcript RAG, with Floor Plan Reviewer
+        sixth (my assumption — annotate here if it should sit higher).</p></div>
+      <div class="delta"><span class="pill-tag new">Decided · your format</span>
+        <h3>2.3 · Page spine: TL;DR → Skills → Architecture → Cost</h3>
+        <p>Replaces problem/build/result on all six featured pages. <b>TL;DR</b> — the 30-second
+        screener strip. <b>Skills</b> — each chip backed by one line of code-level proof, not just a
+        tag. <b>Architecture</b> — diagram plus the design decisions that matter. <b>Cost</b> — what
+        it costs to run and the cost-engineering choices: model tiers, token budgets, caching,
+        offline stubs, usage caps. Eval dashboards embed inside Architecture or Cost where they
+        prove the point. <b>Constraint (your note): keep the existing frontend</b> — this is a
+        restructure of the write-up content inside the current design system; nav, components,
+        theming and CSS stay as they are.</p></div>
+      <div class="delta"><span class="pill-tag new">Decided</span>
+        <h3>2.4 · Hero strip sells skills, not dollars</h3>
+        <p>The +$360/wk chip goes. The strip becomes four skill-proof numbers, each tagged with the
+        competency it demonstrates — e.g. eval-verified accuracy → prompt versioning; the
+        2,050-answer grid → model evaluation; 6.1× token efficiency → RAG cost design; a V2V
+        guardrail/eval stat once C2 verifies one. No dollar figures anywhere in the hero.</p></div>
+    </div>
+
+    <!-- Q1 -->
+    <form class="q" data-lavish-question="demoted-projects" id="q1">
+      <div class="sec-head" style="margin-top:6px"><span class="sec-num">2.1</span><h2 style="font-size:19px">Floor Plan Reviewer &amp; Adversarial Dev — where do they go?</h2></div>
+      <div class="opts">
+        <label class="opt"><input type="radio" name="q1" value="Move both to the Earlier-work strip: pages stay live at their URLs, home grid shows only the curated five" checked><span class="tick"></span>
+          <span class="ttl">Both → Earlier work <span class="rec">Rec</span></span>
+          <span class="desc">Pages and their evidence stay live (no broken links), but the featured grid becomes exactly your five. Floor Plan keeps its video and +$360/wk case for anyone who digs.</span></label>
+        <label class="opt"><input type="radio" name="q1" value="Keep Floor Plan Reviewer featured as a sixth card; move only Adversarial Dev to Earlier work"><span class="tick"></span>
+          <span class="ttl">Keep Floor Plan featured</span>
+          <span class="desc">It has the site's only real walkthrough video and a strong verified number. Six cards instead of five.</span>
+          <span class="cost">dilutes the "curated five" framing</span></label>
+        <label class="opt"><input type="radio" name="q1" value="Delete the Floor Plan and Adversarial Dev pages entirely"><span class="tick"></span>
+          <span class="ttl">Remove entirely</span>
+          <span class="desc">Cleanest grid, but kills live URLs and throws away verified evidence already on the site.</span>
+          <span class="cost">breaks links · loses the only product video until V2V media exists</span></label>
+      </div>
+      <div class="qgo"><button type="submit" class="qbtn">Queue answer 2.1</button><span class="qstatus" id="s-q1"></span></div>
+    </form>
+
+    <!-- Q2 -->
+    <form class="q" data-lavish-question="order" id="q2">
+      <div class="sec-head" style="margin-top:6px"><span class="sec-num">2.2</span><h2 style="font-size:19px">Featured order</h2></div>
+      <div class="opts">
+        <label class="opt"><input type="radio" name="q2" value="V2V Prod Agent → Data Pilot → CUAD → ConvFinQA → Transcript RAG (production weight first)" checked><span class="tick"></span>
+          <span class="ttl">Production-first <span class="rec">Rec</span></span>
+          <span class="desc">Lead with the two production stories (V2V's guardrailed banking agent, Data Pilot's deployed governed SQL), then the three eval-driven studies. Matches what hiring managers screen for in 2026: can you ship agents safely.</span></label>
+        <label class="opt"><input type="radio" name="q2" value="Data Pilot → V2V Prod Agent → CUAD → ConvFinQA → Transcript RAG"><span class="tick"></span>
+          <span class="ttl">Data Pilot first</span>
+          <span class="desc">Keeps the current flagship on top — it's deployed today and has the most product surface (10+ screens).</span></label>
+        <label class="opt"><input type="radio" name="q2" value="Order to be specified in notes"><span class="tick"></span>
+          <span class="ttl">My own order</span>
+          <span class="desc">Write the order you want in the notes box at the bottom.</span></label>
+      </div>
+      <div class="qgo"><button type="submit" class="qbtn">Queue answer 2.2</button><span class="qstatus" id="s-q2"></span></div>
+    </form>
+
+    <!-- Q3 -->
+    <form class="q" data-lavish-question="format" id="q3">
+      <div class="sec-head" style="margin-top:6px"><span class="sec-num">2.3</span><h2 style="font-size:19px">Write-up format — the redesign core</h2></div>
+      <div class="opts">
+        <label class="opt"><input type="radio" name="q3" value="Recruiter TL;DR block above the existing case study: what/number/skills/links skimmable in 30 seconds, depth below, plus a closing Interview-me-on section" checked><span class="tick"></span>
+          <span class="ttl">TL;DR + depth <span class="rec">Rec</span></span>
+          <span class="desc">A skim strip at the top answers a screener's four questions — what is it, what's the number, what skills, where's the code — in 30 seconds. The proven case-study body stays for the engineer who reads on. Ends with "Interview me on this": 3 deep-dive hooks.</span>
+          <div class="fmt-mock">
+            <div class="fm-row hl">TL;DR · metric · skills · links</div>
+            <div class="fm-row med">walkthrough video / media</div>
+            <div class="fm-row">problem → build → result</div>
+            <div class="fm-row">evidence · dashboards</div>
+            <div class="fm-row hl">interview me on: …</div>
+          </div></label>
+        <label class="opt"><input type="radio" name="q3" value="Skills-first restructure: every section is headed by the skill it demonstrates (Guardrail design / Eval harness / ...), narrative woven underneath"><span class="tick"></span>
+          <span class="ttl">Skills-first restructure</span>
+          <span class="desc">The page becomes a skills document: each section headline is a competency, the project is the proof underneath. Maximum keyword alignment.</span>
+          <span class="cost">reads more like a CV than a case study · full rewrite of all five bodies</span>
+          <div class="fmt-mock">
+            <div class="fm-row hl">skill: guardrail design</div>
+            <div class="fm-row">…how this project proves it…</div>
+            <div class="fm-row hl">skill: eval harness</div>
+            <div class="fm-row">…how this project proves it…</div>
+          </div></label>
+        <label class="opt"><input type="radio" name="q3" value="Keep current case-study format unchanged; only refresh content and curation"><span class="tick"></span>
+          <span class="ttl">Keep current format</span>
+          <span class="desc">No template change — just re-curate the grid and refresh the five write-ups' content.</span>
+          <div class="fmt-mock">
+            <div class="fm-row med">walkthrough video / media</div>
+            <div class="fm-row">problem → build → result</div>
+            <div class="fm-row">evidence · dashboards</div>
+          </div></label>
+      </div>
+      <div class="qgo"><button type="submit" class="qbtn">Queue answer 2.3</button><span class="qstatus" id="s-q3"></span></div>
+    </form>
+
+    <!-- Q4 -->
+    <form class="q" data-lavish-question="hero-strip" id="q4">
+      <div class="sec-head" style="margin-top:6px"><span class="sec-num">2.4</span><h2 style="font-size:19px">Hero metric strip — the +$360/wk chip belongs to a demoted project</h2></div>
+      <div class="opts">
+        <label class="opt"><input type="radio" name="q4" value="Replace +$360/wk chip with a verified V2V metric once the deep-read lands (guardrail/eval number); fall back to a Data Pilot deployment stat if V2V yields nothing quotable" checked><span class="tick"></span>
+          <span class="ttl">Swap for a V2V metric <span class="rec">Rec</span></span>
+          <span class="desc">The strip should showcase the featured five. The V2V eval suites almost certainly contain a quotable number (guardrail block rate, judge pass rate); C2 verifies before anything ships.</span></label>
+        <label class="opt"><input type="radio" name="q4" value="Keep the +$360/wk floor-plan chip in the hero even though the project moves to Earlier work"><span class="tick"></span>
+          <span class="ttl">Keep +$360/wk</span>
+          <span class="desc">Still true, still verified, still the most tangible dollar figure on the site.</span>
+          <span class="cost">hero points at a non-featured project</span></label>
+        <label class="opt"><input type="radio" name="q4" value="Redesign the whole strip around the final five once all deep-reads land — pick the four best numbers regardless of source"><span class="tick"></span>
+          <span class="ttl">Rebuild strip after C2</span>
+          <span class="desc">Don't decide now — once V2V and transcript-RAG re-reads land, pick the four strongest verified numbers across the five.</span></label>
+      </div>
+      <div class="qgo"><button type="submit" class="qbtn">Queue answer 2.4</button><span class="qstatus" id="s-q4"></span></div>
+    </form>
+  </section>
+
+  <div class="rule"></div>
+
+  <!-- ============ MOCK ============ -->
+  <section>
+    <div class="sec-head"><span class="sec-num">03</span><h2>Your page spine, mocked</h2></div>
+    <p class="sec-sub">TL;DR → Skills → Architecture → Cost, rendered in the site's own design system
+    with V2V as the example.</p>
+    <div class="mockframe">
+      <div class="mock-title"><span class="dot"></span><span class="dot"></span><span class="dot"></span>
+        nmp-dsci.github.io/projects/v2v-prod-agent/ — proposed</div>
+      <div class="mock">
+        <p class="mk-kick">Agents · Voice · case study 01</p>
+        <p class="mk-h1">V2V Prod Agent</p>
+        <div class="tldr">
+          <p class="k">// 30-second version, for screeners</p>
+          <div class="tldr-grid">
+            <div class="tldr-cell"><div class="l">What</div><div class="v">Voice banking agent that takes real actions — block card, transfer — behind a deterministic guardrail gate</div></div>
+            <div class="tldr-cell"><div class="l">Proof</div><div class="v"><b>[verified metric from C2]</b> · offline + online LLM-judge evals</div></div>
+            <div class="tldr-cell"><div class="l">Skills</div><div class="v">Agentic AI · Guardrails · RAG · Model Evaluation · MLOps</div></div>
+            <div class="tldr-cell"><div class="l">Where</div><div class="v">Repository ↗ · Architecture ↗</div></div>
+          </div>
+        </div>
+        <div class="mk-skills">
+          <span class="mk-skill">Agentic AI 80%</span><span class="mk-skill">RAG 88%</span>
+          <span class="mk-skill">Model Evaluation 40%</span><span class="mk-skill">Responsible AI 32%</span>
+          <span class="mk-skill">Docker 64%</span><span class="mk-skill">MLOps 56%</span>
+        </div>
+        <div class="mk-media">walkthrough video slot · placeholder until recorded</div>
+        <p class="mk-body">…then your spine: <b>Skills demonstrated</b> — each chip expanded with one
+        line of code-level proof; <b>Architecture</b> — the guardrail-gate diagram and the decisions
+        that matter (why the model is never trusted to police itself); <b>Cost</b> — what a call
+        costs to serve, why each pipeline stage's model tier was chosen, token budgets and the
+        cost-efficiency engineering — with eval dashboards embedded where they prove the point.</p>
+      </div>
+    </div>
+    <div class="callout-video" style="margin-top:14px;background:var(--panel);border-left:3px solid var(--good);
+      border-radius:0 10px 10px 0;padding:13px 16px;font-size:13px;color:var(--ink-soft);box-shadow:var(--shadow)">
+      <b style="color:var(--ink)">The scalable video pipeline (your note, now codified).</b>
+      Two repos already follow one convention — <code>&lt;repo&gt;/demo/artifacts/walkthrough.mp4</code>
+      with <code>.srt</code> captions (floor-plan-reviewer wired on the site already; transcript-rag-agent's
+      exists and gets wired in C4). That convention becomes the standard for every write-up:
+      <b>1)</b> record a walkthrough and save it as <code>demo/artifacts/walkthrough.mp4</code> (+ optional
+      <code>.srt</code>) in the project's repo · <b>2)</b> it gets copied to
+      <code>assets/video/&lt;slug&gt;/</code> on this site · <b>3)</b> the page's media slot lights up
+      automatically — captions included — with the designed placeholder showing until then. Same contract
+      scales to reels (<code>media.reel</code>) and GIF loops. V2V and the rest join as their recordings land.
+    </div>
+  </section>
+
+  <div class="rule"></div>
+
+  <!-- ============ PHASES ============ -->
+  <section>
+    <div class="sec-head"><span class="sec-num">04</span><h2>Phases</h2></div>
+    <div class="phases">
+      <div class="phase"><span class="pn">C1</span><span class="pt">Apply curation</span>
+        <span class="pd">Grid becomes the five in your chosen order; demoted projects handled per 2.1; nav/filters unchanged. Small, immediate.</span>
+        <span class="pe">same day</span></div>
+      <div class="phase"><span class="pn">C2</span><span class="pt">Deep-read the moved repos</span>
+        <span class="pd">Full read of <code>v2v-prod-agent</code> (nothing verified yet — README claims must be checked against code and eval outputs), plus deltas: transcript-RAG's Aug-1 retrieval-variants merge and Data Pilot's App Runner + Slack deployment. Every read now also mines <b>cost-relevant facts</b> — models and tiers used, token metrics, caching, infra — to feed each page's Cost section. Facts-from-repos rule as before.</span>
+        <span class="pe">the big one · parallel agents</span></div>
+      <div class="phase"><span class="pn">C3</span><span class="pt">Template upgrade</span>
+        <span class="pd">Build the TL;DR → Skills → Architecture → Cost layout, driven by front-matter so all six featured pages get it consistently — <b>within the existing frontend</b>: same design system, nav, components and theming; only <code>project.html</code>'s structure and a few reused styles change. Adds <code>&lt;track&gt;</code> caption support so the <code>.srt</code> files that ship with your recordings work on-site.</span>
+        <span class="pe">one layout + CSS pass</span></div>
+      <div class="phase"><span class="pn">C4</span><span class="pt">Write the five</span>
+        <span class="pd">All six featured write-ups restructured to the new spine: new V2V page (mined media: architecture, eval dashboards, frontend shots), refreshed Data Pilot (deployment story) and Transcript RAG (variants), CUAD, ConvFinQA and Floor Plan re-shaped to TL;DR/Skills/Architecture/Cost. <b>Existing videos wired in</b>: Transcript RAG's <code>demo/artifacts/walkthrough.mp4</code> + captions joins Floor Plan's (already live) via the standard pipeline. Hero strip rebuilt as skill-proof numbers.</span>
+        <span class="pe">flagships first → review → rest</span></div>
+      <div class="phase"><span class="pn">C5</span><span class="pt">Review → gate → PR</span>
+        <span class="pd">You review the built site, then no-mistakes validates the <code>curate</code> branch and opens the PR to master. Merge stays yours.</span>
+        <span class="pe">you + me + pipeline</span></div>
+    </div>
+  </section>
+
+  <div class="rule"></div>
+
+  <!-- ============ RISKS ============ -->
+  <section>
+    <div class="sec-head"><span class="sec-num">05</span><h2>Risks &amp; open questions</h2></div>
+    <div class="risks">
+      <div class="risk"><b>V2V is unverified.</b> The README is impressive but nothing has been checked against code or eval outputs yet. If its eval numbers aren't quotable, the TL;DR "proof" cell and hero chip fall back to structural claims (guardrail architecture, eval-suite existence) — C2 decides.</div>
+      <div class="risk"><b>Adversarial Dev's repo link.</b> Local repo is gone; if the GitHub repo was also deleted or made private, the page's Repository link 404s. I'll check the remote in C1 and drop the link (keeping the page) if dead.</div>
+      <div class="risk"><b>drone-pilot exists but has no README.</b> Also new in the sibling folder, deliberately not in your five — confirming it's out of scope rather than forgotten.</div>
+      <div class="risk"><b>Uncommitted working-tree change.</b> Your <code>.gitignore</code> currently un-ignores <code>.lavish/</code> — presumably so these console pages get committed on <code>curate</code>. I'll keep it and commit them unless you say otherwise.</div>
+      <div class="risk"><b>Naming.</b> "V2V Prod Agent" is the repo name — the write-up could carry a friendlier product name (like Data Pilot does). Suggest one in notes, or I'll propose options after C2.</div>
+      <div class="risk"><b>Cost-data availability.</b> Not every repo records token/cost figures. Where hard numbers exist (transcript-RAG's token counts, model pricing) they're used; where they don't, the Cost section covers verifiable cost <em>decisions</em> (model-tier choices, offline stubs, usage caps) — never invented dollar figures.</div>
+    </div>
+  </section>
+
+  <!-- ============ APPROVE ============ -->
+  <div class="assemble" id="approve-box">
+    <div class="sec-head"><span class="sec-num">→</span><h2>Approve the plan</h2></div>
+    <p class="sec-sub" style="margin-bottom:0">Queue any answers above you've decided (unanswered
+    questions fall to the recommended defaults), add notes, then approve. C1 starts immediately;
+    your next checkpoint is the flagship review in C4.</p>
+    <textarea class="notes" id="notes" placeholder="Optional notes — e.g. a product name for v2v-prod-agent, your own ordering, 'include drone-pilot later'…"></textarea>
+    <div class="go">
+      <button type="button" class="primary" id="approve">Approve plan — start C1 →</button>
+      <span class="status" id="status"></span>
+    </div>
+    <p class="mini">Nothing merges to master without you; all work lands on the <b>curate</b> branch.</p>
+  </div>
+
+  <div class="foot">
+    <span>nmp-dsci.github.io · build console · 03</span>
+    <span>facts from repos only · defaults = recommendation</span>
+  </div>
+
+</div>
+
+<script>
+  (function(){
+    var r=document.documentElement,b=document.getElementById('console-toggle');
+    function paint(){b.textContent=r.getAttribute('data-theme')==='dark'?'☀':'☾'}
+    b.addEventListener('click',function(){
+      var next=r.getAttribute('data-theme')==='dark'?'light':'dark';
+      r.setAttribute('data-theme',next);
+      try{localStorage.setItem('console-theme',next)}catch(e){}
+      paint();
+    });
+    paint();
+  })();
+
+  function qv(form){var d=new FormData(form);for(var e of d.entries()){return e[1]}return null}
+  function wire(id,label){
+    var f=document.getElementById(id);
+    f.addEventListener('submit',function(e){
+      e.preventDefault();
+      var v=qv(f);
+      if(!v){document.getElementById('s-'+id).textContent='Pick one first.';return}
+      if(window.lavish&&window.lavish.queuePrompt){
+        window.lavish.queuePrompt('Decision '+label+': '+v,
+          {tag:'choice',text:label+': '+v.slice(0,50),element:f,queueKey:id,
+           data:{question:label,answer:v}});
+        document.getElementById('s-'+id).textContent='Queued ✓';
+      }else{
+        document.getElementById('s-'+id).textContent='Selected (toolbar not connected — use approve bar or chat).';
+      }
+    });
+  }
+  document.getElementById('approve').addEventListener('click',function(){
+    var parts=[
+      'Approved: execute the curate plan C1-C5 with locked decisions —',
+      'six featured (curated five + Floor Plan Reviewer), Adversarial Dev to Earlier work;',
+      'order V2V → Data Pilot → CUAD → ConvFinQA → Transcript RAG → Floor Plan;',
+      'page spine TL;DR → Skills → Architecture → Cost on all six;',
+      'hero strip = skill-proof numbers, no dollar figures.'
+    ];
+    var notes=(document.getElementById('notes').value||'').trim();
+    if(notes)parts.push('Notes: '+notes);
+    var msg=parts.join(' ');
+    if(window.lavish&&window.lavish.queuePrompt){
+      window.lavish.queuePrompt(msg,{tag:'choice',text:'Approve curate plan',
+        element:document.getElementById('approve-box'),queueKey:'approve',
+        data:{notes:notes}});
+      document.getElementById('status').textContent='Queued ✓ — press "Send to Agent" in the toolbar to start.';
+    }else{
+      document.getElementById('status').textContent='Copy this to chat: '+msg;
+    }
+  });
+</script>
+</body>
+</html>

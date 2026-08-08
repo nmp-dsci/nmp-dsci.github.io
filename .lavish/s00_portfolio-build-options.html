@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Portfolio Build — Options</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F6F6F3; --panel:#FFFFFF; --ink:#16181B; --ink-soft:#4A4F55;
+    --faint:#8A9099; --line:#E3E4DF; --line-2:#D3D5CE;
+    --ui:#4B4DED; --ui-soft:#ECECFC; --good:#1E845F; --warn:#B26A12;
+    --shadow:0 1px 2px rgba(20,24,28,.04),0 8px 24px -12px rgba(20,24,28,.14);
+    --mono:'JetBrains Mono',ui-monospace,monospace;
+    --sans:'Inter',system-ui,sans-serif;
+    --display:'Space Grotesk','Inter',sans-serif;
+  }
+  *{box-sizing:border-box;min-width:0}
+  html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);
+    line-height:1.55;font-size:16px;letter-spacing:-.005em;
+    background-image:radial-gradient(circle at 1px 1px,rgba(20,24,28,.045) 1px,transparent 0);
+    background-size:26px 26px}
+  .wrap{max-width:1120px;margin:0 auto;padding:40px 22px 120px}
+  .eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--faint);margin:0 0 10px}
+  h1{font-family:var(--display);font-weight:700;font-size:clamp(30px,5vw,50px);
+    line-height:1.14;letter-spacing:-.025em;margin:0 0 10px;padding:.04em 0 .08em}
+  h1 em{font-style:normal;color:var(--ui)}
+  .lead{font-size:clamp(15px,2vw,18px);color:var(--ink-soft);max-width:70ch;margin:0}
+  .rule{height:1px;background:var(--line);margin:40px 0}
+  section{scroll-margin-top:20px}
+  .sec-head{display:flex;gap:14px;align-items:baseline;flex-wrap:wrap;margin:0 0 6px}
+  .sec-num{font-family:var(--mono);font-size:12px;color:var(--ui);font-weight:600;
+    border:1px solid var(--line-2);border-radius:6px;padding:3px 8px;white-space:nowrap}
+  h2{font-family:var(--display);font-weight:600;font-size:clamp(21px,3vw,27px);
+    letter-spacing:-.02em;margin:0}
+  .sec-sub{color:var(--ink-soft);margin:8px 0 24px;max-width:74ch;font-size:15px}
+
+  /* inventory */
+  .inv{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,270px),1fr));gap:12px}
+  .proj{background:var(--panel);border:1px solid var(--line);border-radius:12px;
+    padding:15px 16px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:8px}
+  .proj.dim{opacity:.72}
+  .proj h3{font-family:var(--display);font-size:15.5px;margin:0;letter-spacing:-.01em}
+  .proj p{margin:0;font-size:13px;color:var(--ink-soft);line-height:1.45}
+  .chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:auto;padding-top:4px}
+  .chip{font-family:var(--mono);font-size:10.5px;letter-spacing:.02em;
+    background:var(--ui-soft);color:#3634c7;padding:2px 7px;border-radius:999px;white-space:nowrap}
+  .chip.show{background:#E7F3ED;color:#166a4c}
+  .chip.thin{background:#F3F1EC;color:#7a7256}
+  .star{color:var(--ui);font-weight:700}
+
+  /* question blocks */
+  .q{margin:0 0 12px}
+  .opts{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr))}
+  .opt{position:relative;display:block;background:var(--panel);border:1px solid var(--line);
+    border-radius:12px;padding:16px 16px 15px;cursor:pointer;box-shadow:var(--shadow);
+    transition:border-color .13s,box-shadow .13s,transform .13s}
+  .opt:hover{border-color:var(--line-2)}
+  .opt input{position:absolute;opacity:0;pointer-events:none}
+  .opt .tick{position:absolute;top:16px;right:16px;width:19px;height:19px;border-radius:999px;
+    border:1.6px solid var(--line-2);background:#fff;transition:.13s}
+  .opt:has(input:checked){border-color:var(--ui);box-shadow:0 0 0 1px var(--ui),var(--shadow)}
+  .opt:has(input:checked) .tick{border-color:var(--ui);background:var(--ui)
+    radial-gradient(circle,#fff 32%,transparent 34%)}
+  .opt:has(input:focus-visible){outline:2px solid var(--ui);outline-offset:2px}
+  .opt .ttl{font-family:var(--display);font-weight:600;font-size:15px;margin:0 26px 5px 0;
+    display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+  .opt .desc{font-size:13px;color:var(--ink-soft);margin:0}
+  .rec{font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;
+    background:var(--ui);color:#fff;padding:2px 6px;border-radius:5px;font-weight:600}
+  .ascii{font-family:var(--mono);font-size:11px;line-height:1.35;color:var(--ink-soft);
+    background:#FbFbFA;border:1px solid var(--line);border-radius:8px;padding:9px 10px;margin:10px 0 0;
+    white-space:pre;overflow-x:auto}
+  .cost{font-family:var(--mono);font-size:11px;color:var(--warn);margin:9px 0 0;display:flex;gap:6px}
+  .cost b{color:var(--good);font-weight:600}
+
+  /* direction previews */
+  .dirs{display:grid;gap:18px;grid-template-columns:1fr}
+  @media(min-width:860px){.dirs{grid-template-columns:1fr 1fr 1fr}}
+  .dir{border-radius:14px;overflow:hidden;border:1px solid var(--line);box-shadow:var(--shadow);
+    background:var(--panel);display:flex;flex-direction:column;position:relative}
+  .dir input{position:absolute;opacity:0;pointer-events:none}
+  .dir:has(input:checked){box-shadow:0 0 0 2px var(--ui),var(--shadow)}
+  .dir-pick{display:flex;align-items:center;gap:9px;padding:12px 15px;cursor:pointer;
+    border-top:1px solid var(--line);background:var(--panel);font-size:13.5px}
+  .dir-pick .tick{width:19px;height:19px;border-radius:999px;border:1.6px solid var(--line-2);
+    background:#fff;flex:0 0 auto}
+  .dir:has(input:checked) .dir-pick .tick{border-color:var(--ui);
+    background:var(--ui) radial-gradient(circle,#fff 32%,transparent 34%)}
+  .dir-pick b{font-family:var(--display);font-weight:600}
+  .dir-meta{padding:13px 15px;font-size:12.5px;color:var(--ink-soft);border-top:1px solid var(--line)}
+  .dir-meta .row{display:flex;gap:8px;margin:0 0 6px;align-items:center}
+  .dir-meta .row:last-child{margin:0}
+  .dir-meta .k{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--faint);flex:0 0 52px}
+  .sw{display:flex;gap:5px;flex-wrap:wrap}
+  .sw i{width:17px;height:17px;border-radius:5px;display:block;border:1px solid rgba(0,0,0,.12)}
+  .preview{min-height:230px;flex:1;padding:16px;overflow:hidden;position:relative}
+
+  /* --- Direction A: Eval Report --- */
+  .dir-eval .preview{background:#F4F6F3;font-family:'IBM Plex Sans',sans-serif;color:#14181C}
+  .dir-eval .kick{font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.14em;
+    text-transform:uppercase;color:#77837a}
+  .dir-eval .hl{font-size:19px;font-weight:600;line-height:1.3;letter-spacing:-.02em;margin:6px 0 11px}
+  .dir-eval .metrics{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:13px}
+  .dir-eval .met{background:#fff;border:1px solid #DDE4DC;border-radius:7px;padding:6px 9px;min-width:0}
+  .dir-eval .met .n{font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:600;
+    color:#17876B;font-variant-numeric:tabular-nums;line-height:1.25}
+  .dir-eval .met .l{font-size:9px;color:#77837a;margin-top:2px}
+  .dir-eval .card{background:#fff;border:1px solid #DDE4DC;border-radius:8px;padding:9px 10px}
+  .dir-eval .card .t{font-weight:600;font-size:12.5px}
+  .dir-eval .card .d{font-size:10.5px;color:#5a655d;margin-top:2px}
+  .dir-eval .bar{height:5px;border-radius:3px;background:#E6ECE5;margin-top:8px;overflow:hidden}
+  .dir-eval .bar i{display:block;height:100%;width:77%;background:#17876B}
+
+  /* --- Direction B: Agent Terminal --- */
+  .dir-term .preview{background:#17140F;color:#E8DFCE;font-family:'JetBrains Mono',monospace}
+  .dir-term .hl{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:20px;
+    line-height:1.15;letter-spacing:-.02em;color:#F4ECD9;margin:0 0 12px}
+  .dir-term .hl span{color:#F0A32E}
+  .dir-term .log{font-size:10.5px;line-height:1.7;color:#B9AF98}
+  .dir-term .log .p{color:#F0A32E}
+  .dir-term .log .c{color:#6FB3A6}
+  .dir-term .log .cur{background:#F0A32E;color:#17140F}
+  .dir-term .pill{display:inline-block;margin-top:12px;border:1px solid #4a4130;border-radius:6px;
+    padding:5px 9px;font-size:10px;color:#E8DFCE}
+  .dir-term .pill b{color:#F0A32E}
+
+  /* --- Direction C: Atelier --- */
+  .dir-atelier .preview{background:#EEEDE8;color:#191A1D;font-family:'Inter',sans-serif}
+  .dir-atelier .no{font-family:'Fraunces',serif;font-size:12px;color:#2B4FF0;font-weight:600}
+  .dir-atelier .hl{font-family:'Fraunces',serif;font-weight:900;font-size:27px;line-height:1.15;
+    letter-spacing:-.02em;margin:2px 0 8px}
+  .dir-atelier .sub{font-size:11px;color:#55565b;max-width:34ch;margin:0 0 14px}
+  .dir-atelier .frame{border-top:1.5px solid #2B4FF0;padding-top:9px;display:flex;
+    justify-content:space-between;gap:10px;align-items:flex-end}
+  .dir-atelier .frame .cap{font-size:10px;color:#55565b}
+  .dir-atelier .frame .big{font-family:'Fraunces',serif;font-size:15px;font-weight:600}
+  .dir-atelier .band{height:64px;border-radius:6px;margin-top:10px;
+    background:linear-gradient(105deg,#2B4FF0,#7C8BF6 60%,#c9d0fb);position:relative;overflow:hidden}
+  .dir-atelier .band::after{content:'';position:absolute;inset:0;
+    background:radial-gradient(140px 60px at 78% 120%,rgba(255,255,255,.5),transparent)}
+
+  /* media checkboxes reuse .opt but square tick */
+  .opt.multi:has(input:checked) .tick{border-radius:5px}
+  .opt.multi .tick{border-radius:5px}
+  .opt.multi:has(input:checked) .tick{background:var(--ui)
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='white' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 8.5l3.2 3.2L13 4.5'/%3E%3C/svg%3E") center/13px no-repeat}
+
+  /* assemble bar */
+  .assemble{margin-top:36px;background:var(--panel);border:1px solid var(--line-2);border-radius:16px;
+    padding:22px;box-shadow:var(--shadow)}
+  .assemble h2{margin-bottom:4px}
+  .notes{width:100%;margin-top:14px;border:1px solid var(--line-2);border-radius:10px;padding:11px 13px;
+    font-family:var(--sans);font-size:14px;resize:vertical;min-height:64px;background:#FCFCFB;color:var(--ink)}
+  .notes:focus{outline:2px solid var(--ui);outline-offset:1px;border-color:var(--ui)}
+  .go{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-top:14px}
+  button.primary{font-family:var(--display);font-weight:600;font-size:15px;background:var(--ink);
+    color:#fff;border:0;border-radius:10px;padding:12px 22px;cursor:pointer;transition:transform .1s,background .15s}
+  button.primary:hover{background:#000;transform:translateY(-1px)}
+  button.primary:active{transform:translateY(0)}
+  button.ghost{font-family:var(--display);font-weight:600;font-size:13.5px;background:transparent;
+    color:var(--ink-soft);border:1px solid var(--line-2);border-radius:10px;padding:11px 16px;cursor:pointer;
+    transition:border-color .13s,color .13s}
+  button.ghost:hover{border-color:var(--faint);color:var(--ink)}
+  .status{font-family:var(--mono);font-size:12px;color:var(--good)}
+  .summary-wrap{margin-top:16px}
+  .summary-wrap[hidden]{display:none}
+  .summary-wrap pre{background:#16181B;color:#E8E9E4;border-radius:10px;padding:15px;overflow-x:auto;
+    font-family:var(--mono);font-size:12px;line-height:1.6;white-space:pre-wrap;word-break:break-word}
+  .mini{font-size:12.5px;color:var(--faint);margin-top:9px}
+  a{color:var(--ui);text-decoration:none;border-bottom:1px solid rgba(75,77,237,.3)}
+  .foot{margin-top:60px;font-family:var(--mono);font-size:11.5px;color:var(--faint);
+    display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;border-top:1px solid var(--line);padding-top:16px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <p class="eyebrow">nmp-dsci.github.io · build console</p>
+  <h1>Rebuild the site as a<br><em>portfolio of shipped AI systems.</em></h1>
+  <p class="lead">The current page is a stock Bootstrap carousel of old data-viz demos. Below is a menu: pick how it's stored on the back end, pick one of three design worlds, then pick a shape for every section. Recommendations are pre-selected — change anything, then hit <b>Assemble the brief</b> at the bottom to send me one build order. Nothing is built until you do.</p>
+
+  <div class="rule"></div>
+
+  <!-- ============ MATERIAL ============ -->
+  <section>
+    <div class="sec-head"><span class="sec-num">00</span><h2>The material I found</h2></div>
+    <p class="sec-sub">Eight sibling projects. These are the ones worth featuring, tagged by what actually exists to <em>show</em> today (screenshots, eval dashboards, diagrams, before/afters). This drives every later choice.</p>
+    <div class="inv">
+      <div class="proj">
+        <h3>Data Pilot <span class="star">★</span></h3>
+        <p>Conversational data agent — natural language → governed SQL over data you're allowed to see, with login &amp; admin.</p>
+        <div class="chips"><span class="chip">Agents</span><span class="chip">Text-to-SQL</span><span class="chip show">UI shots ·10+</span><span class="chip show">light/dark</span></div>
+      </div>
+      <div class="proj">
+        <h3>Floor Plan Reviewer <span class="star">★</span></h3>
+        <p>Agentic redesign that re-plans a home to maximise weekly rent, priced against live comps. Annotated before/after overlays.</p>
+        <div class="chips"><span class="chip">Agents</span><span class="chip">Vision</span><span class="chip show">before/after</span></div>
+      </div>
+      <div class="proj">
+        <h3>ConvFinQA Agent</h3>
+        <p>Multi-turn financial QA over tables — 4-stage pipeline. Prompt versioning lifted accuracy 73.0% → 77.1%.</p>
+        <div class="chips"><span class="chip">RAG</span><span class="chip">Multi-turn</span><span class="chip show">eval dashboards</span><span class="chip show">frontend</span></div>
+      </div>
+      <div class="proj">
+        <h3>CUAD Legal Agent</h3>
+        <p>Contract review across 41 legal questions × 50 contracts. Retrieval-coverage + answer-F1 eval over 5 RAG modes.</p>
+        <div class="chips"><span class="chip">RAG</span><span class="chip">Legal</span><span class="chip show">eval dashboards</span></div>
+      </div>
+      <div class="proj">
+        <h3>Transcript RAG</h3>
+        <p>Proves RAG beats full-transcript prompting for YouTube Q&amp;A — single-hop vs recursive vs agentic, side by side.</p>
+        <div class="chips"><span class="chip">RAG</span><span class="chip show">comparison dash</span><span class="chip show">architecture svg</span></div>
+      </div>
+      <div class="proj">
+        <h3>Adversarial Dev</h3>
+        <p>GAN-inspired harness: planner / generator / evaluator agents in adversarial tension. Runs on Claude &amp; Codex SDKs.</p>
+        <div class="chips"><span class="chip">Multi-agent</span><span class="chip">Harness</span><span class="chip show">diagram</span></div>
+      </div>
+      <div class="proj dim">
+        <h3>PropertyIQ ETL</h3>
+        <p>Collection-only ETL for NSW property + census sources. Backbone data behind the property projects.</p>
+        <div class="chips"><span class="chip">Data/ETL</span><span class="chip thin">data report only</span></div>
+      </div>
+      <div class="proj dim">
+        <h3>Chronicle</h3>
+        <p>Earlier D3 analytics dashboard — profile &amp; trend explorer. Live, but older than the agent work.</p>
+        <div class="chips"><span class="chip">Data-viz</span><span class="chip thin">older · optional</span></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="rule"></div>
+
+  <form id="builder" onsubmit="return false">
+
+  <!-- ============ BACKEND ============ -->
+  <section>
+    <div class="sec-head"><span class="sec-num">01</span><h2>Back-end structure</h2></div>
+    <p class="sec-sub">The thing you asked for most: a shape you and I can keep editing forever. All three deploy on GitHub Pages. The question is where a project's data lives when you say <em>"add my new project."</em></p>
+    <div class="opts">
+      <label class="opt">
+        <input type="radio" name="backend" value="collection" data-label="Jekyll collection — one Markdown file per project (_projects/*.md)" checked>
+        <span class="tick"></span>
+        <span class="ttl">Markdown per project <span class="rec">Recommended</span></span>
+        <span class="desc">Each project is one file in <code>_projects/</code> with front-matter (title, tags, metrics, media) + a body for the write-up. GitHub Pages builds it natively — no CI.</span>
+        <div class="ascii">_projects/
+  data-pilot.md      ← "add a project" = add a file
+  floor-plan.md
+  convfinqa.md
+_layouts/  _data/site.yml (your links/bio)</div>
+        <div class="cost"><b>+ per-project detail pages, scales cleanly</b> · slight Liquid/Jekyll learning</div>
+      </label>
+      <label class="opt">
+        <input type="radio" name="backend" value="datafile" data-label="Single YAML data file (_data/projects.yml) + templated cards">
+        <span class="tick"></span>
+        <span class="ttl">One YAML data file</span>
+        <span class="desc">Every project is an entry in one <code>_data/projects.yml</code>. The home page loops over it. Dead simple to eyeball and edit in one place.</span>
+        <div class="ascii">_data/projects.yml
+  - name: Data Pilot
+    tags: [Agents, SQL]
+    metric: "77% acc"
+  - name: Floor Plan …</div>
+        <div class="cost"><b>+ simplest possible edit surface</b> · weaker for long per-project pages</div>
+      </label>
+      <label class="opt">
+        <input type="radio" name="backend" value="json-vanilla" data-label="Plain projects.json rendered by vanilla JS (no Jekyll, no build)">
+        <span class="tick"></span>
+        <span class="ttl">JSON + vanilla JS</span>
+        <span class="desc">No build step at all. A <code>projects.json</code> rendered client-side by a small script. Closest to the current hand-written setup.</span>
+        <div class="ascii">projects.json  →  app.js renders cards
+index.html  (one file, no _layouts)</div>
+        <div class="cost">zero build · <b>but no SEO / no real per-project URLs</b></div>
+      </label>
+    </div>
+  </section>
+
+  <div class="rule"></div>
+
+  <!-- ============ DIRECTION ============ -->
+  <section>
+    <div class="sec-head"><span class="sec-num">02</span><h2>Design direction — pick one world</h2></div>
+    <p class="sec-sub">Three coherent looks, each built from <em>your</em> subject matter (evals, agent traces, case studies) — deliberately not the generic cream-serif / neon-on-black portfolio template. Previews are live, in-style.</p>
+    <div class="dirs">
+
+      <!-- A -->
+      <label class="dir dir-eval">
+        <input type="radio" name="direction" value="eval-report" data-label="Eval Report — instrument/lab aesthetic, metric-forward" checked>
+        <div class="preview">
+          <div class="kick">// applied-ai · measured</div>
+          <div class="hl">I build agents and prove they work.</div>
+          <div class="metrics">
+            <div class="met"><div class="n">77.1%</div><div class="l">ConvFinQA acc</div></div>
+            <div class="met"><div class="n">5</div><div class="l">RAG modes eval'd</div></div>
+            <div class="met"><div class="n">41×50</div><div class="l">CUAD grid</div></div>
+          </div>
+          <div class="card"><div class="t">Data Pilot</div><div class="d">NL → governed SQL agent</div>
+            <div class="bar"><i></i></div></div>
+        </div>
+        <div class="dir-meta">
+          <div class="row"><span class="k">Palette</span><span class="sw"><i style="background:#F4F6F3"></i><i style="background:#17876B"></i><i style="background:#14181C"></i><i style="background:#B26A12"></i></span></div>
+          <div class="row"><span class="k">Type</span><span>IBM Plex Sans + Plex Mono</span></div>
+          <div class="row"><span class="k">Signal</span><span>every project wears a live metric chip</span></div>
+        </div>
+        <div class="dir-pick"><span class="tick"></span><span><b>Eval Report</b> — precise, instrument-like <span class="rec">Rec</span></span></div>
+      </label>
+
+      <!-- B -->
+      <label class="dir dir-term">
+        <input type="radio" name="direction" value="agent-terminal" data-label="Agent Terminal — warm CRT, animated agent trace">
+        <div class="preview">
+          <div class="hl">watch the agents <span>think.</span></div>
+          <div class="log">
+            <span class="p">▸ planner</span> decomposed task → 4 steps<br>
+            <span class="p">▸ retriever</span> <span class="c">top-30</span> chunks · bm25+dense<br>
+            <span class="p">▸ generator</span> drafting answer…<br>
+            <span class="p">▸ evaluator</span> F1 <span class="c">0.81</span> · pass<span class="cur">▊</span>
+          </div>
+          <div class="pill">6 systems · <b>Claude + Codex</b> SDK</div>
+        </div>
+        <div class="dir-meta">
+          <div class="row"><span class="k">Palette</span><span class="sw"><i style="background:#17140F"></i><i style="background:#F0A32E"></i><i style="background:#6FB3A6"></i><i style="background:#E8DFCE"></i></span></div>
+          <div class="row"><span class="k">Type</span><span>Space Grotesk + JetBrains Mono</span></div>
+          <div class="row"><span class="k">Signal</span><span>hero is a live streaming agent trace</span></div>
+        </div>
+        <div class="dir-pick"><span class="tick"></span><span><b>Agent Terminal</b> — warm, alive, developer-native</span></div>
+      </label>
+
+      <!-- C -->
+      <label class="dir dir-atelier">
+        <input type="radio" name="direction" value="atelier" data-label="Atelier — editorial case-study, big imagery">
+        <div class="preview">
+          <div class="no">01 — 06</div>
+          <div class="hl">Applied AI,<br>as case studies.</div>
+          <div class="sub">Six systems, each documented like a piece of work: the problem, the build, the number it moved.</div>
+          <div class="frame"><span class="cap">Floor Plan Reviewer</span><span class="big">+$180/wk</span></div>
+          <div class="band"></div>
+        </div>
+        <div class="dir-meta">
+          <div class="row"><span class="k">Palette</span><span class="sw"><i style="background:#EEEDE8"></i><i style="background:#2B4FF0"></i><i style="background:#191A1D"></i><i style="background:#7C8BF6"></i></span></div>
+          <div class="row"><span class="k">Type</span><span>Fraunces (display) + Inter</span></div>
+          <div class="row"><span class="k">Signal</span><span>numbered studies, oversized imagery</span></div>
+        </div>
+        <div class="dir-pick"><span class="tick"></span><span><b>Atelier</b> — curated, editorial, image-led</span></div>
+      </label>
+
+    </div>
+  </section>
+
+  <div class="rule"></div>
+
+  <!-- ============ SECTIONS ============ -->
+  <section>
+    <div class="sec-head"><span class="sec-num">03</span><h2>Every section — pick a shape</h2></div>
+    <p class="sec-sub">These apply inside whichever direction you chose above. Defaults are my picks for an AI-engineering resume site.</p>
+
+    <!-- Hero -->
+    <div class="q">
+      <div class="sec-head" style="margin-top:6px"><span class="sec-num">3.1</span><h2 style="font-size:19px">Hero</h2></div>
+      <div class="opts">
+        <label class="opt"><input type="radio" name="hero" value="thesis-metrics" data-label="Hero: thesis line + live metric strip" checked><span class="tick"></span>
+          <span class="ttl">Thesis + metric strip <span class="rec">Rec</span></span>
+          <span class="desc">One sharp sentence about what you do, under it a row of real numbers (77% acc, 5 RAG modes, F1s). Says "I ship and measure" instantly.</span></label>
+        <label class="opt"><input type="radio" name="hero" value="agent-trace" data-label="Hero: animated agent trace / streaming log"><span class="tick"></span>
+          <span class="ttl">Animated agent trace</span>
+          <span class="desc">A short typed agent log streams on load — planner → retriever → evaluator. High-personality, pairs best with Agent Terminal.</span></label>
+        <label class="opt"><input type="radio" name="hero" value="featured-takeover" data-label="Hero: featured-project image takeover"><span class="tick"></span>
+          <span class="ttl">Featured takeover</span>
+          <span class="desc">One flagship project fills the hero with a big screenshot (Data Pilot / floor-plan before-after). Pairs best with Atelier.</span></label>
+        <label class="opt"><input type="radio" name="hero" value="minimal" data-label="Hero: minimal name + role + one line"><span class="tick"></span>
+          <span class="ttl">Minimal name-card</span>
+          <span class="desc">Name, role, one line, links. Quiet and fast — lets the project grid do all the talking.</span></label>
+      </div>
+    </div>
+
+    <!-- Index -->
+    <div class="q">
+      <div class="sec-head" style="margin-top:20px"><span class="sec-num">3.2</span><h2 style="font-size:19px">Project index (the grid)</h2></div>
+      <div class="opts">
+        <label class="opt"><input type="radio" name="index" value="filter-metric-grid" data-label="Index: metric-forward grid, filterable by capability" checked><span class="tick"></span>
+          <span class="ttl">Filterable metric grid <span class="rec">Rec</span></span>
+          <span class="desc">Cards with a headline metric each, plus filter pills — <code>Agents · RAG · Multi-agent · Data</code>. Recruiters filter to what they care about.</span>
+          <div class="ascii">[Agents][RAG][Multi-agent][Data]  ← filter
+┌────────┐ ┌────────┐ ┌────────┐
+│77% acc │ │+$180/wk│ │ F1 .81 │
+└────────┘ └────────┘ └────────┘</div></label>
+        <label class="opt"><input type="radio" name="index" value="editorial-list" data-label="Index: numbered editorial list with big imagery"><span class="tick"></span>
+          <span class="ttl">Numbered editorial list</span>
+          <span class="desc">Full-width rows, 01–06, each with large imagery and a pull-quote metric. Fewer projects, more weight each. Pairs with Atelier.</span>
+          <div class="ascii">01 ── Data Pilot        [ image ]
+02 ── Floor Plan        [ image ]
+03 ── ConvFinQA         [ image ]</div></label>
+        <label class="opt"><input type="radio" name="index" value="dense-cards" data-label="Index: dense uniform card grid, no filters"><span class="tick"></span>
+          <span class="ttl">Dense card grid</span>
+          <span class="desc">Simple uniform grid of all projects at once, no filtering. Cleanest to build, good if the count stays small.</span></label>
+      </div>
+    </div>
+
+    <!-- Detail -->
+    <div class="q">
+      <div class="sec-head" style="margin-top:20px"><span class="sec-num">3.3</span><h2 style="font-size:19px">Project detail page</h2></div>
+      <div class="opts">
+        <label class="opt"><input type="radio" name="detail" value="case-study" data-label="Detail: case study — problem / approach / result / demo" checked><span class="tick"></span>
+          <span class="ttl">Case study <span class="rec">Rec</span></span>
+          <span class="desc">Structured page per project: the problem, your approach, the result (with the metric), then the demo media &amp; links. The resume-grade format.</span></label>
+        <label class="opt"><input type="radio" name="detail" value="spec-sheet" data-label="Detail: compact spec sheet + embedded demo"><span class="tick"></span>
+          <span class="ttl">Compact spec sheet</span>
+          <span class="desc">Tight one-screen summary — stack, role, links, one demo embed. Less reading, faster to skim.</span></label>
+        <label class="opt"><input type="radio" name="detail" value="readme-driven" data-label="Detail: rendered from each project's README"><span class="tick"></span>
+          <span class="ttl">README-driven</span>
+          <span class="desc">Pull each repo's README straight in. Lowest maintenance (write once in the repo), but reads like docs, not a portfolio.</span></label>
+        <label class="opt"><input type="radio" name="detail" value="none-modal" data-label="Detail: no page — expand in a modal/lightbox on the grid"><span class="tick"></span>
+          <span class="ttl">No page — inline expand</span>
+          <span class="desc">Everything stays on the home page; clicking a card opens a lightbox. Single-page feel, no detail routes.</span></label>
+      </div>
+    </div>
+
+    <!-- Media -->
+    <div class="q">
+      <div class="sec-head" style="margin-top:20px"><span class="sec-num">3.4</span><h2 style="font-size:19px">Demo &amp; media <span style="font-family:var(--mono);font-size:11px;color:var(--faint);font-weight:400">— your original "show videos" question · pick any</span></h2></div>
+      <div class="opts">
+        <label class="opt multi"><input type="checkbox" name="media" value="live-dashboards" data-label="embedded live dashboards/HTML the projects already output" checked><span class="tick"></span>
+          <span class="ttl">Embed live dashboards</span>
+          <span class="desc">Several projects already output real HTML (eval dashboards, comparison reports, D3). Embed the actual thing — no recording needed. <b>Cheapest, most convincing.</b></span></label>
+        <label class="opt multi"><input type="checkbox" name="media" value="self-hosted-video" data-label="self-hosted MP4/WebM walkthrough videos committed to the repo" checked><span class="tick"></span>
+          <span class="ttl">Self-hosted video</span>
+          <span class="desc">MP4/WebM in <code>assets/video/</code> via HTML5 <code>&lt;video&gt;</code>. GitHub Pages serves it fine (&lt;100 MB/file). <b>You record the walkthrough</b> — I can't capture your desktop or your voice.</span></label>
+        <label class="opt multi"><input type="checkbox" name="media" value="gif-loops" data-label="silent looping GIF/animation previews I can auto-capture"><span class="tick"></span>
+          <span class="ttl">Auto-captured GIF loops</span>
+          <span class="desc">For the browser UIs (Data Pilot, ConvFinQA frontend) I can drive them and record silent looping GIFs myself. Great for card hovers. No audio.</span></label>
+        <label class="opt multi"><input type="checkbox" name="media" value="terminal-cast" data-label="asciinema/terminal recordings for the CLI agents"><span class="tick"></span>
+          <span class="ttl">Terminal recordings</span>
+          <span class="desc">For CLI agents (CUAD, transcript-RAG, adversarial-dev) a crisp asciinema-style terminal cast shows more than a screenshot. I can generate these.</span></label>
+        <label class="opt multi"><input type="checkbox" name="media" value="screens" data-label="static screenshot galleries with captions"><span class="tick"></span>
+          <span class="ttl">Screenshot galleries</span>
+          <span class="desc">Data Pilot already has 10+ polished shots (light/dark/mobile). A captioned gallery is instant and needs no capture at all.</span></label>
+      </div>
+      <p class="mini">Reality check: several of these apps make live API calls, so a run I capture burns real tokens and may not be the take you'd want to show. Video walkthroughs are usually best recorded by you; dashboards / screenshots / terminal casts I can do unattended.</p>
+    </div>
+
+    <!-- About -->
+    <div class="q">
+      <div class="sec-head" style="margin-top:20px"><span class="sec-num">3.5</span><h2 style="font-size:19px">About / info — GitHub · LinkedIn · résumé</h2></div>
+      <div class="opts">
+        <label class="opt"><input type="radio" name="about" value="about-page" data-label="About: dedicated /about page with bio, skills, résumé + links" checked><span class="tick"></span>
+          <span class="ttl">Dedicated About page <span class="rec">Rec</span></span>
+          <span class="desc">Own route: short bio, capability list (RAG, agents, evals, fine-tuning), links to GitHub / LinkedIn, and a résumé download. Room to grow.</span></label>
+        <label class="opt"><input type="radio" name="about" value="sidebar" data-label="About: persistent sidebar/rail with bio + links on every page"><span class="tick"></span>
+          <span class="ttl">Persistent sidebar</span>
+          <span class="desc">A fixed rail carries your name, one-liner, and links on every page. Always visible, portfolio-as-profile feel.</span></label>
+        <label class="opt"><input type="radio" name="about" value="footer-strip" data-label="About: compact footer strip with links only"><span class="tick"></span>
+          <span class="ttl">Footer strip only</span>
+          <span class="desc">Keep it minimal — bio line + GitHub/LinkedIn/résumé in the footer. Lets the work stand alone.</span></label>
+      </div>
+    </div>
+
+    <!-- Nav -->
+    <div class="q">
+      <div class="sec-head" style="margin-top:20px"><span class="sec-num">3.6</span><h2 style="font-size:19px">Navigation</h2></div>
+      <div class="opts">
+        <label class="opt"><input type="radio" name="nav" value="topbar" data-label="Nav: sticky top bar (Work · About · GitHub · résumé)" checked><span class="tick"></span>
+          <span class="ttl">Sticky top bar <span class="rec">Rec</span></span>
+          <span class="desc">Work · About · GitHub · LinkedIn · Résumé. Conventional, recruiters find things fast.</span></label>
+        <label class="opt"><input type="radio" name="nav" value="left-rail" data-label="Nav: left rail / vertical nav"><span class="tick"></span>
+          <span class="ttl">Left rail</span>
+          <span class="desc">Vertical nav down the side — more app-like, pairs with the sidebar-About option and Agent Terminal.</span></label>
+        <label class="opt"><input type="radio" name="nav" value="minimal" data-label="Nav: minimal — links in hero/footer only, single scroll"><span class="tick"></span>
+          <span class="ttl">Minimal / none</span>
+          <span class="desc">No chrome — one long scroll, links live in the hero and footer. Quietest, most editorial.</span></label>
+      </div>
+    </div>
+
+    <!-- Scope -->
+    <div class="q">
+      <div class="sec-head" style="margin-top:20px"><span class="sec-num">3.7</span><h2 style="font-size:19px">First build scope</h2></div>
+      <div class="opts">
+        <label class="opt"><input type="radio" name="scope" value="skeleton" data-label="Scope: walking skeleton — scaffold + home + two flagship detail pages, review, then roll out the rest" checked><span class="tick"></span>
+          <span class="ttl">Walking skeleton <span class="rec">Rec</span></span>
+          <span class="desc">Scaffold the structure, then build the home page and two flagship case studies (Data Pilot + Floor Plan) end-to-end. You review the real thing early and we iterate before rolling the pattern out to the rest.</span></label>
+        <label class="opt"><input type="radio" name="scope" value="full" data-label="Scope: full build — all six projects and all pages in one pass"><span class="tick"></span>
+          <span class="ttl">Full build</span>
+          <span class="desc">All six featured projects and every page in one pass. Slower to first review, but fewer rounds if you already trust the choices above.</span></label>
+        <label class="opt"><input type="radio" name="scope" value="scaffold" data-label="Scope: scaffold only — structure, layouts and placeholder content, no real write-ups yet"><span class="tick"></span>
+          <span class="ttl">Scaffold only</span>
+          <span class="desc">Just the file structure, layouts and placeholder entries — inspect the machinery and the edit workflow before any real content is written.</span></label>
+      </div>
+    </div>
+
+    <!-- Authoring -->
+    <div class="q">
+      <div class="sec-head" style="margin-top:20px"><span class="sec-num">3.8</span><h2 style="font-size:19px">Authoring workflow — how project write-ups get edited</h2></div>
+      <div class="opts">
+        <label class="opt"><input type="radio" name="authoring" value="lavish-loop" data-label="Authoring: AI drafts each page, you annotate/reorder it live in the browser (like this console), agent writes the changes back into the Markdown source" checked><span class="tick"></span>
+          <span class="ttl">Annotate → agent applies <span class="rec">Rec</span></span>
+          <span class="desc">I draft each project page and serve it live, exactly like this console. You click any element — reword it, "move this above that", cut it — and I apply the change to the underlying Markdown, then you re-review. What you approve is what merges.</span></label>
+        <label class="opt"><input type="radio" name="authoring" value="edit-mode" data-label="Authoring: in-page WYSIWYG edit mode — inline text editing + drag-to-reorder sections, Save exports back to the page's Markdown source"><span class="tick"></span>
+          <span class="ttl">In-page edit mode</span>
+          <span class="desc">An author-only mode built into each project page: edit text inline, drag whole sections to reorder, hit <b>Save</b> to write it back to the page's Markdown/front-matter for commit. Most hands-on; edits stay section-level so the site's design system holds.</span></label>
+        <label class="opt"><input type="radio" name="authoring" value="cms" data-label="Authoring: Git-based CMS (Decap) at /admin — form-based editing of _projects/*.md, saves commit via GitHub"><span class="tick"></span>
+          <span class="ttl">Git-based CMS</span>
+          <span class="desc">Decap CMS at <code>/admin</code>: form fields + a Markdown editor over <code>_projects/</code>, and saving commits straight to a branch via GitHub. Zero custom build, editable from any device; form-based rather than drag-around, needs a one-time OAuth setup.</span></label>
+      </div>
+      <p class="mini">All three keep the Markdown file as the source of truth: the interactive edit is captured back into it, GitHub Pages rebuilds automatically, and whatever lands on <b>master</b> is exactly what visitors see at nmp-dsci.github.io.</p>
+    </div>
+  </section>
+
+  <!-- ============ ASSEMBLE ============ -->
+  <div class="assemble" id="assemble-box">
+    <div class="sec-head"><span class="sec-num">→</span><h2>Assemble the brief</h2></div>
+    <p class="sec-sub" style="margin-bottom:0">Change anything above, add a note, then send me one build order. You can also annotate any card directly if you want a tweak I didn't offer as an option.</p>
+    <textarea class="notes" id="notes" placeholder="Optional notes — anything not covered above. e.g. 'lead with Data Pilot', 'use my real name in the hero', 'skip Chronicle', 'match my LinkedIn colours'…"></textarea>
+    <div class="go">
+      <button type="button" class="primary" id="assemble">Assemble the brief →</button>
+      <button type="button" class="ghost" id="reset">Reset to recommendations</button>
+      <span class="status" id="status"></span>
+    </div>
+    <div class="summary-wrap" id="summary-wrap" hidden>
+      <p class="mini">This is exactly what gets sent back to me · <a href="#" id="copy">copy to clipboard</a></p>
+      <pre id="summary-out"></pre>
+    </div>
+  </div>
+
+  </form>
+
+  <div class="foot">
+    <span>nmp-dsci.github.io · build console</span>
+    <span>defaults = my recommendation · nothing built until you assemble</span>
+  </div>
+
+</div>
+
+<script>
+  function collect(){
+    const f=document.getElementById('builder');
+    const one=n=>{const e=f.querySelector('input[name="'+n+'"]:checked');return e?e.getAttribute('data-label'):'(not selected)';};
+    const many=n=>{const e=[...f.querySelectorAll('input[name="'+n+'"]:checked')];return e.length?e.map(x=>x.getAttribute('data-label')).join('; '):'(none)';};
+    return {
+      backend:one('backend'), direction:one('direction'), hero:one('hero'),
+      index:one('index'), detail:one('detail'), media:many('media'),
+      about:one('about'), nav:one('nav'), scope:one('scope'), authoring:one('authoring'),
+      notes:(document.getElementById('notes').value||'').trim()
+    };
+  }
+  function buildPrompt(c){
+    const lines=[
+      'Build the nmp-dsci.github.io portfolio with these choices — scaffold the back end first, then the home page in the chosen direction:',
+      '• Back-end structure: '+c.backend,
+      '• Design direction: '+c.direction,
+      '• Hero: '+c.hero,
+      '• Project index: '+c.index,
+      '• Project detail page: '+c.detail,
+      '• Demo / media: '+c.media,
+      '• About / info: '+c.about,
+      '• Navigation: '+c.nav,
+      '• First build scope: '+c.scope,
+      '• Authoring workflow: '+c.authoring
+    ];
+    if(c.notes) lines.push('• Notes: '+c.notes);
+    lines.push('','Feature: Data Pilot, Floor Plan Reviewer, ConvFinQA Agent, CUAD Legal Agent, Transcript RAG, Adversarial Dev (PropertyIQ + Chronicle optional).');
+    return lines.join('\n');
+  }
+  function setStatus(t){document.getElementById('status').textContent=t;}
+
+  /* selections + notes survive reloads */
+  (function(){
+    const f=document.getElementById('builder'),notes=document.getElementById('notes'),KEY='s00-build-options';
+    function snap(){
+      const o={};
+      f.querySelectorAll('input[type=radio],input[type=checkbox]').forEach(i=>{o[i.name]=o[i.name]||[]});
+      f.querySelectorAll('input:checked').forEach(i=>o[i.name].push(i.value));
+      o._notes=notes.value;
+      try{localStorage.setItem(KEY,JSON.stringify(o))}catch(e){}
+    }
+    function restore(){
+      let o;try{o=JSON.parse(localStorage.getItem(KEY))}catch(e){}
+      if(!o)return;
+      f.querySelectorAll('input[type=radio],input[type=checkbox]').forEach(i=>{
+        if(Array.isArray(o[i.name]))i.checked=o[i.name].includes(i.value);
+      });
+      if(typeof o._notes==='string')notes.value=o._notes;
+    }
+    f.addEventListener('change',snap);
+    notes.addEventListener('input',snap);
+    document.getElementById('reset').addEventListener('click',function(){
+      try{localStorage.removeItem(KEY)}catch(e){}
+      f.querySelectorAll('input[type=radio],input[type=checkbox]').forEach(i=>{i.checked=i.defaultChecked});
+      notes.value='';
+      document.getElementById('summary-wrap').hidden=true;
+      setStatus('Reset to recommendations.');
+    });
+    restore();
+  })();
+
+  document.getElementById('copy').addEventListener('click',function(e){
+    e.preventDefault();
+    const t=document.getElementById('summary-out').textContent;
+    if(navigator.clipboard&&navigator.clipboard.writeText){
+      navigator.clipboard.writeText(t).then(()=>setStatus('Copied ✓'),()=>setStatus('Copy failed — select the text manually.'));
+    }else{setStatus('Copy failed — select the text manually.')}
+  });
+
+  document.getElementById('assemble').addEventListener('click',function(){
+    const c=collect(), prompt=buildPrompt(c);
+    document.getElementById('summary-out').textContent=prompt;
+    document.getElementById('summary-wrap').hidden=false;
+    if(window.lavish&&window.lavish.queuePrompt){
+      window.lavish.queuePrompt(prompt,{tag:'choice',text:'Portfolio build brief',
+        element:document.getElementById('assemble-box'),data:c});
+      setStatus('Queued ✓  — press “Send to Agent” in the toolbar to send.');
+    }else{
+      setStatus('Copy the brief below and paste it back to me.');
+    }
+  });
+</script>
+</body>
+</html>

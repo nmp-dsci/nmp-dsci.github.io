@@ -8,22 +8,31 @@ layout: default
     <h1>{{ page.title }}</h1>
     <p class="study-summary">{{ page.summary }}</p>
 
-    {% if page.skills %}
-    <div class="skillrow" aria-label="AI-engineering skills demonstrated">
-      <span class="skillrow-k">Skills demonstrated</span>
-      {% for s in page.skills %}{% assign sk = site.data.skills[s] %}
-      <span class="skill"{% if sk.market %} title="Asked for in {{ sk.market }} of AI-engineer roles"{% endif %}>{{ sk.label | default: s }}{% if sk.market %}<em>{{ sk.market }}</em>{% endif %}</span>
-      {% endfor %}
+    <div class="tldr" role="region" aria-label="30-second summary">
+      <p class="tldr-k">// 30-second version</p>
+      <div class="tldr-grid">
+        <div class="tldr-cell"><span class="tldr-l">What</span>
+          <span class="tldr-v">{{ page.tldr | default: page.summary }}</span></div>
+        <div class="tldr-cell"><span class="tldr-l">Proof</span>
+          <span class="tldr-v"><b>{{ page.metric }}</b> — {{ page.metric_label }}</span></div>
+        <div class="tldr-cell"><span class="tldr-l">Skills</span>
+          <span class="tldr-v">{% for s in page.skills limit:5 %}{% assign sk = site.data.skills[s] %}{{ sk.label | default: s }}{% unless forloop.last %} · {% endunless %}{% endfor %}</span></div>
+        {% if page.links.repo or page.links.demo %}
+        <div class="tldr-cell"><span class="tldr-l">Where</span>
+          <span class="tldr-v">{% if page.links.repo %}<a href="{{ page.links.repo }}" target="_blank" rel="noopener">Repository ↗</a>{% endif %}{% if page.links.demo %}{% if page.links.repo %} · {% endif %}<a href="{{ page.links.demo }}" target="_blank" rel="noopener">Demo ↗</a>{% endif %}</span></div>
+        {% endif %}
+      </div>
     </div>
-    {% endif %}
 
     <div class="study-cols">
       <div class="study-main">
         <div class="mediaframe">
           {% if page.media.walkthrough %}
           <video class="walkthrough" controls preload="metadata"
-            {% if page.media.poster %}poster="{{ page.media.poster | relative_url }}"{% endif %}
-            src="{{ page.media.walkthrough | relative_url }}"></video>
+            {% if page.media.poster %}poster="{{ page.media.poster | relative_url }}"{% endif %}>
+            <source src="{{ page.media.walkthrough | relative_url }}" type="video/mp4">
+            {% if page.media.captions %}<track kind="captions" src="{{ page.media.captions | relative_url }}" srclang="en" label="English" default>{% endif %}
+          </video>
           {% else %}
           <div class="media-placeholder" role="img" aria-label="App walkthrough video coming soon">
             <span class="mp-label">app walkthrough</span>
@@ -33,11 +42,24 @@ layout: default
           {% endif %}
         </div>
 
+        {% if page.skills_detail %}
+        <section class="skills-demo" aria-label="Skills demonstrated">
+          <h2>Skills demonstrated</h2>
+          <ul class="sd-list">
+            {% for sd in page.skills_detail %}{% assign sk = site.data.skills[sd.skill] %}
+            <li>
+              <span class="skill"{% if sk.market %} title="Asked for in {{ sk.market }} of AI-engineer roles"{% endif %}>{{ sk.label | default: sd.skill }}{% if sk.market %}<em>{{ sk.market }}</em>{% endif %}</span>
+              <span class="sd-proof">{{ sd.proof }}</span>
+            </li>
+            {% endfor %}
+          </ul>
+        </section>
+        {% endif %}
+
         <div class="study-body">
           {{ content }}
 
           {% if page.evidence %}
-          <h2>Evidence</h2>
           {% for ev in page.evidence %}
           <figure class="evidence">
             {% if ev.type == "dashboard" %}

@@ -1,0 +1,41 @@
+WEBVTT
+
+1
+00:00:00.219 --> 00:00:08.915
+Floor-Plan Studio. Open the seeded property, or upload any floor plan for AI vision ingestion.
+
+2
+00:00:08.915 --> 00:00:19.010
+The plan is a live shape object — every room and wall is selectable. The rent story: nine hundred a week baseline, twelve-sixty proposed.
+
+3
+00:00:19.010 --> 00:00:27.043
+Delta view — a computed geometry diff. Red removed, green added, amber modified.
+
+4
+00:00:27.043 --> 00:00:36.895
+Versions are immutable. Version zero is the original; every change is a git-style hunk with rent impact and compliance flags.
+
+5
+00:00:36.895 --> 00:00:44.881
+Select the store room, then shift-click a wall. Drag the handles to pick an exact chunk.
+
+6
+00:00:44.881 --> 00:00:53.793
+One comment covers both targets: make it a study, and cut a servery window. Changes queue locally.
+
+7
+00:00:53.793 --> 00:01:03.144
+Send. The DeepSeek agent replies with typed, validated geometry operations — the building envelope can never grow.
+
+8
+00:01:03.144 --> 00:01:12.872
+The new version arrives live: the study, the servery window, and a fresh rent estimate.
+
+9
+00:01:12.872 --> 00:01:23.490
+Every line in the new hunk traces to a geometry object. Export any version as a styled plan or summary.
+
+10
+00:01:23.490 --> 00:01:29.954
+Select, comment, send. The agent edits geometry — never pixels.

@@ -12,7 +12,10 @@ actually works — and I treat the eval as part of the product, not an afterthou
 ## What I work with
 
 - **Agents** — planning/execution loops, tool use, governed text-to-SQL, vision agents
-- **RAG** — retrieval strategy design and head-to-head benchmarking (single-hop, recursive, agentic)
+- **Guardrails** — deterministic policy gates between the model and its tools, red-team attacks
+  graded on system state, PII redaction
+- **RAG** — retrieval strategy design and head-to-head benchmarking across seven configurations
+  (HyDE, multi-query, contextual retrieval, rank fusion) scored on recall@k, MRR and NDCG
 - **Evals** — accuracy grids, retrieval-coverage and answer-F1 harnesses, prompt versioning with measured lifts
 - **Multi-agent systems** — adversarial planner / generator / evaluator harnesses on Claude and Codex SDKs
 - **Data engineering** — the ETL and analytics work that feeds the systems above
