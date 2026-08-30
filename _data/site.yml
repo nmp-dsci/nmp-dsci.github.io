@@ -1,6 +1,10 @@
 name: Nathan Phillips
 role: Applied AI Engineer
-tagline: I build agents and prove they work.
+strapline: >-
+  Three systems live on AWS — each with evals in CI, guardrails between the model and the
+  data, per-request traces, cost caps and a push-button deploy. Every one is scored against
+  the same production rubric, and you can walk straight into the live app.
+tagline: I build gen-AI systems and run them in production.
 github: "https://github.com/nmp-dsci"
 linkedin: "https://www.linkedin.com/in/nmp-dsci"
 resume: ""

@@ -1,11 +1,13 @@
 ---
+published: false   # D4a — the site shows only the three production systems.
+                   # Content and media stay in git; nothing renders. Reversible.
 title: Floor Plan Reviewer
 summary: An agentic redesign studio that re-plans a home's interior to maximise weekly rent — one validated change at a time, priced against live rental comparables.
 tldr: A vision agent that edits floor plans only through typed, validated geometry operations — never pixels — and prices every proposal against live market comps.
 tags: [Agents]
 metric: "+$360/wk"
 metric_label: "verified uplift on the worked example"
-featured: true
+featured: false
 order: 6
 stack: [Claude Agent SDK, Vision ingest, Tavily live comps, FastAPI, React 19 + d3, Pillow renderers]
 skills: [agentic-ai, vision, prompt-engineering, api-design, python, llms]

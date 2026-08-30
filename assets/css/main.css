@@ -94,18 +94,11 @@ h1,h2,h3{font-weight:600;letter-spacing:-.02em;line-height:1.2;margin:0}
 .sec-head{display:flex;justify-content:space-between;align-items:center;gap:16px;
   flex-wrap:wrap;margin:0 0 22px}
 .sec-head h2{font-size:clamp(21px,2.8vw,27px)}
-.filters{display:flex;gap:7px;flex-wrap:wrap}
-.pill{font-family:var(--mono);font-size:11.5px;letter-spacing:.04em;cursor:pointer;
-  background:var(--panel);color:var(--muted);border:1px solid var(--line-2);
-  border-radius:999px;padding:6px 13px;transition:.15s}
-.pill:hover{border-color:var(--faint);color:var(--ink)}
-.pill.is-active{background:var(--ink);color:var(--bg);border-color:var(--ink)}
 .grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(min(100%,310px),1fr))}
 .card{display:flex;flex-direction:column;gap:10px;background:var(--panel);
   border:1px solid var(--line);border-radius:12px;padding:18px;color:var(--ink);
   box-shadow:var(--shadow);transition:transform .15s,border-color .15s}
 .card:hover{transform:translateY(-2px);border-color:var(--line-2);text-decoration:none}
-.card.is-hidden{display:none}
 .card-top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
 .card h3{font-size:17.5px;line-height:1.3;flex:1 1 auto;min-width:10ch;overflow-wrap:break-word}
 .card-metric{text-align:right;flex:0 1 auto;max-width:15ch}
@@ -119,19 +112,6 @@ h1,h2,h3{font-weight:600;letter-spacing:-.02em;line-height:1.2;margin:0}
   color:var(--chip-ink);border-radius:999px;padding:2px 8px;white-space:nowrap}
 .card-go{font-family:var(--mono);font-size:11.5px;color:var(--signal);white-space:nowrap}
 
-/* ---- earlier work ---- */
-.earlier{margin-top:56px}
-.earlier h2{font-size:19px;color:var(--ink-soft);margin-bottom:14px}
-.earlier-list{border:1px solid var(--line);border-radius:12px;background:var(--panel);
-  overflow:hidden;box-shadow:var(--shadow)}
-.earlier-row{display:flex;gap:16px;align-items:baseline;padding:13px 18px;
-  border-top:1px solid var(--line);color:var(--ink);flex-wrap:wrap}
-.earlier-row:first-child{border-top:0}
-.earlier-row:hover{background:var(--hover);text-decoration:none}
-.earlier-row.is-hidden{display:none}
-.earlier-title{font-weight:600;font-size:14.5px;flex:0 0 auto}
-.earlier-summary{color:var(--muted);font-size:13px;flex:1 1 260px}
-
 /* ---- case study ---- */
 .study-inner{max-width:var(--w);margin:0 auto;padding:46px 22px 90px}
 .crumb{font-size:13px;margin:0 0 26px}
@@ -143,8 +123,13 @@ h1,h2,h3{font-weight:600;letter-spacing:-.02em;line-height:1.2;margin:0}
 .study-cols{display:grid;gap:28px;grid-template-columns:minmax(0,1fr);margin-top:38px}
 @media(min-width:900px){.study-cols{grid-template-columns:minmax(0,1fr) 300px;align-items:start}}
 .study-body{max-width:70ch}
-.study-body h2{font-size:20px;margin:34px 0 10px;padding-top:18px;border-top:1px solid var(--line)}
+.study-body h2{position:relative;font-size:20px;margin:42px 0 12px;padding-top:22px;
+  border-top:1px solid var(--line);scroll-margin-top:86px}
+.study-body h2::before{content:"";position:absolute;left:0;top:-1px;width:44px;height:2px;
+  background:var(--signal);border-radius:2px}
 .study-body h2:first-child{margin-top:0;border-top:0;padding-top:0}
+.study-body h2:first-child::before{display:none}
+.sec-anchor{display:block;height:0;scroll-margin-top:96px}
 .study-body p,.study-body li{color:var(--ink-soft);font-size:15.5px}
 .study-body code{font-family:var(--mono);font-size:.9em;background:var(--chip-bg);
   color:var(--chip-ink);padding:1px 5px;border-radius:5px}
@@ -229,3 +214,195 @@ h1,h2,h3{font-weight:600;letter-spacing:-.02em;line-height:1.2;margin:0}
   justify-content:space-between;gap:14px;flex-wrap:wrap;
   font-family:var(--mono);font-size:12px;color:var(--faint)}
 .footer-links{display:flex;gap:16px;flex-wrap:wrap}
+
+/* ============================================================
+   PRODUCTION SHOWCASE — systems, rubric, ladder, practices
+   Everything below uses the tokens declared at the top of this
+   file, so it is correct in both themes by construction.
+   ============================================================ */
+
+/* ---- shared section furniture ---- */
+.sec-lead{color:var(--muted);font-size:14.5px;max-width:72ch;margin:0 0 4px;line-height:1.6}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;
+  clip:rect(0 0 0 0);white-space:nowrap;border:0}
+
+/* ---- diagrams: the .dia class contract (_templates/agent-structure.svg) ----
+   One SVG file is rendered twice — small on a card, larger in a case-study
+   figure. Type is expressed in viewBox units, so it scales with the render
+   width; --dia-k is the per-context correction that keeps a label around
+   8px on a card and around 13px in a figure. Strokes are non-scaling, so a
+   hairline stays a hairline at both sizes. */
+.dia{--dia-k:1;display:block;width:100%;height:auto;color:inherit;overflow:visible}
+.dia .nd{fill:var(--panel);stroke:currentColor;stroke-width:1;vector-effect:non-scaling-stroke}
+.dia .nd.hi{fill:var(--signal-soft);stroke:var(--signal)}
+.dia .nd.ext{fill:transparent;stroke:var(--faint);stroke-dasharray:3 2}
+.dia .tx{font-family:var(--mono);font-size:calc(8.6px * var(--dia-k));fill:currentColor;
+  text-anchor:middle;letter-spacing:-.01em}
+.dia .tx.s{font-size:calc(7.6px * var(--dia-k));fill:var(--faint)}
+.dia .ed{stroke:currentColor;stroke-width:1;vector-effect:non-scaling-stroke;fill:none}
+.dia .ed.dash{stroke-dasharray:3 2}
+.dia .cap{font-family:var(--mono);font-size:calc(8px * var(--dia-k));fill:var(--faint);text-anchor:start}
+.dia-frame{border:1px solid var(--line);border-radius:9px;background:var(--bg);
+  padding:9px 9px 5px;overflow:hidden}
+
+/* ---- figures (case study §2 and §4, and the home-page loop) ----
+   The frame is capped so the SVG never renders so wide that its type looks
+   oversized; below that cap the frame shrinks with the column, so --dia-k is
+   nudged up once to keep the labels legible on a phone. */
+.fig{margin:16px 0 24px}
+.fig .dia-frame{max-width:560px;margin-inline:auto;padding:14px 14px 9px}
+.fig .dia{--dia-k:.92}
+@media(max-width:600px){.fig .dia{--dia-k:1.08}}
+.fig figcaption{font-family:var(--mono);font-size:11.5px;color:var(--faint);margin-top:9px;line-height:1.55}
+.fig figcaption b{color:var(--ink-soft);font-weight:600}
+.study-body .fig figcaption{font-size:11.5px}
+
+/* ---- the live badge ---- */
+.live-badge{font-family:var(--mono);font-size:9.5px;font-weight:600;letter-spacing:.1em;
+  text-transform:uppercase;background:var(--signal);color:var(--panel);border-radius:999px;
+  padding:3px 9px;white-space:nowrap;display:inline-flex;align-items:center;gap:5px}
+.live-badge::before{content:"";width:6px;height:6px;border-radius:999px;background:currentColor;opacity:.85}
+
+/* ---- the system card ---- */
+.sys-card{gap:11px}
+.sys-card .dia{--dia-k:1.1}
+.sys-card:hover{transform:translateY(-2px);border-color:var(--line-2)}
+.sys-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap}
+.sys-head h3{font-size:17.5px;line-height:1.3;flex:1 1 auto;min-width:10ch}
+.sys-head h3 a{color:var(--ink)}
+.sys-head h3 a:hover{color:var(--signal);text-decoration:none}
+.sys-metric .met-n{font-size:19px;line-height:1.25}
+.sys-metric .met-l{max-width:none;line-height:1.45}
+.sys-row{display:flex;gap:9px;align-items:baseline;font-size:11.5px;color:var(--ink-soft);line-height:1.5}
+.sys-row b{font-family:var(--mono);font-weight:500;font-size:9.5px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--faint);flex:0 0 54px}
+.sys-foot{display:flex;gap:8px;flex-wrap:wrap;margin-top:auto;padding-top:6px}
+.btn-sm{font-size:12.5px;padding:8px 13px;border-radius:8px}
+
+/* ---- the rubric explainer (home) ---- */
+.rubric-explainer,.ladder-sec,.practices-sec{margin-top:62px}
+.rubric-dims{display:grid;gap:12px;margin-top:22px;
+  grid-template-columns:repeat(auto-fit,minmax(min(100%,270px),1fr))}
+.rubric-dim{background:var(--panel);border:1px solid var(--line);border-radius:11px;
+  padding:14px 15px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:5px;
+  scroll-margin-top:96px}
+.rubric-dim:target{border-color:var(--signal);box-shadow:inset 0 0 0 1px var(--signal),var(--shadow)}
+.rd-ref{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint)}
+.rd-t{font-size:14.5px;line-height:1.3;margin:0}
+.rd-q{margin:0;font-size:13px;color:var(--ink-soft);line-height:1.5}
+.rd-w{margin:0;font-size:12.5px;color:var(--muted);line-height:1.5}
+
+/* ---- status glyphs — shared by the matrix and every scorecard ---- */
+/* All four statuses must read equally clearly: an honest hollow dot is the
+   point of the page, so `partial` and `designed` are never faded out. */
+.status-glyph{font-family:var(--mono);font-size:13px;font-weight:600;line-height:1;
+  margin-right:7px;display:inline-block;vertical-align:baseline}
+.status-shipped{color:var(--signal)}
+.status-partial{color:var(--amber)}
+.status-designed{color:var(--muted)}
+.status-na{color:var(--muted)}
+
+/* ---- the compact matrix (home) ---- */
+.rubric-matrix{margin-top:26px;background:var(--panel);border:1px solid var(--line);
+  border-radius:12px;box-shadow:var(--shadow);overflow-x:auto;-webkit-overflow-scrolling:touch}
+.rubric-matrix:focus-visible{outline:2px solid var(--signal);outline-offset:2px}
+.rubric-matrix table{border-collapse:separate;border-spacing:0;width:100%;min-width:660px;font-size:12.5px}
+.rubric-matrix th,.rubric-matrix td{text-align:left;vertical-align:top;padding:10px 13px;
+  border-bottom:1px solid var(--line)}
+.rubric-matrix thead th{font-family:var(--mono);font-weight:500;font-size:10.5px;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--faint);border-bottom:1px solid var(--line-2)}
+.rubric-matrix tbody tr:last-child th,.rubric-matrix tbody tr:last-child td{border-bottom:0}
+.rubric-matrix td{color:var(--ink-soft);line-height:1.45}
+.rubric-matrix .rm-dim{position:sticky;left:0;z-index:1;background:var(--panel);
+  width:160px;min-width:160px;font-family:var(--sans);font-size:12.5px;font-weight:600;
+  color:var(--ink);box-shadow:1px 0 0 var(--line)}
+.rubric-matrix thead .rm-dim{font-family:var(--mono);font-weight:500}
+.rubric-matrix .rm-dim a{color:var(--ink)}
+.rubric-matrix .rm-dim a:hover{color:var(--signal)}
+.rm-how{cursor:help}
+.rm-none{color:var(--faint);cursor:default}
+.rm-hint{display:flex;gap:6px 16px;flex-wrap:wrap;font-family:var(--mono);font-size:10.5px;
+  color:var(--faint);margin:11px 0 0;line-height:1.6}
+.rm-key{white-space:nowrap;min-width:0}
+.rm-scroll{white-space:normal;flex:1 1 240px}
+
+/* ---- the readiness scorecard (case study §7) ---- */
+.readiness{margin-top:14px}
+.rr-head{display:flex;justify-content:space-between;align-items:baseline;gap:14px;
+  flex-wrap:wrap;margin-bottom:13px}
+.rr-score{font-family:var(--mono);font-weight:600;font-size:13px;color:var(--signal);
+  letter-spacing:.02em;white-space:nowrap}
+.rr-legend{display:flex;gap:14px;flex-wrap:wrap;font-family:var(--mono);font-size:10.5px;
+  color:var(--faint);margin:0;line-height:1.6}
+.rr-legend .status-glyph{font-size:11px;margin-right:5px}
+.rr-rows{border:1px solid var(--line);border-radius:12px;background:var(--panel);
+  overflow:hidden;box-shadow:var(--shadow)}
+.rr{display:grid;gap:10px;grid-template-columns:minmax(0,190px) minmax(0,1fr);
+  padding:12px 14px;border-top:1px solid var(--line);align-items:start}
+.rr:first-child{border-top:0}
+.rr-dim{display:grid;grid-template-columns:auto minmax(0,1fr);gap:2px 7px;font-size:13px;
+  font-weight:600;color:var(--ink);line-height:1.4;align-items:baseline}
+.rr-dim a{color:var(--ink)}
+.rr-dim a:hover{color:var(--signal)}
+.rr-status{grid-column:2;font-family:var(--mono);font-weight:400;font-size:10px;
+  letter-spacing:.08em;text-transform:uppercase;color:var(--faint)}
+.rr-how{font-size:13px;color:var(--ink-soft);line-height:1.55}
+.rr-sec{font-family:var(--mono);font-size:11.5px;color:var(--signal);white-space:nowrap}
+.rr-proof{display:block;font-family:var(--mono);font-size:11px;color:var(--faint);
+  margin-top:5px;line-height:1.55;overflow-wrap:anywhere;word-break:break-word}
+.rr-note{font-size:12px;color:var(--faint);margin:11px 0 0;line-height:1.6}
+.rr-note .status-glyph{margin:0 2px}
+@media(max-width:560px){.rr{grid-template-columns:minmax(0,1fr);gap:6px}}
+
+/* ---- the scale ladder ---- */
+.ladder{display:grid;gap:12px;margin-top:16px;
+  grid-template-columns:repeat(auto-fit,minmax(min(100%,215px),1fr))}
+.rung{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:14px 15px;
+  box-shadow:var(--shadow);display:flex;flex-direction:column;gap:6px}
+.rung.is-here{border-color:var(--signal);box-shadow:inset 0 0 0 1px var(--signal),var(--shadow)}
+.rung-n{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.08em;color:var(--signal)}
+.rung-l{font-size:14.5px;font-weight:600;color:var(--ink);line-height:1.3}
+.rung-state{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
+.rung-cost{font-family:var(--mono);font-size:11.5px;color:var(--ink-soft);line-height:1.5}
+.rung-cost em{font-style:normal;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--faint);border:1px solid var(--line-2);border-radius:999px;padding:1px 7px;
+  margin-left:7px;white-space:nowrap}
+.rung-reach{font-size:12.5px;color:var(--muted);line-height:1.5}
+.ladder-note{font-size:12.5px;color:var(--faint);margin:12px 0 0;max-width:78ch;line-height:1.6}
+
+/* ---- practices ---- */
+.practices-grid{display:grid;gap:12px;margin-top:16px;
+  grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr))}
+.practice-card{background:var(--panel);border:1px solid var(--line);border-radius:11px;
+  padding:16px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:7px;
+  transition:transform .15s,border-color .15s}
+.practice-card:hover{transform:translateY(-2px);border-color:var(--line-2)}
+.pc-k{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
+.practice-card h3{font-size:15px;line-height:1.3}
+.practice-card h3 a{color:var(--ink)}
+.practice-card h3 a:hover{color:var(--signal);text-decoration:none}
+.practice-card p{margin:0;font-size:12.5px;color:var(--muted);line-height:1.55}
+.pc-go{font-family:var(--mono);font-size:11.5px;color:var(--signal);margin-top:auto;padding-top:6px}
+
+/* ---- the practice page ---- */
+.practice h1{font-size:clamp(28px,4.4vw,44px);letter-spacing:-.026em;max-width:22ch;padding-bottom:.06em}
+.applies{background:var(--panel);border:1px solid var(--line);border-radius:12px;
+  box-shadow:var(--shadow);padding:14px 16px;margin-top:24px;max-width:70ch;
+  display:flex;flex-direction:column;gap:11px}
+.applies-row{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+.applies-k{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--faint);flex:0 0 74px}
+.applies .chips{display:flex;gap:6px;flex-wrap:wrap;flex:1 1 200px}
+.chip-link{font-family:var(--mono);font-size:11px;background:var(--chip-bg);color:var(--chip-ink);
+  border:1px solid var(--line);border-radius:999px;padding:4px 11px;white-space:nowrap;display:inline-block}
+a.chip-link:hover{border-color:var(--signal);text-decoration:none}
+.chip-dead{background:transparent;color:var(--faint)}
+.practice-body{margin-top:30px}
+.evidence-note{max-width:70ch;margin-top:34px;padding-top:14px;border-top:1px solid var(--line);
+  font-size:12.5px;color:var(--faint);line-height:1.65}
+.evidence-note b{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--faint);margin-bottom:5px;font-weight:500}
+
+/* ---- case-study facts box additions ---- */
+.fact-note{font-family:var(--mono);font-size:10px;line-height:1.6;color:var(--faint);
+  margin:0;padding-top:12px;border-top:1px solid var(--line)}

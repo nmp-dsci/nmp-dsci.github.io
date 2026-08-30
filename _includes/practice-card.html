@@ -1,0 +1,14 @@
+{%- comment -%}
+  One card in the practices strip. Deliberately a different animal from a system
+  card: no live badge, no metric, no diagram — a practice is a write-up, not a
+  deployment.
+{%- endcomment -%}
+{%- assign pr = include.practice -%}
+{%- assign pk = pr.kicker | default: "" | strip -%}
+{%- assign pt = pr.tldr | default: "" | strip -%}
+<article class="practice-card">
+  <span class="pc-k">{% if pk != "" %}{{ pk }}{% else %}practice{% endif %}</span>
+  <h3><a href="{{ pr.url | relative_url }}">{{ pr.title }}</a></h3>
+  <p>{% if pt != "" %}{{ pt }}{% else %}{{ pr.summary }}{% endif %}</p>
+  <span class="pc-go" aria-hidden="true">Read →</span>
+</article>

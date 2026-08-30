@@ -1,0 +1,58 @@
+<!--
+  THE RUBRIC LOOP — the nine dimensions drawn as one cycle.
+  R1–R4 are the learning half (golden set → eval → gate → diagnose);
+  R5–R9 are the operating half (what happens once a version is live).
+  Same contract as _templates/agent-structure.svg: class="dia", no width/height,
+  role="img" + aria-label, <title> in every <g>, unique marker id, styling in main.css.
+-->
+<svg class="dia" viewBox="0 0 320 114" role="img"
+     aria-label="The loop the nine rubric dimensions describe: a versioned golden set feeds an eval run graded by deterministic graders and an independent judge; the eval run feeds a regression gate; a version the gate passes ships to production, where guardrails, traces, cost caps and the scale signal apply; production traces feed a diagnosis that proposes the next version back into the eval run, and a version the gate refuses goes to diagnosis instead of to users.">
+  <defs>
+    <marker id="ar-loop" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="currentColor"/>
+    </marker>
+  </defs>
+
+  <text class="cap" x="2" y="10">R1–R4 · the learning half  ·  R5–R9 · the operating half</text>
+
+  <g><title>R1 — a versioned golden set: fixed cases, committed predictions, reproducible offline</title>
+    <rect class="nd" x="2" y="30" width="58" height="28" rx="6"/>
+    <text class="tx" x="31" y="43">golden set</text>
+    <text class="tx s" x="31" y="53">R1 · fixed</text></g>
+
+  <g><title>The eval run — deterministic graders plus an LLM judge that is independent of the model being graded (R1, R2)</title>
+    <rect class="nd" x="66" y="30" width="66" height="28" rx="6"/>
+    <text class="tx" x="99" y="43">eval + judge</text>
+    <text class="tx s" x="99" y="53">R1 · R2</text></g>
+
+  <g><title>R3 — the regression gate: an eval floor and no per-case pass to fail flips</title>
+    <rect class="nd hi" x="138" y="30" width="46" height="28" rx="6"/>
+    <text class="tx" x="161" y="43">gate</text>
+    <text class="tx s" x="161" y="53">R3</text></g>
+
+  <g><title>R8 — merge is the deploy: keyless OIDC CI/CD with a smoke test and a rollback path</title>
+    <rect class="nd" x="190" y="30" width="46" height="28" rx="6"/>
+    <text class="tx" x="213" y="43">ship</text>
+    <text class="tx s" x="213" y="53">R8</text></g>
+
+  <g><title>Production — guardrails around every action (R5), a trace per request (R6), cost per answer and its caps (R7), and the saturation signal that says when to move up the ladder (R9)</title>
+    <rect class="nd hi" x="242" y="24" width="76" height="40" rx="6"/>
+    <text class="tx" x="280" y="37">production</text>
+    <text class="tx s" x="280" y="48">R5 · R6</text>
+    <text class="tx s" x="280" y="58">R7 · R9</text></g>
+
+  <g><title>R4 — the learning loop: diagnose the traces, propose one lever, verify it against the golden set before it can ship</title>
+    <rect class="nd hi" x="102" y="76" width="68" height="24" rx="6"/>
+    <text class="tx" x="136" y="87">diagnose</text>
+    <text class="tx s" x="136" y="96">R4 · one lever</text></g>
+
+  <path class="ed" d="M60,44 L64,44" marker-end="url(#ar-loop)"/>
+  <path class="ed" d="M132,44 L136,44" marker-end="url(#ar-loop)"/>
+  <path class="ed" d="M184,44 L188,44" marker-end="url(#ar-loop)"/>
+  <path class="ed" d="M236,44 L240,44" marker-end="url(#ar-loop)"/>
+  <path class="ed" d="M280,64 C280,84 210,88 174,88" marker-end="url(#ar-loop)"><title>traces and the judged online sample come back from production</title></path>
+  <path class="ed" d="M102,88 C82,88 84,64 96,58" marker-end="url(#ar-loop)"><title>the proposed next version is re-evaluated before it can ship</title></path>
+  <path class="ed dash" d="M155,58 C150,66 149,71 146,74" marker-end="url(#ar-loop)"><title>a version the gate refuses goes back to diagnosis, not to users</title></path>
+
+  <text class="cap" x="2" y="110">a version the gate refuses goes back to diagnose, never to users</text>
+</svg>

@@ -1,4 +1,6 @@
 ---
+published: false   # D4a — the site shows only the three production systems.
+                   # Content and media stay in git; nothing renders. Reversible.
 title: PropertyIQ ETL
 summary: Collection-only ETL over NSW property and census sources — partitioned CSVs with sha256 manifests, the data backbone behind the property agents.
 tags: [Data]
