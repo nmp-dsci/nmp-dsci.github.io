@@ -7,9 +7,9 @@ and served by GitHub Pages, showcasing shipped agent/RAG/eval systems as case st
 
 - `_projects/` — one Markdown file per case study. Front matter drives the
   home-page card (title, summary, metric, tags), the project-page layout (tldr,
-  skills, skills_detail, stack, links, media, evidence) and the production
-  scorecard (`production.rubric`). Files carrying `published: false` stay in git
-  and out of the build.
+  skills, skills_detail, stack, links, media) and the production scorecard
+  (`production.rubric`). Files carrying `published: false` stay in git and out
+  of the build.
 - `_practices/` — the second collection: a practice is a generalised case study,
   one pattern shown across all three systems, on its own five-section spine.
 - `_data/site.yml` — name, role, tagline, and the GitHub/LinkedIn links used
@@ -28,14 +28,14 @@ and served by GitHub Pages, showcasing shipped agent/RAG/eval systems as case st
   `<img>`, which is what lets them use `currentColor` and be correct in both
   themes from one file.
 - `_layouts/` — `default` (shell + nav/footer/theme toggle), `home` (hero
-  metric strip, capability filters + project cards), `project` (case-study
-  template with a TL;DR strip, media frame, "skills demonstrated" proof list,
-  evidence gallery, scorecard and stack/links sidebar), `practice`, `page`
+  metric strip, live-system project cards, rubric explainer), `project`
+  (case-study template with a TL;DR strip, media frame, "skills demonstrated"
+  proof list, scorecard and stack/links sidebar), `practice`, `page`
   (About, etc).
 - `assets/img/`, `assets/video/`, `assets/audio/`, `assets/dash/` — evidence
   media (screenshots, captioned walkthroughs, sample call audio, self-contained
-  HTML eval dashboards) referenced from a project's `media`/`evidence` front
-  matter or from inline `<figure class="evidence">` blocks in the body.
+  HTML eval dashboards) referenced from a project's `media` front matter or
+  from inline `<figure class="evidence">` blocks in the body.
 - `scripts/lint_case_study.py` — the contract, executable. Run by
   `.github/workflows/lint.yml` on pull requests.
 - `.claude/skills/case-study/` — the `/case-study` skill that turns a sibling
@@ -100,11 +100,10 @@ file attached as a default English caption track. `featured: true` puts the
 project in the home-page card grid; `order` sorts within it. `published: false`
 keeps a file in git and out of the build.
 
-Evidence can come from the `evidence` front matter (`type: image` or
-`type: dashboard`, rendered after the body) or be placed inline in the body as
-a `<figure class="evidence">` containing an `<img>`, an `<audio>` player, or a
-`<div class="dash-embed">` iframe — inline figures let the evidence sit next to
-the prose that explains it.
+Evidence is placed inline in the body as a `<figure class="evidence">`
+containing an `<img>`, an `<audio>` player, or a `<div class="dash-embed">`
+iframe — inline figures let the evidence sit next to the prose that explains
+it, rather than in a separate gallery driven by front matter.
 
 ### Adding a practice
 
