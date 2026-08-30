@@ -1,0 +1,70 @@
+<!--
+  AGENT-STRUCTURE TEMPLATE — what the MODEL does.
+  Copy to _includes/diagrams/agent/<slug>.svg and replace the nodes.
+
+  Rendered twice: small on the home card, larger under "## 2 · Agent
+  architecture". Inlined by the layout (never <img>), so `currentColor` and the
+  site's CSS custom properties resolve — one file, correct in light and dark.
+
+  RULES
+  - viewBox "0 0 320 100" (±10 height). No width/height attributes.
+  - class="dia" on the root <svg>; styling lives in assets/css/main.css.
+  - role="img" + aria-label describing the whole flow in one sentence.
+  - <title> inside every <g> — that is the hover tooltip and the a11y name.
+  - Marker id must be UNIQUE across the page: use "ar-<slug>".
+  - Left → right = the request path. Highlight (.hi) the 2–3 nodes that are
+    the point of the system. Dashed (.ext) = external / optional.
+  - .cap line at y≈92: how the thing is kept honest (graders, judge, traces).
+  - Text is short: 1–2 words on .tx, a qualifier on .tx.s. No paragraphs.
+
+  CLASS CONTRACT (implemented in main.css under .dia)
+    .nd      node box            .nd.hi   highlighted node
+    .nd.ext  dashed/external     .tx      node label (centred)
+    .tx.s    small sub-label     .ed      edge      .ed.dash  feedback/optional edge
+    .cap     caption line
+-->
+<svg class="dia" viewBox="0 0 320 100" role="img"
+     aria-label="TEMPLATE: input enters the agent loop, passes a guard, produces an output; every run is graded.">
+  <defs>
+    <marker id="ar-template" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="currentColor"/>
+    </marker>
+  </defs>
+
+  <g><title>input — what the user actually types</title>
+    <rect class="nd" x="4" y="38" width="48" height="24" rx="6"/>
+    <text class="tx" x="28" y="53">input</text></g>
+
+  <g><title>the agent loop — model, tools, memory; name the framework</title>
+    <rect class="nd hi" x="66" y="30" width="78" height="40" rx="6"/>
+    <text class="tx" x="105" y="46">agent loop</text>
+    <text class="tx s" x="105" y="58">tools · memory</text></g>
+
+  <g><title>the deterministic gate that stands between the model and the resource</title>
+    <rect class="nd" x="158" y="6" width="68" height="28" rx="6"/>
+    <text class="tx" x="192" y="18">guard</text>
+    <text class="tx s" x="192" y="29">deterministic</text></g>
+
+  <g><title>the guarded action — what the model is finally allowed to do</title>
+    <rect class="nd hi" x="158" y="44" width="68" height="30" rx="6"/>
+    <text class="tx" x="192" y="57">action</text>
+    <text class="tx s" x="192" y="68">scoped</text></g>
+
+  <g><title>a second stage — retrieval, sandbox, calculation…</title>
+    <rect class="nd" x="242" y="6" width="72" height="28" rx="6"/>
+    <text class="tx" x="278" y="18">stage</text>
+    <text class="tx s" x="278" y="29">qualifier</text></g>
+
+  <g><title>the answer the user sees, and what it carries with it</title>
+    <rect class="nd hi" x="242" y="44" width="72" height="30" rx="6"/>
+    <text class="tx" x="278" y="57">output</text>
+    <text class="tx s" x="278" y="68">typed</text></g>
+
+  <path class="ed" d="M52,50 L64,50" marker-end="url(#ar-template)"/>
+  <path class="ed" d="M144,44 C150,34 152,24 156,21" marker-end="url(#ar-template)"/>
+  <path class="ed" d="M192,34 L192,42" marker-end="url(#ar-template)"/>
+  <path class="ed" d="M226,52 C232,40 236,26 240,21" marker-end="url(#ar-template)"/>
+  <path class="ed" d="M278,34 L278,42" marker-end="url(#ar-template)"/>
+
+  <text class="cap" x="4" y="92">how it is kept honest — graders · judge · traces</text>
+</svg>

@@ -1,0 +1,138 @@
+# Production gen-AI rubric — one source of truth for the home-page matrix and
+# every case study's "Production readiness" scorecard.
+#
+# Each project's front matter carries `production.rubric:` — nine entries, one
+# per dimension below, each with a `status` from `statuses:` plus `how` and
+# `proof`. Keys here are the contract: scripts/lint_case_study.py fails a case
+# study that omits a dimension, invents one, or uses a status outside the
+# vocabulary. Anything not `shipped` must say why in `how`.
+#
+# Order matters — the matrix and the scorecard render in the order given by
+# `order:` below (R1 → R9: the learning half first, then the operating half).
+
+dimensions:
+  evals:
+    order: 1
+    ref: R1
+    label: "Evals & golden set"
+    short: "Evals"
+    question: "Is there a versioned golden set, and can anyone reproduce the score offline?"
+    why: "Without a fixed set the accuracy number is an anecdote. Committed predictions make the number a fact."
+    section: 3
+
+  judge:
+    order: 2
+    ref: R2
+    label: "LLM-as-judge"
+    short: "Judge"
+    question: "Who grades the open-ended answers, and is the judge independent of the model being graded?"
+    why: "Self-grading inflates scores; a frozen rubric and a cross-family judge keep it honest."
+    section: 3
+
+  gate:
+    order: 3
+    ref: R3
+    label: "Regression gate"
+    short: "Gate"
+    question: "What stops a worse version from shipping?"
+    why: "A CI gate on the eval floor — and on per-case pass→fail flips, since a better average can still hide regressions."
+    section: 3
+
+  loop:
+    order: 4
+    ref: R4
+    label: "Learning loop"
+    short: "Loop"
+    question: "How does the system get better — and is each change traceable to one lever?"
+    why: "Versioned prompts, diagnose → propose → verify, champion/challenger promotion, documented cycles including the failed ones."
+    section: 3
+
+  guardrails:
+    order: 5
+    ref: R5
+    label: "Guardrails & security"
+    short: "Guardrails"
+    question: "What sits between the model and anything it can touch — data, tools, money, other users?"
+    why: "Deterministic gates (RLS, AST guards, sandboxes, policy tables), abuse limits, red-teamed and regression-tested."
+    section: 5
+
+  trace:
+    order: 6
+    ref: R6
+    label: "Observability & tracing"
+    short: "Observability"
+    question: "Can you replay exactly what the agent did on one request, and see the fleet's health on one screen?"
+    why: "Per-run traces plus SLOs with error budgets; the dashboard signal is what tells you when to scale."
+    section: 6
+
+  cost:
+    order: 7
+    ref: R7
+    label: "Cost tracking & control"
+    short: "Cost control"
+    question: "What does one answer cost, what caps the worst day, and what's the cheap-by-default tier?"
+    why: "Cache-adjusted cost per answer, daily caps, flash-tier defaults, and a demo mode whose worst case is a fixed ceiling."
+    section: 6
+
+  release:
+    order: 8
+    ref: R8
+    label: "Deploy & release"
+    short: "Deploy"
+    question: "Is a merge a deploy — and does the deploy prove the live URL is what it claims?"
+    why: "IaC, keyless OIDC CI/CD, a smoke test that asserts demo mode and refuses writes, and a rollback path."
+    section: 4
+
+  scale:
+    order: 9
+    ref: R9
+    label: "Scale path"
+    short: "Scale"
+    question: "What's the topology today, what's been measured under load, and what changes at 100 / 1,000 concurrent users?"
+    why: "Load tests, a queue-scaling experiment with a formula that held, and an honest \"designed, not built\" for the next rungs."
+    section: 4
+
+statuses:
+  shipped:
+    glyph: "●"
+    label: "shipped"
+    blurb: "built, measured, in the repo"
+    needs_reason: false
+  partial:
+    glyph: "◐"
+    label: "partial"
+    blurb: "present but narrower than the rubric asks"
+    needs_reason: true
+  designed:
+    glyph: "○"
+    label: "designed"
+    blurb: "written up, not built"
+    needs_reason: true
+  na:
+    glyph: "—"
+    label: "n/a"
+    blurb: "not needed by design (say why)"
+    needs_reason: true
+
+# The scale ladder — shared across all three systems, detailed in
+# _practices/production-scale.md. `rung:` in a project's production block
+# points at one of these keys.
+rungs:
+  10:
+    label: "10 concurrent users"
+    state: "deployed"
+    tag: "today's demo"
+    cost: "~$5–18 / month per app"
+    reach: "≈ hundreds of visitors a month"
+  100:
+    label: "100 concurrent users"
+    state: "sizing measured"
+    tag: "live LLM back on"
+    cost: "≈ $0.5–1k / month + inference"
+    reach: "≈ 5–10k monthly users"
+  1000:
+    label: "1,000 concurrent users"
+    state: "designed only"
+    tag: "multi-tenant fleet"
+    cost: "≈ $5–15k / month + inference"
+    reach: "≈ 50–100k monthly users"

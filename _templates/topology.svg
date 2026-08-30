@@ -1,0 +1,58 @@
+<!--
+  DEPLOY-TOPOLOGY TEMPLATE — where the thing RUNS.
+  Copy to _includes/diagrams/topology/<slug>.svg and replace the nodes.
+
+  Rendered ONCE, under "## 4 · Deployed architecture". Never on the home card:
+  the card carries the agent structure, because that is what the system IS.
+
+  Same class contract and rules as _templates/agent-structure.svg.
+  Marker id: "tp-<slug>".
+
+  Left → right = the request path: visitor → front door → compute → data.
+  Off-path infrastructure (batch jobs, object storage, alarms) sits on the top
+  row. Highlight (.hi) the nodes that cost money or hold state.
+  The .cap line carries region · IaC · what demo mode changes.
+-->
+<svg class="dia" viewBox="0 0 320 100" role="img"
+     aria-label="TEMPLATE: a visitor reaches the front door, which calls the compute tier, which reads the database; batch jobs load object storage into it.">
+  <defs>
+    <marker id="tp-template" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="currentColor"/>
+    </marker>
+  </defs>
+
+  <g><title>visitor — say whether there is a login</title>
+    <rect class="nd" x="6" y="36" width="52" height="26" rx="6"/>
+    <text class="tx" x="32" y="52">visitor</text></g>
+
+  <g><title>off-path infrastructure — batch jobs, migrations, pipelines</title>
+    <rect class="nd" x="80" y="8" width="72" height="24" rx="6"/>
+    <text class="tx" x="116" y="23">jobs</text></g>
+
+  <g><title>the front door and compute — name the service and the instance count</title>
+    <rect class="nd hi" x="80" y="44" width="72" height="30" rx="6"/>
+    <text class="tx" x="116" y="56">compute</text>
+    <text class="tx s" x="116" y="67">1 instance</text></g>
+
+  <g><title>state — database, index or cache, with its size and what it enforces</title>
+    <rect class="nd hi" x="176" y="44" width="70" height="30" rx="6"/>
+    <text class="tx" x="211" y="56">data</text>
+    <text class="tx s" x="211" y="67">size · policy</text></g>
+
+  <g><title>object storage or registry feeding the deployment</title>
+    <rect class="nd" x="176" y="8" width="70" height="24" rx="6"/>
+    <text class="tx" x="211" y="19">storage</text>
+    <text class="tx s" x="211" y="28">S3 · ECR</text></g>
+
+  <g><title>external dependency — the only metered call, an upstream API…</title>
+    <rect class="nd ext" x="266" y="8" width="48" height="24" rx="6"/>
+    <text class="tx" x="290" y="23">external</text></g>
+
+  <path class="ed" d="M58,49 L78,49" marker-end="url(#tp-template)"/>
+  <path class="ed" d="M58,44 C66,30 70,22 78,20" marker-end="url(#tp-template)"/>
+  <path class="ed" d="M152,59 L174,59" marker-end="url(#tp-template)"/>
+  <path class="ed" d="M211,32 L211,42" marker-end="url(#tp-template)"/>
+  <path class="ed" d="M266,20 L248,20" marker-end="url(#tp-template)"/>
+
+  <text class="cap" x="6" y="92">region · Terraform · what demo mode changes</text>
+</svg>

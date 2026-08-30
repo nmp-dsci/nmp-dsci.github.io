@@ -1,6 +1,7 @@
 title: Nathan Phillips — Applied AI
 description: >-
-  Applied-AI engineer — agents, RAG systems and the evals that prove they work.
+  Applied-AI engineer — three gen-AI systems live on AWS, each with evals in CI,
+  guardrails between the model and the data, per-request traces and cost caps.
 url: "https://nmp-dsci.github.io"
 baseurl: ""
 
@@ -8,6 +9,9 @@ collections:
   projects:
     output: true
     permalink: /projects/:name/
+  practices:
+    output: true
+    permalink: /practices/:name/
 
 defaults:
   - scope:
@@ -15,12 +19,42 @@ defaults:
       type: projects
     values:
       layout: project
+  - scope:
+      path: ""
+      type: practices
+    values:
+      layout: practice
 
 markdown: kramdown
 
 exclude:
+  # tooling — not part of the published site
   - vendor
   - .lavish
+  - .claude
+  - _templates
+  - scripts
   - Gemfile
   - Gemfile.lock
   - readme.md
+  # legacy D3 / notebook pages from the previous portfolio (kept in git, not built)
+  - profile_nswrent.html
+  - profile_nswsold.html
+  - profile_titanic.html
+  - profile_titanic.py
+  - property_hexbin.html
+  - property_input.py
+  - property_leaflet.html
+  - surname_culture.html
+  - tile_calendar.html
+  - datafeed
+  - map_util
+  - tool_utils
+  - resources
+  - css
+  - assets/culture_map.json
+  - assets/culture_surname.json
+  - assets/POA_2016_NSW_reduced.geojson
+  - assets/SA4_2016_NSW_reduced.geojson
+  - assets/world_countries.json
+  - assets/ajax-loader.gif
