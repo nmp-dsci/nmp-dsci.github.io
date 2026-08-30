@@ -45,6 +45,7 @@ import os
 import re
 import sys
 import urllib.error
+import urllib.parse
 import urllib.request
 import xml.etree.ElementTree as ET
 from pathlib import Path
@@ -214,6 +215,8 @@ def proof_paths(proof: str) -> list[str]:
 
 
 def path_exists(repo: Path, token: str) -> bool:
+    if any(part == ".." for part in Path(token).parts):
+        return False
     if any(c in token for c in "*?["):
         return bool(glob.glob(str(repo / token), recursive=True))
     return (repo / token).exists()
@@ -272,11 +275,20 @@ def check_skills(rep: Report, fm: dict, skills: dict) -> None:
 
 def check_rubric(rep: Report, rows: list, rubric: dict) -> None:
     """Nine dimensions, once each, in _data/rubric.yml's own order."""
-    dims = rubric["dimensions"]
+    dims = rubric.get("dimensions")
+    statuses = rubric.get("statuses")
+    if not isinstance(dims, dict) or not isinstance(statuses, (list, set, tuple, dict)):
+        rep.bad("rubric: _data/rubric.yml is missing dimensions or statuses")
+        return
+    malformed = [k for k, v in dims.items() if not isinstance(v, dict) or "order" not in v]
+    if malformed:
+        rep.bad("rubric: _data/rubric.yml dimensions missing 'order'",
+                *listing(no_order=malformed))
+        return
     expected = sorted(dims, key=lambda k: dims[k]["order"])
     got = [r.get("dimension") for r in rows if isinstance(r, dict)]
     off_vocab = sorted({r.get("status") for r in rows
-                        if isinstance(r, dict) and r.get("status") not in rubric["statuses"]})
+                        if isinstance(r, dict) and r.get("status") not in statuses})
     details = listing(
         missing=[d for d in expected if d not in got],
         not_in_rubric_yml=[d for d in got if d not in expected],
@@ -412,6 +424,10 @@ def check_demo(rep: Report, url: str, no_net: bool) -> None:
     if no_net:
         rep.skip("links.demo: not checked (--no-net)")
         return
+    scheme = urllib.parse.urlsplit(url).scheme
+    if scheme not in ("http", "https"):
+        rep.bad(f"links.demo: {scheme!r} is not http/https")
+        return
     try:
         request = urllib.request.Request(url, headers={"User-Agent": "lint-case-study"})
         with urllib.request.urlopen(request, timeout=8) as response:
@@ -517,7 +533,10 @@ def infer_repo(path: Path) -> tuple[Path | None, str]:
         url = ""
     if not url:
         return None, "no links.repo to infer the sibling repo from"
-    candidate = (SITE_ROOT.parent / url.rstrip("/").split("/")[-1]).resolve()
+    name = url.rstrip("/").split("/")[-1]
+    if name.endswith(".git"):
+        name = name[: -len(".git")]
+    candidate = (SITE_ROOT.parent / name).resolve()
     return (candidate, "") if candidate.is_dir() else (None, f"{rel(candidate)} not checked out")
 
 
@@ -543,19 +562,23 @@ def main(argv: list[str] | None = None) -> int:
 
     reports = []
     for path in targets:
-        if not path.is_file():
+        try:
+            if not path.is_file():
+                reports.append(Report(rel(path)))
+                reports[-1].bad("no such file")
+            elif args.practice or path.resolve().parent.name == "_practices":
+                reports.append(lint_practice(path))
+            elif args.repo is not None and not args.all:
+                repo = args.repo.resolve()
+                reports.append(lint_project(
+                    path, repo if repo.is_dir() else None,
+                    f"{rel(repo)} not checked out", args.no_net))
+            else:
+                repo, why = infer_repo(path)
+                reports.append(lint_project(path, repo, why or "no --repo given", args.no_net))
+        except Exception as exc:
             reports.append(Report(rel(path)))
-            reports[-1].bad("no such file")
-        elif args.practice or path.resolve().parent.name == "_practices":
-            reports.append(lint_practice(path))
-        elif args.repo is not None and not args.all:
-            repo = args.repo.resolve()
-            reports.append(lint_project(
-                path, repo if repo.is_dir() else None,
-                f"{rel(repo)} not checked out", args.no_net))
-        else:
-            repo, why = infer_repo(path)
-            reports.append(lint_project(path, repo, why or "no --repo given", args.no_net))
+            reports[-1].bad(f"lint crashed: {type(exc).__name__}: {exc}")
 
     print("\n\n".join(r.render(args.quiet) for r in reports))
     failed = [r for r in reports if r.failed]
