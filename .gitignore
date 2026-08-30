@@ -4,3 +4,7 @@ _site/
 Gemfile.lock
 vendor/
 .DS_Store
+_out_*/
+_probeout/
+__pycache__/
+*.pyc

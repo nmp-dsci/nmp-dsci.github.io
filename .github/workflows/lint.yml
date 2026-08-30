@@ -1,0 +1,56 @@
+# Case-study contract check.
+#
+# GitHub Pages still builds and deploys the site natively on push to master —
+# this workflow adds nothing to that path and cannot block a deploy. It only
+# tells a pull request whether the case studies still hold their contract:
+# nine rubric dimensions, statuses in the vocabulary, a reason on every row
+# that is not `shipped`, the seven H2s in order, and the two diagrams.
+#
+# --no-net is deliberate. The live-demo check needs the public URL and the
+# runner's egress is not the thing under test, so the URL check stays a local
+# and pre-merge concern. The proof-path check also self-skips here: the sibling
+# repos (../data-qa-agent, ../ConvFinQA-agent, ../transcript-rag-agent) are not
+# checked out on the runner, so it prints "~ proof paths: not checked" rather
+# than failing. Run the lint locally with --repo to exercise it:
+#
+#   uv run --with pyyaml --no-project python scripts/lint_case_study.py \
+#       _projects/data-pilot.md --repo ../data-qa-agent
+
+name: lint
+
+permissions:
+  contents: read
+
+on:
+  pull_request:
+    paths:
+      - "_projects/**"
+      - "_practices/**"
+      - "_data/**"
+      - "_includes/diagrams/**"
+      - "_templates/**"
+      - "scripts/lint_case_study.py"
+      - ".github/workflows/lint.yml"
+  push:
+    branches: [master]
+    paths:
+      - "_projects/**"
+      - "_practices/**"
+      - "_data/**"
+      - "_includes/diagrams/**"
+      - "scripts/lint_case_study.py"
+
+jobs:
+  case-studies:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - run: pip install --disable-pip-version-check pyyaml
+
+      - name: Lint every published case study and practice
+        run: python scripts/lint_case_study.py --all --no-net

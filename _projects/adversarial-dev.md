@@ -1,4 +1,6 @@
 ---
+published: false   # D4a — the site shows only the three production systems.
+                   # Content and media stay in git; nothing renders. Reversible.
 title: Adversarial Dev
 summary: A GAN-inspired coding harness — planner, generator and evaluator agents in separate contexts, where code only ships by surviving an agent that's trying to fail it.
 tags: [Multi-agent, Agents]

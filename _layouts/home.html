@@ -1,71 +1,82 @@
 ---
 layout: default
 ---
+{%- assign live = site.projects | where_exp: "p", "p.production.live == true" | sort: "production.order" -%}
+{%- assign dims = site.data.rubric.dimensions -%}
+{%- assign ndim = dims | size -%}
+{%- assign practices = site.practices | sort: "order" -%}
+
 <section class="hero">
   <div class="hero-inner">
-    <p class="kicker">// applied-ai · measured</p>
-    <h1>{{ site.data.site.tagline }}</h1>
-    <p class="hero-sub">{{ site.data.site.role }} — agentic systems, RAG pipelines and the eval harnesses
-      that prove they work. Every project below ships with its number.</p>
+    <p class="kicker">// applied-ai · in production · demo mode</p>
+    <h1>{{ site.data.site.tagline | default: "I build gen-AI systems and run them in production." }}</h1>
+    <p class="hero-sub">{{ site.data.site.strapline | default: "Three systems live on AWS — each with evals in CI, guardrails between the model and the data, per-request traces, cost caps and a push-button deploy. Every one is scored against the same production rubric, and you can walk straight into the live app." }}</p>
     <div class="cta-row">
       <a class="btn-solid" href="#work">See the systems ↓</a>
       <a class="btn-ghost" href="{{ site.data.site.linkedin }}" target="_blank" rel="noopener">Contact on LinkedIn ↗</a>
     </div>
     <div class="metrics" role="list">
-      <div class="met" role="listitem"><span class="met-n">9/9</span><span class="met-l">red-team attacks stopped at the guardrail gate · Responsible AI</span></div>
-      <div class="met" role="listitem"><span class="met-n">77.1%</span><span class="met-l">eval-verified accuracy, up from 73.0% · Prompt Versioning</span></div>
-      <div class="met" role="listitem"><span class="met-n">10,250</span><span class="met-l">predictions scored across 5 context modes · Model Evaluation</span></div>
-      <div class="met" role="listitem"><span class="met-n">6.1×</span><span class="met-l">fewer tokens at 0.93 answer parity · Retrieval Design</span></div>
+      <div class="met" role="listitem"><span class="met-n">3</span><span class="met-l">systems live on AWS · Terraform · OIDC deploys</span></div>
+      <div class="met" role="listitem"><span class="met-n">77.1%</span><span class="met-l">champion accuracy — v3.1 refused by the gate · ConvFinQA</span></div>
+      <div class="met" role="listitem"><span class="met-n">6.1×</span><span class="met-l">fewer tokens at 0.93 answer parity · Transcript RAG</span></div>
+      <div class="met" role="listitem"><span class="met-n">4.98×</span><span class="met-l">measured 5-worker speedup, linear · Data Pilot</span></div>
     </div>
   </div>
 </section>
 
 <section class="work" id="work">
   <div class="work-inner">
-    <div class="sec-head">
-      <h2>Selected systems</h2>
-      <div class="filters" role="group" aria-label="Filter projects by capability">
-        <button class="pill is-active" data-filter="all">All</button>
-        <button class="pill" data-filter="agents">Agents</button>
-        <button class="pill" data-filter="rag">RAG</button>
-        <button class="pill" data-filter="multi-agent">Multi-agent</button>
-        <button class="pill" data-filter="data">Data</button>
-      </div>
-    </div>
+
+    <div class="sec-head"><h2>Three systems, live on AWS</h2></div>
     <div class="grid">
-      {% assign featured = site.projects | where: "featured", true | sort: "order" %}
-      {% for p in featured %}{% include project-card.html project=p %}{% endfor %}
+      {%- for p in live %}{% include project-card.html project=p %}{% endfor -%}
     </div>
 
-    {% assign earlier = site.projects | where: "featured", false | sort: "order" %}
-    {% if earlier.size > 0 %}
-    <div class="earlier">
-      <h2>Earlier work</h2>
-      <div class="earlier-list">
-        {% for p in earlier %}
-        <a class="earlier-row" href="{{ p.url | relative_url }}" data-tags="{% for t in p.tags %}{{ t | slugify }} {% endfor %}">
-          <span class="earlier-title">{{ p.title }}</span>
-          <span class="earlier-summary">{{ p.summary }}</span>
-          <span class="card-go">→</span>
-        </a>
-        {% endfor %}
+    <section class="rubric-explainer" id="rubric" aria-labelledby="rubric-h">
+      <div class="sec-head"><h2 id="rubric-h">What “production” means here</h2></div>
+      <p class="sec-lead">Nine things a gen-AI system needs before real users touch it. Each system is scored
+        honestly — a hollow dot with a reason beats a row of green ones. The first four are the learning half:
+        how a version gets better without getting worse. The last five are the operating half: what happens
+        once it is live.</p>
+
+      <figure class="fig fig-loop">
+        <div class="dia-frame">{% include diagrams/rubric-loop.svg %}</div>
+        <figcaption><b>The loop the nine dimensions describe</b> — golden set → eval + judge → gate → ship →
+          production → diagnose → next version. A version the gate refuses re-enters at diagnose, not at the user.</figcaption>
+      </figure>
+
+      <div class="rubric-dims">
+        {%- for i in (1..ndim) -%}
+          {%- for d in dims -%}
+            {%- if d[1].order == i -%}
+        <div class="rubric-dim" id="rubric-{{ d[0] }}">
+          <span class="rd-ref">{{ d[1].ref }} · {{ d[0] }}</span>
+          <h3 class="rd-t">{{ d[1].label | escape }}</h3>
+          <p class="rd-q">{{ d[1].question | escape }}</p>
+          <p class="rd-w">{{ d[1].why | escape }}</p>
+        </div>
+            {%- endif -%}
+          {%- endfor -%}
+        {%- endfor -%}
       </div>
-    </div>
-    {% endif %}
+
+      {% include rubric-matrix.html %}
+    </section>
+
+    <section class="ladder-sec" id="scale" aria-labelledby="scale-h">
+      <div class="sec-head"><h2 id="scale-h">10 / 100 / 1,000 concurrent users</h2></div>
+      <p class="sec-lead">The same three systems, one ladder. Only the first rung is deployed — the second is
+        sized from a measured queue experiment, the third is a design. Saying which is which is the point.</p>
+      {% include scale-ladder.html %}
+    </section>
+
+    <section class="practices-sec" id="practices" aria-labelledby="practices-h">
+      <div class="sec-head"><h2 id="practices-h">Practices</h2></div>
+      <p class="sec-lead">How the three were built and kept honest — the parts that transfer to any gen-AI system.</p>
+      <div class="practices-grid">
+        {%- for pr in practices %}{% include practice-card.html practice=pr %}{% endfor -%}
+      </div>
+    </section>
+
   </div>
 </section>
-
-<script>
-  (function(){
-    var pills=document.querySelectorAll('.pill');
-    var cards=document.querySelectorAll('[data-tags]');
-    pills.forEach(function(p){p.addEventListener('click',function(){
-      pills.forEach(function(x){x.classList.remove('is-active')});
-      p.classList.add('is-active');
-      var f=p.getAttribute('data-filter');
-      cards.forEach(function(c){
-        c.classList.toggle('is-hidden', f!=='all' && c.getAttribute('data-tags').indexOf(f)===-1);
-      });
-    })});
-  })();
-</script>

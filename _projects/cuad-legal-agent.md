@@ -1,11 +1,13 @@
 ---
+published: false   # D4a — the site shows only the three production systems.
+                   # Content and media stay in git; nothing renders. Reversible.
 title: CUAD Legal Agent
 summary: Contract review at benchmark scale — 41 legal questions × 50 contracts, with full-contract context and four RAG variants raced head-to-head. The honest finding — full context won.
 tldr: A two-layer eval harness over the CUAD benchmark — 10,250 scored predictions across five context strategies, with retrieval coverage measured separately so the bottleneck is a fact, not a guess.
 tags: [RAG]
 metric: "84.5%"
 metric_label: "best answer F1 — and it wasn't RAG"
-featured: true
+featured: false
 order: 3
 stack: [LangChain + DeepSeek, DSPy, BM25 + TF-IDF dense + hybrid retrieval, Static HTML dashboards]
 skills: [model-evaluation, rag, embeddings, prompt-engineering, data-pipelines, python]

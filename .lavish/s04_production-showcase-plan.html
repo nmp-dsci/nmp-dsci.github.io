@@ -1,0 +1,1283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Production Showcase — Three Live Systems, One Rubric</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script>
+  (function(){
+    var t;try{t=localStorage.getItem('console-theme')}catch(e){}
+    if(t!=='light'&&t!=='dark'){t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'}
+    document.documentElement.setAttribute('data-theme',t);
+  })();
+</script>
+<style>
+  :root{
+    --bg:#F6F6F3; --panel:#FFFFFF; --ink:#16181B; --ink-soft:#4A4F55;
+    --faint:#8A9099; --line:#E3E4DF; --line-2:#D3D5CE;
+    --ui:#4B4DED; --ui-soft:#ECECFC; --good:#1E845F; --good-soft:#E7F3ED;
+    --warn:#B26A12; --warn-soft:#F7EFE2; --bad:#B3362B; --bad-soft:#F9E9E7;
+    --shadow:0 1px 2px rgba(20,24,28,.04),0 8px 24px -12px rgba(20,24,28,.14);
+    --mono:'JetBrains Mono',ui-monospace,monospace;
+    --sans:'Inter',system-ui,sans-serif;
+    --display:'Space Grotesk','Inter',sans-serif;
+    /* site (subject) tokens for mocks */
+    --s-bg:#F4F6F3; --s-panel:#FFFFFF; --s-ink:#14181C; --s-ink-soft:#3E4A44; --s-muted:#5A655D;
+    --s-faint:#77837A; --s-line:#DDE4DC; --s-line2:#C9D2C9; --s-signal:#17876B; --s-signal-soft:#E4F1EC;
+    --s-amber:#B26A12; --s-chip-bg:#E4F1EC; --s-chip-ink:#11674F;
+    --s-mono:'IBM Plex Mono',ui-monospace,monospace; --s-sans:'IBM Plex Sans',system-ui,sans-serif;
+  }
+  :root[data-theme="dark"]{
+    --bg:#131417; --panel:#1B1D22; --ink:#E8E9EC; --ink-soft:#B6BAC2;
+    --faint:#7E8590; --line:#2A2D34; --line-2:#3A3E47;
+    --ui:#8B8DF5; --ui-soft:#26284A; --good:#4CC392; --good-soft:#17342A;
+    --warn:#D19243; --warn-soft:#3A2C15; --bad:#E0685C; --bad-soft:#3A1D1A;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -12px rgba(0,0,0,.6);
+    --s-bg:#101511; --s-panel:#171E19; --s-ink:#E8EDE9; --s-ink-soft:#C3CCC5; --s-muted:#96A29A;
+    --s-faint:#71807A; --s-line:#242E27; --s-line2:#33413A; --s-signal:#43C29A; --s-signal-soft:#173428;
+    --s-amber:#D19243; --s-chip-bg:#173428; --s-chip-ink:#7FDDBB;
+  }
+  *,*::before,*::after{box-sizing:border-box;min-width:0}
+  html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);
+    line-height:1.55;font-size:16px;letter-spacing:-.005em;
+    background-image:radial-gradient(circle at 1px 1px,rgba(20,24,28,.045) 1px,transparent 0);
+    background-size:26px 26px;transition:background-color .2s,color .2s}
+  :root[data-theme="dark"] body{background-image:radial-gradient(circle at 1px 1px,rgba(232,233,236,.05) 1px,transparent 0)}
+  :root[data-theme="dark"] code{color:#B3B4F8}
+  :where(p,h1,h2,h3,h4,li,td,th,dd,dt,figcaption){overflow-wrap:anywhere}
+  .wrap{max-width:1160px;margin:0 auto;padding:40px 22px 120px;position:relative}
+  .console-toggle{position:absolute;top:40px;right:22px;width:34px;height:34px;border-radius:999px;
+    border:1px solid var(--line-2);background:var(--panel);color:var(--ink-soft);cursor:pointer;
+    font-size:15px;line-height:1;display:flex;align-items:center;justify-content:center;padding:0}
+  .console-toggle:hover{border-color:var(--ui);color:var(--ui)}
+  .eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--faint);margin:0 0 10px}
+  h1{font-family:var(--display);font-weight:700;font-size:clamp(30px,5vw,48px);
+    line-height:1.14;letter-spacing:-.025em;margin:0 0 10px;padding:.04em 0 .08em;max-width:22ch}
+  h1 em{font-style:normal;color:var(--ui)}
+  .lead{font-size:clamp(15px,2vw,18px);color:var(--ink-soft);max-width:78ch;margin:0}
+  .rule{height:1px;background:var(--line);margin:40px 0}
+  section{scroll-margin-top:20px}
+  .sec-head{display:flex;gap:14px;align-items:baseline;flex-wrap:wrap;margin:0 0 6px}
+  .sec-num{font-family:var(--mono);font-size:12px;color:var(--ui);font-weight:600;
+    border:1px solid var(--line-2);border-radius:6px;padding:3px 8px;white-space:nowrap}
+  h2{font-family:var(--display);font-weight:600;font-size:clamp(21px,3vw,27px);
+    letter-spacing:-.02em;margin:0;line-height:1.25}
+  h3{font-family:var(--display);font-weight:600;font-size:16px;margin:0;line-height:1.3}
+  h4{font-family:var(--display);font-weight:600;font-size:14px;margin:0 0 6px;line-height:1.3}
+  .sec-sub{color:var(--ink-soft);margin:8px 0 24px;max-width:80ch;font-size:15px}
+  code{font-family:var(--mono);font-size:.88em;background:var(--ui-soft);color:#3634c7;
+    padding:1px 5px;border-radius:5px}
+  pre{font-family:var(--mono);font-size:12.5px;line-height:1.55;background:var(--panel);
+    border:1px solid var(--line);border-radius:10px;padding:14px 16px;overflow-x:auto;margin:0}
+  pre code{background:none;color:inherit;padding:0}
+  a{color:var(--ui)}
+  .muted{color:var(--faint)}
+  .small{font-size:13px}
+  .changed-note{background:var(--warn-soft);border:1px solid var(--warn);color:var(--ink);border-radius:10px;padding:10px 14px;font-size:13.5px;margin:0 0 18px}
+  .changed-note b{color:var(--warn)}
+
+  /* stat strip */
+  .stats{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(min(100%,190px),1fr));margin-top:26px}
+  .stat{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px;box-shadow:var(--shadow)}
+  .stat b{display:block;font-family:var(--mono);font-size:24px;color:var(--ui);line-height:1.2;font-weight:600}
+  .stat span{font-size:12.5px;color:var(--ink-soft)}
+  .stat.warn b{color:var(--warn)}
+
+  /* cards */
+  .cards{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr))}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 17px;
+    box-shadow:var(--shadow);display:flex;flex-direction:column;gap:8px}
+  .card p{margin:0;font-size:13.5px;color:var(--ink-soft)}
+  .card ul{margin:0;padding-left:18px;font-size:13.5px;color:var(--ink-soft)}
+  .card li{margin:3px 0}
+  .pill-tag{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;
+    border-radius:5px;padding:2px 7px;font-weight:600;align-self:flex-start;white-space:nowrap}
+  .pill-tag.new{background:var(--good-soft);color:var(--good)}
+  .pill-tag.changed{background:var(--warn-soft);color:var(--warn)}
+  .pill-tag.gone{background:var(--bad-soft);color:var(--bad)}
+  .pill-tag.ui{background:var(--ui-soft);color:var(--ui)}
+  .pill-tag.neutral{background:var(--bg);color:var(--faint);border:1px solid var(--line)}
+  .ba{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr))}
+  .ba .card h3{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+
+  /* tables */
+  .tblwrap{overflow-x:auto;background:var(--panel);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow)}
+  table{border-collapse:collapse;width:100%;font-size:13px}
+  th{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);
+    text-align:left;font-weight:500;padding:11px 14px;border-bottom:1px solid var(--line);background:#FBFBFA;white-space:nowrap;vertical-align:bottom}
+  :root[data-theme="dark"] th{background:#17191E}
+  td{padding:11px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+  tr:last-child td{border-bottom:0}
+  td.k{font-weight:600;font-family:var(--display);white-space:nowrap}
+  td small,th small{display:block;color:var(--faint);font-size:11px;margin-top:3px;font-weight:400;text-transform:none;letter-spacing:0;white-space:normal}
+  .path{font-family:var(--mono);font-size:11px;background:#F3F3F1;border-radius:5px;padding:1px 6px;white-space:nowrap}
+  :root[data-theme="dark"] .path{background:#24262C}
+  table.apps{min-width:900px}
+  table.matrix{min-width:1000px}
+  table.matrix td{font-size:12.5px}
+  table.matrix td .st{margin-right:6px}
+  table.ladder{min-width:960px}
+  table.files{min-width:780px}
+  table.phases{min-width:700px}
+  table.locked{min-width:640px}
+  table.sitemap{min-width:760px}
+
+  /* status dots */
+  .st{display:inline-block;font-family:var(--mono);font-size:10px;font-weight:700;border-radius:999px;
+    padding:2px 8px;white-space:nowrap;vertical-align:middle;letter-spacing:.04em}
+  .st.full{background:var(--good-soft);color:var(--good)}
+  .st.part{background:var(--warn-soft);color:var(--warn)}
+  .st.none{background:var(--bad-soft);color:var(--bad)}
+  .st.na{background:var(--bg);color:var(--faint);border:1px solid var(--line)}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12.5px;color:var(--ink-soft);margin:10px 0 0}
+
+  /* rubric cards */
+  .rubric{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(min(100%,255px),1fr))}
+  .rubric .card{gap:6px}
+  .rubric .n{font-family:var(--mono);font-size:11px;color:var(--ui);font-weight:600}
+  .rubric .q{font-size:13px;color:var(--ink);font-style:italic}
+  .rubric .why{font-size:12.5px;color:var(--faint)}
+
+  /* practices */
+  .practices{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(min(100%,330px),1fr))}
+  .practice{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px 17px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:8px}
+  .practice .slug{font-family:var(--mono);font-size:10.5px;color:var(--ui)}
+  .practice p{margin:0;font-size:13.5px;color:var(--ink-soft)}
+  .practice ul{margin:0;padding-left:18px;font-size:13px;color:var(--ink-soft)}
+  .practice li{margin:3px 0}
+  .practice .ev{border-top:1px dashed var(--line);padding-top:8px;font-size:12.5px;color:var(--faint)}
+  .practice .ev b{color:var(--ink-soft);font-weight:600}
+
+  /* figures */
+  figure{margin:18px 0 0;background:var(--panel);border:1px solid var(--line);border-radius:14px;
+    padding:18px 18px 12px;box-shadow:var(--shadow)}
+  figure svg{width:100%;height:auto;display:block;color:var(--ink)}
+  figcaption{font-family:var(--mono);font-size:11.5px;color:var(--faint);margin-top:10px}
+  .tiers{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(min(100%,330px),1fr));margin-top:18px}
+  .tier{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:10px}
+  .tier .who{font-family:var(--mono);font-size:11px;color:var(--faint)}
+  .tier svg{width:100%;height:auto;display:block;color:var(--ink)}
+  .tier ul{margin:0;padding-left:18px;font-size:13px;color:var(--ink-soft)}
+  .tier li{margin:3px 0}
+  .tier .signal{font-size:12.5px;border-left:3px solid var(--ui);padding:6px 10px;background:var(--ui-soft);border-radius:0 8px 8px 0;color:var(--ink)}
+  .node{fill:var(--panel);stroke:currentColor;stroke-width:1.2}
+  .node.hi{fill:var(--ui-soft);stroke:var(--ui)}
+  .node.db{fill:var(--good-soft);stroke:var(--good)}
+  .node.ext{fill:var(--warn-soft);stroke:var(--warn);stroke-dasharray:3 2}
+  .lbl{font-family:var(--mono);font-size:10.5px;fill:currentColor;text-anchor:middle}
+  .lbl.sm{font-size:9px;fill:var(--faint)}
+  .edge{stroke:currentColor;stroke-width:1.1;fill:none;marker-end:url(#ar)}
+  .edge.ret{stroke:var(--ui);stroke-dasharray:4 3;marker-end:url(#ar-ui)}
+  .zone{fill:none;stroke:var(--line-2);stroke-dasharray:4 3;rx:8}
+  .zlbl{font-family:var(--mono);font-size:9px;fill:var(--faint);letter-spacing:.08em}
+
+  /* site mock */
+  .mockframe{background:var(--panel);border:1px solid var(--line-2);border-radius:14px;overflow:hidden;box-shadow:var(--shadow);margin-top:16px}
+  .mock-title{display:flex;gap:8px;align-items:center;background:#FBFBFA;border-bottom:1px solid var(--line);
+    padding:9px 14px;font-family:var(--mono);font-size:11px;color:var(--faint)}
+  :root[data-theme="dark"] .mock-title{background:#17191E}
+  .dot{width:9px;height:9px;border-radius:999px;background:var(--line-2);display:inline-block}
+  .mock{padding:22px;background:var(--s-bg);font-family:var(--s-sans);color:var(--s-ink);
+    background-image:linear-gradient(rgba(16,22,19,.028) 1px,transparent 1px),linear-gradient(90deg,rgba(16,22,19,.028) 1px,transparent 1px);background-size:34px 34px}
+  :root[data-theme="dark"] .mock{background-image:linear-gradient(rgba(232,237,233,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(232,237,233,.035) 1px,transparent 1px)}
+  .mock *{font-family:inherit}
+  .m-nav{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding-bottom:12px;border-bottom:1px solid var(--s-line);margin-bottom:22px}
+  .m-brand{font-family:var(--s-mono);font-weight:600;font-size:14px}
+  .m-brand i{display:inline-block;width:.55em;height:1em;background:var(--s-signal);vertical-align:-.15em;margin:0 .12em}
+  .m-brand small{font-family:var(--s-mono);font-size:10px;color:var(--s-faint);margin-left:8px;font-weight:400}
+  .m-links{display:flex;gap:14px;font-size:12.5px;color:var(--s-ink-soft);flex-wrap:wrap;align-items:center}
+  .m-links .on{color:var(--s-signal);font-weight:600}
+  .m-links .cta{border:1px solid var(--s-line2);border-radius:7px;padding:3px 9px;color:var(--s-ink)}
+  .m-kicker{font-family:var(--s-mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--s-faint);margin:0 0 8px}
+  .m-h1{font-size:clamp(24px,3.6vw,36px);font-weight:600;letter-spacing:-.026em;line-height:1.14;margin:0;max-width:20ch}
+  .m-sub{color:var(--s-muted);font-size:14.5px;max-width:64ch;margin:10px 0 0}
+  .m-metrics{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(min(100%,180px),1fr));margin-top:18px}
+  .m-met{background:var(--s-panel);border:1px solid var(--s-line);border-radius:10px;padding:10px 12px}
+  .m-met b{display:block;font-family:var(--s-mono);font-weight:600;font-size:20px;color:var(--s-signal);line-height:1.2}
+  .m-met span{font-size:11px;color:var(--s-faint)}
+  .m-cards{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(min(100%,270px),1fr));margin-top:20px}
+  .m-card{background:var(--s-panel);border:1px solid var(--s-line);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:9px;
+    box-shadow:0 1px 2px rgba(16,22,19,.04),0 10px 26px -14px rgba(16,22,19,.16)}
+  .m-card h5{margin:0;font-size:16px;font-weight:600;letter-spacing:-.01em;display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+  .m-live{font-family:var(--s-mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;background:var(--s-signal);color:#fff;border-radius:999px;padding:3px 8px;white-space:nowrap;display:inline-flex;align-items:center;gap:5px}
+  .m-live::before{content:"";width:6px;height:6px;border-radius:999px;background:#fff;opacity:.9}
+  .m-vis{border:1px solid var(--s-line);border-radius:9px;background:var(--s-bg);padding:8px 8px 4px}
+  .m-vis svg{width:100%;height:auto;display:block;color:var(--s-ink)}
+  .m-vis .nd{fill:var(--s-panel);stroke:currentColor;stroke-width:1}
+  .m-vis .nd.hi{fill:var(--s-signal-soft);stroke:var(--s-signal)}
+  .m-vis .nd.ext{fill:transparent;stroke:var(--s-faint);stroke-dasharray:3 2}
+  .m-vis .tx{font-family:var(--s-mono);font-size:8.6px;fill:currentColor;text-anchor:middle}
+  .m-vis .tx.s{font-size:7.6px;fill:var(--s-faint)}
+  .m-vis .ed{stroke:currentColor;stroke-width:.9;fill:none}
+  .m-vis .cap{font-family:var(--s-mono);font-size:8px;fill:var(--s-faint)}
+  .m-card .m-what{font-size:13px;color:var(--s-muted);margin:0;line-height:1.5}
+  .m-card .m-row{display:flex;gap:8px;font-size:11.5px;color:var(--s-ink-soft);align-items:baseline}
+  .m-card .m-row b{font-family:var(--s-mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--s-faint);flex:0 0 58px;font-weight:500}
+  .m-metric{font-family:var(--s-mono);font-weight:600;color:var(--s-signal);font-size:18px;line-height:1.2}
+  .m-metric small{display:block;font-family:var(--s-sans);font-weight:400;color:var(--s-faint);font-size:11px}
+  .m-btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:auto;padding-top:6px}
+  .m-solid{background:var(--s-ink);color:var(--s-bg);font-weight:600;font-size:12.5px;border-radius:8px;padding:8px 13px}
+  .m-ghost{border:1px solid var(--s-line2);color:var(--s-ink);font-weight:500;font-size:12.5px;border-radius:8px;padding:8px 12px;background:var(--s-panel)}
+  .m-h2{font-size:19px;font-weight:600;letter-spacing:-.02em;margin:30px 0 4px}
+  .m-p{color:var(--s-muted);font-size:13.5px;margin:0 0 12px;max-width:70ch}
+  .m-tbl{overflow-x:auto;background:var(--s-panel);border:1px solid var(--s-line);border-radius:12px}
+  .m-tbl table{min-width:720px;font-size:12.5px}
+  .m-tbl th{font-family:var(--s-mono);color:var(--s-faint);background:transparent;border-bottom:1px solid var(--s-line)}
+  .m-tbl td{border-bottom:1px solid var(--s-line);color:var(--s-ink-soft)}
+  .m-tbl td.k{color:var(--s-ink);font-family:var(--s-sans)}
+  .m-dot{display:inline-block;width:9px;height:9px;border-radius:999px;margin-right:6px;vertical-align:-1px}
+  .m-dot.f{background:var(--s-signal)} .m-dot.p{background:var(--s-amber)} .m-dot.n{background:transparent;border:1.5px solid var(--s-faint)}
+  .m-prac{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(min(100%,210px),1fr));margin-top:10px}
+  .m-prac div{background:var(--s-panel);border:1px solid var(--s-line);border-radius:10px;padding:12px;font-size:12px;color:var(--s-muted);display:flex;flex-direction:column;gap:5px}
+  .m-prac b{font-family:var(--s-mono);color:var(--s-faint);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase}
+  .m-prac strong{font-size:13.5px;color:var(--s-ink);font-weight:600}
+  .m-prac i{font-style:normal;color:var(--s-signal);font-family:var(--s-mono);font-size:11px;margin-top:auto}
+  .m-earlier{border:1px solid var(--s-line);border-radius:10px;background:var(--s-panel);overflow:hidden;margin-top:10px}
+  .m-earlier div{display:flex;gap:12px;padding:9px 14px;border-top:1px solid var(--s-line);font-size:12px;color:var(--s-muted);flex-wrap:wrap}
+  .m-earlier div:first-child{border-top:0}
+  .m-earlier b{color:var(--s-ink);font-weight:600;flex:0 0 auto}
+  .m-tldr{background:var(--s-panel);border:1px solid var(--s-line);border-left:4px solid var(--s-signal);border-radius:12px;padding:14px 16px;margin-top:8px}
+  .m-tldr .k{font-family:var(--s-mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--s-signal);font-weight:600;margin:0 0 8px}
+  .m-tldr .g{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(min(100%,180px),1fr))}
+  .m-tldr .l{display:block;font-family:var(--s-mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--s-faint);margin-bottom:2px}
+  .m-tldr .v{font-size:12.5px;color:var(--s-ink-soft);line-height:1.45}
+  .m-tldr .v b{color:var(--s-signal);font-family:var(--s-mono)}
+  .m-tldr a{color:var(--s-signal);text-decoration:none}
+  .m-h3{font-size:16px;font-weight:600;margin:18px 0 6px;padding-top:14px;border-top:1px solid var(--s-line)}
+  .m-h3 small{font-family:var(--s-mono);font-size:10px;color:var(--s-faint);font-weight:500;margin-left:8px;letter-spacing:.06em}
+  .m-ul{margin:6px 0 0;padding-left:18px;font-size:12.5px;color:var(--s-ink-soft);line-height:1.5}
+  .m-ul li{margin:3px 0}
+  .m-ul b{color:var(--s-ink);font-weight:600}
+  .m-ul code{font-family:var(--s-mono);font-size:11px;background:var(--s-chip-bg);color:var(--s-chip-ink);padding:0 4px;border-radius:4px}
+  .m-cap{font-family:var(--s-mono);font-size:10.5px;color:var(--s-faint);margin:6px 0 0}
+  .m-prod{margin-top:18px}
+  .m-prod h6{font-size:16px;font-weight:600;margin:0 0 4px;padding-top:14px;border-top:1px solid var(--s-line);display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:baseline}
+  .m-prod h6 span{font-family:var(--s-mono);font-size:11px;color:var(--s-signal);font-weight:600}
+  .m-prod .rows{display:flex;flex-direction:column;gap:0;margin-top:10px;border:1px solid var(--s-line);border-radius:10px;background:var(--s-panel);overflow:hidden}
+  .m-prod .row{display:grid;gap:10px;grid-template-columns:minmax(0,150px) minmax(0,1fr);padding:10px 12px;border-top:1px solid var(--s-line);font-size:12.5px;align-items:start}
+  .m-prod .row:first-child{border-top:0}
+  .m-prod .chip{font-family:var(--s-mono);font-size:10.5px;background:var(--s-chip-bg);color:var(--s-chip-ink);border:1px solid var(--s-line);border-radius:999px;padding:3px 10px;white-space:nowrap;justify-self:start}
+  .m-prod .chip.p{background:transparent;color:var(--s-amber);border-color:var(--s-amber)}
+  .m-prod .chip.n{background:transparent;color:var(--s-faint)}
+  .m-prod .how{color:var(--s-ink-soft);line-height:1.5}
+  .m-prod .how em{display:block;font-style:normal;font-family:var(--s-mono);font-size:10.5px;color:var(--s-faint);margin-top:3px}
+  .m-ladder{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));margin-top:10px}
+  .m-ladder div{background:var(--s-panel);border:1px solid var(--s-line);border-radius:10px;padding:12px;font-size:12px;color:var(--s-ink-soft)}
+  .m-ladder div.on{border-color:var(--s-signal);box-shadow:inset 0 0 0 1px var(--s-signal)}
+  .m-ladder b{display:block;font-family:var(--s-mono);color:var(--s-signal);font-size:11px;letter-spacing:.06em;margin-bottom:4px}
+  .m-ladder i{display:block;font-style:normal;color:var(--s-faint);font-size:10.5px;margin-top:6px;font-family:var(--s-mono)}
+  @media(max-width:520px){.m-prod .row{grid-template-columns:minmax(0,1fr)}}
+  .note{font-size:12.5px;color:var(--faint);margin:10px 0 0}
+
+  /* decisions */
+  .q{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 18px;box-shadow:var(--shadow);margin-top:14px}
+  .q h3{margin-bottom:4px}
+  .q .why{font-size:13px;color:var(--ink-soft);margin:0 0 12px}
+  .choice{display:flex;gap:10px;align-items:flex-start;padding:9px 10px;border:1px solid var(--line);border-radius:9px;margin:6px 0;cursor:pointer;background:var(--bg)}
+  .choice:hover{border-color:var(--ui)}
+  .choice input{margin-top:4px;flex:0 0 auto}
+  .choice .t{display:block;font-weight:600;font-size:13.5px}
+  .choice .d{display:block;font-size:12.5px;color:var(--ink-soft)}
+  .choice .rec{font-family:var(--mono);font-size:9.5px;color:var(--good);margin-left:6px;letter-spacing:.06em}
+  .qrow{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:10px}
+  .btn{font-family:var(--sans);font-weight:600;font-size:13px;border-radius:8px;padding:8px 14px;border:1px solid var(--line-2);background:var(--panel);color:var(--ink);cursor:pointer}
+  .btn.primary{background:var(--ui);border-color:var(--ui);color:#fff}
+  .btn:hover{border-color:var(--ui)}
+  .status{font-family:var(--mono);font-size:11.5px;color:var(--good)}
+  .txt{width:100%;font-family:var(--mono);font-size:12.5px;padding:8px 10px;border:1px solid var(--line-2);border-radius:8px;background:var(--bg);color:var(--ink)}
+  textarea.txt{min-height:74px;resize:vertical;font-family:var(--sans);font-size:13px}
+  .urls{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr))}
+  .urls label{display:block;font-size:12.5px;color:var(--ink-soft);margin-bottom:4px;font-weight:600}
+  .urls label small{display:block;font-weight:400;color:var(--faint)}
+  #approve-box{background:var(--ui-soft);border:1px solid var(--ui);border-radius:14px;padding:20px;margin-top:28px}
+  #approve-box h3{color:var(--ui)}
+  .foot{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-family:var(--mono);font-size:11px;color:var(--faint);margin-top:48px;border-top:1px solid var(--line);padding-top:14px}
+
+  /* risks */
+  .risks{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr))}
+  .risk{border-left:3px solid var(--warn);padding-left:12px}
+  .risk.bad{border-left-color:var(--bad)}
+  .risk.ok{border-left-color:var(--good)}
+  .risk h4{margin-bottom:3px}
+  .risk p{margin:0;font-size:13px;color:var(--ink-soft)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <button class="console-toggle" id="console-toggle" type="button" aria-label="Toggle dark mode">☾</button>
+
+  <p class="eyebrow">nmp-dsci.github.io · build console · 04 · production showcase · rev 3</p>
+  <h1>Three live systems, one <em>production rubric</em></h1>
+  <p class="lead">Rebuild the portfolio around the three gen-AI systems that actually run on AWS — Data Pilot, the ConvFinQA Agent and
+    Transcript RAG — each with a case study that walks the full production rubric and lands the visitor in the live demo.
+    Alongside them, a second kind of write-up: <b>practices</b> that cut across all three — the eval loop, ways of working
+    (Git · Lavish · no-mistakes), and what production looks like at 10 / 100 / 1,000 concurrent users.</p>
+
+  <div class="changed-note"><b>Rev 3 — what changed from your review:</b> D4b / D4c / D8 / D9 locked from your queued answers (§09); the visual on each home card is now the <em>AI / agent structure</em> (§06-A), and the AWS topology
+    moves into the case study as its own figure (§06-B). The case-study structure is now defined as a <b>reusable contract + skill</b> (new §07): a front-matter schema, a
+    <code>_templates/project.md</code> scaffold, two SVG templates, a lint script, and a <code>/case-study &lt;repo&gt;</code> skill that produces a case study from a repo and validates it —
+    the three production case studies get built <em>through</em> it (D9). All three demo URLs are now in and verified live; CloudFront is dropped per your note — App Runner URLs as-is. <b>D4a locked:</b> only the three systems are shown — no "Earlier work" list; the other six projects and the legacy D3 pages are unpublished.
+    <b>Case-study spine (locked, supersedes D5):</b> 1 Purpose / benefit · 2 Agent architecture · 3 Agent loop / evaluation · 4 Deployed architecture · 5 Guardrails &amp; security · 6 Observability &amp; cost · 7 Production-readiness scorecard (§06-B mocked on Data Pilot, §07 contract). Rev 2's changes stand: three systems only, three practices, nine rubric rows per case study, the 10 / 100 / 1,000 concurrent-user ladder, D1/D2/D3/D5 locked.</div>
+
+  <div class="stats">
+    <div class="stat"><b>3</b><span>systems on the site — Data Pilot, ConvFinQA, Transcript RAG. Nothing else is shown (D4a locked)</span></div>
+    <div class="stat"><b>9 × 3</b><span>rubric dimensions × apps, each with a status, a how-it-performs line, and a proof path</span></div>
+    <div class="stat"><b>3</b><span>practice write-ups: eval loop · ways of working · production at 10/100/1,000 concurrent</span></div>
+    <div class="stat"><b>3 / 3</b><span>demo URLs in hand and verified live (mode=demo, writes refused) — App Runner URLs stay as-is, no CloudFront</span></div>
+  </div>
+
+  <div class="rule"></div>
+
+  <!-- 00 -->
+  <section id="s00">
+    <div class="sec-head"><span class="sec-num">00</span><h2>The restructure — nine projects → three systems + three practices</h2></div>
+    <p class="sec-sub">Today the site is a nine-project portfolio ordered by eval headline. The target is a production portfolio: three systems that run, a rubric that says what "runs" means,
+      and practice pages that show <em>how</em> they got built and kept honest. The six other projects stop being featured.</p>
+    <div class="ba">
+      <div class="card">
+        <h3><span class="pill-tag neutral">Today</span> Nine projects, benchmark-led</h3>
+        <ul>
+          <li>Hero metrics: 9/9 (V2V), 77.1% (ConvFinQA), 10,250 (CUAD), 6.1× (Transcript RAG).</li>
+          <li>Six featured cards: V2V → Data Pilot → CUAD → ConvFinQA → Transcript RAG → Floor Plan; three in "Earlier work".</li>
+          <li>Filter pills by capability (Agents / RAG / Multi-agent / Data).</li>
+          <li>Case-study spine <code>TL;DR → Skills → Architecture → Cost</code>; <code>links.demo</code> supported by the layout but unused.</li>
+          <li>Nothing says "deployed"; no cross-cutting write-ups about process.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3><span class="pill-tag new">Target</span> Three systems, one rubric, three practices</h3>
+        <ul>
+          <li>Hero metrics from the production systems: <b>3</b> live on AWS · <b>77.1%</b> champion, v3.1 refused by the gate · <b>6.1×</b> fewer tokens at 0.93 parity · <b>4.98×</b> measured 5-worker speedup.</li>
+          <li>Home = the hub: three system cards with an agent-structure visual + "Open live demo ↗" → the rubric matrix → the practices strip. Nothing else.</li>
+          <li>Each case study on one spine: <code>1 Purpose → 2 Agent architecture → 3 Agent loop &amp; evaluation → 4 Deployed architecture → 5 Guardrails → 6 Observability &amp; cost → 7 Scorecard</code>, with the demo link in the TL;DR strip, section 1 and the sidebar.</li>
+          <li>New <code>_practices</code> collection: <b>The eval loop</b> · <b>Ways of working: Git · Lavish · no-mistakes</b> · <b>Production at 10 / 100 / 1,000 concurrent users</b>.</li>
+          <li>Nav: Work · Practices · About. No filter pills (three cards don't need them).</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="tblwrap" style="margin-top:18px">
+      <table class="sitemap">
+        <thead><tr><th>Project</th><th>Today</th><th>Target</th><th>Why</th></tr></thead>
+        <tbody>
+          <tr><td class="k">Data Pilot</td><td>featured · 2</td><td><span class="st full">SYSTEM 1</span></td><td>Live on CloudFront + App Runner + Aurora; scores 9/9 on the rubric, scale path measured.</td></tr>
+          <tr><td class="k">ConvFinQA Agent</td><td>featured · 4</td><td><span class="st full">SYSTEM 2</span></td><td>Live operator console; the strongest learning-loop story (registry, promotion contract, refused challenger).</td></tr>
+          <tr><td class="k">Transcript RAG</td><td>featured · 5</td><td><span class="st full">SYSTEM 3</span></td><td>Live evaluation workbench; the strongest eval/judge/cost story; has the walkthrough video.</td></tr>
+          <tr><td class="k">V2V Prod Agent</td><td>featured · 1</td><td><span class="st none">HIDDEN</span></td><td>Not deployed. Unpublished. The eval-loop practice may still cite its 9/9 red-team result, linking to the GitHub repo rather than a site page.</td></tr>
+          <tr><td class="k">CUAD Legal Agent</td><td>featured · 3</td><td><span class="st none">HIDDEN</span></td><td>Benchmark study, not a service. Unpublished; cited from the eval-loop practice via GitHub if at all.</td></tr>
+          <tr><td class="k">Floor Plan Reviewer</td><td>featured · 6</td><td><span class="st none">HIDDEN</span></td><td>Not deployed. Unpublished.</td></tr>
+          <tr><td class="k">Adversarial Dev · PropertyIQ ETL · Chronicle</td><td>earlier · 7–9</td><td><span class="st none">HIDDEN</span></td><td>Unpublished. PropertyIQ is the data behind Data Pilot — mention it in that case study's Architecture with a GitHub link. Chronicle's legacy D3 pages (<code>profile_*.html</code>, <code>property_*.html</code>, <code>surname_culture.html</code>, <code>tile_calendar.html</code>) are excluded from the build too.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="note"><b>D4a locked — only the three are shown.</b> Implementation: <code>published: false</code> on the six project files (content stays in git, nothing renders — reversible), the legacy D3 pages and their data added to <code>_config.yml</code> <code>exclude:</code>, and no "Earlier work" section on the home page. Say the word if you'd rather delete the files outright.</p>
+  </section>
+
+  <div class="rule"></div>
+
+  <!-- 01 -->
+  <section id="s01">
+    <div class="sec-head"><span class="sec-num">01</span><h2>The three systems — what a visitor actually lands in</h2></div>
+    <p class="sec-sub">All three ship in <b>demo mode</b>: read-only, keyless, no inference on the public URL. That is a deliberate production decision
+      (a no-login app with a live LLM has an unbounded abuse bill) and the home page says so up front — it is a cost-control story, not a limitation to hide.
+      Every claim below is from the repo named in the row.</p>
+    <div class="tblwrap">
+      <table class="apps">
+        <thead><tr>
+          <th>System</th><th>What it is</th><th>What's live in the demo</th><th>Deploy topology <small>region · size · cost</small></th><th>Live URL</th><th>Case study</th>
+        </tr></thead>
+        <tbody>
+          <tr>
+            <td class="k">Data Pilot<small>data-qa-agent</small></td>
+            <td>Conversational data agent: NL → governed SQL over NSW property data (~3.2M rows), with Postgres RLS deciding what each user may see.</td>
+            <td><b>Walk-in demo, no login.</b> Chat replays recorded agent runs as paced SSE (plan → charts → report, ~5–10s). <b>Explore + SQL editor are genuinely live</b> against real marts. Admin surfaces (Ops deck, Evaluations, Goldens) visible read-only. First Explore call may wait ~30s while Aurora wakes.</td>
+            <td>CloudFront → App Runner backend (1 instance, max_concurrency 100) → Aurora Serverless v2 (0–1 ACU, scale-to-zero) · ECS Fargate one-shot jobs (migrate 0.5 vCPU / pipeline 1 vCPU 4 GB) · Secrets Manager · Terraform<br><small>ap-southeast-2 · ~$8–18/mo in demo mode (was ~$36–66 with the live agent)</small></td>
+            <td><span class="path">deqfc8b0u8s64.cloudfront.net</span><br><small>API: hzxtrasvdp.ap-southeast-2.awsapprunner.com</small></td>
+            <td><span class="path">_projects/data-pilot.md</span></td>
+          </tr>
+          <tr>
+            <td class="k">ConvFinQA Agent<small>ConvFinQA-agent</small></td>
+            <td>Multi-turn financial Q&amp;A over report text + tables — four pydantic-ai agents (triage → preprocess → retriever → calculator), prompts versioned and promoted like releases.</td>
+            <td><b>Operator console, read-only.</b> Chat replays 8 recorded conversations (30–60s turns play in ~4s). All six admin pages live: Evaluations (770 q, gold vs each version), Experiments (accuracy trend, version diff), Traces (every turn stage-by-stage), Research (rules per round), System debrief. Writes → 403/501.</td>
+            <td>ECR → App Runner (1 instance, 0.5 vCPU / 1 GB, max_size 1) · CloudWatch 5xx alarm · no VPC, no DB · Terraform · <code>DEMO_MODE</code> baked into the image<br><small>ap-southeast-1 (Sydney's 2-service App Runner cap) · ~$5–15/mo · 225–315 MiB RSS measured</small></td>
+            <td><span class="path">vrpy25pewm.ap-southeast-1.awsapprunner.com</span><br><small><span class="st full" style="font-size:9px">VERIFIED</span> <code>/healthz</code> → mode=demo · champion v2 · bundle <code>bec0e68</code> · 8 recorded reports · runs v1/v2/v3_1 · POST promote → 403</small></td>
+            <td><span class="path">_projects/convfinqa-agent.md</span></td>
+          </tr>
+          <tr>
+            <td class="k">Transcript RAG<small>transcript-rag-agent · "transcript·lab"</small></td>
+            <td>Evaluation-first RAG workbench over YouTube transcripts — hybrid BM25 + dense fusion, reranking, HyDE / multi-query / contextual retrieval, GraphRAG over Neo4j, four answer paths raced on one golden set.</td>
+            <td><b>Read-only workbench.</b> Browse the corpus tree + Retrieval Lab (semantic vs BM25 vs graph side by side), chunk graph, knowledge graph (snapshot), Themes, Disagreements, the Scoreboard over committed matrix runs, and recorded Q&amp;A with per-answer execution traces. No composer, no ingestion (403).</td>
+            <td>S3 demo data (Chroma index, graph snapshot) → ECR → App Runner (1 instance, 0.5 vCPU / 1 GB, auto-deploy on <code>:latest</code>) · Terraform · PostHog three-way gated<br><small>ap-southeast-2 · ~$5–15/mo · $0 inference</small></td>
+            <td><span class="path">iibze7vuqr.ap-southeast-2.awsapprunner.com</span><br><small><span class="st full" style="font-size:9px">VERIFIED</span> <code>/api/health</code> → mode=demo · corpus 102 videos / 2,827 chunks / 61 channels · POST /api/ask → 403</small></td>
+            <td><span class="path">_projects/transcript-rag.md</span><br><small>has walkthrough video</small></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="note">Sources: <span class="path">data-qa-agent/README.md §Deploy to AWS</span>, <span class="path">.lavish/s38_demo-mode-prod-plan.html</span>, <span class="path">infra/terraform/foundations/apprunner.tf</span> ·
+      <span class="path">ConvFinQA-agent/README.md §Container &amp; deploy</span>, <span class="path">infra/terraform/demo/main.tf</span>, <span class="path">serving/limits.py</span> ·
+      <span class="path">transcript-rag-agent/README.md §Demo deployment (AWS)</span>, <span class="path">.github/workflows/deploy-aws.yml</span>.</p>
+  </section>
+
+  <div class="rule"></div>
+
+  <!-- 02 -->
+  <section id="s02">
+    <div class="sec-head"><span class="sec-num">02</span><h2>The rubric — what "production gen-AI" has to answer <span class="st full" style="margin-left:8px">D2 LOCKED · NINE</span></h2></div>
+    <p class="sec-sub">Nine dimensions, each phrased as the question a hiring engineer would ask. This becomes <code>_data/rubric.yml</code>
+      — one source of truth for the home-page matrix and every case study's "Production readiness" section, exactly like <code>_data/skills.yml</code> feeds the skill chips today.</p>
+    <div class="rubric">
+      <div class="card"><span class="n">R1 · evals</span><h3>Evals &amp; golden set</h3><p class="q">Is there a versioned golden set, and can anyone reproduce the score offline?</p><p class="why">Without a fixed set the accuracy number is an anecdote. Committed predictions make the number a fact.</p></div>
+      <div class="card"><span class="n">R2 · judge</span><h3>LLM-as-judge</h3><p class="q">Who grades the open-ended answers, and is the judge independent of the model being graded?</p><p class="why">Self-grading inflates scores; a frozen rubric and a cross-family judge keep it honest.</p></div>
+      <div class="card"><span class="n">R3 · gate</span><h3>Regression gate</h3><p class="q">What stops a worse version from shipping?</p><p class="why">A CI gate on the eval floor — and on per-case pass→fail flips, since a better average can still hide regressions.</p></div>
+      <div class="card"><span class="n">R4 · loop</span><h3>Learning loop</h3><p class="q">How does the system get better — and is each change traceable to one lever?</p><p class="why">Versioned prompts, diagnose → propose → verify, champion/challenger promotion, documented cycles including the failed ones.</p></div>
+      <div class="card"><span class="n">R5 · guardrails</span><h3>Guardrails &amp; security</h3><p class="q">What sits between the model and anything it can touch — data, tools, money, other users?</p><p class="why">Deterministic gates (RLS, AST guards, sandboxes, policy tables), abuse limits, red-teamed and regression-tested.</p></div>
+      <div class="card"><span class="n">R6 · trace</span><h3>Observability &amp; tracing</h3><p class="q">Can you replay exactly what the agent did on one request, and see the fleet's health on one screen?</p><p class="why">Per-run traces + SLOs with error budgets; the dashboard signal is what tells you when to scale.</p></div>
+      <div class="card"><span class="n">R7 · cost</span><h3>Cost tracking &amp; control</h3><p class="q">What does one answer cost, what caps the worst day, and what's the cheap-by-default tier?</p><p class="why">Cache-adjusted cost per answer, daily caps, flash-tier defaults, and a demo mode whose worst case is a fixed ceiling.</p></div>
+      <div class="card"><span class="n">R8 · release</span><h3>Deploy &amp; release</h3><p class="q">Is a merge a deploy — and does the deploy prove the live URL is what it claims?</p><p class="why">IaC, keyless OIDC CI/CD, a smoke test that asserts demo mode and refuses writes, and a rollback path.</p></div>
+      <div class="card"><span class="n">R9 · scale</span><h3>Scale path</h3><p class="q">What's the topology today, what's been measured under load, and what changes at 100 / 1,000 concurrent users?</p><p class="why">Load tests, a queue-scaling experiment with a formula that held, and an honest "designed, not built" for the next rungs.</p></div>
+    </div>
+
+    <figure>
+      <svg viewBox="0 0 900 190" role="img" aria-labelledby="loop-title">
+        <title id="loop-title">The production loop the rubric describes: golden set feeds eval, eval feeds the gate, the gate ships, production traces feed a judge sample and diagnosis, which proposes the next version back into eval.</title>
+        <defs>
+          <marker id="ar" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="currentColor"/></marker>
+          <marker id="ar-ui" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="var(--ui)"/></marker>
+        </defs>
+        <g id="l-golden"><title>R1 — versioned golden set (chunk labels / golden SQL+report / gold programs)</title><rect class="node" x="14" y="52" width="120" height="46" rx="8"/><text class="lbl" x="74" y="72">Golden set</text><text class="lbl sm" x="74" y="86">R1 · versioned</text></g>
+        <g id="l-eval"><title>Eval run — deterministic graders + LLM judge (R2)</title><rect class="node" x="164" y="52" width="120" height="46" rx="8"/><text class="lbl" x="224" y="72">Eval run</text><text class="lbl sm" x="224" y="86">R1 + R2 judge</text></g>
+        <g id="l-gate"><title>R3 — CI gate: floor + no pass→fail flips</title><rect class="node hi" x="314" y="52" width="120" height="46" rx="8"/><text class="lbl" x="374" y="72">Gate</text><text class="lbl sm" x="374" y="86">R3 · floor + flips</text></g>
+        <g id="l-ship"><title>R8 — merge = deploy, smoke-tested</title><rect class="node" x="464" y="52" width="120" height="46" rx="8"/><text class="lbl" x="524" y="72">Ship</text><text class="lbl sm" x="524" y="86">R8 · OIDC + smoke</text></g>
+        <g id="l-prod"><title>Production — R5 guardrails around every action, R6 traces, R7 cost per answer, R9 scale signal</title><rect class="node db" x="614" y="40" width="130" height="70" rx="8"/><text class="lbl" x="679" y="62">Production</text><text class="lbl sm" x="679" y="77">R5 gate · R6 trace</text><text class="lbl sm" x="679" y="91">R7 cost · R9 scale</text></g>
+        <g id="l-diag"><title>R4 — diagnose traces, propose one-lever change, verify</title><rect class="node" x="774" y="52" width="112" height="46" rx="8"/><text class="lbl" x="830" y="72">Diagnose</text><text class="lbl sm" x="830" y="86">R4 · one lever</text></g>
+        <path class="edge" d="M134,75 L162,75"><title>golden set → eval</title></path>
+        <path class="edge" d="M284,75 L312,75"><title>eval → gate</title></path>
+        <path class="edge" d="M434,75 L462,75"><title>gate passes → ship</title></path>
+        <path class="edge" d="M584,75 L612,75"><title>ship → production</title></path>
+        <path class="edge" d="M744,75 L772,75"><title>traces + judge sample → diagnose</title></path>
+        <path class="edge ret" d="M830,98 C830,160 224,160 224,100"><title>propose next version → back to eval (R4 learning loop)</title></path>
+        <text class="lbl sm" x="527" y="150" style="fill:var(--ui)">new prompt / knowledge version → re-evaluated before it can ship</text>
+        <path class="edge ret" d="M374,98 C374,128 300,128 300,128 L290,128" style="marker-end:none"><title>gate refuses — version stays unshipped</title></path>
+        <text class="lbl sm" x="330" y="139">✗ refused</text>
+      </svg>
+      <figcaption>The loop the nine dimensions describe. R1–R4 are the learning half — that is the "eval loop" practice page; R5–R9 are the operating half. Each case study says where it sits on it, dimension by dimension.</figcaption>
+    </figure>
+  </section>
+
+  <div class="rule"></div>
+
+  <!-- 03 -->
+  <section id="s03">
+    <div class="sec-head"><span class="sec-num">03</span><h2>Apps × rubric — how each system performs each skill</h2></div>
+    <p class="sec-sub">This matrix renders compactly on the home page and in full — one row per dimension with the status, the how-it-performs explanation and the proof path — as each case study's closing
+      <b>Production readiness scorecard</b> (section 7), with each row pointing back to the section that explains it (R1–R4 → §3, R5 → §5, R6–R7 → §6, R8–R9 → §4). Ratings are deliberately honest — a ◐ or ○ with a one-line reason reads as engineering judgement; nine green dots reads as marketing.</p>
+    <div class="legend">
+      <span><span class="st full">● SHIPPED</span> built, measured, in the repo</span>
+      <span><span class="st part">◐ PARTIAL</span> present but narrower than the rubric asks</span>
+      <span><span class="st none">○ DESIGNED</span> written up, not built</span>
+      <span><span class="st na">— N/A</span> not needed by design (say why)</span>
+    </div>
+    <div class="tblwrap" style="margin-top:12px">
+      <table class="matrix">
+        <thead><tr><th>Dimension</th><th>Data Pilot</th><th>ConvFinQA Agent</th><th>Transcript RAG</th></tr></thead>
+        <tbody>
+          <tr><td class="k">R1 Evals &amp; golden set</td>
+            <td><span class="st full">●</span>Goldens authored <em>in the product</em> (① SQL → ② sandbox objects → ③ report), version-controlled to <span class="path">evals/cases/*.yaml</span> across 3 datasets, T1–T7 question ladder, deterministic graders G1–G4. Journey evals incl. RLS isolation run in CI.<small>evals/journeys.yaml · agent/eval_graders.py · docs/evals/</small></td>
+            <td><span class="st full">●</span>770-question scored set (200 conversations) with a genuinely never-seen 309-q subset; prediction CSVs committed so <code>REUSE_CACHE=1</code> reproduces v1 73.0% → v2 77.1% with zero API calls; cut analysis by turn type / conversation type / depth.<small>evaluation/predictions/ · data/loader.py::optimizer_split</small></td>
+            <td><span class="st full">●</span>20-entry golden set with <em>chunk-level</em> labels (14 local / 4 global / 2 temporal, 4 domains); deterministic recall@k / MRR / NDCG; 8-config retrieval ablation; 17 committed run snapshots.<small>src/evals/golden_dataset.json · evals/runs/ · docs/golden-set-curation.md</small></td></tr>
+          <tr><td class="k">R2 LLM-as-judge</td>
+            <td><span class="st full">●</span>Cross-family by rule: Claude judges the DeepSeek agent against a frozen, hashed rubric; refuses to grade its own family and records <code>skipped</code> rather than a fake score. Insight is scored but never gates alone.<small>agent/eval_judge.py</small></td>
+            <td><span class="st na">—</span>Answers are numbers and programs — scored deterministically (exact / program accuracy). No judge needed, and the write-up says so: it's a strength of the task framing.<small>evaluation/metrics.py</small></td>
+            <td><span class="st full">●</span>RAGAS (faithfulness, relevancy, context precision) plus a <code>depth-v2</code> rubric (grounding 40% / depth 60%, faithfulness cap); self-graded runs flagged; independent non-DeepSeek judging; <code>rejudge</code> re-scores a committed run.<small>src/evals/judge.py · Scoreboard tab</small></td></tr>
+          <tr><td class="k">R3 Regression gate</td>
+            <td><span class="st full">●</span><code>make eval-compare</code> blocks on <b>any</b> case flipping pass → fail regardless of the average; refuses to compare different pack versions. A zero-LLM pack lint gates every merge; the scored gate is a deliberate CD step.<small>scripts/eval_compare.py · tests/test_eval_pack.py · ci.yml</small></td>
+            <td><span class="st full">●</span>CI eval-regression gate re-scores committed CSVs: champion must hold its floor (v2 77.14% vs 76.64%) and a challenger's pass→fail flips are printed. Deploy runs only after CI is green (<code>workflow_run</code>) — "never ship a red main".<small>tracking/gate.py · comparator.py · deploy-aws.yml</small></td>
+            <td><span class="st full">●</span>Dedicated <code>eval-gate</code> CI job validates committed snapshots and enforces floors on the headline retrieval claims.<small>tests/evals/test_committed_runs.py · ci.yml</small></td></tr>
+          <tr><td class="k">R4 Learning loop</td>
+            <td><span class="st full">●</span>Every <code>/ask</code> stamped with a build fingerprint (provider + model + prompt/skills/knowledge hashes) so a base-vs-experiment run proves one lever moved; <code>make eval-diagnose</code> proposes one-lever hypotheses (read-only by design); three written-up cycles — 001 PASS, <b>002 FAIL, not shipped</b>, 003 PASS.<small>agent/version.py · scripts/eval_diagnose.py · docs/evals/cycle-00N.md</small></td>
+            <td><span class="st full">●</span>Prompts versioned as code (v1, v2, v3_1…); GEPA optimisation (1,964 metric calls) produced v2; s7 diagnose → propose → verify harness generated 39 rules → v3_1, which the gate <b>refused</b> (76.2% &lt; 77.1%). Champion/challenger registry with an append-only promotion contract; MLflow logging lives inside the runners.<small>prompts/ · diagnosis/ · tracking/registry.py</small></td>
+            <td><span class="st part">◐</span>Golden-set curation process (target 40+, per domain), per-cell cached matrix keyed by config + corpus digest, Experiments tab — but no prompt-optimisation harness or champion registry yet.<small>docs/golden-set-curation.md · src/evals/matrix_cache.py</small></td></tr>
+          <tr><td class="k">R5 Guardrails &amp; security</td>
+            <td><span class="st full">●</span>OIDC + RBAC + Postgres RLS (<code>SET LOCAL</code> per request); agent connects as a read-only role; 3-layer SQL guard (shape → denylist → sqlglot AST rejecting DML/DDL/<code>set_config</code>); Pyodide/WASM sandbox for analysis code; per-role <code>statement_timeout</code>; daily caps 5/10/200 + 22 requests + 600k tokens per run. Deterministic injection suite in CI + promptfoo red-team in 4 classes → <code>/ops</code>. The suite found two real guard defects.<small>SECURITY.md · sql_guardrails.py · tests/security/</small></td>
+            <td><span class="st part">◐</span>Abuse controls rather than policy gates: one LLM choke point (<span class="path">llm.py</span>) owns the demo gate, retry/backoff and 120s timeout; global in-flight cap (4) + per-IP sliding window (30/60s) shed load before it costs anything; calculator computes only through explicit tools; demo replay <b>declines</b> below its match threshold rather than serve another filing's number.<small>serving/limits.py · llm.py · demo_pack/</small></td>
+            <td><span class="st part">◐</span>Demo gate deny-by-default on method (403), WebSocket re-check for STT (close 1008) with 110/120s session caps, SSRF guards on document fetch, analytics three-way gated. Single-tenant workbench — no per-user auth or data isolation, by scope.<small>src/api/main.py · README §Reviewing a document</small></td></tr>
+          <tr><td class="k">R6 Observability &amp; tracing</td>
+            <td><span class="st full">●</span>OTel → self-hosted Jaeger (or Logfire); <code>/ops</code> flight deck: latency + time-to-first-page p95, error/degraded rates, cost per answer, two SLOs with error-budget burn, marts freshness, red-team pass rates, deploy timeline, saturation (CloudWatch tier 2). Reads one pre-aggregated Postgres row, so it stays up when the cloud APIs don't; a runbook keyed off the lamps.<small>frontend/features/ops · docs/runbook.md</small></td>
+            <td><span class="st full">●</span>Per-turn trace store — inputs, outputs, reasoning, tool loop, tokens, latency, gold comparison — browsable at <code>/admin/traces</code>; <code>/metrics/production</code> split by serving / demo / eval source; tiles with no metered data render an em dash, not a flattering zero.<small>tracking/traces.py · serving/routers/</small></td>
+            <td><span class="st full">●</span>Every answer persists an ordered execution trace (route decision, each retrieval/rerank/fusion stage with kept chunk ids, every LLM call) rendered under the answer and surviving reload; MLflow for CLI runs.<small>README §Evaluation Workbench · src/chat/</small></td></tr>
+          <tr><td class="k">R7 Cost tracking &amp; control</td>
+            <td><span class="st full">●</span>Cache-adjusted cost per answer on the deck (naive token counts overstate several-fold); daily caps; CloudWatch billing alarm → SNS; local fastembed embeddings; agent App Runner deleted in demo mode — measured ~60–70% cheaper (~$36–66 → ~$8–18/mo).<small>ops/ · app/limits.py · s38 write-up</small></td>
+            <td><span class="st full">●</span>Flash tier for all four production agents, pro tier only inside the optimisation harness; <code>tracking/cost.py</code>; cached evals are free to re-run; demo performs no inference; 1 GB instance sized from measured RSS (225 → 315 MiB).<small>tracking/cost.py · README §Container</small></td>
+            <td><span class="st full">●</span>The headline <em>is</em> a cost finding — 6.1× fewer tokens at 0.93 parity; per-strategy token budgets recorded; Scoreboard efficiency panel ranks composite per 1k tokens; embeddings + reranker local; agentic path shown to cost 3–5× for no gain.<small>evals/runs/ · Scoreboard</small></td></tr>
+          <tr><td class="k">R8 Deploy &amp; release</td>
+            <td><span class="st full">●</span>~10-stage OIDC deploy on merge: images → Terraform → ECS migrate + pipeline → App Runner → CloudFront → cloud smoke; no stored keys; billing/5xx alarms; <code>make rollback</code> reverts App Runner to the previous image.<small>.github/workflows/deploy-aws.yml · infra/terraform/</small></td>
+            <td><span class="st full">●</span>CI-gated deploy (waits for green CI), OIDC, ECR, Terraform, wait-for-RUNNING, smoke asserts mode=demo, a registered champion, the never-seen split, evidence served, and a 403 on an admin write; rollback = retag <code>:sha</code> as <code>:latest</code>.<small>deploy-aws.yml · scripts/demo_smoke.sh</small></td>
+            <td><span class="st full">●</span>OIDC deploy: pulls demo data from S3, builds linux/amd64, Terraform, waits for RUNNING, smoke asserts mode=demo, corpus served, POST → 403.<small>deploy-aws.yml · scripts/demo_smoke.sh</small></td></tr>
+          <tr><td class="k">R9 Scale path</td>
+            <td><span class="st full">●</span>k6 load tests recorded to <code>app.load_tests</code>; a Redis Streams queue experiment measured <b>linear</b> worker scaling (3 → 2.97–2.99×, 5 → 4.87–4.98×) within 0.5–6% of ⌈N/W⌉×S, plus a live-LLM validation; sizing is arithmetic and the "scale out" dashboard signal is named. Prod today: rung 10 — 1 instance/service, Aurora 0–1 ACU.<small>out/wsweep/ · .lavish/s42 · load/k6/chat.js</small></td>
+            <td><span class="st none">○</span>Rung 10: single instance, <code>--workers 1</code>, in-memory sessions and limits — and the code says where the seam is ("if that ever changes, these two classes are the seam"). No load test. Rungs 100 / 1,000 are design only.<small>serving/limits.py · CLAUDE.md invariants</small></td>
+            <td><span class="st none">○</span>Rung 10: single 0.5 vCPU instance, read-only, index baked into the image; ingestion queue with 3 workers exists for the write path. No load test. Rungs 100 / 1,000 are design only.<small>infra/terraform/demo/main.tf · README §Quickstart</small></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="note">Counts to re-verify before publishing numbers: Data Pilot golden pack size (85 <code>question:</code> lines across the three YAMLs — may include drafts; use <code>make eval-export</code> output), Transcript RAG test count (README says 700+; <code>grep def test_</code> finds ~1,440 — run <code>pytest --collect-only -q</code>).</p>
+  </section>
+
+  <div class="rule"></div>
+
+  <!-- 04 -->
+  <section id="s04">
+    <div class="sec-head"><span class="sec-num">04</span><h2>The scale ladder — 10 / 100 / 1,000 concurrent users <span class="st full" style="margin-left:8px">D3 LOCKED · SHARED</span></h2></div>
+    <p class="sec-sub">Re-based on <b>concurrent users</b> as you asked. The ladder becomes its own practice page (<span class="path">_practices/production-scale.md</span>), is summarised in one strip on the home page,
+      and each case study shows its rung and links here. Only rung 10 is deployed; rung 100's sizing is <em>measured</em> (Data Pilot's queue experiment and k6 runs, on one laptop); rung 1,000 is design.
+      The page labels each rung that way, and dollar ranges are labelled order-of-magnitude estimates.</p>
+
+    <div class="tiers">
+      <div class="tier">
+        <div><span class="pill-tag new">Rung 10 · deployed</span></div>
+        <h3>10 concurrent users — today's demo</h3>
+        <span class="who">~$5–18 / month per app · ≈ hundreds of visitors a month</span>
+        <svg viewBox="0 0 340 170" role="img" aria-label="Rung 10 topology: visitors to CloudFront or a single App Runner instance to Aurora Serverless scale-to-zero; no LLM in demo mode">
+          <g><title>Visitors (10–20 concurrent)</title><rect class="node" x="10" y="66" width="70" height="36" rx="7"/><text class="lbl" x="45" y="88">visitors</text></g>
+          <g><title>CloudFront (static SPA) — Data Pilot only</title><rect class="node" x="104" y="20" width="96" height="34" rx="7"/><text class="lbl" x="152" y="41">CloudFront</text></g>
+          <g><title>App Runner — one instance per service, 0.5–1 vCPU, max_size 1</title><rect class="node hi" x="104" y="66" width="96" height="40" rx="7"/><text class="lbl" x="152" y="83">App Runner ×1</text><text class="lbl sm" x="152" y="97">0.5 vCPU · 1 GB</text></g>
+          <g><title>Aurora Serverless v2, 0–1 ACU, scale-to-zero (Data Pilot); ConvFinQA and Transcript RAG have no database</title><rect class="node db" x="224" y="66" width="106" height="40" rx="7"/><text class="lbl" x="277" y="83">Aurora v2</text><text class="lbl sm" x="277" y="97">0 → 1 ACU · pauses</text></g>
+          <g><title>LLM — not called in demo mode; chat replays recorded runs</title><rect class="node ext" x="104" y="122" width="96" height="34" rx="7"/><text class="lbl" x="152" y="138">LLM</text><text class="lbl sm" x="152" y="150">replayed · $0</text></g>
+          <path class="edge" d="M80,84 L102,84"/><path class="edge" d="M80,80 C90,60 96,40 102,37"/><path class="edge" d="M200,86 L222,86"/>
+          <path class="edge" d="M152,106 L152,120" style="stroke-dasharray:3 2"/>
+          <text class="lbl sm" x="277" y="130">sessions + limits</text><text class="lbl sm" x="277" y="142">in process memory</text>
+        </svg>
+        <ul>
+          <li><b>Compute:</b> one App Runner instance per service (front door and compute bundled); <code>max_concurrency 100</code> for read paths; ConvFinQA caps live turns at 4 in flight and needs <code>--workers 1</code>.</li>
+          <li><b>State:</b> sessions, rate limits and the demo pack live in process memory — correct at N=1, the named seam beyond it.</li>
+          <li><b>Data:</b> Aurora pauses when idle (first visitor waits ~30s, narrated in the UI); the other two bake their index/CSVs into the image.</li>
+          <li><b>Spend:</b> no inference on the public URL; worst-case bill is a fixed ceiling.</li>
+        </ul>
+        <div class="signal"><b>Signal to move:</b> App Runner 5xx alarm or concurrency at cap; Aurora ACU pinned at max; in Data Pilot the deck's <em>wait p95 rising while service p95 stays flat</em>.</div>
+      </div>
+
+      <div class="tier">
+        <div><span class="pill-tag changed">Rung 100 · sizing measured, not deployed</span></div>
+        <h3>100 concurrent users — live LLM back on</h3>
+        <span class="who">≈ $0.5–1k / month + inference · ≈ 5–10k monthly users (1–2% concurrency rule of thumb)</span>
+        <svg viewBox="0 0 340 190" role="img" aria-label="Rung 100 topology: ALB front door to API tasks on ECS Fargate, a job queue, agent worker tasks scaling on backlog, Aurora with minimum capacity and a reader, Redis for sessions">
+          <g><title>Users (~100 concurrent askers)</title><rect class="node" x="8" y="62" width="58" height="36" rx="7"/><text class="lbl" x="37" y="84">users</text></g>
+          <g><title>Front door: Application Load Balancer + WAF — the role an API Gateway would otherwise play; replaces App Runner's managed endpoint and enables weighted blue/green</title><rect class="node" x="80" y="58" width="58" height="44" rx="7"/><text class="lbl" x="109" y="76">ALB</text><text class="lbl sm" x="109" y="90">front door</text></g>
+          <g><title>Compute: the same FastAPI app running as an ECS service on Fargate — 2–4 stateless tasks, autoscaled on CPU/requests. Fargate is where containers run, not a gateway.</title><rect class="node hi" x="152" y="20" width="82" height="40" rx="7"/><text class="lbl" x="193" y="37">API ×2–4</text><text class="lbl sm" x="193" y="51">tasks on Fargate</text></g>
+          <g><title>Job queue (Redis Streams or SQS) — admission depth, at-least-once, DLQ</title><rect class="node" x="152" y="74" width="82" height="36" rx="7"/><text class="lbl" x="193" y="90">queue</text><text class="lbl sm" x="193" y="103">depth = backlog</text></g>
+          <g><title>Agent workers — ~50 slots (e.g. 8–12 tasks × 4–6 concurrency); scale on backlog-per-task</title><rect class="node hi" x="152" y="124" width="82" height="40" rx="7"/><text class="lbl" x="193" y="141">workers · 50 slots</text><text class="lbl sm" x="193" y="155">⌈N/slots⌉ × S</text></g>
+          <g><title>LLM provider — concurrency bounded by worker slots (≤ 50 in flight)</title><rect class="node ext" x="252" y="124" width="80" height="40" rx="7"/><text class="lbl" x="292" y="141">LLM</text><text class="lbl sm" x="292" y="155">≤ slots in flight</text></g>
+          <g><title>Aurora — min ACU above zero (no cold start) plus one reader for Explore/SQL</title><rect class="node db" x="252" y="20" width="80" height="40" rx="7"/><text class="lbl" x="292" y="37">Aurora</text><text class="lbl sm" x="292" y="51">min&gt;0 + reader</text></g>
+          <g><title>Redis — sessions, rate limits, demo pack out of process memory</title><rect class="node db" x="252" y="74" width="80" height="36" rx="7"/><text class="lbl" x="292" y="90">Redis</text><text class="lbl sm" x="292" y="103">sessions · limits</text></g>
+          <path class="edge" d="M66,80 L78,80"/><path class="edge" d="M138,76 C146,60 146,44 150,40"/><path class="edge" d="M193,60 L193,72"/><path class="edge" d="M193,110 L193,122"/>
+          <path class="edge" d="M234,144 L250,144"/><path class="edge" d="M234,40 L250,40"/><path class="edge" d="M234,92 L250,92"/>
+          <path class="edge" d="M234,132 C244,110 244,64 250,50" style="stroke-dasharray:3 2"/>
+        </svg>
+        <ul>
+          <li><b>Terms, so the diagram reads right:</b> <em>ALB</em> (Application Load Balancer) is the <b>front door</b> — the job an <em>API Gateway</em> would otherwise do. <em>ECS Fargate</em> is the <b>compute</b> — where the FastAPI containers run, no servers to manage. They're the two halves of what App Runner bundles at rung 10.</li>
+          <li><b>Why ALB, not API Gateway, for the chat path:</b> API Gateway's integration timeout is ~30s, which can't hold a 90s agent answer or an SSE stream; ALB's idle timeout goes to 4,000s. API Gateway earns a place <em>beside</em> the ALB only for keyed surfaces (Data Pilot's <code>dpk_</code> webhook/MCP keys) where per-key usage plans and throttling are the point.</li>
+          <li><b>The sizing is arithmetic:</b> the measured formula — drain time ⌈N ÷ slots⌉ × S — held within 6%. 100 askers × ~90s answers with a sub-3-minute wait target → <b>~50 slots</b>, e.g. 8–12 worker tasks × 4–6 concurrency. Measured footprint: ~300–840 MB per warm worker, ~1.45 GB for one process running 4 slots — so ~10 tasks at 1 vCPU / 2 GB.</li>
+          <li><b>State out of process:</b> Redis for sessions/limits — ConvFinQA's named seam; Data Pilot's queue already does this.</li>
+          <li><b>Data:</b> Aurora min ACU &gt; 0 kills the cold start; one reader for Explore/SQL; pgvector stays in-DB.</li>
+          <li><b>Guardrails scale with it:</b> per-user daily caps become tenant quotas; WAF + edge rate limits; provider quota alarms — 50 concurrent LLM calls is where a single provider's rate limit starts to matter.</li>
+        </ul>
+        <div class="signal"><b>Signal to move:</b> queue wait p95 rising with service p95 flat = add slots; both rising = the agent got slower (an eval problem, not infra); reader CPU / connection count on Aurora; cost-per-answer × volume crossing the budget alarm.</div>
+      </div>
+
+      <div class="tier">
+        <div><span class="pill-tag gone">Rung 1,000 · designed only</span></div>
+        <h3>1,000 concurrent users — multi-tenant fleet</h3>
+        <span class="who">≈ $5–15k / month + inference · ≈ 50–100k monthly users</span>
+        <svg viewBox="0 0 340 200" role="img" aria-label="Rung 1,000 topology: edge WAF and CDN, multi-AZ API fleet, per-class SQS queues, separate worker fleets for agent sandbox and judge, LLM router across providers, Aurora writer with readers partitioned by tenant, dedicated vector store">
+          <rect class="zone" x="140" y="8" width="192" height="184"/><text class="zlbl" x="146" y="20">MULTI-AZ · PER-ROLE AUTOSCALING</text>
+          <g><title>Edge — WAF, CDN, edge rate limiting per tenant</title><rect class="node" x="8" y="60" width="62" height="40" rx="7"/><text class="lbl" x="39" y="77">edge</text><text class="lbl sm" x="39" y="91">WAF · CDN</text></g>
+          <g><title>API fleet — 10–20 tasks across AZs behind an ALB per fleet</title><rect class="node hi" x="84" y="60" width="48" height="40" rx="7"/><text class="lbl" x="108" y="77">API</text><text class="lbl sm" x="108" y="91">fleet</text></g>
+          <g><title>SQS queues per workload class (interactive / batch / eval sample)</title><rect class="node" x="150" y="28" width="82" height="36" rx="7"/><text class="lbl" x="191" y="44">SQS × class</text><text class="lbl sm" x="191" y="57">interactive · batch</text></g>
+          <g><title>Agent worker fleet — ~500 slots (60–120 tasks × 4–8 concurrency), scales on backlog</title><rect class="node hi" x="150" y="74" width="82" height="30" rx="7"/><text class="lbl" x="191" y="93">agent · 500 slots</text></g>
+          <g><title>Sandbox fleet — CPU-bound analysis isolated from LLM-wait workers</title><rect class="node hi" x="150" y="110" width="82" height="30" rx="7"/><text class="lbl" x="191" y="129">sandbox fleet</text></g>
+          <g><title>Online judge — samples 1–5% of production answers for the eval loop</title><rect class="node" x="150" y="146" width="82" height="30" rx="7"/><text class="lbl" x="191" y="165">judge sample</text></g>
+          <g><title>LLM router — multiple providers, per-tenant quotas, prompt caching, fallbacks</title><rect class="node ext" x="250" y="74" width="74" height="30" rx="7"/><text class="lbl" x="287" y="93">LLM router</text></g>
+          <g><title>Aurora — writer + N readers; marts partitioned by tenant/dataset; RLS → schema-per-tenant where isolation demands it</title><rect class="node db" x="250" y="28" width="74" height="36" rx="7"/><text class="lbl" x="287" y="44">Aurora</text><text class="lbl sm" x="287" y="57">writer + readers</text></g>
+          <g><title>Vector store — pgvector moves to a dedicated/partitioned service</title><rect class="node db" x="250" y="110" width="74" height="30" rx="7"/><text class="lbl" x="287" y="129">vector store</text></g>
+          <g><title>Observability + cost showback per tenant</title><rect class="node" x="250" y="146" width="74" height="30" rx="7"/><text class="lbl" x="287" y="165">o11y · showback</text></g>
+          <path class="edge" d="M70,80 L82,80"/><path class="edge" d="M132,72 C140,60 142,48 148,46"/><path class="edge" d="M191,64 L191,72"/><path class="edge" d="M191,104 L191,108" style="stroke-dasharray:2 2"/>
+          <path class="edge" d="M232,89 L248,89"/><path class="edge" d="M232,46 L248,46"/><path class="edge" d="M232,125 L248,125"/><path class="edge" d="M232,161 L248,161"/>
+          <text class="lbl sm" x="108" y="120">sharded by</text><text class="lbl sm" x="108" y="131">tenant</text>
+        </svg>
+        <ul>
+          <li><b>Compute:</b> separate autoscaling fleets per role — API, LLM-wait workers (cheap, high concurrency), CPU-bound sandbox workers, an online judge — across AZs. ~500 slots for 1,000 askers at the same wait target; slots are slots — the experiment showed one process × 4 coroutines beat 3 serial replicas.</li>
+          <li><b>Queues per class:</b> interactive vs batch vs eval-sample, so a report backfill never queues a live user.</li>
+          <li><b>Data:</b> Aurora writer + readers; marts partitioned by tenant/dataset; RLS graduates to schema-per-tenant where a customer demands physical isolation; pgvector to a dedicated or partitioned store.</li>
+          <li><b>LLM:</b> 500 concurrent calls exceeds one provider's default quota — a router across providers with per-tenant quotas, prompt caching and fallbacks: the choke-point pattern ConvFinQA already has, fleet-wide.</li>
+          <li><b>Release:</b> blue/green via ALB weighted target groups, canary judged by the online eval sample before 100%.</li>
+          <li><b>Cost:</b> per-tenant showback; the budget alarm becomes a per-tenant quota.</li>
+        </ul>
+        <div class="signal"><b>Signal to move:</b> rung-100 autoscaling hitting its max repeatedly; reader lag / connection exhaustion; one tenant's load starving others (the argument for per-class queues and sharding); provider 429s.</div>
+      </div>
+    </div>
+
+    <div class="tblwrap" style="margin-top:18px">
+      <table class="ladder">
+        <thead><tr><th>What changes</th><th>Rung 10 · today</th><th>Rung 100</th><th>Rung 1,000</th></tr></thead>
+        <tbody>
+          <tr><td class="k">Front door</td><td>App Runner's managed endpoint (CloudFront for the SPA)</td><td>ALB + WAF · API Gateway only for keyed service surfaces (usage plans)</td><td>CloudFront + WAF at the edge → ALB per fleet · API Gateway usage plans per tenant</td></tr>
+          <tr><td class="k">Compute</td><td>1 App Runner instance / service</td><td>ECS Fargate: API ×2–4 + agent workers ~50 slots behind the ALB</td><td>Per-role fleets (API / agent ~500 slots / sandbox / judge), multi-AZ</td></tr>
+          <tr><td class="k">Concurrency model</td><td>In-process caps (4 in-flight, 30 req/min/IP)</td><td>Queue with admission depth; slots = replicas × concurrency; ⌈N/slots⌉ × S</td><td>Queues per workload class; per-tenant quotas at the edge</td></tr>
+          <tr><td class="k">Session &amp; limit state</td><td>Process memory (<code>--workers 1</code>)</td><td>Redis</td><td>Redis cluster / DynamoDB; sticky nothing</td></tr>
+          <tr><td class="k">Database</td><td>Aurora v2 0–1 ACU (or none)</td><td>Aurora min ACU &gt; 0 + 1 reader</td><td>Writer + N readers; marts partitioned/sharded by tenant; schema-per-tenant option</td></tr>
+          <tr><td class="k">Vectors</td><td>pgvector / Chroma in image</td><td>pgvector in Aurora</td><td>Dedicated or partitioned vector service</td></tr>
+          <tr><td class="k">LLM spend</td><td>$0 (replayed)</td><td>Bounded by ~50 worker slots; daily caps → tenant quotas</td><td>Router + multi-provider + caching; per-tenant showback</td></tr>
+          <tr><td class="k">Release</td><td>Auto-deploy <code>:latest</code>, rollback by retag</td><td>Blue/green on ALB weighted target groups</td><td>Canary judged by the online eval sample</td></tr>
+          <tr><td class="k">How you know</td><td>5xx alarm; ACU pinned; wait p95 ≫ service p95</td><td>Backlog-per-task; reader CPU; cost × volume alarm</td><td>Autoscale max hit; reader lag; tenant starvation; provider 429s</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="note">Evidence for the arithmetic: <span class="path">data-qa-agent/.lavish/s42_worker-scaling-results.html</span> (10 cells, 150/150 answers, 0 shed; E9 live-LLM validation: 10 users through 3 workers in 197s vs 73s direct on 8 idle cores — the queue trades ~2 min for bounded CPU and LLM spend) and <span class="path">out/wsweep/summary.json</span>. Concurrency ↔ monthly-user translation is a 1–2% rule of thumb, labelled as such on the page.</p>
+  </section>
+
+  <div class="rule"></div>
+
+  <!-- 05 -->
+  <section id="s05">
+    <div class="sec-head"><span class="sec-num">05</span><h2>The practices — generalised case studies</h2></div>
+    <p class="sec-sub">A new collection, <code>_practices/</code>, for write-ups that cut across all three systems. Same visual language as a case study, different spine:
+      <b>Problem → Pattern → Where it shows up in the three systems → Evidence → Failure modes</b>. Each one cites the repos with counts I've verified today.</p>
+    <div class="practices">
+      <div class="practice">
+        <span class="slug">_practices/eval-loop.md</span>
+        <h3>The eval loop</h3>
+        <p>How a gen-AI system gets better without getting worse: golden set → graders + judge → gate → ship → traces → diagnose → next version → promote. The R1–R4 half of the rubric as one story, with the three systems as three instantiations.</p>
+        <ul>
+          <li><b>Data Pilot:</b> goldens authored in-product, build fingerprints, three documented cycles — one refused (<span class="path">docs/evals/cycle-002.md</span>).</li>
+          <li><b>ConvFinQA:</b> prompts as versioned code, GEPA → v2, s7 harness → v3.1, champion/challenger registry that <em>refused</em> v3.1 on per-question flips.</li>
+          <li><b>Transcript RAG:</b> chunk-labelled goldens, 8-config ablation, RAGAS + depth-v2 judge, <code>rejudge</code>, 17 committed runs gated in CI.</li>
+          <li><b>Failure modes named:</b> self-grading, a better average hiding flips, unlabelled goldens, "held-out" that isn't (ConvFinQA's 78-of-120 split disagreement).</li>
+        </ul>
+        <div class="ev"><b>May also cite (GitHub links only — those pages are unpublished):</b> V2V's 9/9 red-team graded on bank state, CUAD's 10,250-prediction grid with retrieval measured separately.</div>
+      </div>
+      <div class="practice">
+        <span class="slug">_practices/ways-of-working.md</span>
+        <h3>Ways of working: Git · Lavish · no-mistakes</h3>
+        <p>How the three systems were built by one engineer with agents, without the usual slop: plan in the browser, build on a branch, validate through a gate, ship on merge. Three sections (or three pages — D4c).</p>
+        <ul>
+          <li><b>Git:</b> feature branch + PR per slice — 33 PRs merged on Data Pilot, 12 on Transcript RAG, 4 on ConvFinQA; conventional commits (Data Pilot: 71 feat · 35 fix · 16 docs); worktrees for isolated fixes (<code>worktree-prod-login-fix</code>); CI on every PR, deploy on merge via OIDC, "never ship a red main".</li>
+          <li><b>Lavish:</b> every non-trivial change starts as a numbered review artifact — <code>.lavish/sNN_*.html</code> — architecture, plans, tickets, experiment results, screenshots — reviewed and annotated in the browser before code exists. 40 on Data Pilot, 20 on Transcript RAG, 4 on ConvFinQA, 5 here (this plan is s04). Never gitignored, by workspace rule.</li>
+          <li><b>no-mistakes:</b> a local gate that runs intent → rebase → review → test → document → lint → push → PR → CI before anything reaches main; its findings land as <code>no-mistakes(review|document|lint|test):</code> commits — 27 on Data Pilot (10 review · 10 document · 4 lint · 3 test), 16 on Transcript RAG, 6 here. Real catches: "Guard ws.onopen against listening-flash after cancel", "Coalesce repeated /health/db probes to throttle Aurora wake abuse".</li>
+          <li><b>…and the portfolio itself:</b> the <code>/case-study</code> skill from §07 closes the loop — a repo becomes a case study through the same plan → gate → merge path, with a lint that refuses claims without a path.</li>
+        </ul>
+        <div class="ev"><b>Evidence:</b> <span class="path">git log --grep 'no-mistakes('</span> per repo · <span class="path">.lavish/</span> listings · <span class="path">.github/workflows/</span> · <span class="path">~/.claude/skills/no-mistakes/SKILL.md</span> for what the gate does.</div>
+      </div>
+      <div class="practice">
+        <span class="slug">_practices/production-scale.md</span>
+        <h3>Production at 10 / 100 / 1,000 concurrent users</h3>
+        <p>The ladder from §04 as a page: what runs today, what changes at each rung (front door, compute, queue, state, database, vectors, LLM spend, release), the measured sizing formula, and the dashboard signal that tells you to move.</p>
+        <ul>
+          <li>Rung 10 with the three real topologies; rung 100 with the queue arithmetic and the ALB-vs-API-Gateway reasoning; rung 1,000 with per-role fleets, per-class queues, sharding and an LLM router.</li>
+          <li>Each rung labelled <em>deployed / measured / designed</em>; dollar ranges labelled estimates.</li>
+          <li>Where each system sits: Data Pilot rung 10 with rung-100 sizing measured; ConvFinQA and Transcript RAG rung 10 with the seam named.</li>
+        </ul>
+        <div class="ev"><b>Evidence:</b> <span class="path">.lavish/s42_worker-scaling-results.html</span> · <span class="path">out/wsweep/summary.json</span> · <span class="path">load/k6/chat.js</span> · <span class="path">serving/limits.py</span> · Terraform in all three repos.</div>
+      </div>
+    </div>
+    <p class="note">The rubric explainer itself (R1–R9 with the loop figure) lives on the home page above the matrix — it is the frame for everything else, so it doesn't need its own practice page.</p>
+  </section>
+
+  <div class="rule"></div>
+
+  <!-- 06 -->
+  <section id="s06">
+    <div class="sec-head"><span class="sec-num">06</span><h2>The site, mocked in its own design system</h2></div>
+    <p class="sec-sub">IBM Plex, paper/ink/signal-green tokens from <code>assets/css/main.css</code>. Two surfaces: the home page (now the hub) and a case study with the full nine-row readiness section.
+      Two diagrams per system, in different places: the <b>agent structure</b> (what the AI does) on the home card and in section 2 of the case study; the <b>deploy topology</b> (where it runs) in section 4 only.</p>
+
+    <h3>A · Home — three systems, each with its agent structure, the matrix, the practices</h3>
+    <div class="mockframe">
+      <div class="mock-title"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span style="margin-left:8px">nmp-dsci.github.io/</span></div>
+      <div class="mock">
+        <div class="m-nav">
+          <span class="m-brand">nathan<i></i>phillips <small>// applied-ai</small></span>
+          <span class="m-links"><span class="on">Work</span><span>Practices</span><span>About</span><span>GitHub</span><span>LinkedIn</span><span class="cta">☾</span></span>
+        </div>
+        <p class="m-kicker">// applied-ai · in production · demo mode</p>
+        <h2 class="m-h1">I build gen-AI systems and run them in production.</h2>
+        <p class="m-sub">Three systems live on AWS — each with evals in CI, guardrails between the model and the data, per-request traces, cost caps and a push-button deploy.
+          Every one is scored against the same production rubric, then you can walk straight into the live app.</p>
+        <div class="m-metrics">
+          <div class="m-met"><b>3</b><span>systems live on AWS · Terraform · OIDC deploys</span></div>
+          <div class="m-met"><b>77.1%</b><span>champion accuracy — v3.1 refused by the gate · ConvFinQA</span></div>
+          <div class="m-met"><b>6.1×</b><span>fewer tokens at 0.93 answer parity · Transcript RAG</span></div>
+          <div class="m-met"><b>4.98×</b><span>measured 5-worker speedup, linear · Data Pilot</span></div>
+        </div>
+
+        <div class="m-cards">
+          <div class="m-card">
+            <h5>Data Pilot <span class="m-live">live</span></h5>
+            <div class="m-vis">
+              <svg viewBox="0 0 320 100" role="img" aria-label="Data Pilot agent structure: a question enters a pydantic-ai agent loop with schema knowledge and per-user memory; generated SQL passes an AST guard and runs as a governed read-only SELECT under row-level security; results go through a WASM sandbox analysis step into a report with charts; every run is graded and traced">
+                <defs><marker id="mar1" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="currentColor"/></marker></defs>
+                <g><title>question in natural language</title><rect class="nd" x="4" y="38" width="48" height="24" rx="6"/><text class="tx" x="28" y="53">question</text></g>
+                <g><title>pydantic-ai agent loop — tools: schema knowledge (dbt manifest), value lookup, per-user pgvector memory, make_chart</title><rect class="nd hi" x="66" y="30" width="78" height="40" rx="6"/><text class="tx" x="105" y="46">agent loop</text><text class="tx s" x="105" y="58">schema · memory · tools</text></g>
+                <g><title>SQL guard — shape check, keyword denylist, sqlglot AST walk rejecting DML/DDL/set_config</title><rect class="nd" x="158" y="6" width="68" height="28" rx="6"/><text class="tx" x="192" y="18">SQL guard</text><text class="tx s" x="192" y="29">sqlglot AST</text></g>
+                <g><title>governed SELECT — one read-only statement under Postgres RLS via a read-only role</title><rect class="nd hi" x="158" y="44" width="68" height="30" rx="6"/><text class="tx" x="192" y="57">SELECT · RLS</text><text class="tx s" x="192" y="68">read-only role</text></g>
+                <g><title>sandbox analysis — model-written pandas in Pyodide/WASM: no network, no filesystem, attempt budget</title><rect class="nd" x="242" y="6" width="72" height="28" rx="6"/><text class="tx" x="278" y="18">sandbox</text><text class="tx s" x="278" y="29">Pyodide · WASM</text></g>
+                <g><title>report — typed presentation objects and chart pages rendered by one report engine</title><rect class="nd hi" x="242" y="44" width="72" height="30" rx="6"/><text class="tx" x="278" y="57">report + chart</text><text class="tx s" x="278" y="68">typed objects</text></g>
+                <path class="ed" d="M52,50 L64,50" marker-end="url(#mar1)"/>
+                <path class="ed" d="M144,44 C150,34 152,24 156,21" marker-end="url(#mar1)"/>
+                <path class="ed" d="M192,34 L192,42" marker-end="url(#mar1)"/>
+                <path class="ed" d="M226,52 C232,40 236,26 240,21" marker-end="url(#mar1)"/>
+                <path class="ed" d="M278,34 L278,42" marker-end="url(#mar1)"/>
+                <text class="cap" x="4" y="92">graded G1–G4 · cross-family judge · every run traced</text>
+              </svg>
+            </div>
+            <p class="m-what">Ask a question in plain English; get governed SQL, a chart and a report — over only the rows you're allowed to see.</p>
+            <div class="m-metric">9 / 9<small>rubric dimensions shipped · scale path measured</small></div>
+            <div class="m-row"><b>Demo</b><span>No login. Explore + SQL editor live on 3.2M rows; chat replays recorded runs. First load may wake the database (~30s).</span></div>
+            <div class="m-row"><b>Runs on</b><span>CloudFront · App Runner · Aurora Serverless v2 · ECS jobs — topology in the case study</span></div>
+            <div class="m-btns"><span class="m-solid">Open live demo ↗</span><span class="m-ghost">Case study →</span></div>
+          </div>
+
+          <div class="m-card">
+            <h5>ConvFinQA Agent <span class="m-live">live</span></h5>
+            <div class="m-vis">
+              <svg viewBox="0 0 320 100" role="img" aria-label="ConvFinQA agent structure: each turn (question, report, history) flows through four pydantic-ai agents — triage classifies the turn, preprocess resolves references and writes a program, retriever pulls the values, calculator computes through explicit tools — number turns short-circuit at the retriever; prompts are versioned and the champion is v2">
+                <defs><marker id="mar2" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="currentColor"/></marker></defs>
+                <text class="cap" x="4" y="12">4 pydantic-ai agents · flash tier · prompts as versioned code</text>
+                <g><title>turn input — question + report (text + table) + conversation history; 60% of questions depend on earlier turns</title><rect class="nd" x="4" y="34" width="54" height="32" rx="6"/><text class="tx" x="31" y="47">turn</text><text class="tx s" x="31" y="59">q · report · history</text></g>
+                <g><title>triage agent — classifies turn type (number vs program) and conversation type (I / II)</title><rect class="nd hi" x="70" y="22" width="54" height="30" rx="6"/><text class="tx" x="97" y="35">triage</text><text class="tx s" x="97" y="46">turn type</text></g>
+                <g><title>preprocess agent — resolves "that" / "this change" against history, decomposes into sub-questions and a program (program turns only)</title><rect class="nd hi" x="132" y="22" width="62" height="30" rx="6"/><text class="tx" x="163" y="35">preprocess</text><text class="tx s" x="163" y="46">sub-Qs · program</text></g>
+                <g><title>retriever agent — pulls the raw values from text/table; answers number turns directly</title><rect class="nd hi" x="202" y="22" width="54" height="30" rx="6"/><text class="tx" x="229" y="35">retriever</text><text class="tx s" x="229" y="46">values</text></g>
+                <g><title>calculator agent — computes only through explicit tools (add, subtract, multiply, divide, exp, greater), never free-text math</title><rect class="nd hi" x="264" y="22" width="52" height="30" rx="6"/><text class="tx" x="290" y="35">calculator</text><text class="tx s" x="290" y="46">6 tools</text></g>
+                <g><title>answer — compared to gold; per-turn trace stored with tokens, latency, reasoning</title><rect class="nd" x="264" y="62" width="52" height="24" rx="6"/><text class="tx" x="290" y="77">answer</text></g>
+                <path class="ed" d="M58,50 C62,50 64,40 68,37" marker-end="url(#mar2)"/>
+                <path class="ed" d="M124,37 L130,37" marker-end="url(#mar2)"/>
+                <path class="ed" d="M194,37 L200,37" marker-end="url(#mar2)"/>
+                <path class="ed" d="M256,37 L262,37" marker-end="url(#mar2)"/>
+                <path class="ed" d="M290,52 L290,60" marker-end="url(#mar2)"/>
+                <path class="ed" d="M229,52 C229,74 248,74 262,74" marker-end="url(#mar2)" style="stroke-dasharray:3 2"><title>number turns short-circuit at the retriever</title></path>
+                <text class="cap" x="4" y="96">champion v2 · v3.1 refused by the gate · every turn traced</text>
+              </svg>
+            </div>
+            <p class="m-what">Multi-turn financial Q&amp;A over report tables — four agents, prompts versioned and promoted like releases, every turn traced.</p>
+            <div class="m-metric">77.1%<small>champion accuracy · v3.1 refused by the gate</small></div>
+            <div class="m-row"><b>Demo</b><span>Read-only operator console: 8 recorded conversations replayed, live Evaluations, Experiments, Traces and the champion registry (v2).</span></div>
+            <div class="m-row"><b>Runs on</b><span>App Runner · ECR · no database — topology in the case study</span></div>
+            <div class="m-btns"><span class="m-solid">Open live demo ↗</span><span class="m-ghost">Case study →</span></div>
+          </div>
+
+          <div class="m-card">
+            <h5>Transcript RAG <span class="m-live">live</span></h5>
+            <div class="m-vis">
+              <svg viewBox="0 0 320 104" role="img" aria-label="Transcript RAG retrieval structure: a question is optionally transformed (HyDE or multi-query), retrieved semantically and by BM25 (top-30 each), fused by reciprocal rank, reranked by a cross-encoder to top-k, then answered by one of four paths — single-hop, recursive multi-hop, a ReAct agent, or a GraphRAG router — graded by IR metrics and a RAGAS judge">
+                <defs><marker id="mar3" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="currentColor"/></marker></defs>
+                <text class="cap" x="4" y="11">graded: recall@k · MRR · NDCG · RAGAS + depth-v2 judge</text>
+                <g><title>question</title><rect class="nd" x="4" y="44" width="48" height="24" rx="6"/><text class="tx" x="28" y="59">question</text></g>
+                <g><title>query-side transforms — HyDE writes the passage that would answer; multi-query paraphrases ×3; optional, cached per question</title><rect class="nd ext" x="62" y="18" width="72" height="22" rx="6"/><text class="tx" x="98" y="32">HyDE · multi-Q</text></g>
+                <g><title>semantic retrieval — MiniLM embeddings in ChromaDB, top-30 candidates (a parallel contextualised index exists)</title><rect class="nd" x="62" y="48" width="72" height="22" rx="6"/><text class="tx" x="98" y="62">semantic top-30</text></g>
+                <g><title>BM25 keyword retrieval, top-30 — recovers exact figures, names and dates that embeddings blur</title><rect class="nd" x="62" y="76" width="72" height="22" rx="6"/><text class="tx" x="98" y="90">BM25 top-30</text></g>
+                <g><title>reciprocal-rank fusion of both rankings (hybrid) — best recall@10 / MRR / NDCG in the ablation</title><rect class="nd hi" x="142" y="56" width="40" height="26" rx="6"/><text class="tx" x="162" y="67">RRF</text><text class="tx s" x="162" y="78">fusion</text></g>
+                <g><title>cross-encoder rerank to top-k — measured: helps a bi-encoder ranking, hurts a fused one</title><rect class="nd hi" x="190" y="56" width="56" height="26" rx="6"/><text class="tx" x="218" y="67">rerank</text><text class="tx s" x="218" y="78">cross-encoder</text></g>
+                <g><title>four answer paths over the same retrieval — single-hop, recursive multi-hop, LangGraph ReAct agent, GraphRAG router over Neo4j — with timestamped citations</title><rect class="nd hi" x="254" y="44" width="62" height="46" rx="6"/><text class="tx" x="285" y="58">answer paths</text><text class="tx s" x="285" y="69">1-hop · recursive</text><text class="tx s" x="285" y="80">ReAct · GraphRAG</text></g>
+                <path class="ed" d="M52,52 C56,44 58,34 60,30" marker-end="url(#mar3)" style="stroke-dasharray:3 2"/>
+                <path class="ed" d="M98,40 L98,46" marker-end="url(#mar3)" style="stroke-dasharray:3 2"/>
+                <path class="ed" d="M52,58 L60,59" marker-end="url(#mar3)"/>
+                <path class="ed" d="M52,60 C56,74 58,84 60,87" marker-end="url(#mar3)"/>
+                <path class="ed" d="M134,60 C138,62 138,66 140,67" marker-end="url(#mar3)"/>
+                <path class="ed" d="M134,87 C138,84 138,76 140,73" marker-end="url(#mar3)"/>
+                <path class="ed" d="M182,69 L188,69" marker-end="url(#mar3)"/>
+                <path class="ed" d="M246,69 L252,68" marker-end="url(#mar3)"/>
+              </svg>
+            </div>
+            <p class="m-what">An evaluation-first RAG workbench — eight retrieval configs raced on a chunk-labelled golden set, with a judge and a scoreboard.</p>
+            <div class="m-metric">6.1×<small>fewer tokens at 0.93 answer parity</small></div>
+            <div class="m-row"><b>Demo</b><span>Read-only over 102 videos / 2,827 chunks from 61 channels. Retrieval Lab, knowledge graph, Scoreboard over committed runs, recorded Q&amp;A with execution traces.</span></div>
+            <div class="m-row"><b>Runs on</b><span>App Runner · S3 demo data · ChromaDB in the image — topology in the case study</span></div>
+            <div class="m-btns"><span class="m-solid">Open live demo ↗</span><span class="m-ghost">Case study →</span></div>
+          </div>
+        </div>
+
+        <h3 class="m-h2">What "production" means here</h3>
+        <p class="m-p">Nine things a gen-AI system needs before real users touch it. Each system is scored honestly — a hollow dot with a reason beats a row of green ones. Open a case study for the full explanation per dimension.</p>
+        <div class="m-tbl">
+          <table>
+            <thead><tr><th>Dimension</th><th>Data Pilot</th><th>ConvFinQA</th><th>Transcript RAG</th></tr></thead>
+            <tbody>
+              <tr><td class="k">Evals &amp; golden set</td><td><span class="m-dot f"></span>Goldens authored in-product, versioned pack</td><td><span class="m-dot f"></span>770 q, reproduces offline</td><td><span class="m-dot f"></span>20 chunk-labelled goldens, IR metrics</td></tr>
+              <tr><td class="k">LLM-as-judge</td><td><span class="m-dot f"></span>Cross-family (Claude ⟶ DeepSeek)</td><td>— deterministic scoring</td><td><span class="m-dot f"></span>RAGAS + depth-v2 rubric</td></tr>
+              <tr><td class="k">Regression gate</td><td><span class="m-dot f"></span>Blocks on any pass→fail flip</td><td><span class="m-dot f"></span>CI floor + flips; deploy waits for CI</td><td><span class="m-dot f"></span>eval-gate job on committed runs</td></tr>
+              <tr><td class="k">Learning loop</td><td><span class="m-dot f"></span>Fingerprints + 3 cycles (1 refused)</td><td><span class="m-dot f"></span>GEPA + s7 harness + registry</td><td><span class="m-dot p"></span>Curation process; no optimiser yet</td></tr>
+              <tr><td class="k">Guardrails</td><td><span class="m-dot f"></span>RLS · AST guard · sandbox · red-team</td><td><span class="m-dot p"></span>Choke point + abuse limits</td><td><span class="m-dot p"></span>Demo gate · SSRF · session caps</td></tr>
+              <tr><td class="k">Observability</td><td><span class="m-dot f"></span>Ops deck, SLOs, Jaeger</td><td><span class="m-dot f"></span>Per-turn traces, /metrics</td><td><span class="m-dot f"></span>Per-answer execution trace</td></tr>
+              <tr><td class="k">Cost control</td><td><span class="m-dot f"></span>Cost/answer, caps, billing alarm</td><td><span class="m-dot f"></span>Flash tier, cached evals, $0 demo</td><td><span class="m-dot f"></span>6.1× finding, local embeddings</td></tr>
+              <tr><td class="k">Deploy &amp; release</td><td><span class="m-dot f"></span>10-stage OIDC deploy + rollback</td><td><span class="m-dot f"></span>CI-gated deploy + smoke</td><td><span class="m-dot f"></span>OIDC deploy + smoke</td></tr>
+              <tr><td class="k">Scale path</td><td><span class="m-dot f"></span>Linear worker scaling, measured</td><td><span class="m-dot n"></span>Rung 10; seam named</td><td><span class="m-dot n"></span>Rung 10</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 class="m-h2">Practices</h3>
+        <p class="m-p">How the three were built and kept honest — the parts that transfer to any gen-AI system.</p>
+        <div class="m-prac">
+          <div><b>practice</b><strong>The eval loop</strong>Golden set → judge → gate → ship → trace → diagnose → next version. Three systems, one loop — including the versions it refused.<i>Read →</i></div>
+          <div><b>practice</b><strong>Ways of working: Git · Lavish · no-mistakes</strong>Plan in the browser, build on a branch, validate through a gate, ship on merge. 49 PRs, 69 review artifacts, 49 gate-fix commits.<i>Read →</i></div>
+          <div><b>practice</b><strong>Production at 10 / 100 / 1,000 concurrent users</strong>What runs today, what changes at each rung, the measured sizing formula, and the signal that says "move".<i>Read →</i></div>
+        </div>
+
+      </div>
+    </div>
+
+    <h3 style="margin-top:26px">B · A case study on your spine — Data Pilot</h3>
+    <p class="note" style="margin:6px 0 0">The locked spine: <b>1 Purpose / benefit · 2 Agent architecture · 3 Agent loop / evaluation · 4 Deployed architecture · 5 Guardrails &amp; security · 6 Observability &amp; cost · 7 Production readiness scorecard</b>. The TL;DR strip and the skills chips stay above section 1 as today. Every rubric dimension has exactly one home section; the scorecard points back to it.</p>
+    <div class="mockframe">
+      <div class="mock-title"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span style="margin-left:8px">nmp-dsci.github.io/projects/data-pilot/</span></div>
+      <div class="mock">
+        <div class="m-tldr">
+          <p class="k">// 30-second version</p>
+          <div class="g">
+            <div><span class="l">What</span><span class="v">Governed NL→SQL agent in production — Postgres RLS and AST guardrails decide what the model may touch…</span></div>
+            <div><span class="l">Proof</span><span class="v"><b>9 / 9</b> — rubric dimensions shipped · live on AWS</span></div>
+            <div><span class="l">Skills</span><span class="v">Agentic AI · Governance · MLOps · SQL · RAG</span></div>
+            <div><span class="l">Where</span><span class="v"><a>Repository ↗</a> · <a><b>Live demo ↗</b></a></span></div>
+          </div>
+        </div>
+
+        <h3 class="m-h3">1 · Purpose &amp; benefit <small>WHO · WHY · WHAT YOU GET</small></h3>
+        <p class="m-p">Analysts ask questions of NSW property data (~3.2M sales and rental-bond rows) in plain English and get governed SQL, a chart and a written report — over only the rows they are allowed to see.
+          The benefit is the governance: the model cannot touch what the user cannot, every answer carries the SQL that produced it, and the same pipeline serves the web app, a Slack bot, a webhook and an MCP surface.</p>
+        <ul class="m-ul">
+          <li><b>In the live demo:</b> no login — Explore + the SQL editor run live against the real marts; chat replays recorded agent runs (plan → charts → report in ~5–10s); the Ops deck, Evaluations and Golden Examples are visible read-only. First Explore call after an idle hour waits ~30s while the database wakes.</li>
+        </ul>
+        <div class="m-btns"><span class="m-solid">Open live demo ↗</span><span class="m-ghost">Repository ↗</span></div>
+
+        <h3 class="m-h3">2 · Agent architecture <small>AGENTS · LLM · TOOLS · MEMORY</small></h3>
+        <div class="m-vis" style="margin-top:10px">
+          <svg viewBox="0 0 320 100" role="img" aria-label="Data Pilot agent structure: question → agent loop with schema, memory and tools → SQL guard → governed SELECT under RLS → WASM sandbox → report with charts">
+            <defs><marker id="mar5" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="currentColor"/></marker></defs>
+            <g><title>question</title><rect class="nd" x="4" y="38" width="48" height="24" rx="6"/><text class="tx" x="28" y="53">question</text></g>
+            <g><title>pydantic-ai agent loop</title><rect class="nd hi" x="66" y="30" width="78" height="40" rx="6"/><text class="tx" x="105" y="46">agent loop</text><text class="tx s" x="105" y="58">schema · memory · tools</text></g>
+            <g><title>SQL guard</title><rect class="nd" x="158" y="6" width="68" height="28" rx="6"/><text class="tx" x="192" y="18">SQL guard</text><text class="tx s" x="192" y="29">sqlglot AST</text></g>
+            <g><title>governed SELECT under RLS</title><rect class="nd hi" x="158" y="44" width="68" height="30" rx="6"/><text class="tx" x="192" y="57">SELECT · RLS</text><text class="tx s" x="192" y="68">read-only role</text></g>
+            <g><title>sandbox analysis</title><rect class="nd" x="242" y="6" width="72" height="28" rx="6"/><text class="tx" x="278" y="18">sandbox</text><text class="tx s" x="278" y="29">Pyodide · WASM</text></g>
+            <g><title>report</title><rect class="nd hi" x="242" y="44" width="72" height="30" rx="6"/><text class="tx" x="278" y="57">report + chart</text><text class="tx s" x="278" y="68">typed objects</text></g>
+            <path class="ed" d="M52,50 L64,50" marker-end="url(#mar5)"/><path class="ed" d="M144,44 C150,34 152,24 156,21" marker-end="url(#mar5)"/><path class="ed" d="M192,34 L192,42" marker-end="url(#mar5)"/><path class="ed" d="M226,52 C232,40 236,26 240,21" marker-end="url(#mar5)"/><path class="ed" d="M278,34 L278,42" marker-end="url(#mar5)"/>
+            <text class="cap" x="4" y="92">graded G1–G4 · cross-family judge · every run traced</text>
+          </svg>
+        </div>
+        <p class="m-cap">Agent structure — <code style="font-family:var(--s-mono)">assets/img/agent/data-pilot.svg</code> · from <code style="font-family:var(--s-mono)">architecture.diagram</code> · same figure as the home card</p>
+        <ul class="m-ul">
+          <li><b>Agents:</b> one pydantic-ai loop that plans extract → sandboxed pandas analysis → report, plus an isolated title agent (<code>POST /agent/title</code>) so titling never adds latency to an answer.</li>
+          <li><b>LLM:</b> DeepSeek by default; Claude reachable behind the same abstraction (Decision G); a deterministic NL→SQL stub with no key at all, so the whole product is testable for free. Claude is used only as the eval judge.</li>
+          <li><b>Tools:</b> schema knowledge grounded in the dbt manifest, value lookup, per-user memory (<code>remember</code> / recall over pgvector, embedded locally with fastembed bge-small), <code>make_chart</code>, and the Pyodide sandbox.</li>
+          <li><b>Prompts &amp; skills:</b> versioned; every answer carries a build fingerprint of provider + model + prompt / skills / knowledge hashes (<code>agent/version.py</code>).</li>
+        </ul>
+
+        <h3 class="m-h3">3 · Agent loop &amp; evaluation <small>ONE REQUEST · THEN THE EVAL LOOP</small></h3>
+        <ul class="m-ul">
+          <li><b>One request:</b> sign in → <code>POST /ask</code> → the backend sets <code>app.current_user_id</code> so RLS scopes everything → the agent recalls memory, plans, writes a single read-only SELECT → guard → run → sandbox analysis → report pages stream back over SSE as they land → the full trace and pages persist to <code>query_runs</code>.</li>
+          <li><b>Golden set:</b> goldens authored in the product stage by stage (① SQL extract → ② sandbox objects → ③ report), version-controlled to <code>evals/cases/*.yaml</code> across three datasets on a T1–T7 question ladder.</li>
+          <li><b>Graders &amp; judge:</b> deterministic graders G1–G4; insight judged cross-family (Claude grades DeepSeek) against a frozen, hashed rubric — the judge refuses its own family and records <code>skipped</code> rather than a fake score.</li>
+          <li><b>Gate:</b> <code>make eval-compare</code> blocks on any case flipping pass → fail, whatever the average does; a zero-LLM pack lint gates every merge.</li>
+          <li><b>Learning loop:</b> <code>make eval-diagnose</code> proposes one-lever hypotheses from traces; three cycles written up — 001 PASS, 002 FAIL (not shipped), 003 PASS.</li>
+        </ul>
+
+        <h3 class="m-h3">4 · Deployed architecture <small>AWS · API · DATABASE · DEPLOY · SCALE</small></h3>
+        <div class="m-vis" style="margin-top:10px">
+          <svg viewBox="0 0 320 100" role="img" aria-label="Data Pilot deploy topology: visitor to CloudFront SPA and App Runner backend, backend to Aurora Serverless; ECS jobs load S3 CSVs into Aurora">
+            <defs><marker id="mar4" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="currentColor"/></marker></defs>
+            <g><title>visitor — no login</title><rect class="nd" x="6" y="36" width="52" height="26" rx="6"/><text class="tx" x="32" y="52">visitor</text></g>
+            <g><title>CloudFront — static React SPA</title><rect class="nd" x="80" y="8" width="72" height="24" rx="6"/><text class="tx" x="116" y="23">CloudFront</text></g>
+            <g><title>App Runner backend — 1 instance; chat replays recorded runs, Explore/SQL live</title><rect class="nd hi" x="80" y="44" width="72" height="30" rx="6"/><text class="tx" x="116" y="56">App Runner</text><text class="tx s" x="116" y="67">backend ×1</text></g>
+            <g><title>Aurora Serverless v2 — 0–1 ACU, scale-to-zero; RLS enforced here</title><rect class="nd hi" x="176" y="44" width="70" height="30" rx="6"/><text class="tx" x="211" y="56">Aurora v2</text><text class="tx s" x="211" y="67">0–1 ACU · RLS</text></g>
+            <g><title>ECS Fargate one-shot jobs — migrate + dlt/dbt pipeline</title><rect class="nd" x="176" y="8" width="70" height="24" rx="6"/><text class="tx" x="211" y="19">ECS jobs</text><text class="tx s" x="211" y="28">migrate · dbt</text></g>
+            <g><title>S3 — full NSW CSVs streamed by the pipeline job</title><rect class="nd" x="266" y="8" width="48" height="24" rx="6"/><text class="tx" x="290" y="23">S3 CSVs</text></g>
+            <path class="ed" d="M58,49 L78,49" marker-end="url(#mar4)"/><path class="ed" d="M58,44 C66,30 70,22 78,20" marker-end="url(#mar4)"/>
+            <path class="ed" d="M152,59 L174,59" marker-end="url(#mar4)"/><path class="ed" d="M211,32 L211,42" marker-end="url(#mar4)"/><path class="ed" d="M266,20 L248,20" marker-end="url(#mar4)"/>
+            <text class="cap" x="6" y="92">ap-southeast-2 · Terraform · demo mode: chat replayed, Explore + SQL live</text>
+          </svg>
+        </div>
+        <p class="m-cap">Deploy topology — <code style="font-family:var(--s-mono)">assets/img/production/data-pilot.svg</code> · from <code style="font-family:var(--s-mono)">production.topology_diagram</code> · only here, never on the home card</p>
+        <ul class="m-ul">
+          <li><b>API:</b> <code>backend-api</code> (FastAPI) public on App Runner — auth, RLS context, <code>/ask</code>, Explore, SQL editor, admin, and the non-UI front doors (webhook, Slack slash command + @mention bot, MCP at <code>/mcp</code>) all through one <code>run_question()</code>; <code>data-agent</code> is a second private service (token-guarded) that the demo deployment omits.</li>
+          <li><b>Database:</b> Aurora Serverless v2 Postgres 16 + pgvector, scale-to-zero (0–1 ACU in demo); schemas <code>app</code> / <code>raw</code> / <code>staging</code> / <code>marts</code>; RLS policies and per-role statement timeouts applied by Alembic migrations; dlt + dbt build the marts as ECS Fargate one-shot jobs streaming the full CSVs from S3.</li>
+          <li><b>Deploy:</b> merge to <code>main</code> → ten-stage workflow under GitHub OIDC (no stored keys): images → Terraform → ECS migrate + pipeline → App Runner → CloudFront → cloud smoke against the live URL; billing + 5xx alarms → SNS; <code>make rollback</code> reverts App Runner to the previous image.</li>
+          <li><b>Scale rung:</b> 10 today (one instance per service). Rung-100 sizing is measured, not guessed — a queue in front of the agent scaled linearly (3 workers 2.97–2.99×, 5 workers 4.87–4.98×) within 6% of ⌈N/W⌉×S. <a style="color:var(--s-signal)">See the ladder →</a></li>
+        </ul>
+
+        <h3 class="m-h3">5 · Guardrails &amp; security <small>WHAT SITS BETWEEN THE MODEL AND THE DATA</small></h3>
+        <ul class="m-ul">
+          <li>Google OIDC → role gating → <b>Postgres RLS</b> set per request; the agent connects as a read-only role — a bug in app code still cannot leak rows.</li>
+          <li>Generated SQL: shape check → keyword denylist → <b>sqlglot AST walk</b> rejecting DML/DDL, <code>set_config</code>, <code>pg_read_file</code> and friends; analysis code runs in <b>Pyodide/WASM</b> (no network, no filesystem); attempt budgets, row caps, statement timeouts.</li>
+          <li>Cost backstops: daily AI caps (5 free / 10 paid / 200 service), 22 requests + 600k tokens per run; service-account keys stored as SHA-256, shown once.</li>
+          <li>Tested two ways: a deterministic injection suite in CI (found two real guard defects) and a four-class promptfoo red-team (<code>rls-bypass</code>, <code>jailbreak-to-dml</code>, <code>prompt-injection</code>, <code>pii-exfil</code>) whose pass rates light the Ops deck.</li>
+        </ul>
+
+        <h3 class="m-h3">6 · Observability &amp; cost <small>IS IT HEALTHY, SAFE, FAST, AFFORDABLE</small></h3>
+        <ul class="m-ul">
+          <li>OpenTelemetry traces → self-hosted Jaeger (or Logfire); every agent run inspectable end to end.</li>
+          <li>The <code>/ops</code> flight deck: latency + time-to-first-page p95, error/degraded rates, cost per answer, two SLOs with error-budget burn, marts freshness, red-team pass rates, deploy timeline, saturation — read from one pre-aggregated Postgres row so it stays up when the cloud APIs don't; a runbook keyed off its lamps.</li>
+          <li>Cost per answer is cache-adjusted (most input tokens are prompt-cache hits); CloudWatch billing alarm; local embeddings; demo mode deleted the agent service — measured ~60–70% cheaper (~$36–66 → ~$8–18/mo).</li>
+        </ul>
+
+        <h3 class="m-h3">7 · Production readiness scorecard <small>9 OF 9 SHIPPED · SCALE PATH MEASURED</small></h3>
+        <div class="m-prod" style="margin-top:0">
+          <div class="rows">
+            <div class="row"><span class="chip"><span class="m-dot f"></span>Evals &amp; golden set</span><span class="how">Goldens authored in-product, versioned pack, deterministic graders, journey evals in CI. <a style="color:var(--s-signal)">§3</a><em>evals/cases/*.yaml · agent/eval_graders.py</em></span></div>
+            <div class="row"><span class="chip"><span class="m-dot f"></span>LLM-as-judge</span><span class="how">Cross-family judge on a frozen rubric; refuses its own family. <a style="color:var(--s-signal)">§3</a><em>agent/eval_judge.py</em></span></div>
+            <div class="row"><span class="chip"><span class="m-dot f"></span>Regression gate</span><span class="how">Blocks on any pass→fail flip; pack lint on every merge. <a style="color:var(--s-signal)">§3</a><em>scripts/eval_compare.py · tests/test_eval_pack.py</em></span></div>
+            <div class="row"><span class="chip"><span class="m-dot f"></span>Learning loop</span><span class="how">Build fingerprints, read-only diagnoser, three cycles (one refused). <a style="color:var(--s-signal)">§3</a><em>agent/version.py · docs/evals/</em></span></div>
+            <div class="row"><span class="chip"><span class="m-dot f"></span>Guardrails &amp; security</span><span class="how">RLS · read-only role · AST guard · WASM sandbox · caps · red-teamed. <a style="color:var(--s-signal)">§5</a><em>SECURITY.md · sql_guardrails.py</em></span></div>
+            <div class="row"><span class="chip"><span class="m-dot f"></span>Observability</span><span class="how">Jaeger/Logfire traces; Ops deck with SLOs and error budgets. <a style="color:var(--s-signal)">§6</a><em>frontend/features/ops · docs/runbook.md</em></span></div>
+            <div class="row"><span class="chip"><span class="m-dot f"></span>Cost control</span><span class="how">Cache-adjusted cost per answer, caps, billing alarm, demo mode −60–70%. <a style="color:var(--s-signal)">§6</a><em>app/limits.py · .lavish/s38</em></span></div>
+            <div class="row"><span class="chip"><span class="m-dot f"></span>Deploy &amp; release</span><span class="how">Ten-stage OIDC deploy with cloud smoke; rollback. <a style="color:var(--s-signal)">§4</a><em>.github/workflows/deploy-aws.yml</em></span></div>
+            <div class="row"><span class="chip"><span class="m-dot f"></span>Scale path</span><span class="how">Rung 10 today; rung-100 sizing measured (linear worker scaling). <a style="color:var(--s-signal)">§4</a><em>out/wsweep/summary.json · .lavish/s42</em></span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p class="note">Sections 1–6 are Markdown the skill drafts from the template; the two figures are injected by the layout under the §2 and §4 headings; §7 renders from <code>production.rubric</code> through the scorecard include, so the three case studies stay one Markdown file each. ConvFinQA's scorecard will show one "—" row (judge, deterministic scoring) and one "○" row (scale) with their reasons; Transcript RAG two "◐" and one "○".</p>
+  </section>
+
+  <div class="rule"></div>
+
+  <!-- 07 -->
+  <section id="s07">
+    <div class="sec-head"><span class="sec-num">07</span><h2>The case-study contract — a reusable template, and a skill that fills it</h2></div>
+    <p class="sec-sub">Straight answer to your question: <b>not yet.</b> Today the structure is implicit — a layout (<code>_layouts/project.html</code>), a front-matter convention, and a paragraph in the readme.
+      This section makes it explicit and reusable in three layers: a <b>contract</b> (schema + spine + rules), a <b>scaffold</b> you copy, and a <b><code>/case-study</code> skill</b> that produces a case study from a repo, draws the two diagrams, and lints the result.
+      The three production case studies are then built <em>through</em> the skill, which is the proof the template works (D9).</p>
+
+    <div class="cards">
+      <div class="card">
+        <span class="pill-tag ui">Layer 1 · contract</span>
+        <h3>What every case study must have</h3>
+        <p><b>Front matter (schema):</b> <code>title</code> · <code>summary</code> · <code>tldr</code> · <code>tags</code> · <code>metric</code> + <code>metric_label</code> · <code>featured</code> · <code>order</code> · <code>stack</code> · <code>skills</code> (keys in <code>_data/skills.yml</code>) · <code>skills_detail[{skill, proof}]</code> · <code>links{repo, demo}</code> · <code>media{walkthrough, poster, captions, reel}</code> · <b><code>architecture{diagram, caption}</code></b> · <b><code>production{live, order, surface, topology, topology_diagram, region, rung, rung_note, score, rubric[9]{dimension, status, how, proof}}</code></b> · <code>evidence[]</code>.</p>
+        <p><b>Body spine (H2s, in order — your structure):</b> <code>1 Purpose &amp; benefit</code> (problem, who it's for, the benefit in one number, what you can do in the live demo) → <code>2 Agent architecture</code> (agents/stages, LLMs and tiers, tools, retrieval, prompts, memory; agent-structure diagram) → <code>3 Agent loop &amp; evaluation</code> (one request end to end, then golden set → graders/judge → gate → learning loop) → <code>4 Deployed architecture</code> (topology diagram; API surfaces, database/storage, CI/CD + smoke, region and sizing, scale rung) → <code>5 Guardrails &amp; security</code> → <code>6 Observability &amp; cost</code> → <code>7 Production readiness scorecard</code> (rendered from front matter; each row links to its section).</p>
+        <p><b>Rules:</b> every number has a repo path · all nine rubric dimensions present, statuses from the vocabulary · ◐ / ○ / — carry a reason in <code>how</code> · <code>links.demo</code> must answer <code>mode: demo</code> (or 200) · two diagrams: agent structure (card + §2), deploy topology (§4 only) · the seven H2s in order, none skipped (write "n/a — why" rather than omit) · summary ≤ 2 sentences, tldr = one line.</p>
+        <p class="muted small">Practices get a parallel contract: <code>title</code> · <code>summary</code> · <code>order</code> · <code>systems[]</code> · <code>rubric[]</code> (dimensions explained) and the spine Problem → Pattern → In the three systems → Evidence → Failure modes.</p>
+      </div>
+      <div class="card">
+        <span class="pill-tag ui">Layer 2 · scaffold</span>
+        <h3><code>_templates/</code> — copy, fill, lint</h3>
+        <ul>
+          <li><code>_templates/project.md</code> — the full front matter with every key present and a one-line comment saying what goes there and where to find it in a repo (README §, <code>infra/</code>, <code>.github/workflows/</code>, <code>evals/</code>, <code>SECURITY.md</code>…), plus the seven H2s with a prompt under each (e.g. §2: "agents / stages · LLM(s) and tiers · tools · retrieval · prompts · memory").</li>
+          <li><code>_templates/practice.md</code> — same for practices.</li>
+          <li><code>_templates/agent-structure.svg</code> — the node/edge style used in §06 (currentColor, theme-aware, <code>&lt;title&gt;</code> on every node, viewBox 320×100) with placeholder nodes: input → stages → output → grading caption.</li>
+          <li><code>_templates/topology.svg</code> — same style for the deploy diagram: front door → compute → data → external, with a region/cost caption.</li>
+          <li><code>readme.md</code> §Adding a project points at the templates and the skill instead of describing the fields by hand.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <span class="pill-tag ui">Layer 3 · skill</span>
+        <h3><code>/case-study &lt;repo-path&gt;</code></h3>
+        <p>A project skill at <code>.claude/skills/case-study/SKILL.md</code> in this repo (versioned with the site; D8 for location). Invoked with a sibling repo path; steps:</p>
+        <ul>
+          <li><b>Survey</b> the repo — README, AGENTS/CLAUDE.md, <code>infra/</code>, <code>.github/workflows/</code>, <code>evals/</code>, <code>tests/</code>, <code>SECURITY.md</code>, <code>.lavish/</code>, <code>git log</code> — and collect facts <em>with paths</em>. No claim without a path.</li>
+          <li><b>Fill</b> <code>_templates/project.md</code> → <code>_projects/&lt;slug&gt;.md</code>, all seven sections; skills and rubric keys must resolve in <code>_data/</code>.</li>
+          <li><b>Score</b> the nine rubric rows — status + <code>how</code> + <code>proof</code>; anything below ● gets its reason.</li>
+          <li><b>Draw</b> the two SVGs from the templates into <code>assets/img/agent/</code> and <code>assets/img/production/</code>.</li>
+          <li><b>Lint</b> with <code>scripts/lint_case_study.py --repo &lt;path&gt;</code> and build with <code>bundle exec jekyll build</code>.</li>
+          <li><b>Review</b> — open the draft in Lavish (the practice), then commit on a branch and run <code>no-mistakes</code>.</li>
+        </ul>
+        <p class="muted small"><code>/case-study lint</code> validates every case study; <code>/case-study practice &lt;name&gt;</code> scaffolds a practice page the same way.</p>
+      </div>
+    </div>
+
+    <div class="cards" style="margin-top:14px">
+      <div class="card">
+        <h3><code>scripts/lint_case_study.py</code> — what it checks</h3>
+        <pre><code>$ python scripts/lint_case_study.py _projects/data-pilot.md --repo ../data-qa-agent
+✓ front matter matches schema (0 unknown keys, 0 missing)
+✓ skills: 7/7 keys in _data/skills.yml
+✓ rubric: 9/9 dimensions, statuses in vocabulary
+✓ rubric: 0 non-shipped rows without a reason
+✓ proof paths: 23/23 exist in ../data-qa-agent
+✓ diagrams: assets/img/agent/data-pilot.svg, assets/img/production/data-pilot.svg
+✓ spine: 7/7 sections present, in order
+✓ links.demo: 200, "mode":"demo"
+✓ summary 2 sentences · tldr 1 line
+PASS</code></pre>
+        <p class="muted small">Stdlib + PyYAML; runs in a small GitHub Actions workflow on PRs (<code>.github/workflows/lint.yml</code>) — Pages still builds the site natively, this only adds a check.</p>
+      </div>
+      <div class="card">
+        <h3>Why a skill and not just a template</h3>
+        <ul>
+          <li>The hard part isn't the Markdown — it's <b>surveying a repo and tying every claim to a path</b>. That's what I did by hand for this plan (§01–§03) and it's exactly the repeatable part.</li>
+          <li>It keeps the rubric honest: the skill can't rate a row ● without a proof path the lint can find.</li>
+          <li>Dogfooding it on the three production apps (D9) means the template is proven before a fourth system ever exists.</li>
+          <li>It's a practice in its own right — the ways-of-working page can show the toolchain end to end: Lavish plan → <code>/case-study</code> → lint → no-mistakes → merge → Pages deploy.</li>
+        </ul>
+        <p class="muted small">Skill format follows the existing ones in <code>~/.claude/skills/</code> (<code>lavish</code>, <code>no-mistakes</code>): front matter with <code>name</code>, <code>description</code>, <code>user-invocable: true</code>, then the workflow.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="rule"></div>
+
+  <!-- 08 -->
+  <section id="s08">
+    <div class="sec-head"><span class="sec-num">08</span><h2>Implementation — data model, files, phases</h2></div>
+    <p class="sec-sub">Everything is Jekyll-native: one data file, front matter on three projects, a second collection, three includes, two layouts, CSS — plus the templates, lint and skill from §07. No plugins (GitHub Pages builds it).</p>
+
+    <div class="cards">
+      <div class="card">
+        <h3>1 · <code>_data/rubric.yml</code> — the vocabulary</h3>
+        <pre><code>evals:      {label: "Evals &amp; golden set",
+             question: "Is there a versioned golden set…?"}
+judge:      {label: "LLM-as-judge",         question: "…"}
+gate:       {label: "Regression gate",      question: "…"}
+loop:       {label: "Learning loop",        question: "…"}
+guardrails: {label: "Guardrails &amp; security", question: "…"}
+trace:      {label: "Observability",        question: "…"}
+cost:       {label: "Cost control",         question: "…"}
+release:    {label: "Deploy &amp; release",     question: "…"}
+scale:      {label: "Scale path",           question: "…"}
+statuses:
+  shipped:  {glyph: "●", label: "shipped"}
+  partial:  {glyph: "◐", label: "partial"}
+  designed: {glyph: "○", label: "designed"}
+  na:       {glyph: "—", label: "n/a"}</code></pre>
+      </div>
+      <div class="card">
+        <h3>2 · Project front matter — from <code>_templates/project.md</code></h3>
+        <pre><code>featured: true          # only these three stay true
+links:
+  repo: https://github.com/nmp-dsci/data-qa-agent
+  demo: https://deqfc8b0u8s64.cloudfront.net
+architecture:           # the AI / agent structure
+  diagram: /assets/img/agent/data-pilot.svg      # home card + Architecture
+  caption: "question → agent loop → guarded SELECT → sandbox → report"
+production:
+  live: true
+  order: 1
+  surface: "Walk-in demo — chat replays recorded runs;
+            Explore + SQL editor live on ~3.2M rows"
+  topology: "CloudFront → App Runner → Aurora v2 · ECS jobs"
+  topology_diagram: /assets/img/production/data-pilot.svg   # case study only
+  region: ap-southeast-2
+  rung: 10
+  rung_note: "rung-100 sizing measured (s42)"
+  score: "9 / 9"
+  rubric:                 # all nine, always
+    - {dimension: evals, status: shipped,
+       how: "Goldens are authored inside the product…",
+       proof: "evals/cases/*.yaml · agent/eval_graders.py"}
+    - {dimension: judge, status: shipped, how: "…", proof: "…"}
+    …</code></pre>
+      </div>
+      <div class="card">
+        <h3>3 · Practices collection</h3>
+        <pre><code># _config.yml
+collections:
+  projects:  {output: true, permalink: /projects/:name/}
+  practices: {output: true, permalink: /practices/:name/}
+defaults:
+  - scope: {type: practices}
+    values: {layout: practice}
+
+# _practices/eval-loop.md
+---
+title: The eval loop
+summary: Golden set → judge → gate → ship → trace → diagnose…
+order: 1
+systems: [data-pilot, convfinqa-agent, transcript-rag]
+rubric: [evals, judge, gate, loop]   # dimensions it explains
+---
+## Problem
+## Pattern
+## In the three systems
+## Evidence
+## Failure modes</code></pre>
+      </div>
+    </div>
+
+    <div class="tblwrap" style="margin-top:18px">
+      <table class="files">
+        <thead><tr><th>File</th><th>Change</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td class="k"><span class="path">_data/rubric.yml</span></td><td><span class="pill-tag new">new</span></td><td>Nine dimensions + status vocabulary. Single source of truth.</td></tr>
+          <tr><td class="k"><span class="path">_templates/project.md</span> · <span class="path">practice.md</span> · <span class="path">agent-structure.svg</span> · <span class="path">topology.svg</span></td><td><span class="pill-tag new">new</span></td><td>The scaffolds (§07 layer 2). Excluded from the Jekyll build via <code>_config.yml</code>.</td></tr>
+          <tr><td class="k"><span class="path">.claude/skills/case-study/SKILL.md</span></td><td><span class="pill-tag new">new</span></td><td>The <code>/case-study</code> skill (§07 layer 3): survey → fill → score → draw → lint → review. Location per D8.</td></tr>
+          <tr><td class="k"><span class="path">scripts/lint_case_study.py</span> · <span class="path">.github/workflows/lint.yml</span></td><td><span class="pill-tag new">new</span></td><td>Schema/vocab/rubric/paths/diagrams/spine/demo-URL checks; runs on PRs.</td></tr>
+          <tr><td class="k"><span class="path">_config.yml</span></td><td><span class="pill-tag changed">edit</span></td><td>Add the <code>practices</code> collection + default layout; exclude <code>_templates</code>, <code>scripts</code>, <code>.claude</code>.</td></tr>
+          <tr><td class="k"><span class="path">_projects/data-pilot.md</span> · <span class="path">convfinqa-agent.md</span> · <span class="path">transcript-rag.md</span></td><td><span class="pill-tag changed">rebuild via skill</span></td><td>Regenerated with <code>/case-study</code> (D9): <code>links.demo</code>; <code>architecture:</code> + full <code>production:</code> block (nine rubric entries with <code>how</code> + <code>proof</code>); body gains <code>## Scale</code>; summaries refreshed (Transcript RAG's predates GraphRAG and the deployment; Data Pilot's says "live on App Runner" — now "walk-in demo"). Existing prose and evidence kept.</td></tr>
+          <tr><td class="k"><span class="path">_projects/</span> — v2v-prod-agent · cuad-legal-agent · floor-plan-reviewer · adversarial-dev · propertyiq-etl · chronicle</td><td><span class="pill-tag gone">unpublish</span></td><td><code>published: false</code> on all six (D4a). Nothing renders; content stays in git. Legacy D3 pages + their data (<code>profile_*.html</code>, <code>property_*.html</code>, <code>surname_culture.html</code>, <code>tile_calendar.html</code>, <code>datafeed/</code>, <code>map_util/</code>, <code>tool_utils/</code>, <code>resources/</code>, <code>css/</code>, the big GeoJSON/JSON under <code>assets/</code>) added to <code>_config.yml</code> <code>exclude:</code>.</td></tr>
+          <tr><td class="k"><span class="path">_practices/eval-loop.md</span> · <span class="path">ways-of-working.md</span> · <span class="path">production-scale.md</span></td><td><span class="pill-tag new">new</span></td><td>The three practice write-ups from §05 (§04 becomes <code>production-scale.md</code>). Ways of working may be three files (D4c).</td></tr>
+          <tr><td class="k"><span class="path">_layouts/practice.html</span></td><td><span class="pill-tag new">new</span></td><td>Practice spine; "Applies to" strip listing the three systems with links; rubric-dimension chips it explains.</td></tr>
+          <tr><td class="k"><span class="path">_includes/production-readiness.html</span></td><td><span class="pill-tag new">new</span></td><td>Nine rows from front matter: status chip, <code>how</code>, <code>proof</code>; header score; anchors to <code>/#rubric-&lt;dimension&gt;</code>.</td></tr>
+          <tr><td class="k"><span class="path">_includes/rubric-matrix.html</span> · <span class="path">scale-ladder.html</span> · <span class="path">practice-card.html</span></td><td><span class="pill-tag new">new</span></td><td>Compact matrix from <code>site.projects | where_exp: "p","p.production.live == true"</code>; the three-rung strip with a <code>rung</code> highlight; practice card.</td></tr>
+          <tr><td class="k"><span class="path">_layouts/home.html</span></td><td><span class="pill-tag changed">rewrite</span></td><td>New hero copy + metrics; three system cards (with <code>architecture.diagram</code> — the agent structure); rubric explainer + matrix; practices strip. Filter pills and the earlier-work block removed.</td></tr>
+          <tr><td class="k"><span class="path">_layouts/project.html</span> · <span class="path">_includes/project-card.html</span> · <span class="path">_includes/nav.html</span></td><td><span class="pill-tag changed">edit</span></td><td>Body is the seven H2s from the Markdown; the layout injects the agent figure under §2 and the topology figure under §4 (by heading anchor) and renders the scorecard include as §7 from <code>production.rubric</code>; TL;DR "Proof" reads the rubric score for live systems; card gains live badge + agent diagram; nav: Work · Practices · About.</td></tr>
+          <tr><td class="k"><span class="path">assets/css/main.css</span></td><td><span class="pill-tag changed">edit</span></td><td><code>.live-badge</code>, <code>.card-vis</code>, <code>.fig-agent</code> / <code>.fig-topology</code>, <code>.rubric-matrix</code>, <code>.rr-*</code> rows, <code>.ladder</code>, practice cards — all on existing tokens, light + dark.</td></tr>
+          <tr><td class="k"><span class="path">assets/img/agent/*.svg</span> · <span class="path">assets/img/production/*.svg</span> · <span class="path">*.png</span></td><td><span class="pill-tag new">new</span></td><td>Per system: one agent-structure SVG (home card + Architecture) and one deploy-topology SVG (Production readiness) — both from the §07 templates, currentColor, theme-aware; the §06 mocks are the drafts. Plus one screenshot per live demo as evidence.</td></tr>
+          <tr><td class="k"><span class="path">about.md</span> · <span class="path">readme.md</span></td><td><span class="pill-tag changed">edit</span></td><td>About leads with "three systems in production" + the practices; readme documents <code>_data/rubric.yml</code>, <code>production:</code>, the practices collection.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="tblwrap" style="margin-top:18px">
+      <table class="phases">
+        <thead><tr><th>Phase</th><th>Does</th><th>Done when</th><th>Effort</th></tr></thead>
+        <tbody>
+          <tr><td class="k">P0 · Contract + skill</td><td><code>_data/rubric.yml</code>; <code>_templates/</code> (project, practice, two SVG templates); <code>scripts/lint_case_study.py</code> + workflow; <code>.claude/skills/case-study/SKILL.md</code>; readme §Adding a project rewritten</td><td>Lint passes on a scaffold; <code>/case-study</code> runs end-to-end on one repo (Data Pilot) and produces a PASS</td><td>~2.5 h</td></tr>
+          <tr><td class="k">P1 · Data</td><td>Run <code>/case-study</code> for the three repos → <code>_projects/*.md</code> with <code>links.demo</code>, <code>architecture:</code>, full <code>production:</code> blocks (text from §03); <code>_config.yml</code> collection + excludes; unpublish the other six</td><td><code>bundle exec jekyll build</code> clean; lint PASS ×3; "Demo ↗" in the three TL;DR strips; <code>_site/</code> contains exactly three project pages and no legacy D3 pages</td><td>~1.5 h</td></tr>
+          <tr><td class="k">P2 · Surfaces</td><td>Home rewrite, includes, practice layout, CSS, nav; six SVGs (three agent-structure, three topology) from the templates</td><td>Home renders cards + agent visuals + matrix + practices in light and dark; no horizontal scroll at 360px</td><td>~3 h</td></tr>
+          <tr><td class="k">P3 · Case studies</td><td>Nine <code>how</code> explanations × 3 apps (drafted by the skill, edited by hand); <code>## Scale</code> paragraphs; refreshed summaries; screenshots from the live demos</td><td>Every row maps to a path in §03; lint PASS; screenshots in place</td><td>~2 h</td></tr>
+          <tr><td class="k">P4 · Practices</td><td>Write <code>eval-loop.md</code>, <code>ways-of-working.md</code>, <code>production-scale.md</code></td><td>Each cites verified counts (§05) and links the three systems + the earlier work it draws on</td><td>~3–4 h</td></tr>
+          <tr><td class="k">P5 · Verify</td><td><code>curl</code> each demo URL (expect <code>"mode":"demo"</code> / 403 on POST); click-through both themes; About + readme</td><td>Three live links open the right app; smoke output pasted into the PR</td><td>~45 min</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <div class="rule"></div>
+
+  <!-- 09 -->
+  <section id="s09">
+    <div class="sec-head"><span class="sec-num">09</span><h2>Decisions — all locked</h2></div>
+    <p class="sec-sub">Your answers are locked and already reflected above; all three demo URLs are in and verified; CloudFront is dropped; only the three systems are shown; the seven-section case-study spine is locked. D4b / D4c / D8 / D9 are now locked too — every decision is in the table below. Nothing is open except the approve bar; the D6 form stays only in case a URL changes.</p>
+
+    <div class="tblwrap">
+      <table class="locked">
+        <thead><tr><th>Locked</th><th>Your answer</th><th>Where it landed</th></tr></thead>
+        <tbody>
+          <tr><td class="k">D1 hub</td><td>Hub page + readiness block on each case study</td><td>Readiness blocks: §06-B. The hub's content is on the home page (§06-A); D4b confirms no separate <code>/production/</code>.</td></tr>
+          <tr><td class="k">D2 rubric</td><td>All nine, honest ●/◐/○/— ratings</td><td>§02, §03, and all nine rows on every case study.</td></tr>
+          <tr><td class="k">D3 ladder</td><td>Shared ladder, rung per project, labelled estimates</td><td>§04 → <code>_practices/production-scale.md</code>; strip on home; rung highlight per case study.</td></tr>
+          <tr><td class="k">D5 spine</td><td><s>… Architecture → Production readiness → Scale → Cost</s> — superseded by your spine note</td><td>Now: 1 Purpose → 2 Agent architecture → 3 Agent loop &amp; evaluation → 4 Deployed architecture → 5 Guardrails → 6 Observability &amp; cost → 7 Scorecard. §06-B mock, §07 contract, §08 layout.</td></tr>
+          <tr><td class="k">D10 closing sections</td><td>"Yes, go with 5, 6, 7"</td><td>5 Guardrails &amp; security · 6 Observability &amp; cost · 7 Production-readiness scorecard are part of the contract; the lint requires all seven H2s in order.</td></tr>
+          <tr><td class="k">D4 note</td><td>Only Data Pilot / ConvFinQA / Transcript RAG, plus generalised case studies: eval loop, ways of working (Git / Lavish / no-mistakes), production at 10/100/1,000 concurrent users</td><td>§00 restructure, §04 re-based, §05 practices, §06 home mock, §08 collection.</td></tr>
+          <tr><td class="k">Diagrams note</td><td>Card visual = the AI / agent structure; AWS architecture is a diagram inside the case study</td><td>§06-A cards redrawn; §06-B gains Architecture (agent) + deploy topology figures; <code>architecture.diagram</code> vs <code>production.topology_diagram</code> in §08.</td></tr>
+          <tr><td class="k">Template note</td><td>Case-study structure defined as a reusable shared template / skill</td><td>§07: contract + <code>_templates/</code> + lint + <code>/case-study</code> skill; P0 in §08; D8 / D9 locked below.</td></tr>
+          <tr><td class="k">D7 CloudFront</td><td>No — deprioritised; the App Runner URLs are used as-is</td><td>Dropped from the plan; §01 and D6 carry the three verified URLs.</td></tr>
+          <tr><td class="k">D4a other projects</td><td>"Only show Data Pilot / ConvFinQA / Transcript agent, don't show the rest"</td><td>No Earlier-work list (§06-A); the six project files get <code>published: false</code> and the legacy D3 pages are excluded from the build (§00, §08). Reversible; deletion on request.</td></tr>
+          <tr><td class="k">D4b hub page</td><td>Home page is the hub — no separate <code>/production/</code></td><td>§06-A is the hub: cards, rubric explainer + matrix, practices strip. The case-study chips link to <code>/#rubric-&lt;key&gt;</code> anchors on the home page; no <code>/production/</code> page in §08.</td></tr>
+          <tr><td class="k">D4c ways of working</td><td>One practice page with three sections: Git · Lavish · no-mistakes</td><td><code>_practices/ways-of-working.md</code> — one page, three anchored sections plus the case-study skill; §05, §08 P4.</td></tr>
+          <tr><td class="k">D8 skill location</td><td>Project skill in this repo — <code>.claude/skills/case-study/</code></td><td>Skill, <code>_templates/</code>, <code>scripts/lint_case_study.py</code> and the site travel in one PR; §07, §08 P0.</td></tr>
+          <tr><td class="k">D9 build via skill</td><td>Yes — P0 first, then the three case studies through <code>/case-study</code></td><td>Contract → templates → lint → skill, then regenerate Data Pilot / ConvFinQA / Transcript RAG through it, keeping existing prose and evidence; §08 phase order.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+
+
+
+
+    <form class="q" data-lavish-question="urls" id="q6">
+      <h3>D6 · Live demo URLs <span class="st full" style="margin-left:6px">ALL THREE VERIFIED</span></h3>
+      <p class="why">All three answer as their demo mode and refuse writes. These go straight into <code>links.demo</code>. Only queue this if you want to change one.</p>
+      <div class="urls">
+        <div><label>Data Pilot<small>CloudFront SPA · verified earlier today</small></label><input class="txt" type="url" name="datapilot" value="https://deqfc8b0u8s64.cloudfront.net"></div>
+        <div><label>ConvFinQA Agent<small>verified · mode=demo · champion v2 · 8 recorded reports · 403 on promote</small></label><input class="txt" type="url" name="convfinqa" value="https://vrpy25pewm.ap-southeast-1.awsapprunner.com"></div>
+        <div><label>Transcript RAG<small>verified · mode=demo · 102 videos · 403 on ask</small></label><input class="txt" type="url" name="transcript" value="https://iibze7vuqr.ap-southeast-2.awsapprunner.com"></div>
+      </div>
+      <div class="qrow"><button class="btn" type="submit">Queue changed URLs</button><span class="status" id="s-q6"></span></div>
+    </form>
+  </section>
+
+  <div class="rule"></div>
+
+  <!-- 10 -->
+  <section id="s10">
+    <div class="sec-head"><span class="sec-num">10</span><h2>Risks &amp; open questions</h2></div>
+    <div class="risks" style="margin-top:14px">
+      <div class="risk ok"><h4>All three demo URLs verified live</h4><p>Data Pilot (CloudFront), ConvFinQA and Transcript RAG (App Runner) each answer as demo mode and refuse writes. P5's link check is a re-run of the same curls.</p></div>
+      <div class="risk"><h4>Hiding V2V and CUAD removes two strong numbers from the site</h4><p>The 9/9 red-team and 10,250-prediction results leave the hero and the site; the new strip is 3 · 77.1% · 6.1× · 4.98×. The eval-loop practice can still cite them with GitHub links — your call whether it should.</p></div>
+      <div class="risk"><h4>Unpublished ≠ deleted</h4><p><code>published: false</code> keeps the six write-ups and their media in git (unlinked media under <code>assets/</code> is still served if someone knows the URL). If you want the repo clean, deleting the files and media is a follow-up commit.</p></div>
+      <div class="risk"><h4>Demo mode must be described as a decision, not a caveat</h4><p>Replayed chat in Data Pilot and ConvFinQA is a cost-bounding choice (unbounded abuse bill otherwise). The home copy says so up front and names what <em>is</em> live.</p></div>
+      <div class="risk"><h4>Aurora cold start on Data Pilot</h4><p>First Explore/SQL call after an idle hour waits ~30s. The card says so; chat replay is immune because the pack loads into memory.</p></div>
+      <div class="risk"><h4>Numbers that need re-verifying</h4><p>Data Pilot golden-pack count (85 lines may include drafts); Transcript RAG test count (700+ vs ~1,440 collected). Verify with <code>make eval-export</code> and <code>pytest --collect-only</code> before they go on the page.</p></div>
+      <div class="risk"><h4>Rung-100 / 1,000 dollar ranges are estimates</h4><p>Only rung-10 costs are measured (s38, ConvFinQA README). Labelled order-of-magnitude on the page (locked in D3).</p></div>
+      <div class="risk"><h4>Practices are the biggest write</h4><p>P4 is ~3–4 h of content and the counts must stay verifiable (they're from <code>git log</code> today — re-run before publishing).</p></div>
+      <div class="risk"><h4>The skill can over-claim</h4><p>An LLM surveying a repo will rate rows ● generously. The lint's proof-path check is the backstop — a ● without an existing path fails — and the Lavish review step keeps a human on every case study before merge.</p></div>
+      <div class="risk"><h4>Two diagrams per system is six SVGs</h4><p>Hand-authored from the templates (~20 min each). The §06 mocks are already the drafts for four of them; ConvFinQA and Transcript RAG topologies come from rev 2's cards.</p></div>
+      <div class="risk ok"><h4>Layout already supports <code>links.demo</code></h4><p>The TL;DR "Where" cell and sidebar "Live demo ↗" row exist in <code>_layouts/project.html</code> — setting the field is enough for those two surfaces.</p></div>
+      <div class="risk ok"><h4>No plugins needed</h4><p>A second collection, <code>where_exp</code>, nested front matter and data files are all in the github-pages Jekyll build. The site keeps building on push.</p></div>
+    </div>
+  </section>
+
+  <div id="approve-box">
+    <h3>Approve the plan</h3>
+    <p class="small" style="color:var(--ink-soft);margin:6px 0 12px">Every decision is locked. This queues one prompt with all of them plus any notes. Then press <b>Send to Agent</b> in the toolbar.</p>
+    <textarea class="txt" id="notes" placeholder="Anything to change — copy tone, a rubric dimension to add (e.g. 'data quality', 'privacy/PII'), a practice to add or drop, screenshot preferences…"></textarea>
+    <div class="qrow"><button class="btn primary" type="button" id="approve">Approve — build P0–P5</button><span class="status" id="status"></span></div>
+  </div>
+
+  <div class="foot">
+    <span>nmp-dsci.github.io · build console · 04 · production showcase · rev 3</span>
+    <span>facts from the three repos only · defaults = recommendation · design: site tokens for mocks, console chrome for the plan</span>
+  </div>
+</div>
+
+<script>
+  (function(){
+    var r=document.documentElement,b=document.getElementById('console-toggle');
+    function paint(){b.textContent=r.getAttribute('data-theme')==='dark'?'☀':'☾'}
+    b.addEventListener('click',function(){
+      var next=r.getAttribute('data-theme')==='dark'?'light':'dark';
+      r.setAttribute('data-theme',next);
+      try{localStorage.setItem('console-theme',next)}catch(e){}
+      paint();
+    });
+    paint();
+  })();
+
+  function qv(form){var d=new FormData(form);for(var e of d.entries()){return e[1]}return null}
+  function wire(id,label){
+    var f=document.getElementById(id);
+    f.addEventListener('submit',function(e){
+      e.preventDefault();
+      var v=qv(f);
+      if(!v){document.getElementById('s-'+id).textContent='Pick one first.';return}
+      if(window.lavish&&window.lavish.queuePrompt){
+        window.lavish.queuePrompt('Decision '+label+': '+v,
+          {tag:'choice',text:label+': '+v.slice(0,60),element:f,queueKey:id,data:{question:label,answer:v}});
+        document.getElementById('s-'+id).textContent='Queued ✓';
+      }else{
+        document.getElementById('s-'+id).textContent='Selected (toolbar not connected — use the approve bar or chat).';
+      }
+    });
+  }
+
+  document.getElementById('q6').addEventListener('submit',function(e){
+    e.preventDefault();
+    var d=new FormData(e.currentTarget),parts=[],blank=[];
+    [['datapilot','Data Pilot'],['convfinqa','ConvFinQA Agent'],['transcript','Transcript RAG']].forEach(function(p){
+      var v=(d.get(p[0])||'').trim(); if(v)parts.push(p[1]+' = '+v); else blank.push(p[1]);
+    });
+    var msg='Decision D6 live demo URLs: '+parts.join('; ')+(blank.length?'. Fetch via AWS/terraform for: '+blank.join(', '):'');
+    if(window.lavish&&window.lavish.queuePrompt){
+      window.lavish.queuePrompt(msg,{tag:'choice',text:'D6 URLs ('+parts.length+' given)',element:e.currentTarget,queueKey:'q6',data:{given:parts,missing:blank}});
+      document.getElementById('s-q6').textContent='Queued ✓';
+    }else{document.getElementById('s-q6').textContent='Copy to chat: '+msg}
+  });
+
+  document.getElementById('approve').addEventListener('click',function(){
+    var parts=[
+      'Approved: build the production showcase rev 3, P0-P5 —',
+      'P0 first: case-study contract (_data/rubric.yml, _templates/project.md + practice.md + two SVG templates, scripts/lint_case_study.py + lint workflow) and the /case-study skill at .claude/skills/case-study/ in this repo; then regenerate the three case studies through it, keeping existing prose and evidence;',
+      'site shows only Data Pilot, ConvFinQA Agent, Transcript RAG; the other six projects get published: false and the legacy D3 pages are excluded from the build — nothing else is shown;',
+      'home page is the hub: hero metrics 3 / 77.1% / 6.1x / 4.98x, three system cards each with an agent-structure SVG + live demo link, rubric explainer + matrix, practices strip; no earlier-work section; no separate /production/ page;',
+      'case-study spine: 1 Purpose & benefit → 2 Agent architecture (agent-structure figure) → 3 Agent loop & evaluation → 4 Deployed architecture (topology figure; API, database, deploy, scale rung) → 5 Guardrails & security → 6 Observability & cost → 7 Production readiness scorecard (nine rows with status + how + proof, each linking to its section);',
+      'new _practices collection: eval-loop, ways-of-working (one page: Git / Lavish / no-mistakes / case-study skill), production-scale (10 / 100 / 1,000 concurrent users, shared ladder, labelled estimates);',
+      'demo URLs (all verified): Data Pilot https://deqfc8b0u8s64.cloudfront.net; ConvFinQA https://vrpy25pewm.ap-southeast-1.awsapprunner.com; Transcript RAG https://iibze7vuqr.ap-southeast-2.awsapprunner.com;',
+      'no CloudFront work — App Runner URLs used as-is;',
+      'D4b home is the hub, D4c one ways-of-working page, D8 skill in this repo, D9 skill first — all locked.'
+    ];
+    var notes=(document.getElementById('notes').value||'').trim();
+    if(notes)parts.push('Notes: '+notes);
+    var msg=parts.join(' ');
+    if(window.lavish&&window.lavish.queuePrompt){
+      window.lavish.queuePrompt(msg,{tag:'choice',text:'Approve production showcase plan (rev 3)',element:document.getElementById('approve-box'),queueKey:'approve',data:{notes:notes}});
+      document.getElementById('status').textContent='Queued ✓ — press "Send to Agent" in the toolbar to start.';
+    }else{
+      document.getElementById('status').textContent='Copy this to chat: '+msg;
+    }
+  });
+</script>
+</body>
+</html>

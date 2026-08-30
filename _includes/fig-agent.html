@@ -1,0 +1,13 @@
+{%- comment -%}
+Agent-structure figure. Rendered by the case-study Markdown, directly under
+"## 2 · Agent architecture". The SVG is INLINED (never <img>) so currentColor
+and the theme tokens resolve. Renders nothing if the front matter has no diagram.
+{%- endcomment -%}
+{%- assign dgm = page.architecture.diagram | default: "" | strip -%}
+{%- assign cap = page.architecture.caption | default: "" | strip -%}
+{%- if dgm != "" -%}
+<figure class="fig fig-agent">
+<div class="dia-frame">{% include {{ page.architecture.diagram }} %}</div>
+<figcaption><b>Agent structure</b>{% if cap != "" %} — {{ cap }}{% endif %} · the same figure as the home card.</figcaption>
+</figure>
+{%- endif -%}

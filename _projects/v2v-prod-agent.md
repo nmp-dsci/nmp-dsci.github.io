@@ -1,11 +1,13 @@
 ---
+published: false   # D4a — the site shows only the three production systems.
+                   # Content and media stay in git; nothing renders. Reversible.
 title: V2V Prod Agent
 summary: A voice-to-voice banking agent built to production standard — callers get verified, answered from a knowledge base, and served by tools that can block cards and move money, with a deterministic policy gate between the model and every action.
 tldr: Voice in, voice out, real actions in between — and the model is never trusted to police itself. A pure-Python guardrail gate authorizes every tool call; red-team attacks are graded on whether a single bank value moved.
 tags: [Agents, RAG]
 metric: "9/9"
 metric_label: "red-team attacks stopped at the gate"
-featured: true
+featured: false
 order: 1
 stack: [pydantic-ai, faster-whisper STT, Kokoro TTS, FastAPI + SQLite, BM25 RAG, OTel → Langfuse, Docker + CI]
 skills: [responsible-ai, agentic-ai, model-evaluation, rag, mlops, prompt-engineering, docker, python]

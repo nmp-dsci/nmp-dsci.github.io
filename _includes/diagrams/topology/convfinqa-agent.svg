@@ -1,0 +1,46 @@
+<svg class="dia" viewBox="0 0 320 100" role="img"
+     aria-label="ConvFinQA deploy topology: a visitor with no login reaches a single App Runner instance of 0.5 vCPU and 1 GB, which serves the dataset, the committed prediction CSVs and the recorded demo pack baked into its own image; GitHub Actions pushes that image to ECR over OIDC and App Runner auto-deploys the latest tag, while one CloudWatch alarm watches for sustained 5xx. There is no VPC and no database.">
+  <defs>
+    <marker id="tp-convfinqa" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="currentColor"/>
+    </marker>
+  </defs>
+
+  <g><title>GitHub Actions — merge to main, CI must conclude success, then OIDC into the deploy role; no AWS keys are stored anywhere</title>
+    <rect class="nd" x="4" y="6" width="72" height="24" rx="6"/>
+    <text class="tx" x="40" y="18">GitHub CI</text>
+    <text class="tx s" x="40" y="27">OIDC deploy</text></g>
+
+  <g><title>ECR — the image registry; pushing :latest is the release step, App Runner auto-deploys it, and the lifecycle policy keeps five images as the rollback window</title>
+    <rect class="nd" x="92" y="6" width="88" height="24" rx="6"/>
+    <text class="tx" x="136" y="18">ECR :latest</text>
+    <text class="tx s" x="136" y="27">auto-deploy</text></g>
+
+  <g><title>CloudWatch — one alarm, on sustained 5xx from the service: the single failure mode worth being paged about</title>
+    <rect class="nd" x="196" y="6" width="118" height="24" rx="6"/>
+    <text class="tx" x="255" y="18">CloudWatch</text>
+    <text class="tx s" x="255" y="27">5xx alarm</text></g>
+
+  <g><title>visitor — no login, no account, nothing to sign up for</title>
+    <rect class="nd" x="4" y="41" width="52" height="26" rx="6"/>
+    <text class="tx" x="30" y="57">visitor</text></g>
+
+  <g><title>App Runner — one service, one instance, 0.5 vCPU and 1 GB sized from measured RSS; --workers 1, sessions and rate limits in process memory</title>
+    <rect class="nd hi" x="92" y="38" width="88" height="32" rx="6"/>
+    <text class="tx" x="136" y="51">App Runner</text>
+    <text class="tx s" x="136" y="63">0.5 vCPU · 1 GB</text></g>
+
+  <g><title>state, all of it baked into the image at build time — the dataset, the committed prediction CSVs, the s7 diagnostics, the exported registry and the recorded demo pack</title>
+    <rect class="nd hi" x="196" y="38" width="118" height="32" rx="6"/>
+    <text class="tx" x="255" y="51">in-image data</text>
+    <text class="tx s" x="255" y="63">770-q CSVs · pack</text></g>
+
+  <path class="ed" d="M76,18 L90,18" marker-end="url(#tp-convfinqa)"/>
+  <path class="ed" d="M136,30 L136,36" marker-end="url(#tp-convfinqa)"/>
+  <path class="ed" d="M56,54 L90,54" marker-end="url(#tp-convfinqa)"/>
+  <path class="ed" d="M180,55 L194,55" marker-end="url(#tp-convfinqa)"/>
+  <path class="ed dash" d="M180,45 C188,36 190,30 194,26" marker-end="url(#tp-convfinqa)">
+    <title>the service publishes its 5xx count to the alarm</title></path>
+
+  <text class="cap" x="4" y="92">ap-southeast-1 · Terraform · no VPC · no DB · DEMO_MODE baked in</text>
+</svg>

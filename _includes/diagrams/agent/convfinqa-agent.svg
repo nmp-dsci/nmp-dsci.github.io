@@ -1,0 +1,52 @@
+<svg class="dia" viewBox="0 0 320 104" role="img"
+     aria-label="ConvFinQA agent structure: a turn — the question plus the filing and the conversation history — passes through four typed pydantic-ai agents in sequence, triage then preprocess then retriever then calculator, all four loading one versioned prompt set; number turns short-circuit at the retriever and go straight to the answer, while program turns are computed through six explicit calculator tools.">
+  <defs>
+    <marker id="ar-convfinqa" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="currentColor"/>
+    </marker>
+  </defs>
+
+  <g><title>the versioned prompt set — v1, v2, generated v3_1; a module per version, auto-discovered, loaded by all four agents</title>
+    <rect class="nd" x="112" y="2" width="96" height="20" rx="6"/>
+    <text class="tx" x="160" y="15">prompt set v2</text></g>
+
+  <g><title>the turn — question plus the filing (text and table) plus the conversation history; roughly 60% of questions refer back to an earlier turn</title>
+    <rect class="nd" x="4" y="30" width="48" height="28" rx="6"/>
+    <text class="tx" x="28" y="42">turn</text>
+    <text class="tx s" x="28" y="53">+ report</text></g>
+
+  <g><title>triage agent — classifies the turn as number or program, and the conversation as Type I or Type II</title>
+    <rect class="nd" x="62" y="30" width="52" height="28" rx="6"/>
+    <text class="tx" x="88" y="42">triage</text>
+    <text class="tx s" x="88" y="53">turn type</text></g>
+
+  <g><title>preprocess agent — resolves "that" and "this change" against history, then decomposes the question into retrieval sub-questions and a calculation program</title>
+    <rect class="nd hi" x="122" y="30" width="60" height="28" rx="6"/>
+    <text class="tx" x="152" y="42">preprocess</text>
+    <text class="tx s" x="152" y="53">program</text></g>
+
+  <g><title>retriever agent — pulls the raw values out of the report's text and table, and answers number turns directly</title>
+    <rect class="nd hi" x="190" y="30" width="52" height="28" rx="6"/>
+    <text class="tx" x="216" y="42">retriever</text>
+    <text class="tx s" x="216" y="53">values</text></g>
+
+  <g><title>calculator agent — executes the program through six explicit tools (add, subtract, multiply, divide, exp, greater), never free-text arithmetic</title>
+    <rect class="nd hi" x="250" y="30" width="66" height="28" rx="6"/>
+    <text class="tx" x="283" y="42">calculator</text>
+    <text class="tx s" x="283" y="53">6 tools</text></g>
+
+  <g><title>the answer — a number, scored against gold by exact match and by program match; the whole turn is written to the trace store</title>
+    <rect class="nd" x="250" y="68" width="66" height="22" rx="6"/>
+    <text class="tx" x="283" y="82">answer</text></g>
+
+  <path class="ed dash" d="M160,22 L160,28" marker-end="url(#ar-convfinqa)"/>
+  <path class="ed" d="M52,44 L60,44" marker-end="url(#ar-convfinqa)"/>
+  <path class="ed" d="M114,44 L120,44" marker-end="url(#ar-convfinqa)"/>
+  <path class="ed" d="M182,44 L188,44" marker-end="url(#ar-convfinqa)"/>
+  <path class="ed" d="M242,44 L248,44" marker-end="url(#ar-convfinqa)"/>
+  <path class="ed" d="M283,58 L283,66" marker-end="url(#ar-convfinqa)"/>
+  <path class="ed dash" d="M216,58 C216,76 232,79 248,79" marker-end="url(#ar-convfinqa)">
+    <title>number turns short-circuit at the retriever and never reach the calculator</title></path>
+
+  <text class="cap" x="4" y="99">champion v2 · v3_1 refused by the gate · every turn traced</text>
+</svg>

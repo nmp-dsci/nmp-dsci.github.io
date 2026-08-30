@@ -1,0 +1,25 @@
+{%- comment -%}
+  The three-rung scale ladder, from _data/rubric.yml `rungs`. Shared by the home
+  page and any case study that wants to mark its own rung:
+      {% include scale-ladder.html highlight=page.production.rung %}
+  Dollar figures are labelled: measured at rung 10, order-of-magnitude estimates above it.
+{%- endcomment -%}
+{%- assign rungs = site.data.rubric.rungs -%}
+{%- if include.highlight -%}{%- assign hl = include.highlight | append: "" -%}{%- endif -%}
+{%- if rungs -%}
+<div class="ladder">
+  {%- for r in rungs -%}
+    {%- assign rk = r[0] | append: "" -%}
+    {%- assign rung = r[1] -%}
+    {%- assign rkd = rk | replace: "1000", "1,000" -%}
+  <div class="rung{% if hl and rk == hl %} is-here{% endif %}">
+    <span class="rung-n">rung {{ rkd }}{% if hl and rk == hl %} · this system{% endif %}</span>
+    <span class="rung-l">{{ rung.label }}</span>
+    <span class="rung-state">{{ rung.state }}{% if rung.tag %} · {{ rung.tag }}{% endif %}</span>
+    <span class="rung-cost">{{ rung.cost }}<em>{% if rung.state == "deployed" %}measured{% else %}estimate{% endif %}</em></span>
+    <span class="rung-reach">{{ rung.reach }}</span>
+  </div>
+  {%- endfor -%}
+</div>
+<p class="ladder-note">Rung 10 is what is deployed today and its cost is the measured demo bill. Rung 100's sizing is measured but not deployed; rung 1,000 is designed only. Both of those dollar ranges are order-of-magnitude estimates, and the visitor-per-month figures use a 1–2% concurrency rule of thumb. <a href="{{ '/practices/production-scale/' | relative_url }}">The full ladder →</a></p>
+{%- endif -%}

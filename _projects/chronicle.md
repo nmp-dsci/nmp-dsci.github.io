@@ -1,4 +1,6 @@
 ---
+published: false   # D4a — the site shows only the three production systems.
+                   # Content and media stay in git; nothing renders. Reversible.
 title: Chronicle
 summary: Earlier D3 data-viz work — interactive profile and trend explorers with compressed datafeeds, still live on this site.
 tags: [Data]
