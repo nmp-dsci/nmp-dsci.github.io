@@ -1,54 +1,56 @@
-<svg class="dia" viewBox="0 0 320 104" role="img"
+<svg class="dia" viewBox="0 0 360 160" role="img"
      aria-label="Transcript RAG retrieval structure: a question is optionally rewritten by HyDE or multi-query, retrieved in parallel by MiniLM semantic search and BM25 at thirty candidates each, fused by reciprocal rank, reranked by a local cross-encoder down to top-k, and answered by one of four paths — single-hop, recursive multi-hop, a LangGraph ReAct agent, or a GraphRAG router over Neo4j — with every configuration scored on recall@k, MRR, NDCG and a RAGAS or depth-v2 judge.">
   <defs>
-    <marker id="ar-transcript-rag" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+    <marker id="ar-transcript-rag" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
       <path d="M0,0 L8,4 L0,8 z" fill="currentColor"/>
     </marker>
   </defs>
 
-  <text class="cap" x="4" y="10">graded on recall@k · MRR · NDCG@10 · RAGAS + depth-v2 judge</text>
-
-  <g><title>the question a visitor asks of the 102-video corpus</title>
-    <rect class="nd" x="4" y="48" width="46" height="24" rx="6"/>
-    <text class="tx" x="27" y="63">question</text></g>
-
   <g><title>optional query-side transforms — HyDE writes the passage that would answer, multi-query fans out paraphrases; both cached per question so a sweep is free to repeat</title>
-    <rect class="nd ext" x="58" y="16" width="70" height="26" rx="6"/>
-    <text class="tx" x="93" y="28">HyDE</text>
-    <text class="tx s" x="93" y="39">multi-query</text></g>
-
-  <g><title>dense retrieval — MiniLM embeddings in ChromaDB, 30 candidates; a parallel contextualised collection is the index-side variant</title>
-    <rect class="nd" x="58" y="48" width="70" height="26" rx="6"/>
-    <text class="tx" x="93" y="60">semantic</text>
-    <text class="tx s" x="93" y="71">MiniLM · top-30</text></g>
-
-  <g><title>BM25 keyword retrieval, 30 candidates — recovers the exact figures, scheme names and dates that embeddings blur</title>
-    <rect class="nd" x="58" y="76" width="70" height="26" rx="6"/>
-    <text class="tx" x="93" y="88">BM25</text>
-    <text class="tx s" x="93" y="99">top-30</text></g>
-
-  <g><title>reciprocal-rank fusion (k=60) of the two rankings — the best config in the ablation on recall@10, MRR and NDCG@10</title>
-    <rect class="nd hi" x="136" y="58" width="38" height="28" rx="6"/>
-    <text class="tx" x="155" y="70">RRF</text>
-    <text class="tx s" x="155" y="81">fusion</text></g>
+    <rect class="nd ext" x="98" y="4" width="116" height="36" rx="8"/>
+    <text class="tx" x="156" y="19">HyDE</text>
+    <text class="tx s" x="156" y="34">multi-query</text></g>
 
   <g><title>local cross-encoder rerank to top-k — measured to help a bi-encoder ranking and hurt a fused one</title>
-    <rect class="nd hi" x="180" y="58" width="56" height="28" rx="6"/>
-    <text class="tx" x="208" y="70">rerank</text>
-    <text class="tx s" x="208" y="81">cross-encoder</text></g>
+    <rect class="nd hi" x="224" y="4" width="130" height="36" rx="8"/>
+    <text class="tx" x="289" y="19">rerank</text>
+    <text class="tx s" x="289" y="34">cross-encoder</text></g>
+
+  <g><title>the question a visitor asks of the 102-video corpus</title>
+    <rect class="nd" x="6" y="52" width="80" height="36" rx="8"/>
+    <text class="tx" x="46" y="74">question</text></g>
+
+  <g><title>dense retrieval — MiniLM embeddings in ChromaDB, 30 candidates; a parallel contextualised collection is the index-side variant</title>
+    <rect class="nd" x="98" y="52" width="116" height="36" rx="8"/>
+    <text class="tx" x="156" y="67">semantic</text>
+    <text class="tx s" x="156" y="82">MiniLM · top-30</text></g>
+
+  <g><title>reciprocal-rank fusion (k=60) of the two rankings — the best config in the ablation on recall@10, MRR and NDCG@10</title>
+    <rect class="nd hi" x="234" y="52" width="56" height="36" rx="8"/>
+    <text class="tx" x="262" y="67">RRF</text>
+    <text class="tx s" x="262" y="82">fusion</text></g>
+
+  <g><title>BM25 keyword retrieval, 30 candidates — recovers the exact figures, scheme names and dates that embeddings blur</title>
+    <rect class="nd" x="98" y="98" width="116" height="34" rx="8"/>
+    <text class="tx" x="156" y="112">BM25</text>
+    <text class="tx s" x="156" y="127">top-30</text></g>
 
   <g><title>four answer paths over the same retrieval — single-hop, recursive multi-hop, a LangGraph ReAct agent and a GraphRAG router over Neo4j — all returning timestamped citations</title>
-    <rect class="nd hi" x="242" y="48" width="74" height="48" rx="6"/>
-    <text class="tx" x="279" y="63">answer paths</text>
-    <text class="tx s" x="279" y="76">1-hop · recursive</text>
-    <text class="tx s" x="279" y="88">ReAct · GraphRAG</text></g>
+    <rect class="nd hi" x="224" y="98" width="130" height="50" rx="8"/>
+    <text class="tx" x="289" y="114">answer paths</text>
+    <text class="tx s" x="289" y="128">1-hop · recursive</text>
+    <text class="tx s" x="289" y="142">ReAct · GraphRAG</text></g>
 
-  <path class="ed" d="M50,61 L56,61" marker-end="url(#ar-transcript-rag)"/>
-  <path class="ed dash" d="M50,55 C54,44 54,34 56,30" marker-end="url(#ar-transcript-rag)"/>
-  <path class="ed dash" d="M93,42 L93,46" marker-end="url(#ar-transcript-rag)"/>
-  <path class="ed" d="M50,67 C54,78 54,84 56,88" marker-end="url(#ar-transcript-rag)"/>
-  <path class="ed" d="M128,63 C132,65 132,68 134,71" marker-end="url(#ar-transcript-rag)"/>
-  <path class="ed" d="M128,88 C132,86 132,79 134,76" marker-end="url(#ar-transcript-rag)"/>
-  <path class="ed" d="M174,72 L178,72" marker-end="url(#ar-transcript-rag)"/>
-  <path class="ed" d="M236,72 C239,70 239,66 240,64" marker-end="url(#ar-transcript-rag)"/>
+  <path class="ed" d="M86,70 H96" marker-end="url(#ar-transcript-rag)"/>
+  <path class="ed dash" d="M46,52 V30 Q46,24 52,24 H96" marker-end="url(#ar-transcript-rag)">
+    <title>the query-side transforms are optional and cached per question</title></path>
+  <path class="ed dash" d="M156,40 V50" marker-end="url(#ar-transcript-rag)"/>
+  <path class="ed" d="M46,88 V109 Q46,115 52,115 H96" marker-end="url(#ar-transcript-rag)"/>
+  <path class="ed" d="M214,70 H232" marker-end="url(#ar-transcript-rag)"/>
+  <path class="ed" d="M214,115 H218 Q224,115 224,109 V84 Q224,78 230,78 H232" marker-end="url(#ar-transcript-rag)"/>
+  <path class="ed" d="M262,52 V42" marker-end="url(#ar-transcript-rag)"/>
+  <path class="ed" d="M340,40 V96" marker-end="url(#ar-transcript-rag)"/>
+
+  <text class="cap" x="6" y="145">graded on recall@k · MRR</text>
+  <text class="cap" x="6" y="156">NDCG@10 · RAGAS + depth-v2 judge</text>
 </svg>

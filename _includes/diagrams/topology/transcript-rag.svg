@@ -1,45 +1,47 @@
-<svg class="dia" viewBox="0 0 320 100" role="img"
+<svg class="dia" viewBox="0 0 360 190" role="img"
      aria-label="Transcript RAG deploy topology: a visitor with no login reaches one App Runner instance of half a vCPU and one gigabyte, which answers every read route from a Chroma index and knowledge-graph snapshot baked into its own image; the deploy pulls that demo data from S3 into the image it pushes to ECR, which App Runner auto-deploys on the latest tag, and one CloudWatch alarm watches sustained 5xx.">
   <defs>
-    <marker id="tp-transcript-rag" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+    <marker id="tp-transcript-rag" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
       <path d="M0,0 L8,4 L0,8 z" fill="currentColor"/>
     </marker>
   </defs>
 
-  <g><title>visitor — no login, no account, no keys anywhere in the path</title>
-    <rect class="nd" x="4" y="44" width="48" height="26" rx="6"/>
-    <text class="tx" x="28" y="60">visitor</text></g>
-
   <g><title>S3 demo bucket — the non-git working data the deploy syncs in: the Chroma index, the exported knowledge-graph snapshot, themes and conflicts</title>
-    <rect class="nd" x="6" y="6" width="66" height="26" rx="6"/>
-    <text class="tx" x="39" y="18">S3 demo data</text>
-    <text class="tx s" x="39" y="28">index · graph</text></g>
+    <rect class="nd" x="6" y="24" width="112" height="44" rx="8"/>
+    <text class="tx" x="62" y="42">S3 demo data</text>
+    <text class="tx s" x="62" y="57">index · graph</text></g>
 
   <g><title>ECR — the linux/amd64 image with the corpus baked in; pushing :latest is the release step, App Runner auto-deploys it, and a 5-image lifecycle policy is the rollback window</title>
-    <rect class="nd" x="92" y="6" width="66" height="26" rx="6"/>
-    <text class="tx" x="125" y="18">ECR :latest</text>
-    <text class="tx s" x="125" y="28">auto-deploy</text></g>
-
-  <g><title>App Runner — one instance, demo mode baked into the image, no VPC, no database, no provider keys; every non-GET is refused with 403</title>
-    <rect class="nd hi" x="76" y="44" width="76" height="30" rx="6"/>
-    <text class="tx" x="114" y="56">App Runner ×1</text>
-    <text class="tx s" x="114" y="67">0.5 vCPU · 1 GB</text></g>
-
-  <g><title>state — the Chroma chunk index and the graph snapshot ship inside the container, so the running service is read-only by construction; 539 MiB RSS measured at rest</title>
-    <rect class="nd hi" x="176" y="44" width="76" height="30" rx="6"/>
-    <text class="tx" x="214" y="56">baked-in index</text>
-    <text class="tx s" x="214" y="67">2,827 chunks</text></g>
+    <rect class="nd" x="134" y="24" width="102" height="44" rx="8"/>
+    <text class="tx" x="185" y="42">ECR :latest</text>
+    <text class="tx s" x="185" y="57">auto-deploy</text></g>
 
   <g><title>CloudWatch — one alarm on sustained 5xx, the single failure mode worth waking up for on a portfolio demo</title>
-    <rect class="nd" x="252" y="6" width="64" height="26" rx="6"/>
-    <text class="tx" x="284" y="18">CloudWatch</text>
-    <text class="tx s" x="284" y="28">5xx alarm</text></g>
+    <rect class="nd" x="252" y="24" width="94" height="44" rx="8"/>
+    <text class="tx" x="299" y="42">CloudWatch</text>
+    <text class="tx s" x="299" y="57">5xx alarm</text></g>
 
-  <path class="ed" d="M52,57 L74,57" marker-end="url(#tp-transcript-rag)"/>
-  <path class="ed" d="M72,19 L90,19" marker-end="url(#tp-transcript-rag)"/>
-  <path class="ed" d="M125,32 L125,42" marker-end="url(#tp-transcript-rag)"/>
-  <path class="ed" d="M152,59 L174,59" marker-end="url(#tp-transcript-rag)"/>
-  <path class="ed dash" d="M152,50 C190,40 220,27 250,20" marker-end="url(#tp-transcript-rag)"/>
+  <g><title>visitor — no login, no account, no keys anywhere in the path</title>
+    <rect class="nd" x="6" y="100" width="72" height="48" rx="8"/>
+    <text class="tx" x="42" y="128">visitor</text></g>
 
-  <text class="cap" x="6" y="92">ap-southeast-2 · Terraform · demo: no keys, no inference</text>
+  <g><title>App Runner — one instance, demo mode baked into the image, no VPC, no database, no provider keys; every non-GET is refused with 403</title>
+    <rect class="nd hi" x="93" y="100" width="120" height="48" rx="8"/>
+    <text class="tx" x="153" y="120">App Runner ×1</text>
+    <text class="tx s" x="153" y="135">0.5 vCPU · 1 GB</text></g>
+
+  <g><title>state — the Chroma chunk index and the graph snapshot ship inside the container, so the running service is read-only by construction; 539 MiB RSS measured at rest</title>
+    <rect class="nd hi" x="228" y="100" width="126" height="48" rx="8"/>
+    <text class="tx" x="291" y="120">baked-in index</text>
+    <text class="tx s" x="291" y="135">2,827 chunks</text></g>
+
+  <path class="ed" d="M118,46 H132" marker-end="url(#tp-transcript-rag)"/>
+  <path class="ed" d="M185,68 V98" marker-end="url(#tp-transcript-rag)"/>
+  <path class="ed" d="M78,124 H91" marker-end="url(#tp-transcript-rag)"/>
+  <path class="ed" d="M213,124 H226" marker-end="url(#tp-transcript-rag)"/>
+  <path class="ed dash" d="M205,100 V86 Q205,80 211,80 H293 Q299,80 299,74 V70" marker-end="url(#tp-transcript-rag)">
+    <title>the service publishes its 5xx count to the alarm</title></path>
+
+  <text class="cap" x="6" y="170">ap-southeast-2 · Terraform</text>
+  <text class="cap" x="6" y="183">demo: no keys, no inference</text>
 </svg>

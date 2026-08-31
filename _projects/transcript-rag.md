@@ -7,6 +7,29 @@ summary: >-
 tldr: >-
   RAG matches full-transcript answers at 6.1× fewer tokens — measured on a chunk-labelled
   golden set with an 8-config retrieval ablation and a CI gate that re-scores every committed run.
+headline: "Retrieval you can prove, at 6.1× fewer tokens"
+outcome: >-
+  A RAG workbench over 102 transcripts where eight retrieval configurations are raced on a
+  chunk-labelled golden set, and CI re-scores every committed run.
+proof_line: >-
+  RAG answers match full-transcript prompting at 0.93 similarity while spending 2,997 prompt
+  tokens against 18,295 — 6.1× fewer.
+sections:
+  - n: 1
+    summary: "Which retrieval configuration ranks the evidence best is an empirical question, so the workbench answers it with a golden set rather than by feel."
+  - n: 2
+    summary: "Retrieve wide, rerank narrow: fuse by rank rather than score, then hand the same chunks to four answer paths that return the same shape."
+  - n: 3
+    summary: "Chunk-level labels are what reference-free metrics cannot give you, and they show the plain hybrid baseline still beating every clever addition."
+  - n: 4
+    summary: "The service is read-only by construction — no keys, no database, the index baked into the image — rather than by policy."
+  - n: 5
+    summary: "Denying by HTTP method rather than by route list refuses a new endpoint before anyone remembers to add it to a list."
+  - n: 6
+    summary: "Cost is the finding: more agency spends more tokens, and whether it buys anything depends entirely on which rubric scores it."
+  - n: 7
+    summary: "Five of nine dimensions shipped; the judge, loop, guardrails and scale gaps are named with their reasons rather than rounded up."
+
 tags: [RAG]
 metric: "6.1×"
 metric_label: "fewer tokens at 0.93 answer parity"
@@ -37,9 +60,11 @@ media:
   walkthrough: /assets/video/transcript-rag/walkthrough.mp4
   poster: ""
   captions: /assets/video/transcript-rag/walkthrough.vtt
-  reel: planned
+  reel: ""
 
 architecture:
+  takeaway: >-
+    Retrieval is a pipeline of interchangeable parts — which is the only reason eight configurations can be compared at all.
   diagram: "diagrams/agent/transcript-rag.svg"
   caption: "question → HyDE / multi-query → semantic + BM25 top-30 → RRF fusion → cross-encoder rerank → one of four answer paths, all graded on the same golden set"
 
@@ -171,28 +196,39 @@ production:
 Anyone building RAG has to answer a question the demos skip: *which* retrieval
 configuration ranks the evidence best, and how would you know? transcript·lab is
 the workbench built to answer it. It indexes a real corpus — 102 YouTube videos,
-2,827 chunks, 61 channels — and treats retrieval as an experiment with a golden
-set, IR metrics, an ablation harness and a CI gate, rather than a setting you
-tune by feel. The benefit in one number: RAG answers match full-transcript
-prompting at **0.93 similarity for 6.1× fewer tokens**.
+2,827 chunks, 61 channels — and treats retrieval as an experiment rather than a
+setting you tune by feel:
+
+- a golden set whose questions carry chunk-level labels;
+- IR metrics scored from chunk ids alone, with no LLM in the loop;
+- an eight-configuration ablation harness over those same questions;
+- a CI gate that re-scores every committed run.
+
+The benefit in one number: RAG answers match full-transcript prompting at
+**0.93 similarity for 6.1× fewer tokens**.
 
 The live deployment is that same app in demo mode: read-only, keyless, no
 inference. That is a decision, not a limitation — a no-login public app with a
 live LLM behind it has an unbounded abuse bill, and the interesting surface here
-is the evidence, not the chat box. So you can browse the corpus tree, run the
-Retrieval Lab (semantic, BM25 and graph ranked side by side for any query), open
-the chunk-similarity graph and a 2,000-entity knowledge-graph snapshot, read the
-30 cross-video Themes and the 7 Disagreements, rank engines on the Scoreboard
-over committed matrix runs, and read 66 recorded conversations with the execution
-trace under each answer. There is no composer and no ingestion: every write is a
-403.
+is the evidence, not the chat box.
+
+So the demo serves the evidence and nothing that writes:
+
+- the corpus tree;
+- the Retrieval Lab — semantic, BM25 and graph ranked side by side for any query;
+- the chunk-similarity graph and a 2,000-entity knowledge-graph snapshot;
+- 30 cross-video Themes and 7 Disagreements;
+- the Scoreboard, ranking engines over committed matrix runs;
+- 66 recorded conversations, each answer carrying its own execution trace.
+
+There is no composer and no ingestion: every write is a 403.
 
 [Open the demo ↗](https://iibze7vuqr.ap-southeast-2.awsapprunner.com) ·
 [repo ↗](https://github.com/nmp-dsci/transcript-rag-agent)
 
 <figure class="evidence">
   <img src="/assets/img/transcript-rag/demo-chat.png" alt="A recorded answer in the demo: single-hop RAG answer with timestamped citations, a token and latency strip, and a footer saying new questions are disabled" loading="lazy">
-  <figcaption>Demo replay — a real judged conversation, with its token count, chunk count, LLM calls and latency on the answer. Asking new questions is disabled on this deployment.</figcaption>
+  <figcaption><strong>Every answer here is a replay of a judged run, not a live call.</strong> The token count, chunk count, LLM calls and latency come from the stored trace; asking new questions is disabled on this deployment. Source: <code>src/chat/history.py</code>, <code>src/agents/models.py</code>, <code>src/api/main.py</code>.</figcaption>
 </figure>
 
 ## 2 · Agent architecture
@@ -205,25 +241,30 @@ and written to ChromaDB. A parallel collection holds the same chunks embedded
 with an LLM-written situating sentence — Anthropic-style contextual retrieval as
 an index-side variant you can ablate against.
 
-Query time is where the lab lives. A question is optionally rewritten (HyDE
-writes the passage that would answer it; multi-query fans out paraphrases — both
-cached per question, so a sweep is reproducible and free to repeat). Semantic and
-BM25 each return 30 candidates; reciprocal-rank fusion merges them by rank rather
-than score, because cosine distance and Okapi BM25 are not on comparable scales.
-A local cross-encoder then reorders the survivors down to top-k. Retrieve wide,
-rerank narrow.
+Query time is where the lab lives. A question is optionally rewritten: HyDE
+writes the passage that would answer it, and multi-query fans out paraphrases.
+Both are cached per question, so a sweep is reproducible and free to repeat.
+
+Semantic and BM25 each return 30 candidates; reciprocal-rank fusion merges them
+by rank rather than score, because cosine distance and Okapi BM25 are not on
+comparable scales. A local cross-encoder then reorders the survivors down to
+top-k. Retrieve wide, rerank narrow.
 
 Four answer paths consume that same retrieval and return the same typed answer
-shape, so they are directly comparable: single-hop, recursive multi-hop that acts
-on its own proposed subtopics, a LangGraph ReAct agent that chooses its own
-retrieval calls, and a GraphRAG agent that routes a question to `local`, `global`
-or `temporal` and answers over a Neo4j entity/claim graph with Leiden communities
-and pre-built summaries. DeepSeek flash is the only remote dependency; embeddings
-and reranking are local.
+shape, so they are directly comparable:
+
+- **single-hop**;
+- **recursive multi-hop**, which acts on its own proposed subtopics;
+- **a LangGraph ReAct agent**, which chooses its own retrieval calls;
+- **a GraphRAG agent**, which routes a question to `local`, `global` or `temporal` and
+  answers over a Neo4j entity/claim graph with Leiden communities and pre-built
+  summaries.
+
+DeepSeek flash is the only remote dependency; embeddings and reranking are local.
 
 <figure class="evidence">
   <img src="/assets/img/transcript-rag/architecture.svg" alt="Pipeline architecture: ingestion, chunking and embeddings into ChromaDB, then query-time retrieval with recursive fan-out" loading="lazy">
-  <figcaption>The pipeline in full — ingestion, indexing, and query-time retrieval with recursive fan-out</figcaption>
+  <figcaption><strong>Retrieve wide, rerank narrow.</strong> Ingestion chunks and embeds locally; query time fans out, fuses two rankings by rank, then cuts to top-k before any model sees the evidence. Source: <code>src/rag/contextualize.py</code>, <code>src/rag/fusion.py</code>, <code>src/rag/rerank.py</code>.</figcaption>
 </figure>
 
 ## 3 · Agent loop & evaluation
@@ -235,25 +276,39 @@ actually cites — not from reference JSON the model was trusted to emit.
 The eval loop underneath is the point of the project. Twenty golden questions
 carry chunk-level labels — which specific `chunk:<video>:<index>` a good
 retriever must surface — because that is exactly what reference-free metrics
-cannot give you. Eight configurations sweep those questions and the honest
-finding is that plain hybrid fusion still wins on recall@10, MRR and NDCG@10.
-The cross-encoder helps a bi-encoder ranking (+0.058 recall@3) and *hurts* a
-fused one (−0.061 recall@10), because fusion already did that reordering with a
-second retriever's opinion. HyDE has the best recall@1 and the worst
-`video_recall`: a precision instrument with a hallucination failure mode.
+cannot give you.
+
+Eight configurations sweep those questions, and the honest finding is that plain
+hybrid fusion still wins on recall@10, MRR and NDCG@10:
+
+| Configuration | Where it acts | What the sweep found |
+|---|---|---|
+| Semantic only | retrieval | the floor hybrid has to beat at recall@3, which CI checks on every run |
+| Hybrid fusion — RRF over BM25 + semantic | retrieval | wins recall@10, MRR and NDCG@10: the plain baseline is still the best ranker |
+| Cross-encoder rerank over a bi-encoder ranking | post-retrieval | it helps: +0.058 recall@3 |
+| Cross-encoder rerank over a fused ranking | post-retrieval | it hurts: −0.061 recall@10, because fusion had already done that reordering with a second retriever's opinion |
+| HyDE | query side | best recall@1 and worst `video_recall`: a precision instrument with a hallucination failure mode |
+| Multi-query | query side | — |
+| Contextual retrieval | index side | — |
+
+The per-configuration numbers behind those cells are committed as run snapshots
+under `evals/runs/`, so a reviewer opens the exact figures rather than a summary
+of them.
 
 Answers are graded by RAGAS plus a `depth-v2` rubric weighting grounding 40% /
-depth 60%, capped hard when faithfulness falls below 0.6. The workbench refuses
-to flatter itself: the run the live Scoreboard ranks was judged by the model that
-wrote the answers, and says so in a banner, beside a note that its corpus digest
-(71 videos) is not the corpus in the header. A CI job re-scores every committed
-snapshot from its stored chunk ids and fails on a floor breach or a golden-set
-edit that silently invalidates a run — deterministic, no corpus, no API key.
-[The eval loop →](/practices/eval-loop/)
+depth 60%, capped hard when faithfulness falls below 0.6.
+
+The workbench refuses to flatter itself: the run the live Scoreboard ranks was
+judged by the model that wrote the answers, and says so in a banner, beside a
+note that its corpus digest (71 videos) is not the corpus in the header.
+
+A CI job re-scores every committed snapshot from its stored chunk ids and fails
+on a floor breach or a golden-set edit that silently invalidates a run —
+deterministic, no corpus, no API key. [The eval loop →](/practices/eval-loop/)
 
 <figure class="evidence">
   <img src="/assets/img/transcript-rag/demo-scoreboard.png" alt="The Scoreboard on the live demo: 20 of 20 questions judged under the RAGAS rubric, an efficiency panel ranking composite per 1k tokens, and warning banners about self-grading and a corpus mismatch" loading="lazy">
-  <figcaption>The Scoreboard over a committed matrix run — 20/20 judged, composite per 1k tokens, and two warnings the app raises against its own numbers: self-graded, and scored on a smaller corpus than the header reports</figcaption>
+  <figcaption><strong>The Scoreboard argues against its own numbers.</strong> 20 of 20 questions judged and ranked by composite per 1k tokens, under two warnings it raises itself: the run is self-graded, and it was scored on a smaller corpus (71 videos) than the header reports. Source: <code>frontend/src/scoreboard/</code>, <code>evals/runs/matrix-20260809-071818-depth-v2.json</code>.</figcaption>
 </figure>
 
 ## 4 · Deployed architecture
@@ -262,20 +317,28 @@ edit that silently invalidates a run — deterministic, no corpus, no API key.
 
 One App Runner service in `ap-southeast-2`, 0.5 vCPU / 1 GB, no VPC, no database
 and no Secrets Manager — the container holds no provider keys because it never
-calls one. Everything the read routes serve is baked into the image: the React
-bundle, the Chroma index, the committed eval runs, the chat history and the
-exported knowledge-graph snapshot that stands in for a live Neo4j. That is what
-makes the running service read-only by construction rather than by policy.
+calls one.
+
+Everything the read routes serve is baked into the image: the React bundle, the
+Chroma index, the committed eval runs, the chat history and the exported
+knowledge-graph snapshot that stands in for a live Neo4j. That is what makes the
+running service read-only by construction rather than by policy.
 
 Merging to `main` is the deploy. Over GitHub OIDC with no stored AWS keys, the
 workflow syncs the non-git demo data from S3, builds and pushes the linux/amd64
 image to ECR — pushing `:latest` is the release step, since App Runner
 auto-deploys it — reconciles Terraform, polls until the service reports
-`RUNNING`, then smoke-tests the live URL. The smoke test fails the deploy unless
-health reports `mode: demo`, the corpus is non-empty, `POST /api/ask` returns 403
-with the demo refusal body, and the shell renders. An ECR lifecycle policy keeps
-the last five images, which is the rollback window; a CloudWatch alarm on
-sustained 5xx is the one page-worthy failure.
+`RUNNING`, then smoke-tests the live URL.
+
+The smoke test fails the deploy unless all four hold:
+
+- health reports `mode: demo`;
+- the corpus is non-empty;
+- `POST /api/ask` returns 403 with the demo refusal body;
+- the React shell renders.
+
+An ECR lifecycle policy keeps the last five images, which is the rollback window;
+a CloudWatch alarm on sustained 5xx is the one page-worthy failure.
 
 Sizing is measured, not assumed: 539 MiB RSS at rest with the corpus loaded, so
 1 GB is the honest floor and 0.5 GB would OOM on the first burst. This is rung 10
@@ -285,11 +348,15 @@ and nothing has been load-tested. [See the scale ladder →](/practices/producti
 
 The demo gate is deny-by-default on *method*, not a hand-kept route list: every
 non-GET returns `403 {"detail":"demo"}`, which covers ask, judge, index, eval and
-any POST added later without that file being touched. Two carve-outs are written
-down where they live — `POST /api/chunk-graph` builds a layout from stored
-vectors alone and is allowed (while still refusing the query overlay, which would
-load the embedding stack), and the two GETs that *do* work rather than read, the
-matrix and ingestion streams, are refused despite being GETs.
+any POST added later without that file being touched.
+
+Two carve-outs are written down where they live:
+
+- `POST /api/chunk-graph` builds a layout from stored vectors alone and is
+  allowed, while still refusing the query overlay, which would load the
+  embedding stack;
+- the matrix and ingestion streams are refused despite being GETs, because they
+  do work rather than read.
 
 The speech-to-text WebSocket is a separate boundary because HTTP middleware never
 sees a WebSocket handshake, so the refusal lives in the route: accept, then close
@@ -299,9 +366,15 @@ client cap sits inside a 120s server cap.
 Document review — the one feature that fetches something the user supplied — runs
 behind SSRF guards that re-check scheme, credentials, port and address before
 *every* redirect hop, and reject a host if any DNS answer is private, loopback or
-link-local. Analytics needs three gates open at once: the server saying demo, a
-key baked in at build, and init not already run; there is no autocapture and no
-session recording.
+link-local.
+
+Analytics needs three gates open at once:
+
+- the server saying `demo`;
+- a key baked in at build time;
+- init not already run.
+
+There is no autocapture and no session recording.
 
 What this is not: a multi-tenant application. There is no per-user auth and no
 data isolation, because there is one corpus and it is public in the repo. That is
@@ -309,29 +382,41 @@ scope, not a control, and it is the first thing that would have to change.
 
 ## 6 · Observability & cost
 
-Every answer carries its own trace — route decision, each retrieval and rerank
-stage with the chunk ids it kept, the query it actually searched for (a follow-up
-is rewritten, and a trace that hides that cannot show you the corpus was searched
-for the wrong thing), and every LLM call with its model and elapsed time. Steps
-report only what the code measured: an empty chunk list means "not measured",
-never a guess. It is stored with the history entry, so it survives a reload and
-is readable on the live demo. MLflow instruments the CLI; the server never opens
-a run.
+Every answer carries its own trace, built only from what the code measured:
+
+- the route decision;
+- each retrieval and rerank stage, with the chunk ids it kept;
+- the query it actually searched for — a follow-up is rewritten, and a trace that
+  hides that cannot show you the corpus was searched for the wrong thing;
+- every LLM call, with its model and elapsed time.
+
+An empty chunk list means "not measured", never a guess. The trace is stored with
+the history entry rather than session state, so it survives a reload and is
+readable on the live demo. MLflow instruments the CLI; the server never opens a
+run.
 
 Cost is the finding, not a footnote. Against full-transcript prompting the same
 question costs 2,997 prompt tokens instead of 18,295 — 6.1× — at 0.93 answer
-similarity. Recursive multi-hop costs ~10.4k for a *lower* composite. The ReAct
-agent costs ~24.5k, and what it buys depends entirely on the rubric: under
-grounding-only RAGAS it scores below single-hop, and only under `depth-v2` does
-it come out clearly ahead. That is a real finding about agency and also a warning
-about single-metric leaderboards, which is why the default ships single-hop.
+similarity. Agency costs more than that, and what it buys depends entirely on the
+rubric it is scored under:
+
+| Answer path | Prompt tokens | What that spend returns |
+|---|---|---|
+| Full-transcript prompting | 18,295 | the baseline the others are compared against |
+| Single-hop RAG | 2,997 | 0.93 similarity to that baseline at 6.1× fewer tokens — the shipped default |
+| Recursive multi-hop | ~10.4k | a *lower* composite than single-hop |
+| ReAct agent | ~24.5k | below single-hop under grounding-only RAGAS; clearly ahead only under `depth-v2` |
+
+That is a real finding about agency and also a warning about single-metric
+leaderboards, which is why the default ships single-hop.
+
 Embeddings and reranking are local, so the ablation is free to repeat; the demo
 performs no inference at all, leaving a fixed ~$8–12/month App Runner bill as the
 worst case.
 
 <figure class="evidence">
   <div class="dash-embed"><iframe src="/assets/dash/transcript-rag/comparison.html" loading="lazy" title="Retrieval strategy comparison dashboard"></iframe></div>
-  <figcaption>Single-hop vs recursive vs agentic on one question — the committed comparison, with each path's token cost · <a href="/assets/dash/transcript-rag/comparison.html" target="_blank" rel="noopener">open full-screen ↗</a></figcaption>
+  <figcaption><strong>More agency costs more tokens and does not buy grounding.</strong> Single-hop, recursive and agentic on one question, each carrying its own token cost. Source: <code>evals/runs/</code>, <code>dashboard/evaluation.json</code> · <a href="/assets/dash/transcript-rag/comparison.html" target="_blank" rel="noopener">open full-screen ↗</a></figcaption>
 </figure>
 
 ## 7 · Production readiness scorecard

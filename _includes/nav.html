@@ -1,29 +1,74 @@
-<header class="nav">
+{%- comment -%}
+  Logo left, links right, utility cluster last. Three destinations only — the
+  profile links live in the footer, where a hiring manager looks for them, so
+  the nav stays one line at every width. Under 820px it collapses to a sheet.
+{%- endcomment -%}
+<header class="nav" id="nav">
   <div class="nav-inner">
-    <a class="brand" href="{{ '/' | relative_url }}" aria-label="{{ site.data.site.name }} — home">
-      <span class="wordmark">nathan<span class="cursor" aria-hidden="true"></span>phillips</span>
-      <span class="brand-role">// applied-ai</span>
+    <a class="brand" href="{{ '/' | relative_url }}">
+      <b>{{ site.data.site.name | downcase | replace: " ", "" }}</b>
+      <span>{{ site.data.site.role | downcase }}</span>
     </a>
-    <nav class="nav-links">
+
+    <button class="icon-btn nav-toggle" id="nav-toggle" type="button"
+            aria-expanded="false" aria-controls="nav-links" aria-label="Open menu">≡</button>
+
+    <nav class="nav-links" id="nav-links" aria-label="Primary">
       <a href="{{ '/#work' | relative_url }}">Work</a>
+      <a href="{{ '/#rubric' | relative_url }}">Rubric</a>
       <a href="{{ '/#practices' | relative_url }}">Practices</a>
       <a href="{{ '/about/' | relative_url }}">About</a>
-      <a href="{{ site.data.site.github }}" target="_blank" rel="noopener">GitHub</a>
-      {% if site.data.site.linkedin != "" %}<a href="{{ site.data.site.linkedin }}" target="_blank" rel="noopener">LinkedIn</a>{% endif %}
-      <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Toggle dark mode">☾</button>
     </nav>
+
+    <div class="nav-util">
+      <a class="icon-btn" href="{{ site.data.site.github }}" target="_blank" rel="noopener"
+         title="GitHub" aria-label="GitHub profile">gh</a>
+      {%- if site.data.site.linkedin != "" %}
+      <a class="icon-btn" href="{{ site.data.site.linkedin }}" target="_blank" rel="noopener"
+         title="LinkedIn" aria-label="LinkedIn profile">in</a>
+      {%- endif %}
+      <button class="icon-btn" id="theme-toggle" type="button"
+              aria-label="Colour theme: following system">◐</button>
+    </div>
   </div>
 </header>
 <script>
   (function(){
-    var b=document.getElementById('theme-toggle'),r=document.documentElement;
-    function paint(){b.textContent=r.getAttribute('data-theme')==='dark'?'☀':'☾'}
-    b.addEventListener('click',function(){
-      var next=r.getAttribute('data-theme')==='dark'?'light':'dark';
-      r.setAttribute('data-theme',next);
-      try{localStorage.setItem('theme',next)}catch(e){}
+    var root = document.documentElement;
+    var btn  = document.getElementById('theme-toggle');
+    var nav  = document.getElementById('nav');
+    var tgl  = document.getElementById('nav-toggle');
+
+    /* Three states, in this order: system → light → dark. "System" stores
+       nothing, so a visitor who never touches this follows their OS forever. */
+    function state(){
+      var t = root.getAttribute('data-theme');
+      return (t === 'light' || t === 'dark') ? t : 'system';
+    }
+    function paint(){
+      var s = state();
+      btn.textContent = s === 'light' ? '☀' : s === 'dark' ? '☾' : '◐';
+      btn.setAttribute('aria-label', 'Colour theme: ' +
+        (s === 'system' ? 'following system' : s) + '. Click to change.');
+    }
+    btn.addEventListener('click', function(){
+      var next = { system:'light', light:'dark', dark:'system' }[state()];
+      try{
+        if (next === 'system'){ localStorage.removeItem('theme'); root.removeAttribute('data-theme'); }
+        else { localStorage.setItem('theme', next); root.setAttribute('data-theme', next); }
+      }catch(e){
+        if (next === 'system') root.removeAttribute('data-theme');
+        else root.setAttribute('data-theme', next);
+      }
       paint();
     });
     paint();
+
+    tgl.addEventListener('click', function(){
+      var open = nav.getAttribute('data-open') === 'true';
+      nav.setAttribute('data-open', String(!open));
+      tgl.setAttribute('aria-expanded', String(!open));
+      tgl.setAttribute('aria-label', open ? 'Open menu' : 'Close menu');
+    });
   })();
 </script>

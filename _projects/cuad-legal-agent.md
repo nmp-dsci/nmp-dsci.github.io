@@ -25,7 +25,7 @@ skills_detail:
 links:
   repo: https://github.com/nmp-dsci/CUAD-agent
 media:
-  reel: planned
+  reel: ""
 ---
 
 ## Architecture

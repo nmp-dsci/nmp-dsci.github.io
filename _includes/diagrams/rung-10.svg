@@ -1,46 +1,48 @@
-<svg class="dia" viewBox="0 0 340 170" role="img"
+<svg class="dia" viewBox="0 0 340 200" role="img"
      aria-label="Rung 10, deployed today: visitors reach CloudFront for the single-page app or one App Runner instance per service; that instance holds sessions and rate limits in its own process memory and reads an Aurora Serverless v2 database that pauses when idle, while the language model is never called because chat answers are replayed from a recorded pack.">
   <defs>
-    <marker id="rg10" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+    <marker id="rg10" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
       <path d="M0,0 L8,4 L0,8 z" fill="currentColor"/>
     </marker>
   </defs>
 
-  <g><title>visitors — no login on any of the three demos, so every arrival is anonymous</title>
-    <rect class="nd" x="8" y="64" width="68" height="36" rx="6"/>
-    <text class="tx" x="42" y="79">visitors</text>
-    <text class="tx s" x="42" y="91">10–20</text></g>
-
   <g><title>CloudFront — the static React bundle, Data Pilot only; the other two serve their UI from the same container as the API</title>
-    <rect class="nd" x="102" y="18" width="98" height="34" rx="6"/>
-    <text class="tx" x="151" y="32">CloudFront</text>
-    <text class="tx s" x="151" y="44">static SPA</text></g>
+    <rect class="nd" x="102" y="10" width="118" height="42" rx="8"/>
+    <text class="tx" x="161" y="27">CloudFront</text>
+    <text class="tx s" x="161" y="42">static SPA</text></g>
+
+  <g><title>visitors — no login on any of the three demos, so every arrival is anonymous</title>
+    <rect class="nd" x="6" y="70" width="80" height="48" rx="8"/>
+    <text class="tx" x="46" y="90">visitors</text>
+    <text class="tx s" x="46" y="105">10–20</text></g>
 
   <g><title>App Runner — front door and compute in one managed service, pinned to a single instance per service (min_size = max_size = 1, max_concurrency 100)</title>
-    <rect class="nd hi" x="102" y="64" width="98" height="40" rx="6"/>
-    <text class="tx" x="151" y="81">App Runner ×1</text>
-    <text class="tx s" x="151" y="93">min = max = 1</text></g>
+    <rect class="nd hi" x="102" y="70" width="118" height="48" rx="8"/>
+    <text class="tx" x="161" y="90">App Runner ×1</text>
+    <text class="tx s" x="161" y="105">min = max = 1</text></g>
 
   <g><title>Aurora Serverless v2 — 0 to 1 ACU, so it pauses when idle; the first visitor after a pause waits about 30 seconds, narrated in the UI. Data Pilot only.</title>
-    <rect class="nd hi" x="224" y="64" width="106" height="40" rx="6"/>
-    <text class="tx" x="277" y="81">Aurora v2</text>
-    <text class="tx s" x="277" y="93">0 → 1 ACU · pauses</text></g>
+    <rect class="nd hi" x="236" y="70" width="98" height="48" rx="8"/>
+    <text class="tx" x="285" y="85">Aurora v2</text>
+    <text class="tx s" x="285" y="99">0 → 1 ACU</text>
+    <text class="tx s" x="285" y="113">pauses</text></g>
 
   <g><title>session and rate-limit state — kept in process memory, which is correct at exactly one instance and is the named seam beyond it</title>
-    <rect class="nd" x="102" y="116" width="98" height="34" rx="6"/>
-    <text class="tx" x="151" y="130">session state</text>
-    <text class="tx s" x="151" y="142">in process</text></g>
+    <rect class="nd" x="102" y="134" width="118" height="42" rx="8"/>
+    <text class="tx" x="161" y="151">session state</text>
+    <text class="tx s" x="161" y="166">in process</text></g>
 
   <g><title>the language model — not called on the public URL; chat replays recorded runs, so the worst-case bill is a fixed ceiling instead of an unbounded one</title>
-    <rect class="nd ext" x="224" y="116" width="106" height="34" rx="6"/>
-    <text class="tx" x="277" y="130">LLM</text>
-    <text class="tx s" x="277" y="142">replayed · $0</text></g>
+    <rect class="nd ext" x="236" y="134" width="98" height="42" rx="8"/>
+    <text class="tx" x="285" y="151">LLM</text>
+    <text class="tx s" x="285" y="166">replayed · $0</text></g>
 
-  <path class="ed" d="M76,84 L100,84" marker-end="url(#rg10)"/>
-  <path class="ed" d="M76,74 C86,52 92,41 100,37" marker-end="url(#rg10)"/>
-  <path class="ed" d="M200,84 L222,84" marker-end="url(#rg10)"/>
-  <path class="ed" d="M151,104 L151,114" marker-end="url(#rg10)"/>
-  <path class="ed dash" d="M200,96 C210,110 214,124 222,131" marker-end="url(#rg10)"/>
+  <path class="ed" d="M86,94 H100" marker-end="url(#rg10)"/>
+  <path class="ed" d="M46,70 V37 Q46,31 52,31 H100" marker-end="url(#rg10)"/>
+  <path class="ed" d="M220,94 H234" marker-end="url(#rg10)"/>
+  <path class="ed" d="M161,118 V132" marker-end="url(#rg10)"/>
+  <path class="ed dash" d="M192,118 V122 Q192,128 198,128 H279 Q285,128 285,132" marker-end="url(#rg10)">
+    <title>the model is not called on the public URL — chat is replayed</title></path>
 
-  <text class="cap" x="6" y="163">deployed today · ~$5–18 / month per app</text>
+  <text class="cap" x="6" y="192">deployed today · ~$5–18 / month per app</text>
 </svg>

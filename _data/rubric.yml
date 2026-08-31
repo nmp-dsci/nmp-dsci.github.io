@@ -111,7 +111,7 @@ statuses:
   na:
     glyph: "—"
     label: "n/a"
-    blurb: "not needed by design (say why)"
+    blurb: "not needed by design"
     needs_reason: true
 
 # The scale ladder — shared across all three systems, detailed in

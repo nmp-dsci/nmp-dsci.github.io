@@ -1,15 +1,17 @@
 {%- comment -%}
-Deploy-topology figure. Rendered by the case-study Markdown, directly under
-"## 4 · Deployed architecture" — never on the home card. Inlined, theme-aware.
-Caption carries the one-line topology plus the region and the measured demo cost.
+  The deployed-topology figure inside a case study (§4).
 {%- endcomment -%}
-{%- assign dgm  = page.production.topology_diagram | default: "" | strip -%}
-{%- assign topo = page.production.topology         | default: "" | strip -%}
-{%- assign rgn  = page.production.region           | default: "" | strip -%}
-{%- assign cost = page.production.cost             | default: "" | strip -%}
-{%- if dgm != "" -%}
-<figure class="fig fig-topology">
-<div class="dia-frame">{% include {{ page.production.topology_diagram }} %}</div>
-<figcaption><b>Deploy topology</b>{% if topo != "" %} — {{ topo }}{% endif %}{% if rgn != "" %} · {{ rgn }}{% endif %}{% if cost != "" %} · {{ cost }}, measured in demo mode{% endif %}.</figcaption>
+{%- assign dgm = page.production.topology_diagram | default: "" | strip -%}
+{%- assign topo = page.production.topology | default: "" | strip -%}
+{%- assign reg = page.production.region | default: "" | strip -%}
+{%- assign cost = page.production.cost | default: "" | strip -%}
+{%- if dgm != "" %}
+<figure class="fig">
+  <div class="dia-frame">{% include {{ page.production.topology_diagram }} %}</div>
+  <figcaption><b>What is actually deployed.</b>
+    {%- if topo != "" %} {{ topo }}.{% endif %}
+    {%- if reg != "" %} Region {{ reg }}.{% endif %}
+    {%- if cost != "" %} Measured cost {{ cost }}.{% endif %}
+    Everything on the public URL runs in demo mode — read-only, no keys, no inference.</figcaption>
 </figure>
-{%- endif -%}
+{%- endif %}

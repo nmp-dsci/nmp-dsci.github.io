@@ -1,0 +1,133 @@
+/* ============================================================================
+   nmp-dsci.github.io — design tokens
+   The single source of truth for colour, type, space, shape and motion.
+   Nothing else in the stylesheet may declare a raw hex, px size or duration.
+
+   Light is the reference palette; dark redefines colour only. The theme follows
+   the operating system unless the visitor picks one, so both must be complete.
+
+   Every text/surface pair that has to be legible is declared in the @contrast
+   lines at the bottom and verified in CI by scripts/contrast_audit.py.
+   ========================================================================== */
+
+:root{
+  color-scheme: light dark;
+
+  /* ---- surfaces (60) ---------------------------------------------------- */
+  --bg:#F7F6F2;          /* paper — the page                                 */
+  --panel:#FFFFFF;       /* raised — cards, the reading rail                 */
+  --band:#EFEEE8;        /* recessed — alternating sections, figure frames   */
+
+  /* ---- ink (30): four steps, each one a job ----------------------------- */
+  --ink:#1A1D1B;         /* headings, numbers                     15.7:1     */
+  --ink-2:#3B403D;       /* body prose                             9.8:1     */
+  --muted:#4A514D;       /* secondary prose, captions              7.5:1     */
+  --faint:#5C635E;       /* labels, metadata — the smallest text   5.7:1     */
+
+  /* ---- rules: decorative vs meaningful ---------------------------------- */
+  --line:#DCDAD2;        /* hairlines between rows — decorative              */
+  --line-2:#C7C5BC;      /* card and input borders — decorative              */
+  --line-3:#8A8880;      /* borders that carry meaning (a "designed" cell)   */
+
+  /* ---- accent (10): the action, and status ------------------------------ */
+  --accent:#0A6552;      /* primary action, links, "shipped"       6.5:1     */
+  --accent-ink:#FFFFFF;  /* text on the accent                     7.0:1     */
+  --accent-soft:#DFEFE8; /* accent-tinted fill                               */
+  --amber:#8A5006;       /* "partial" — the one warning colour     6.0:1     */
+  --amber-soft:#F6E6CF;
+
+  /* ---- type: one superfamily, three jobs -------------------------------- */
+  --sans:'IBM Plex Sans','IBM Plex Sans Fallback',system-ui,-apple-system,sans-serif;
+  --serif:'IBM Plex Serif','IBM Plex Serif Fallback',Georgia,'Times New Roman',serif;
+  --mono:'IBM Plex Mono','IBM Plex Mono Fallback',ui-monospace,SFMono-Regular,monospace;
+
+  /* scale: 16px UI base × 1.25. Nothing on the site is smaller than --t-2.  */
+  --t-2:0.8rem;    /* 12.8 — mono keys, legend text                          */
+  --t-1:0.875rem;  /* 14   — small UI, table cells                           */
+  --t0:1rem;       /* 16   — UI base                                         */
+  --t1:1.125rem;   /* 18   — reading base                                    */
+  --t2:1.406rem;   /* 22.5 — h3                                              */
+  --t3:1.758rem;   /* 28.1 — h2                                              */
+  --t4:2.197rem;   /* 35.2 — page h1 (inner pages)                           */
+  --t5:2.75rem;    /* 44   — hero h1 small                                   */
+  --t6:3.4rem;     /* 54.4 — hero h1 large                                   */
+
+  --lh-body:1.6;
+  --lh-snug:1.35;
+  --lh-tight:1.12;
+  --measure:68ch;        /* the reading column: ~66–72 characters            */
+  --track-label:.08em;   /* the only letter-spacing on the site             */
+
+  /* ---- space: one 4/8-point ladder -------------------------------------- */
+  --s1:4px;  --s2:8px;  --s3:12px; --s4:16px; --s5:24px;
+  --s6:32px; --s7:48px; --s8:64px; --s9:96px; --s10:128px;
+  --sec-gap:var(--s9);   /* between major sections                           */
+  --sec-pad:var(--s7);   /* inside a section                                 */
+  --gutter:var(--s5);    /* page edge                                        */
+
+  /* ---- shape, elevation, motion ----------------------------------------- */
+  --r:10px;              /* one radius, everywhere                           */
+  --r-sm:6px;            /* chips and cells only                             */
+  --shadow:0 1px 2px rgb(20 25 22 / .05), 0 12px 28px -18px rgb(20 25 22 / .22);
+  --dur:300ms;
+  --ease:cubic-bezier(.2,.7,.2,1);
+  --focus:var(--accent);
+
+  --w:1180px;            /* page max width                                   */
+  --w-narrow:820px;      /* single-column reading pages                      */
+}
+
+/* Dark: colour only. Every token here has a light counterpart above; anything
+   not redefined is inherited, which is what keeps the two themes in step. */
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#121614; --panel:#191E1B; --band:#161A18;
+    --ink:#E8EBE7; --ink-2:#C9CFC9; --muted:#AEB6B0; --faint:#98A09A;
+    --line:#28302B; --line-2:#3A443E; --line-3:#727E77;
+    --accent:#43C29A; --accent-ink:#0E1512; --accent-soft:#17382C;
+    --amber:#D99A4E; --amber-soft:#3A2A14;
+    --shadow:0 1px 2px rgb(0 0 0 / .4), 0 12px 28px -18px rgb(0 0 0 / .65);
+  }
+}
+
+/* The explicit choice wins in both directions. Declared as its own block (not
+   merged with the media query) so a visitor who picks dark on a light OS gets
+   the same palette the audit checks. */
+:root[data-theme="dark"]{
+  --bg:#121614; --panel:#191E1B; --band:#161A18;
+  --ink:#E8EBE7; --ink-2:#C9CFC9; --muted:#AEB6B0; --faint:#98A09A;
+  --line:#28302B; --line-2:#3A443E; --line-3:#727E77;
+  --accent:#43C29A; --accent-ink:#0E1512; --accent-soft:#17382C;
+  --amber:#D99A4E; --amber-soft:#3A2A14;
+  --shadow:0 1px 2px rgb(0 0 0 / .4), 0 12px 28px -18px rgb(0 0 0 / .65);
+}
+
+/* Responsive: the scale and the rhythm both shrink; the measure does not. */
+@media (max-width:900px){
+  :root{ --sec-gap:var(--s8); --sec-pad:var(--s6); --t5:2.3rem; --t6:2.6rem; --t4:1.9rem; }
+}
+@media (max-width:560px){
+  :root{ --sec-gap:var(--s7); --sec-pad:var(--s5); --gutter:var(--s4); --t3:1.5rem; }
+}
+
+/* Motion is an enhancement. Zeroing one token disables every transition. */
+@media (prefers-reduced-motion: reduce){
+  :root{ --dur:0.01ms; }
+}
+
+/* ---------------------------------------------------------------------------
+   Contrast contract — read by scripts/contrast_audit.py in both themes.
+   4.5 for text of any size (the site has no "large text" exemptions left),
+   3.0 for borders and glyph outlines that carry meaning on their own.
+
+   @contrast --ink --bg 4.5 | --ink --panel 4.5 | --ink --band 4.5
+   @contrast --ink-2 --bg 4.5 | --ink-2 --panel 4.5 | --ink-2 --band 4.5
+   @contrast --muted --bg 4.5 | --muted --panel 4.5 | --muted --band 4.5
+   @contrast --faint --bg 4.5 | --faint --panel 4.5 | --faint --band 4.5
+   @contrast --accent --bg 4.5 | --accent --panel 4.5 | --accent --band 4.5
+   @contrast --accent --accent-soft 4.5 | --accent-ink --accent 4.5
+   @contrast --amber --bg 4.5 | --amber --panel 4.5 | --amber --band 4.5
+   @contrast --amber --amber-soft 4.5
+   @contrast --line-3 --bg 3.0 | --line-3 --panel 3.0 | --line-3 --band 3.0
+   @contrast --accent --panel 3.0
+   --------------------------------------------------------------------------- */

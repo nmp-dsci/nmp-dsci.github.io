@@ -1,25 +1,21 @@
 {%- comment -%}
-  Section 7 of a case study — the production-readiness scorecard.
-  Rendered from page.production.rubric joined to _data/rubric.yml, so the
-  scorecard and the home-page matrix can never disagree. Rows come out in
-  _data/rubric.yml `order` (R1 → R9). Renders nothing without a rubric.
-  `how` goes through markdownify so the `backticked paths` authors write in the
-  front matter come out as code; everything that lands in an attribute is escaped.
+  Section 7 of a case study — the readiness scorecard. Rendered from
+  page.production.rubric joined to _data/rubric.yml, so the scorecard and the
+  home-page matrix can never disagree. Rows come out in _data/rubric.yml order
+  (R1 → R9). `how` goes through markdownify so backticked paths become code;
+  everything bound to an attribute is escaped.
 {%- endcomment -%}
 {%- if page.production.rubric -%}
 {%- assign dims = site.data.rubric.dimensions -%}
 {%- assign ndim = dims | size -%}
 {%- assign score = page.production.score | default: "" | strip -%}
-<section class="readiness" aria-label="Production readiness scorecard">
-  <div class="rr-head">
-    {%- if score != "" %}<span class="rr-score">{{ score }} dimensions shipped</span>{% endif -%}
-    <p class="rr-legend">
-      {%- for s in site.data.rubric.statuses -%}
-      <span><span class="status-glyph status-{{ s[0] }}" aria-hidden="true">{{ s[1].glyph }}</span>{{ s[1].label }} — {{ s[1].blurb }}</span>
-      {%- endfor -%}
-    </p>
+<section class="score" id="s7-card" aria-labelledby="score-h">
+  <div class="score-head">
+    <h2 id="score-h">Production readiness</h2>
+    {%- if score != "" %}<span class="score-total">{{ score }} shipped</span>{% endif -%}
   </div>
-  <div class="rr-rows">
+
+  <div class="rows">
     {%- for i in (1..ndim) -%}
       {%- for d in dims -%}
         {%- if d[1].order == i -%}
@@ -30,16 +26,15 @@
           {%- assign st = site.data.rubric.statuses[cell.status] -%}
           {%- assign how = cell.how | default: "" | strip -%}
           {%- assign proof = cell.proof | default: "" | strip -%}
-    <div class="rr">
-      <div class="rr-dim">
-        <span class="status-glyph status-{{ cell.status }}" aria-hidden="true">{{ st.glyph | default: "·" }}</span>
+    <div class="row">
+      <div class="row-dim">
         <a href="{{ '/' | relative_url }}#rubric-{{ key }}">{{ dim.label | escape }}</a>
-        <span class="rr-status">{{ st.label | default: cell.status }}</span>
+        <span class="status status-{{ cell.status }}">{{ st.label | default: cell.status }}</span>
       </div>
-      <div class="rr-how">
+      <div class="row-how">
         {%- if how != "" %}{{ how | markdownify | remove: "<p>" | remove: "</p>" | strip }} {% endif -%}
-        {%- if dim.section %}<a class="rr-sec" href="#s{{ dim.section }}" title="{{ dim.question | escape }}">§{{ dim.section }}</a>{% endif -%}
-        {%- if proof != "" %}<span class="rr-proof">{{ proof | escape }}</span>{% endif -%}
+        {%- if dim.section %}<a class="row-sec" href="#s{{ dim.section }}" title="{{ dim.question | escape }}">§{{ dim.section }}</a>{% endif -%}
+        {%- if proof != "" %}<span class="row-proof">{{ proof | escape }}</span>{% endif -%}
       </div>
     </div>
           {%- endif -%}
@@ -47,8 +42,9 @@
       {%- endfor -%}
     {%- endfor -%}
   </div>
-  <p class="rr-note">Every row links back to the section that explains it, and to the dimension's definition on
-    the home page. Anything that is not <span class="status-glyph status-shipped" aria-hidden="true">●</span>
-    shipped carries its reason in the same sentence.</p>
+
+  <p class="score-note">Every row links back to the section that explains it and to the dimension's
+    definition on the home page. Anything not marked <b>shipped</b> carries its reason in the same
+    sentence — a hollow rating with a reason is worth more than a filled one without.</p>
 </section>
 {%- endif -%}

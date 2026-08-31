@@ -1,0 +1,17 @@
+{%- comment -%}
+  Skills come AFTER the work, not before it: a skills list above the projects is
+  the most common portfolio inversion. Each skill is answered by one piece of
+  evidence with its paths.
+{%- endcomment -%}
+{%- if page.skills_detail -%}
+<section class="skills" aria-labelledby="skills-h">
+  <h2 id="skills-h">Skills, and where to check them</h2>
+  <dl>
+    {%- for sd in page.skills_detail -%}
+    {%- assign sk = site.data.skills[sd.skill] -%}
+    <dt>{{ sk.label | default: sd.skill }}{% if sk.market %}<em>asked for in {{ sk.market }} of AI-engineer roles</em>{% endif %}</dt>
+    <dd>{{ sd.proof }}</dd>
+    {%- endfor -%}
+  </dl>
+</section>
+{%- endif -%}

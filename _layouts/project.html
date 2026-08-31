@@ -2,151 +2,107 @@
 layout: default
 ---
 {%- comment -%}
+  A case study is a reading surface. Header and TL;DR reward the 90-second scan;
+  the TOC, the one-line section summaries and the rail reward the 12-minute read.
   Optional string fields arrive as "" as often as they arrive missing, and an
-  empty string is truthy in Liquid — so every optional field is normalised here
-  and tested against "" rather than for truthiness.
+  empty string is truthy in Liquid — so each is normalised and tested against "".
 {%- endcomment -%}
-{%- assign m_walk   = page.media.walkthrough    | default: "" | strip -%}
-{%- assign m_poster = page.media.poster         | default: "" | strip -%}
-{%- assign m_caps   = page.media.captions       | default: "" | strip -%}
-{%- assign m_reel   = page.media.reel           | default: "" | strip -%}
-{%- assign p_score  = page.production.score     | default: "" | strip -%}
-{%- assign p_metric = page.metric               | default: "" | strip -%}
-{%- assign p_mlabel = page.metric_label         | default: "" | strip -%}
-{%- assign p_region = page.production.region    | default: "" | strip -%}
-{%- assign p_cost   = page.production.cost      | default: "" | strip -%}
-{%- assign p_rung   = page.production.rung      | default: "" | strip -%}
+{%- assign p_head   = page.headline           | default: page.title | strip -%}
+{%- assign p_proof  = page.proof_line         | default: "" | strip -%}
+{%- assign p_score  = page.production.score   | default: "" | strip -%}
+{%- assign p_metric = page.metric             | default: "" | strip -%}
+{%- assign p_mlabel = page.metric_label       | default: "" | strip -%}
+{%- assign p_region = page.production.region  | default: "" | strip -%}
+{%- assign p_cost   = page.production.cost    | default: "" | strip -%}
+{%- assign p_rung   = page.production.rung    | default: "" | strip -%}
 {%- assign p_rnote  = page.production.rung_note | default: "" | strip -%}
-{%- assign l_repo   = page.links.repo           | default: "" | strip -%}
-{%- assign l_demo   = page.links.demo           | default: "" | strip -%}
+{%- assign l_repo   = page.links.repo         | default: "" | strip -%}
+{%- assign l_demo   = page.links.demo         | default: "" | strip -%}
+{%- assign m_walk   = page.media.walkthrough  | default: "" | strip -%}
+{%- assign m_poster = page.media.poster       | default: "" | strip -%}
+{%- assign m_caps   = page.media.captions     | default: "" | strip -%}
+
 <article class="study">
-  <div class="study-inner">
-    <p class="crumb"><a href="{{ '/#work' | relative_url }}">← All systems</a></p>
-    <p class="kicker">{% for t in page.tags %}{{ t }}{% unless forloop.last %} · {% endunless %}{% endfor %} · case study</p>
-    <h1>{{ page.title }}</h1>
-    <p class="study-summary">{{ page.summary }}</p>
+  <header class="page-head wrap">
+    <p class="crumb"><a href="{{ '/#work' | relative_url }}">← All systems</a> · {{ page.title }}</p>
+    {%- if page.tags and page.tags != empty %}
+    <p class="label kick">{% for t in page.tags %}{{ t }} · {% endfor %}case study</p>
+    {%- endif %}
+    <h1>{{ p_head }}</h1>
+    <p class="dek">{{ page.summary }}</p>
 
-    <div class="tldr" role="region" aria-label="30-second summary">
-      <p class="tldr-k">// 30-second version</p>
-      <div class="tldr-grid">
-        <div class="tldr-cell"><span class="tldr-l">What</span>
-          <span class="tldr-v">{{ page.tldr | default: page.summary }}</span></div>
-        <div class="tldr-cell"><span class="tldr-l">Proof</span>
-          <span class="tldr-v">{% if p_score != "" %}<b>{{ p_score }}</b> — rubric dimensions shipped{% if page.production.live %} · live on AWS{% endif %}{% elsif p_metric != "" %}<b>{{ p_metric }}</b>{% if p_mlabel != "" %} — {{ p_mlabel }}{% endif %}{% endif %}</span></div>
-        <div class="tldr-cell"><span class="tldr-l">Skills</span>
-          <span class="tldr-v">{% for s in page.skills limit:5 %}{% assign sk = site.data.skills[s] %}{{ sk.label | default: s }}{% unless forloop.last %} · {% endunless %}{% endfor %}</span></div>
-        {% if l_repo != "" or l_demo != "" %}
-        <div class="tldr-cell"><span class="tldr-l">Where</span>
-          <span class="tldr-v">{% if l_repo != "" %}<a href="{{ l_repo }}" target="_blank" rel="noopener">Repository ↗</a>{% endif %}{% if l_demo != "" %}{% if l_repo != "" %} · {% endif %}<a href="{{ l_demo }}" target="_blank" rel="noopener"><b>Live demo ↗</b></a>{% if page.production.live %} <span class="live-badge">live</span>{% endif %}{% endif %}</span></div>
-        {% endif %}
-      </div>
+    <p class="meta">
+      {%- if p_score != "" %}<span><b>{{ p_score }}</b> rubric dimensions shipped</span>{% endif -%}
+      {%- if page.production.live %}<span><b>live</b>{% if p_region != "" %} · {{ p_region }}{% endif %}</span>{% endif -%}
+      {%- if p_cost != "" %}<span><b>{{ p_cost }}</b></span>{% endif -%}
+      <span><b data-reading-time>—</b> read · 7 sections</span>
+    </p>
+
+    <div class="head-actions">
+      {%- if l_demo != "" %}<a class="btn" href="{{ l_demo }}" target="_blank" rel="noopener">Open the live demo ↗</a>{% endif -%}
+      {%- if l_repo != "" %}<a class="lnk" href="{{ l_repo }}" target="_blank" rel="noopener">Repository ↗</a>{% endif -%}
+      <a class="lnk" href="#s7">Jump to the scorecard</a>
     </div>
 
-    <div class="study-cols">
-      <div class="study-main">
-        <div class="mediaframe">
-          {% if m_walk != "" %}
-          <video class="walkthrough" controls preload="metadata"{% if m_poster != "" %} poster="{{ m_poster | relative_url }}"{% endif %}>
-            <source src="{{ m_walk | relative_url }}" type="video/mp4">
-            {% if m_caps != "" %}<track kind="captions" src="{{ m_caps | relative_url }}" srclang="en" label="English" default>{% endif %}
-          </video>
-          {% else %}
-          <div class="media-placeholder" role="img" aria-label="App walkthrough video coming soon">
-            <span class="mp-label">app walkthrough</span>
-            <span class="mp-play" aria-hidden="true">▶</span>
-            <span class="mp-note">video coming — being recorded</span>
-          </div>
-          {% endif %}
-        </div>
-
-        {% if page.skills_detail %}
-        <section class="skills-demo" aria-label="Skills demonstrated">
-          <h2>Skills demonstrated</h2>
-          <ul class="sd-list">
-            {% for sd in page.skills_detail %}{% assign sk = site.data.skills[sd.skill] %}
-            <li>
-              <span class="skill"{% if sk.market %} title="Asked for in {{ sk.market }} of AI-engineer roles"{% endif %}>{{ sk.label | default: sd.skill }}{% if sk.market %}<em>{{ sk.market }}</em>{% endif %}</span>
-              <span class="sd-proof">{{ sd.proof }}</span>
-            </li>
-            {% endfor %}
-          </ul>
-        </section>
-        {% endif %}
-
-        <div class="study-body">
-          {{ content }}
-          {% include production-readiness.html %}
-        </div>
+    <dl class="tldr" aria-label="The 30-second version">
+      <div>
+        <dt>What it is</dt>
+        <dd>{{ page.tldr | default: page.summary }}</dd>
       </div>
+      <div>
+        <dt>What it proves</dt>
+        <dd>{% if p_proof != "" %}{{ p_proof | markdownify | remove: "<p>" | remove: "</p>" | strip }}{% elsif p_metric != "" %}<b>{{ p_metric }}</b>{% if p_mlabel != "" %} — {{ p_mlabel }}{% endif %}{% endif %}</dd>
+      </div>
+      <div>
+        <dt>Skills</dt>
+        <dd>{% for s in page.skills limit:6 %}{% assign sk = site.data.skills[s] %}{{ sk.label | default: s }}{% unless forloop.last %} · {% endunless %}{% endfor %}</dd>
+      </div>
+    </dl>
+  </header>
 
-      <aside class="study-facts">
-        <div class="fact-box">
-          {% if p_metric != "" %}
-          <div class="fact-metric">
-            <span class="met-n">{{ p_metric }}</span>
-            <span class="met-l">{{ p_mlabel }}</span>
-          </div>
-          {% elsif p_score != "" %}
-          <div class="fact-metric">
-            <span class="met-n">{{ p_score }}</span>
-            <span class="met-l">rubric dimensions shipped</span>
-          </div>
-          {% endif %}
-          {% if page.stack and page.stack != empty %}
-          <div class="fact-row"><span class="fact-k">Stack</span>
-            <span>{% for s in page.stack %}{{ s }}{% unless forloop.last %} · {% endunless %}{% endfor %}</span></div>
-          {% endif %}
-          {% if p_region != "" %}
-          <div class="fact-row"><span class="fact-k">Region</span>
-            <span>{{ p_region }}</span></div>
-          {% endif %}
-          {% if p_rung != "" %}
-          <div class="fact-row"><span class="fact-k">Rung</span>
-            <span><a href="{{ '/practices/production-scale/' | relative_url }}">{{ p_rung }} concurrent users →</a>{% if p_rnote != "" %} — {{ p_rnote | markdownify | remove: "<p>" | remove: "</p>" | strip }}{% endif %}</span></div>
-          {% endif %}
-          {% if p_cost != "" %}
-          <div class="fact-row"><span class="fact-k">Cost</span>
-            <span>{{ p_cost }}</span></div>
-          {% endif %}
-          {% if l_repo != "" %}
-          <div class="fact-row"><span class="fact-k">Code</span>
-            <a href="{{ l_repo }}" target="_blank" rel="noopener">Repository ↗</a></div>
-          {% endif %}
-          {% if l_demo != "" %}
-          <div class="fact-row"><span class="fact-k">Demo</span>
-            <a href="{{ l_demo }}" target="_blank" rel="noopener">Live demo ↗</a></div>
-          {% endif %}
-          {% if p_region != "" or p_cost != "" or p_rung != "" %}
-          <p class="fact-note">Region, rung and monthly cost are measured on the demo-mode deployment the link
-            above opens — read-only, with no inference on the public URL.</p>
-          {% endif %}
-        </div>
-        {% if m_reel != "" and m_reel != "planned" %}
-        <video class="reel" controls preload="metadata" src="{{ m_reel | relative_url }}"></video>
-        {% elsif m_reel == "planned" %}
-        <div class="reel reel-placeholder"><span>9:16 reel<br>coming</span></div>
-        {% endif %}
-      </aside>
+  <div class="wrap reader">
+    <nav class="toc" data-toc aria-label="On this page"></nav>
+
+    <div class="prose" data-sections="{{ page.sections | jsonify | escape }}">
+      {%- if m_walk != "" %}
+      <figure class="evidence">
+        <video controls preload="metadata"{% if m_poster != "" %} poster="{{ m_poster | relative_url }}"{% endif %} style="width:100%;border-radius:var(--r)">
+          <source src="{{ m_walk | relative_url }}" type="video/mp4">
+          {%- if m_caps != "" %}<track kind="captions" src="{{ m_caps | relative_url }}" srclang="en" label="English" default>{% endif %}
+        </video>
+        <figcaption><b>Walkthrough.</b> The app as it runs today.</figcaption>
+      </figure>
+      {%- endif %}
+
+      {{ content }}
+
+      {% include production-readiness.html %}
+      {% include skills-demonstrated.html %}
+      {% include next-system.html %}
     </div>
+
+    <aside class="rail">
+      {% include readiness-mini.html %}
+      <div class="rail-box">
+        <b>Facts</b>
+        <dl>
+          {%- if page.stack and page.stack != empty %}
+          <dt>Stack</dt><dd>{% for s in page.stack %}{{ s }}{% unless forloop.last %} · {% endunless %}{% endfor %}</dd>
+          {%- endif %}
+          {%- if p_region != "" %}<dt>Region</dt><dd>{{ p_region }}</dd>{% endif %}
+          {%- if p_rung != "" %}
+          <dt>Rung</dt><dd><a href="{{ '/practices/production-scale/' | relative_url }}">{{ p_rung }} concurrent users →</a>{% if p_rnote != "" %} — {{ p_rnote | markdownify | remove: "<p>" | remove: "</p>" | strip }}{% endif %}</dd>
+          {%- endif %}
+          {%- if p_cost != "" %}<dt>Cost</dt><dd>{{ p_cost }}</dd>{% endif %}
+          {%- if l_repo != "" %}<dt>Code</dt><dd><a href="{{ l_repo }}" target="_blank" rel="noopener">Repository ↗</a></dd>{% endif %}
+          {%- if l_demo != "" %}<dt>Demo</dt><dd><a href="{{ l_demo }}" target="_blank" rel="noopener">Live demo ↗</a></dd>{% endif %}
+        </dl>
+        {%- if p_region != "" or p_cost != "" or p_rung != "" %}
+        <p class="rail-note">Region, rung and monthly cost are measured on the demo-mode deployment
+          the link above opens — read-only, with no inference on the public URL.</p>
+        {%- endif %}
+      </div>
+    </aside>
   </div>
 </article>
-<script>
-  /* The seven numbered H2s are Markdown, so their ids are kramdown's. Insert a
-     stable #s1…#s7 anchor beside each one so every scorecard row can point back
-     at the section that explains it. */
-  (function(){
-    var hs=document.querySelectorAll('.study-body h2');
-    for(var i=0;i<hs.length;i++){
-      var m=/^\s*(\d+)/.exec(hs[i].textContent||'');
-      var id='s'+(m?m[1]:(i+1));
-      if(document.getElementById(id))continue;
-      var a=document.createElement('span');
-      a.id=id;a.className='sec-anchor';
-      hs[i].parentNode.insertBefore(a,hs[i]);
-    }
-    if(location.hash){
-      var t=document.getElementById(location.hash.slice(1));
-      if(t)t.scrollIntoView();
-    }
-  })();
-</script>
+<script src="{{ '/assets/js/study.js' | relative_url }}" defer></script>

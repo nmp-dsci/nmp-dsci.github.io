@@ -12,9 +12,11 @@ from a repo that already exists. The site does the rest: `_layouts/project.html`
 renders the spine, the scorecard and the home-page matrix from that file's front
 matter, so the case study and the matrix can never disagree.
 
-The contract this skill fills lives in three places, and they are the authority
+The contract this skill fills lives in four places, and they are the authority
 when this file and they disagree:
 
+- `DESIGN.md` — the brief: who the page is for, the evidence rules, and the
+  "Never do this" list. Everything below is downstream of it
 - `_templates/project.md` — the front-matter schema, one comment per field, and
   the seven H2s
 - `_data/rubric.yml` — the nine dimensions, the status vocabulary, the rungs
@@ -82,6 +84,66 @@ Keep `{% include fig-agent.html %}` directly under §2 and
 
 Write like an engineer explaining to another engineer. No "seamless", no
 "robust", no "cutting-edge". The existing `_projects/*.md` bodies are the voice.
+British/Australian spelling. Em dashes are fine; three in one paragraph is not.
+
+### The three card lines
+
+A visitor scans for 60–90 seconds and reads about a quarter of the words
+(DESIGN.md §1). These three fields are most of what they actually take in, so
+they are written last, from what the body turned out to prove — not first, from
+what you hoped it would.
+
+| Field | Limit | What it does |
+|---|---|---|
+| `headline` | ≤ **9 words**, never equal to `title` | The outcome, not the name. "Governed NL→SQL in production" — not "Data Pilot" |
+| `outcome` | **one sentence**, ≤ 25 words | The achievement with its stake, for the home-page row. What goes wrong without it |
+| `proof_line` | **one sentence**, and it MUST carry a number | The TL;DR "Proof" cell. The number brings its baseline or denominator with it: "77.1%, up from 73.0% (594/770)", never a bare "77.1%" |
+
+### `sections:` — one summary per H2
+
+```yaml
+sections:
+  - n: 1
+    summary: "A data agent is only useful if its users can be trusted with the rows it returns."
+```
+
+One entry per H2, `n` matching the number in the heading, 1..7 in order. Each
+`summary` is **one sentence of at most 24 words** and states the **point** of the
+section, not its topic:
+
+- ✅ "Governance is the product, not a feature."
+- ❌ "This section covers governance."
+
+They render in the reading rail beside the prose, so a scanner who reads nothing
+else gets seven sentences that add up to the argument.
+
+### Prose rules the lint enforces
+
+1. **No paragraph over 80 words.** Over that it does not get read. Split at the
+   natural seam; do not delete content to fit. The lint reports the first 60
+   characters and the word count, and warns (`!`, not a failure) at 65–80 so you
+   can see the ones sitting near the limit. Fenced code, tables, lists,
+   blockquotes, HTML blocks and Liquid tags are not paragraphs and are not
+   measured.
+2. **Enumerations become lists or tables.** If a sentence carries three or more
+   parallel items — three cost caps, four tools, eight configurations, graders
+   G1–G3 — lift them into a markdown list or table. This is the single biggest
+   readability win available in a 2,700-word page, and it is usually also what
+   fixes an over-length paragraph.
+3. **Keep inline `code`** for paths, identifiers and commands.
+4. **A figure caption states the takeaway first, then the source.** Never the
+   topic:
+
+   ```markdown
+   **The model never touches the database directly.** Every path from question
+   to report passes the AST guard and then RLS.
+   Source: db/init/02_rls.sql, agent/sql_guardrails.py
+   ```
+
+5. **No placeholder for media that does not exist** (DESIGN.md rule 5). If the
+   walkthrough is not recorded, `walkthrough: ""` — the slot is then not
+   rendered at all. `planned`, `coming`, `tbd`, `todo` fail the lint, because a
+   promise in a portfolio reads as a thing that was never finished.
 
 ## Step 3 · Score the nine rows
 
@@ -92,7 +154,7 @@ One row per dimension in `_data/rubric.yml`, in that file's `order:`, each with
 status: shipped ●   built, measured, in the repo
         partial ◐   present but narrower than the rubric asks
         designed ○  written up, not built
-        na —        not needed by design (say why)
+        na —        not needed by design (still say why in `how`)
 ```
 
 Anything that is not `shipped` must carry its reason in `how`. This is not a
@@ -148,8 +210,11 @@ uv run --with pyyaml --no-project python scripts/lint_case_study.py \
     _projects/<slug>.md --repo ../<repo-dir>
 ```
 
-Every check prints one line: `✓` held, `✗` broken, `~` not checked. Fix until
-`PASS`. Across everything, as CI runs it:
+Every check prints one line: `✓` held, `✗` broken, `!` near a limit (a warning,
+never a failure), `~` not checked. Fix until `PASS`. The lines most likely to be
+red on a first draft are `paragraphs:` and `sections:` — both are fixed by
+splitting a paragraph or lifting an enumeration into a list, never by cutting a
+fact. Across everything, as CI runs it:
 
 ```bash
 uv run --with pyyaml --no-project python scripts/lint_case_study.py --all --no-net
@@ -158,6 +223,10 @@ uv run --with pyyaml --no-project python scripts/lint_case_study.py --all --no-n
 `--no-net` skips the live `links.demo` request; drop it locally to confirm the
 demo URL still answers 200 and that a demo build still answers `"mode":"demo"`.
 For a practice page, `--practice` (or just a path under `_practices/`).
+
+CI runs this same command plus the contrast audit
+(`scripts/contrast_audit.py assets/css/tokens.css`) in
+`.github/workflows/lint.yml`, so a case study that passes locally passes there.
 
 ## Step 6 · Build
 
@@ -210,6 +279,11 @@ Same shape, different contract:
 cp _templates/practice.md _practices/<name>.md
 uv run --with pyyaml --no-project python scripts/lint_case_study.py _practices/<name>.md
 ```
+
+The prose rules are the same — 80-word paragraphs, enumerations as lists,
+takeaway-first captions. The three card lines and `sections:` are optional on a
+practice (it has no system card), but the lint holds them to the same limits
+whenever they are present.
 
 A practice is a generalised case study: one pattern shown across all three
 systems, on the spine Problem → Pattern → In the three systems → Evidence →

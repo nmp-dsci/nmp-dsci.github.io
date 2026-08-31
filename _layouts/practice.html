@@ -5,63 +5,66 @@ layout: default
 {%- assign ndim = dims | size -%}
 {%- assign nsys = page.systems | size -%}
 {%- assign nrub = page.rubric | size -%}
-{%- assign pk = page.kicker | default: "" | strip -%}
+{%- assign pk = page.kicker | default: "practice" | strip -%}
 {%- assign pnote = page.evidence_note | default: "" | strip -%}
 <article class="practice">
-  <div class="study-inner">
-    <p class="crumb"><a href="{{ '/#practices' | relative_url }}">← All practices</a></p>
-    <p class="kicker">{% if pk != "" %}{{ pk }}{% else %}practice{% endif %}</p>
+  <header class="page-head wrap">
+    <p class="crumb"><a href="{{ '/#practices' | relative_url }}">← All practices</a> · {{ pk }}</p>
     <h1>{{ page.title }}</h1>
-    <p class="study-summary">{{ page.summary }}</p>
+    <p class="dek">{{ page.summary }}</p>
+    <p class="meta"><span><b data-reading-time>—</b> read</span></p>
+  </header>
 
-    {%- if nsys > 0 or nrub > 0 %}
-    <div class="applies" role="region" aria-label="What this practice applies to">
-      {%- if nsys > 0 %}
-      <div class="applies-row">
-        <span class="applies-k">Applies to</span>
-        <span class="chips">
-          {%- for s in page.systems -%}
-            {%- assign hit = nil -%}
-            {%- for p in site.projects -%}
-              {%- if p.slug == s -%}{%- assign hit = p -%}{%- endif -%}
-            {%- endfor -%}
-            {%- if hit -%}
-          <a class="chip-link" href="{{ hit.url | relative_url }}">{{ hit.title }} →</a>
-            {%- else -%}
-          <span class="chip-link chip-dead">{{ s }}</span>
-            {%- endif -%}
-          {%- endfor -%}
-        </span>
-      </div>
-      {%- endif %}
-      {%- if nrub > 0 %}
-      <div class="applies-row">
-        <span class="applies-k">Explains</span>
-        <span class="chips">
-          {%- for i in (1..ndim) -%}
-            {%- for d in dims -%}
-              {%- if d[1].order == i -%}
-                {%- if page.rubric contains d[0] -%}
-          <a class="chip-link" href="{{ '/' | relative_url }}#rubric-{{ d[0] }}" title="{{ d[1].question | escape }}">{{ d[1].ref }} · {{ d[1].short | default: d[1].label | escape }}</a>
-                {%- endif -%}
-              {%- endif -%}
-            {%- endfor -%}
-          {%- endfor -%}
-        </span>
-      </div>
-      {%- endif %}
-    </div>
-    {%- endif %}
+  <div class="wrap reader">
+    <nav class="toc" data-toc aria-label="On this page"></nav>
 
-    <div class="study-body practice-body">
+    <div class="prose" data-sections="{{ page.sections | default: empty | jsonify | escape }}">
       {{ content }}
+
+      {%- if pnote != "" %}
+      <aside class="evidence-note">
+        <b>How to re-run these numbers</b>
+        {{ pnote }}
+      </aside>
+      {%- endif %}
     </div>
 
-    {%- if pnote != "" %}
-    <aside class="evidence-note">
-      <b>How to re-run these numbers</b>
-      {{ pnote }}
+    <aside class="rail">
+      {%- if nsys > 0 or nrub > 0 %}
+      <div class="rail-box">
+        <b>What this applies to</b>
+        <div class="applies">
+          {%- if nsys > 0 %}
+          <div class="applies-row">
+            <span class="label">Systems</span>
+            <span class="chips">
+              {%- for s in page.systems -%}
+                {%- assign hit = nil -%}
+                {%- for p in site.projects -%}{%- if p.slug == s -%}{%- assign hit = p -%}{%- endif -%}{%- endfor -%}
+                {%- if hit -%}<a class="chip" href="{{ hit.url | relative_url }}">{{ hit.title }} →</a>
+                {%- else -%}<span class="chip chip-dead">{{ s }}</span>{%- endif -%}
+              {%- endfor -%}
+            </span>
+          </div>
+          {%- endif %}
+          {%- if nrub > 0 %}
+          <div class="applies-row">
+            <span class="label">Explains</span>
+            <span class="chips">
+              {%- for i in (1..ndim) -%}
+                {%- for d in dims -%}
+                  {%- if d[1].order == i and page.rubric contains d[0] -%}
+              <a class="chip" href="{{ '/' | relative_url }}#rubric-{{ d[0] }}" title="{{ d[1].question | escape }}">{{ d[1].ref }} · {{ d[1].short | default: d[1].label | escape }}</a>
+                  {%- endif -%}
+                {%- endfor -%}
+              {%- endfor -%}
+            </span>
+          </div>
+          {%- endif %}
+        </div>
+      </div>
+      {%- endif %}
     </aside>
-    {%- endif %}
   </div>
 </article>
+<script src="{{ '/assets/js/study.js' | relative_url }}" defer></script>

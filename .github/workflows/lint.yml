@@ -1,10 +1,17 @@
-# Case-study contract check.
+# Case-study contract check, plus the token contrast audit.
 #
 # GitHub Pages still builds and deploys the site natively on push to master —
 # this workflow adds nothing to that path and cannot block a deploy. It only
 # tells a pull request whether the case studies still hold their contract:
 # nine rubric dimensions, statuses in the vocabulary, a reason on every row
-# that is not `shipped`, the seven H2s in order, and the two diagrams.
+# that is not `shipped`, the seven H2s in order, the two diagrams, the three
+# card lines, one section summary per H2, no paragraph over 80 words and no
+# placeholder in `media:`.
+#
+# The second step is the other half of DESIGN.md §2: every text/surface pair
+# declared in the `@contrast` block of assets/css/tokens.css, resolved in both
+# themes, has to clear 4.5:1 (3:1 for meaningful borders). It is stdlib-only and
+# needs no network, so it is the cheapest check here.
 #
 # --no-net is deliberate. The live-demo check needs the public URL and the
 # runner's egress is not the thing under test, so the URL check stays a local
@@ -29,7 +36,9 @@ on:
       - "_data/**"
       - "_includes/diagrams/**"
       - "_templates/**"
+      - "assets/css/tokens.css"
       - "scripts/lint_case_study.py"
+      - "scripts/contrast_audit.py"
       - ".github/workflows/lint.yml"
   push:
     branches: [master]
@@ -38,7 +47,9 @@ on:
       - "_practices/**"
       - "_data/**"
       - "_includes/diagrams/**"
+      - "assets/css/tokens.css"
       - "scripts/lint_case_study.py"
+      - "scripts/contrast_audit.py"
 
 jobs:
   case-studies:
@@ -50,7 +61,12 @@ jobs:
         with:
           python-version: "3.12"
 
-      - run: pip install --disable-pip-version-check pyyaml
+      # pyyaml for the case-study lint; uv so the contrast audit runs under the
+      # same command DESIGN.md documents. Both are pip installs, not new actions.
+      - run: pip install --disable-pip-version-check pyyaml uv
 
       - name: Lint every published case study and practice
         run: python scripts/lint_case_study.py --all --no-net
+
+      - name: Audit token contrast in both themes
+        run: uv run --no-project python scripts/contrast_audit.py assets/css/tokens.css

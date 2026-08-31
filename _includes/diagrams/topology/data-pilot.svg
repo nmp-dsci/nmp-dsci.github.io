@@ -1,51 +1,52 @@
-<svg class="dia" viewBox="0 0 320 100" role="img"
+<svg class="dia" viewBox="0 0 360 190" role="img"
      aria-label="Data Pilot deploy topology: a visitor with no login reaches the React SPA on CloudFront and S3, which calls one App Runner backend instance, which reads Aurora Serverless v2 where row-level security is enforced; ECS Fargate one-shot jobs stream the full CSVs from S3 to rebuild the marts, and the data-agent service is not created at all in demo mode.">
   <defs>
-    <marker id="tp-data-pilot" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+    <marker id="tp-data-pilot" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
       <path d="M0,0 L8,4 L0,8 z" fill="currentColor"/>
     </marker>
   </defs>
 
+  <g><title>data-agent App Runner service — 2 vCPU / 4 GB in the full build; Terraform does not create it in demo mode, which is the single biggest cost line removed</title>
+    <rect class="nd ext" x="204" y="10" width="94" height="42" rx="8"/>
+    <text class="tx" x="251" y="27">data-agent</text>
+    <text class="tx s" x="251" y="42">not in demo</text></g>
+
   <g><title>visitor — no account, no sign-up; one click into a seeded read-only demo identity</title>
-    <rect class="nd" x="4" y="42" width="48" height="30" rx="6"/>
-    <text class="tx" x="28" y="54">visitor</text>
-    <text class="tx s" x="28" y="65">no login</text></g>
+    <rect class="nd" x="6" y="70" width="72" height="44" rx="8"/>
+    <text class="tx" x="42" y="88">visitor</text>
+    <text class="tx s" x="42" y="103">no login</text></g>
 
   <g><title>CloudFront in front of a private S3 bucket — the Vite build of the React SPA, served over the default cloudfront.net certificate with an SPA fallback route</title>
-    <rect class="nd" x="60" y="42" width="56" height="30" rx="6"/>
-    <text class="tx" x="88" y="54">CloudFront</text>
-    <text class="tx s" x="88" y="65">S3 · SPA</text></g>
+    <rect class="nd" x="94" y="70" width="94" height="44" rx="8"/>
+    <text class="tx" x="141" y="88">CloudFront</text>
+    <text class="tx s" x="141" y="103">S3 · SPA</text></g>
 
   <g><title>backend-api on App Runner — one instance, 0.25 vCPU / 512 MB, max_concurrency 100; carries the web API, the webhook, the Slack surface, MCP and the demo replay pack</title>
-    <rect class="nd hi" x="124" y="42" width="74" height="30" rx="6"/>
-    <text class="tx" x="161" y="54">App Runner</text>
-    <text class="tx s" x="161" y="65">backend ×1</text></g>
-
-  <g><title>Aurora Serverless v2 Postgres 16 with pgvector — 0 to 1 ACU, scale-to-zero; row-level security and per-role statement timeouts are enforced here, not in application code</title>
-    <rect class="nd hi" x="206" y="42" width="68" height="30" rx="6"/>
-    <text class="tx" x="240" y="54">Aurora · RLS</text>
-    <text class="tx s" x="240" y="65">0–1 ACU</text></g>
-
-  <g><title>data-agent App Runner service — 2 vCPU / 4 GB in the full build; Terraform does not create it in demo mode, which is the single biggest cost line removed</title>
-    <rect class="nd ext" x="124" y="6" width="74" height="26" rx="6"/>
-    <text class="tx" x="161" y="17">data-agent</text>
-    <text class="tx s" x="161" y="27">not in demo</text></g>
-
-  <g><title>ECS Fargate one-shot tasks — Alembic migrations at 0.5 vCPU / 1 GB, then the dlt and dbt pipeline at 1 vCPU / 4 GB rebuilding the marts</title>
-    <rect class="nd" x="200" y="6" width="76" height="26" rx="6"/>
-    <text class="tx" x="238" y="17">ECS jobs</text>
-    <text class="tx s" x="238" y="27">migrate · dbt</text></g>
+    <rect class="nd hi" x="204" y="70" width="94" height="44" rx="8"/>
+    <text class="tx" x="251" y="88">App Runner</text>
+    <text class="tx s" x="251" y="103">backend ×1</text></g>
 
   <g><title>S3 — the full NSW sales and rental-bond CSVs the pipeline job streams in</title>
-    <rect class="nd" x="284" y="6" width="32" height="26" rx="6"/>
-    <text class="tx" x="300" y="22">S3</text></g>
+    <rect class="nd" x="6" y="130" width="48" height="42" rx="8"/>
+    <text class="tx" x="30" y="155">S3</text></g>
 
-  <path class="ed" d="M52,57 L58,57" marker-end="url(#tp-data-pilot)"/>
-  <path class="ed" d="M116,57 L122,57" marker-end="url(#tp-data-pilot)"/>
-  <path class="ed" d="M198,57 L204,57" marker-end="url(#tp-data-pilot)"/>
-  <path class="ed dash" d="M161,42 L161,34" marker-end="url(#tp-data-pilot)"/>
-  <path class="ed" d="M238,32 L238,40" marker-end="url(#tp-data-pilot)"/>
-  <path class="ed" d="M284,19 L278,19" marker-end="url(#tp-data-pilot)"/>
+  <g><title>ECS Fargate one-shot tasks — Alembic migrations at 0.5 vCPU / 1 GB, then the dlt and dbt pipeline at 1 vCPU / 4 GB rebuilding the marts</title>
+    <rect class="nd" x="88" y="130" width="96" height="42" rx="8"/>
+    <text class="tx" x="136" y="147">ECS jobs</text>
+    <text class="tx s" x="136" y="162">migrate · dbt</text></g>
 
-  <text class="cap" x="4" y="92">ap-southeast-2 · Terraform · chat replayed, SQL live</text>
+  <g><title>Aurora Serverless v2 Postgres 16 with pgvector — 0 to 1 ACU, scale-to-zero; row-level security and per-role statement timeouts are enforced here, not in application code</title>
+    <rect class="nd hi" x="204" y="130" width="112" height="42" rx="8"/>
+    <text class="tx" x="260" y="147">Aurora · RLS</text>
+    <text class="tx s" x="260" y="162">0–1 ACU</text></g>
+
+  <path class="ed" d="M78,92 H92" marker-end="url(#tp-data-pilot)"/>
+  <path class="ed" d="M188,92 H202" marker-end="url(#tp-data-pilot)"/>
+  <path class="ed dash" d="M251,70 V54" marker-end="url(#tp-data-pilot)">
+    <title>the data-agent service is not created in demo mode</title></path>
+  <path class="ed" d="M251,114 V128" marker-end="url(#tp-data-pilot)"/>
+  <path class="ed" d="M54,151 H86" marker-end="url(#tp-data-pilot)"/>
+  <path class="ed" d="M184,151 H202" marker-end="url(#tp-data-pilot)"/>
+
+  <text class="cap" x="6" y="184">ap-southeast-2 · Terraform · chat replayed, SQL live</text>
 </svg>

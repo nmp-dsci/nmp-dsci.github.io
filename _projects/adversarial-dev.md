@@ -13,7 +13,7 @@ skills: [typescript, multi-agent, agentic-ai, llms, prompt-engineering, model-ev
 links:
   repo: https://github.com/nmp-dsci/adversarial-dev-test
 media:
-  reel: planned
+  reel: ""
 evidence:
   - type: image
     src: /assets/img/adversarial-dev/diagram.png

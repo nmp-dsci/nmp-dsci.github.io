@@ -1,0 +1,19 @@
+{%- comment -%}
+  The nine dimensions as a numbered list, three columns — replaces nine
+  identical cards. Each <li> is the anchor target for every matrix cell and
+  every scorecard row on the site.
+{%- endcomment -%}
+{%- assign dims = site.data.rubric.dimensions -%}
+{%- assign ndim = dims | size -%}
+<ol class="dims">
+  {%- for i in (1..ndim) -%}
+    {%- for d in dims -%}
+      {%- if d[1].order == i -%}
+  <li id="rubric-{{ d[0] }}">
+    <span class="ref">{{ d[1].ref }}</span>
+    <span><b>{{ d[1].label | escape }}</b><span>{{ d[1].question | escape }}</span></span>
+  </li>
+      {%- endif -%}
+    {%- endfor -%}
+  {%- endfor -%}
+</ol>

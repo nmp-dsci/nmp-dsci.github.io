@@ -18,7 +18,20 @@ The contract, in one place:
                 <title> in every <g>, no width/height on the root <svg>).
   Spine         the seven H2s, exactly titled, in order; fig-agent under §2 and
                 fig-topology under §4; §7 left empty for the layout to render.
-  Prose         `summary` at most two sentences, `tldr` one line.
+  Card          `headline` at most nine words and never the title again;
+                `outcome` one sentence of at most 25 words for the home-page
+                card; `proof_line` one sentence that carries a number, because
+                DESIGN.md asks every number to bring its denominator.
+  Sections      one `sections:` entry per H2, `n` running 1..7 in the order the
+                headings are numbered, each `summary` one sentence of at most 24
+                words saying the POINT of the section, not its topic.
+  Prose         `summary` at most two sentences, `tldr` one line, and no body
+                paragraph over 80 words (DESIGN.md §3 rule 12). Fenced code,
+                tables, lists, quotes, HTML blocks and Liquid tags are not
+                paragraphs and are not measured. 65-80 words warns.
+  Media         no `"planned"` / `"tbd"` / `"coming"` in `media:`. DESIGN.md rule
+                5: media that does not exist is not rendered, so it is not
+                promised either. An empty string is the honest empty slot.
   Live          `links.demo` answers 200, and a demo build answers "mode":"demo".
 
 Practices (--practice, or any file under _practices/) get the parallel
@@ -31,9 +44,11 @@ Usage
         _projects/data-pilot.md --repo ../data-qa-agent
     uv run --with pyyaml --no-project python scripts/lint_case_study.py --all --no-net
 
+The brief these rules come from is DESIGN.md in the site root.
+
 Stdlib + PyYAML only, so it runs without a project virtualenv. Every check
-prints one ✓ (held), ✗ (broken) or ~ (not checked) line. Exit status is 1 if
-any file fails.
+prints one ✓ (held), ✗ (broken), ! (near a limit, not a failure) or ~ (not
+checked) line. Exit status is 1 if any file fails; a ! never fails a file.
 """
 
 from __future__ import annotations
@@ -57,9 +72,9 @@ SITE_ROOT = Path(__file__).resolve().parent.parent
 # ---------------------------------------------------------------- the contract
 
 REQUIRED = [
-    "title", "summary", "tldr", "tags", "metric", "metric_label", "featured",
-    "order", "stack", "skills", "skills_detail", "links", "architecture",
-    "production",
+    "title", "headline", "outcome", "proof_line", "summary", "tldr", "sections",
+    "tags", "metric", "metric_label", "featured", "order", "stack", "skills",
+    "skills_detail", "links", "architecture", "production",
 ]
 OPTIONAL = ["published", "media", "evidence", "layout", "permalink", "date"]
 REQUIRED_NESTED = {
@@ -87,15 +102,30 @@ EMPTY_SECTION = "7 · Production readiness scorecard"
 
 PRACTICE_REQUIRED = ["title", "summary", "tldr", "order", "kicker", "systems",
                      "rubric", "evidence_note"]
-PRACTICE_OPTIONAL = ["published", "layout", "permalink", "date", "tags", "featured"]
+# A practice has no home-page system card, so the three card lines and the
+# section summaries are optional there — but linted the same way when present.
+PRACTICE_OPTIONAL = ["published", "layout", "permalink", "date", "tags", "featured",
+                     "headline", "outcome", "proof_line", "sections"]
 PRACTICE_SPINE = ["Problem", "Pattern", "In the three systems", "Evidence",
                   "Failure modes"]
+
+HEADLINE_WORDS = 9        # the card's first line, read at a glance
+OUTCOME_WORDS = 25        # one sentence under it, on the home-page card
+SUMMARY_WORDS = 24        # one `sections[].summary`, in the reading rail
+PARAGRAPH_MAX = 80        # DESIGN.md §3 rule 12 — over this the lint fails
+PARAGRAPH_WARN = 65       # under the limit but close enough to say so
+PLACEHOLDER_MEDIA = {"planned", "coming", "soon", "tbd", "todo", "pending", "wip"}
+MEDIA_SLOTS = ["walkthrough", "poster", "captions"]
 
 HOW_MIN = 40  # a reason shorter than this is a shrug, not an explanation
 ABBREV = re.compile(r"\b(e\.g|i\.e|etc|vs|approx|Dr|Mr|Ms|No|Fig|cf)\.", re.I)
 SENTENCE_END = re.compile(r"(?<=[.!?])[\"')\]]?\s+(?=[A-Z\"'“(])")
 EXTENSION = re.compile(r"\.[A-Za-z][A-Za-z0-9]{1,5}$")
 HTML_COMMENT = re.compile(r"<!--.*?-->", re.S)
+HEADING_NUMBER = re.compile(r"^\s*(\d+)\b")
+LIST_ITEM = re.compile(r"^\s*(?:[-*+]\s|\d+[.)]\s)")
+NOT_PROSE = ("#", ">", "|", "<", "{%", "{{", "!", "=")  # heading, quote, table,
+#                                          HTML, Liquid, image, setext underline
 
 
 # --------------------------------------------------------------------- output
@@ -112,7 +142,7 @@ def listing(**groups: list) -> list[str]:
 
 
 class Report:
-    """The ✓ / ✗ / ~ lines for one file, plus its verdict."""
+    """The ✓ / ✗ / ! / ~ lines for one file, plus its verdict."""
 
     def __init__(self, label: str) -> None:
         self.label = label
@@ -128,6 +158,10 @@ class Report:
 
     def skip(self, msg: str) -> None:
         self.lines.append(("~", msg, []))
+
+    def warn(self, msg: str, *details: str) -> None:
+        """Worth the author's eye, not worth failing a build over."""
+        self.lines.append(("!", msg, list(details)))
 
     def verdict(self, held: bool, msg: str, *details: str, fail_msg: str = "") -> None:
         """Details explain a failure, so they print only when it fails."""
@@ -197,6 +231,60 @@ def h2_sections(body: str) -> list[tuple[str, str]]:
         elif sections:
             sections[-1][1].append(line)
     return [(title, "\n".join(lines)) for title, lines in sections]
+
+
+def body_paragraphs(body: str) -> list[str]:
+    """The prose blocks of a body, as single strings.
+
+    Only prose is measured: fenced code, tables, lists, blockquotes, HTML blocks
+    and Liquid tags are not paragraphs. A block that starts as prose and turns
+    into a list, a table or a <figure> is measured up to that turn.
+    """
+    blocks: list[list[str]] = []
+    block: list[str] = []
+    fenced = False
+    for line in HTML_COMMENT.sub("", body).splitlines():
+        if line.lstrip().startswith(("```", "~~~")):
+            fenced = not fenced
+            blocks.append(block)
+            block = []
+        elif fenced:
+            continue
+        elif line.strip():
+            block.append(line)
+        else:
+            blocks.append(block)
+            block = []
+    blocks.append(block)
+
+    paragraphs = []
+    for chunk in blocks:
+        prose = []
+        for line in chunk:
+            if LIST_ITEM.match(line) or line.lstrip().startswith(NOT_PROSE):
+                break
+            prose.append(line.strip())
+        if prose:
+            paragraphs.append(" ".join(prose))
+    return paragraphs
+
+
+def words_in(value) -> tuple[str, int]:
+    """(the value on one line, its word count) — front matter folds, so re-join."""
+    text = " ".join(str(value or "").split())
+    return text, len(text.split())
+
+
+def is_placeholder_media(value) -> bool:
+    """DESIGN.md rule 5. A path or a URL is a file; "planned" is a promise."""
+    if value is True:
+        return True
+    if not isinstance(value, str):
+        return False
+    text = value.strip().strip("\"'").casefold()
+    if not text or "/" in text or text.startswith("http"):
+        return False
+    return bool({w for w in re.split(r"[^a-z]+", text) if w} & PLACEHOLDER_MEDIA)
 
 
 def proof_paths(proof: str) -> list[str]:
@@ -411,6 +499,139 @@ def check_prose(rep: Report, fm: dict) -> None:
                          f"tldr {len(tldr)} chars")
 
 
+def check_headline(rep: Report, fm: dict) -> None:
+    """The card's first line: the outcome in nine words, not the product name."""
+    headline, words = words_in(fm.get("headline"))
+    title, _ = words_in(fm.get("title"))
+    faults = []
+    if not headline:
+        faults.append("absent — the card and the page header both lead with it")
+    if words > HEADLINE_WORDS:
+        faults.append(f"{words} words, and the line holds {HEADLINE_WORDS}: {headline}")
+    if headline and headline.casefold() == title.casefold():
+        faults.append(f"identical to title ({title!r}) — say the outcome, not the name again")
+    rep.verdict(not faults, f"headline: {words} {plural(words, 'word')}, not the title",
+                *faults, fail_msg=f"headline: {words} {plural(words, 'word')}")
+
+
+def check_outcome(rep: Report, fm: dict) -> None:
+    """One sentence for the home-page card: what the system achieves, and the stake."""
+    outcome, words = words_in(fm.get("outcome"))
+    sentences = count_sentences(outcome)
+    faults = []
+    if not outcome:
+        faults.append("absent — the home-page card has no sentence to show")
+    if words > OUTCOME_WORDS:
+        faults.append(f"{words} words, limit {OUTCOME_WORDS}: {outcome[:60]}")
+    if sentences > 1:
+        faults.append(f"{sentences} sentences — the card shows one")
+    rep.verdict(not faults, f"outcome: 1 sentence, {words} {plural(words, 'word')}", *faults,
+                fail_msg=f"outcome: {sentences} {plural(sentences, 'sentence')}, "
+                         f"{words} {plural(words, 'word')}")
+
+
+def check_proof_line(rep: Report, fm: dict) -> None:
+    """The TL;DR "Proof" cell. DESIGN.md: every number carries its baseline or
+    denominator — so a proof line with no number is not proof of anything."""
+    proof, words = words_in(fm.get("proof_line"))
+    faults = []
+    if not proof:
+        faults.append("absent — the TL;DR Proof cell needs a sentence")
+    elif not any(character.isdigit() for character in proof):
+        faults.append(f"carries no number: {proof[:60]}")
+    rep.verdict(not faults, f"proof_line: {words} {plural(words, 'word')}, carries a number",
+                *faults, fail_msg="proof_line: not usable as the TL;DR Proof cell")
+
+
+def check_sections(rep: Report, fm: dict, body: str, required: bool = True) -> None:
+    """One `sections:` entry per H2, numbered as the headings are, each summary a
+    single sentence stating the point of the section rather than its topic."""
+    entries = fm.get("sections")
+    heads = [title for title, _ in h2_sections(body)]
+    if entries is None:
+        if required:
+            rep.bad(f"sections: absent — the rail wants one summary per H2 "
+                    f"({len(heads)} in the body)")
+        else:
+            rep.skip("sections: not declared (optional on a practice)")
+        return
+    if not isinstance(entries, list) or not entries:
+        rep.bad(f"sections: {entries!r} is not a list of n/summary entries")
+        return
+
+    faults, numbers = [], []
+    if len(entries) != len(heads):
+        faults.append(f"{len(entries)} entries for {len(heads)} H2s — one each, no more")
+    for position, entry in enumerate(entries, 1):
+        if not isinstance(entry, dict):
+            faults.append(f"entry {position} is not a mapping with n: and summary:")
+            continue
+        n = entry.get("n")
+        numbered = isinstance(n, int) and not isinstance(n, bool)
+        label = f"n={n}" if numbered else f"entry {position}"
+        if numbered:
+            numbers.append(n)
+        else:
+            faults.append(f"entry {position}: n is {n!r}, not a section number")
+        summary, words = words_in(entry.get("summary"))
+        if not summary:
+            faults.append(f"{label}: summary is empty — say the point of the section")
+            continue
+        sentences = count_sentences(summary)
+        if sentences > 1:
+            faults.append(f"{label}: summary is {sentences} sentences — one states the point")
+        if words > SUMMARY_WORDS:
+            faults.append(f"{label}: summary is {words} words, limit {SUMMARY_WORDS}: "
+                          f"{summary[:60]}")
+    if numbers and numbers != list(range(1, len(numbers) + 1)):
+        faults.append("n runs " + ", ".join(str(n) for n in numbers)
+                      + f" — expected 1..{len(numbers)}, in order, once each")
+    heading_numbers = [int(match.group(1)) for title in heads
+                       for match in [HEADING_NUMBER.match(title)] if match]
+    if numbers and len(heading_numbers) == len(heads) and numbers != heading_numbers:
+        faults.append("n does not follow the H2 numbers: "
+                      + ", ".join(str(n) for n in heading_numbers))
+    rep.verdict(not faults,
+                f"sections: {len(entries)}/{len(heads)} summaries, numbered as the H2s, "
+                "one sentence each", *faults,
+                fail_msg=f"sections: {len(entries)} for {len(heads)} H2s")
+
+
+def check_paragraphs(rep: Report, body: str) -> None:
+    """DESIGN.md §3 rule 12. Over 80 words the paragraph is not read; split it at
+    the natural seam, or lift the enumeration inside it into a list."""
+    over, near, paragraphs = [], [], body_paragraphs(body)
+    for para in paragraphs:
+        words = len(para.split())
+        if words > PARAGRAPH_MAX:
+            over.append(f"{words} words: {para[:60]}")
+        elif words >= PARAGRAPH_WARN:
+            near.append(f"{words} words: {para[:60]}")
+    rep.verdict(not over,
+                f"paragraphs: {len(paragraphs)} prose {plural(len(paragraphs), 'paragraph')}, "
+                f"none over {PARAGRAPH_MAX} words", *over,
+                fail_msg=f"paragraphs: {len(over)} over {PARAGRAPH_MAX} words")
+    if near:
+        rep.warn(f"paragraphs: {len(near)} between {PARAGRAPH_WARN} and {PARAGRAPH_MAX} words",
+                 *near)
+
+
+def check_media(rep: Report, fm: dict) -> None:
+    """DESIGN.md rule 5: no placeholder for media that does not exist. An empty
+    string is how an unrecorded slot says so; "planned" renders a promise."""
+    media = fm.get("media")
+    if not isinstance(media, dict):
+        rep.ok("media: nothing declared, so no slot to placeholder")
+        return
+    faults = [f"media.{key}: {value!r} is a promise, not a file — leave it empty"
+              for key, value in media.items() if is_placeholder_media(value)]
+    filled = [key for key in MEDIA_SLOTS if not is_empty(media.get(key))]
+    rep.verdict(not faults,
+                f"media: {len(filled)}/{len(MEDIA_SLOTS)} slots filled, no placeholder",
+                *faults,
+                fail_msg=f"media: {len(faults)} placeholder {plural(len(faults), 'value')}")
+
+
 def check_rung(rep: Report, production: dict, rubric: dict) -> None:
     rungs = {str(k) for k in (rubric.get("rungs") or {})}
     rung = str(production.get("rung"))
@@ -478,6 +699,12 @@ def lint_project(path: Path, repo: Path | None, why: str, no_net: bool) -> Repor
     check_spine(rep, body)
     check_score(rep, production, rows)
     check_prose(rep, fm)
+    check_headline(rep, fm)
+    check_outcome(rep, fm)
+    check_proof_line(rep, fm)
+    check_sections(rep, fm, body)
+    check_paragraphs(rep, body)
+    check_media(rep, fm)
     check_rung(rep, production, rubric)
     if links.get("demo"):
         check_demo(rep, str(links["demo"]), no_net)
@@ -512,6 +739,12 @@ def lint_practice(path: Path) -> Report:
     rep.verdict(not faults, f"spine: {hits}/5 sections present, in order", *faults,
                 fail_msg=f"spine: {hits}/5 sections match the contract")
     check_prose(rep, fm)
+    for key, check in (("headline", check_headline), ("outcome", check_outcome),
+                       ("proof_line", check_proof_line)):
+        if key in fm:
+            check(rep, fm)
+    check_sections(rep, fm, body, required=False)
+    check_paragraphs(rep, body)
     return rep
 
 
@@ -543,7 +776,8 @@ def infer_repo(path: Path) -> tuple[Path | None, str]:
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         description="Lint a case study against the contract in _templates/project.md.",
-        epilog="Contract: _templates/project.md · _data/rubric.yml · _data/skills.yml",
+        epilog="Contract: DESIGN.md · _templates/project.md · _data/rubric.yml "
+               "· _data/skills.yml",
     )
     parser.add_argument("files", nargs="*", type=Path, help="_projects/<slug>.md")
     parser.add_argument("--repo", type=Path, help="sibling repo the proof paths resolve against")
