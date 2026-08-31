@@ -8,3 +8,8 @@ _out_*/
 _probeout/
 __pycache__/
 *.pyc
+
+# local Jekyll build output (Docker)
+_o/
+_o_*/
+_probe*/
