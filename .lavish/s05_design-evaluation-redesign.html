@@ -1,0 +1,1320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Design evaluation & redesign plan · nmp-dsci.github.io</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Serif:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500;600&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ------------------------------------------------------------------
+   Artifact chrome — uses the site's own tokens (IBM Plex, paper/ink,
+   signal green) so the review reads as a document from this project.
+   The two design mocks below carry their OWN scoped token sets.
+------------------------------------------------------------------- */
+:root{
+  color-scheme:dark;
+  --bg:#121614; --panel:#191E1B; --ink:#E8EBE7; --ink-2:#C9CFC9; --muted:#A7AFA9;
+  --line:#28302B; --line-2:#3A443E; --signal:#3DBB95; --signal-soft:#17382C;
+  --amber:#D99A4E; --amber-soft:#3A2A14; --red:#E2795F; --red-soft:#3B211A;
+  --mono:'IBM Plex Mono',ui-monospace,SFMono-Regular,monospace;
+  --sans:'IBM Plex Sans',system-ui,-apple-system,sans-serif;
+  --w:1240px;
+}
+*,*::before,*::after{box-sizing:border-box;min-width:0}
+:where(.grid,.flex)>*{min-width:0}
+:where(p,h1,h2,h3,h4,li,dd,figcaption,td,th){overflow-wrap:anywhere}
+:where(img,svg,video){max-width:100%;height:auto}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 var(--sans)}
+a{color:var(--signal)}
+h1,h2,h3,h4{line-height:1.2;letter-spacing:-.015em;margin:0;text-wrap:balance}
+h1{font-size:clamp(30px,4vw,44px);font-weight:700}
+h2{font-size:clamp(22px,2.6vw,30px);font-weight:600;margin-top:8px}
+h3{font-size:20px;font-weight:600}
+h4{font-size:16px;font-weight:600}
+p{margin:0 0 12px}
+code{font-family:var(--mono);font-size:.9em;background:var(--signal-soft);padding:1px 5px;border-radius:4px}
+.wrap{max-width:var(--w);margin:0 auto;padding:0 24px}
+.kicker{font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+section.blk{padding:56px 0;border-top:1px solid var(--line)}
+section.blk:first-of-type{border-top:0}
+.lead{font-size:18px;color:var(--ink-2);max-width:72ch}
+.two{display:grid;gap:24px;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr))}
+.three{display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr))}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:20px}
+.card h4{margin-bottom:6px}
+.note{font-size:14px;color:var(--muted)}
+.small{font-size:13.5px}
+.tag{display:inline-block;font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border-radius:999px;background:var(--signal-soft);color:var(--signal);margin-right:6px}
+.tag.amber{background:var(--amber-soft);color:var(--amber)}
+.tag.red{background:var(--red-soft);color:var(--red)}
+.tag.grey{background:var(--line);color:var(--muted)}
+ul,ol{padding-left:22px;margin:0 0 12px}
+li{margin-bottom:4px}
+/* top bar */
+.top{position:sticky;top:0;z-index:20;background:rgba(18,22,20,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.top .wrap{display:flex;gap:18px;align-items:center;padding:10px 24px;flex-wrap:wrap}
+.top b{font-family:var(--mono);font-size:13px}
+.top nav{display:flex;gap:14px;flex-wrap:wrap}
+.top nav a{font-size:13px;color:var(--ink-2);text-decoration:none}
+.top nav a:hover{color:var(--signal)}
+/* verdict */
+.verdict{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));margin-top:26px}
+.score{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px 20px}
+.score .n{font-family:var(--mono);font-size:40px;font-weight:600;line-height:1;letter-spacing:-.02em}
+.score .l{font-size:13px;color:var(--muted);margin-top:6px}
+.score.cur .n{color:var(--red)}
+.score.a .n{color:var(--signal)}
+.score.b .n{color:var(--signal)}
+.bar{height:8px;background:var(--line-2);border-radius:999px;margin-top:12px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--signal);border-radius:999px}
+.score.cur .bar i{background:var(--red)}
+/* tables */
+table{border-collapse:collapse;width:100%;font-size:14px;background:var(--panel)}
+.tscroll{overflow-x:auto;border:1px solid var(--line);border-radius:12px}
+th,td{text-align:left;vertical-align:top;padding:10px 12px;border-bottom:1px solid var(--line)}
+thead th{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);background:var(--panel);position:sticky;top:0}
+tbody tr:last-child td{border-bottom:0}
+td.num{font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+.s0,.s1{color:var(--red);font-weight:600}.s2{color:var(--amber);font-weight:600}.s3{color:var(--muted);font-weight:600}.s4,.s5{color:var(--signal);font-weight:600}
+.pill{display:inline-block;min-width:26px;text-align:center;border-radius:6px;padding:1px 6px;font-family:var(--mono);font-size:12.5px;font-weight:600}
+.pill.p0,.pill.p1{background:var(--red-soft);color:var(--red)}.pill.p2{background:var(--amber-soft);color:var(--amber)}.pill.p3{background:var(--line-2);color:var(--ink)}.pill.p4,.pill.p5{background:var(--signal-soft);color:var(--signal)}
+/* figures */
+figure{margin:0}
+.shot{border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#111}
+.shot img{display:block;width:100%}
+figcaption{font-size:13px;color:var(--muted);margin-top:8px;line-height:1.5}
+figcaption b{color:var(--ink)}
+.callouts{counter-reset:c;list-style:none;padding:0;margin:10px 0 0;display:grid;gap:6px}
+.callouts li{position:relative;padding-left:28px;font-size:13.5px}
+.callouts li::before{counter-increment:c;content:counter(c);position:absolute;left:0;top:2px;width:20px;height:20px;border-radius:999px;background:var(--red);color:#1A100C;font:600 11px/20px var(--mono);text-align:center}
+/* rules list */
+.rules{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr))}
+.rule{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.rule b{display:block;margin-bottom:4px}
+.rule .src{font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:6px}
+/* mock frames */
+.frame{border:1px solid var(--line-2);border-radius:14px;overflow:hidden;background:var(--panel);box-shadow:0 1px 2px rgba(0,0,0,.3),0 18px 40px -24px rgba(0,0,0,.6);container-type:inline-size}
+.frame .bar-ui{display:flex;align-items:center;gap:8px;padding:8px 12px;background:#0E1210;border-bottom:1px solid var(--line-2);font-family:var(--mono);font-size:11px;color:var(--muted)}
+.frame .bar-ui i{width:10px;height:10px;border-radius:999px;background:var(--line-2);display:inline-block}
+.frame .bar-ui .url{margin-left:auto;background:var(--panel);border-radius:6px;padding:2px 10px}
+.frame .bar-ui button{margin-left:8px;font:inherit;border:1px solid var(--line-2);background:var(--panel);color:var(--ink);border-radius:6px;padding:2px 8px;cursor:pointer}
+.frames{display:grid;gap:22px;grid-template-columns:minmax(0,1fr)}
+.frame-row{display:grid;gap:22px;grid-template-columns:minmax(0,1fr);align-items:start}
+.frame-row .frame.narrow{justify-self:start}
+.frame.narrow{width:400px;max-width:100%}
+.swatches{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.sw{width:112px;border:1px solid var(--line);border-radius:8px;overflow:hidden;font-family:var(--mono);font-size:10.5px}
+.sw i{display:block;height:34px}
+.sw span{display:block;padding:4px 6px;background:var(--panel);color:var(--muted)}
+/* option header */
+.opt-head{display:grid;gap:22px;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);align-items:start;margin-bottom:22px}
+@media(max-width:900px){.opt-head{grid-template-columns:minmax(0,1fr)}}
+.opt-head .card ul{margin:0}
+/* plan */
+.phase{display:grid;gap:14px;grid-template-columns:120px minmax(0,1fr);border:1px solid var(--line);border-radius:12px;background:var(--panel);padding:16px 18px;margin-bottom:12px}
+@media(max-width:700px){.phase{grid-template-columns:minmax(0,1fr)}}
+.phase .ph{font-family:var(--mono);font-size:12px;color:var(--signal);font-weight:600}
+.phase .ph small{display:block;color:var(--muted);font-weight:400;margin-top:4px}
+.phase ul{margin:6px 0 0}
+.files{font-family:var(--mono);font-size:12px;color:var(--muted);margin-top:8px;line-height:1.7}
+/* input */
+form.q{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:20px;margin-bottom:16px}
+form.q label{display:block;margin:6px 0;font-size:15px}
+form.q input[type=radio],form.q input[type=checkbox]{margin-right:8px;transform:scale(1.15)}
+form.q textarea{width:100%;min-height:70px;font:14px/1.5 var(--sans);background:var(--bg);color:var(--ink);border:1px solid var(--line-2);border-radius:8px;padding:10px;margin-top:6px}
+form.q button{font:600 14px var(--sans);background:var(--signal);color:#0E1512;border:0;border-radius:8px;padding:10px 16px;margin-top:10px;cursor:pointer}
+form.q .queued{font-family:var(--mono);font-size:12px;color:var(--signal);margin-left:10px}
+.codeblk{margin:18px 0 26px}
+.codeblk .why{font-size:14px;color:var(--ink-2);margin:0 0 8px}
+.codeblk .why code{font-size:.85em}
+details{border:1px solid var(--line);border-radius:10px;background:var(--panel);padding:10px 16px;margin:10px 0}
+summary{cursor:pointer;font-weight:600}
+
+/* ==================================================================
+   MOCK A — "Field Guide"  (scoped tokens)
+================================================================== */
+.ma{
+  --bg:#F7F6F2; --panel:#FFFFFF; --band:#EFEEE8; --ink:#1A1D1B; --ink-2:#3B403D; --muted:#5B625E; --faint:#646B66;
+  --line:#DCDAD2; --line-2:#C7C5BC; --accent:#0B6E58; --accent-ink:#fff; --accent-soft:#DFEFE8; --amber:#8F5306; --amber-soft:#F6E6CF;
+  --sans:'IBM Plex Sans',system-ui,sans-serif; --serif:'IBM Plex Serif',Georgia,serif; --mono:'IBM Plex Mono',ui-monospace,monospace;
+  --s1:4px;--s2:8px;--s3:12px;--s4:16px;--s5:24px;--s6:32px;--s7:48px;--s8:64px;--s9:96px;
+  --r:10px; --shadow:0 1px 2px rgba(20,25,22,.05),0 12px 28px -18px rgba(20,25,22,.22);
+  background:var(--bg);color:var(--ink);font:16px/1.55 var(--sans);
+}
+.ma[data-scheme=dark]{
+  --bg:#121614; --panel:#191E1B; --band:#161A18; --ink:#E8EBE7; --ink-2:#C9CFC9; --muted:#A7AFA9; --faint:#8C948E;
+  --line:#28302B; --line-2:#3A443E; --accent:#3DBB95; --accent-ink:#0E1512; --accent-soft:#17382C; --amber:#D99A4E; --amber-soft:#3A2A14;
+}
+.ma *{box-sizing:border-box;min-width:0}
+.ma a{color:inherit;text-decoration:none}
+.ma .nav{display:flex;align-items:center;gap:var(--s5);padding:14px 32px;border-bottom:1px solid var(--line);background:color-mix(in srgb,var(--bg) 88%,transparent)}
+.ma .brand{font-family:var(--mono);font-weight:600;font-size:15px;letter-spacing:-.01em}
+.ma .brand small{font-weight:400;color:var(--faint);margin-left:8px}
+.ma .links{display:flex;gap:22px;margin-left:auto;font-size:14.5px;font-weight:500;color:var(--ink-2)}
+.ma .links a{position:relative;padding:6px 0}
+.ma .links a::after{content:"";position:absolute;left:0;right:100%;bottom:0;height:2px;background:var(--accent);transition:right .3s ease-out}
+.ma .links a:hover::after{right:0}
+.ma .util{display:flex;gap:8px;align-items:center;margin-left:8px}
+.ma .ic{width:32px;height:32px;border-radius:8px;border:1px solid var(--line-2);display:inline-flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:12px;color:var(--ink-2)}
+.ma .btn{display:inline-flex;align-items:center;gap:8px;font-weight:600;font-size:15px;padding:12px 20px;border-radius:var(--r);background:var(--accent);color:var(--accent-ink);transition:transform .3s,box-shadow .3s}
+.ma .btn:hover{transform:translateY(-1px);box-shadow:var(--shadow)}
+.ma .btn.sm{font-size:13.5px;padding:9px 14px}
+.ma .lnk{font-weight:500;color:var(--accent);text-decoration:underline;text-underline-offset:4px;text-decoration-thickness:1.5px}
+.ma .hero{display:grid;gap:var(--s7);grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);padding:var(--s8) 32px var(--s7);align-items:center}
+.ma .kick{font-family:var(--mono);font-size:12.5px;color:var(--accent);font-weight:500;letter-spacing:.02em;margin:0 0 var(--s4)}
+.ma h1{font:600 clamp(34px,4.6cqw,54px)/1.08 var(--sans);letter-spacing:-.03em;margin:0 0 var(--s4);text-wrap:balance}
+.ma h1 em{font-style:normal;color:var(--accent)}
+.ma .dek{font:400 19px/1.5 var(--serif);color:var(--ink-2);max-width:48ch;margin:0 0 var(--s5)}
+.ma .ctas{display:flex;gap:var(--s4);align-items:center;flex-wrap:wrap;margin-bottom:var(--s5)}
+.ma .proofline{font-size:14px;color:var(--muted);display:flex;gap:var(--s4);flex-wrap:wrap}
+.ma .proofline b{color:var(--ink);font-family:var(--mono);font-weight:600}
+/* the star: matrix */
+.ma .star{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:var(--s5);box-shadow:var(--shadow)}
+.ma .star .t{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:var(--s4)}
+.ma .star .t b{font-size:15px}
+.ma .star .t span{font-family:var(--mono);font-size:11.5px;color:var(--faint)}
+.ma .mx{display:grid;grid-template-columns:minmax(0,1.6fr) repeat(3,minmax(0,1fr));gap:6px;font-size:12.5px}
+.ma .mx .h{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);padding:2px 4px 6px;text-align:center}
+.ma .mx .h:first-child{text-align:left}
+.ma .mx .d{padding:6px 4px;color:var(--ink-2);display:flex;gap:6px;align-items:center}
+.ma .mx .d i{font-family:var(--mono);font-size:10.5px;color:var(--faint);font-style:normal;width:18px}
+.ma .c{height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:10.5px;font-weight:600;letter-spacing:.02em;transition:transform .2s}
+.ma .c:hover{transform:scale(1.06)}
+.ma .c.y{background:var(--accent);color:var(--accent-ink)}
+.ma .c.p{background:var(--amber-soft);color:var(--amber);border:1px solid var(--amber)}
+.ma .c.d{background:transparent;color:var(--muted);border:1.5px dashed var(--line-2)}
+.ma .c.n{background:transparent;color:var(--faint)}
+.ma .legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:var(--s4);font-size:12px;color:var(--muted)}
+.ma .legend i{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-2px;margin-right:5px}
+/* proof strip */
+.ma .proof{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--s5);padding:var(--s6) 32px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--band)}
+.ma .proof .n{font:600 34px/1 var(--mono);letter-spacing:-.02em;color:var(--ink)}
+.ma .proof .l{font-size:14px;color:var(--ink-2);margin-top:8px;line-height:1.45}
+.ma .proof .l small{display:block;color:var(--faint);font-family:var(--mono);font-size:11.5px;margin-top:4px}
+/* systems */
+.ma .sec{padding:var(--s8) 32px}
+.ma .sec-h{display:flex;align-items:baseline;gap:var(--s4);margin-bottom:var(--s5)}
+.ma .sec-h h2{font:600 28px/1.15 var(--sans);letter-spacing:-.02em;margin:0}
+.ma .sec-h span{font-family:var(--mono);font-size:12px;color:var(--faint)}
+.ma .sys{display:grid;gap:var(--s5);grid-template-columns:repeat(3,minmax(0,1fr))}
+.ma .sc{background:var(--panel);border-radius:14px;padding:var(--s5);box-shadow:var(--shadow);display:flex;flex-direction:column;gap:var(--s4);transition:transform .3s,box-shadow .3s}
+.ma .sc:hover{transform:translateY(-3px);box-shadow:0 2px 4px rgba(20,25,22,.06),0 22px 40px -20px rgba(20,25,22,.3)}
+.ma .sc .top{display:flex;justify-content:space-between;align-items:center}
+.ma .sc h3{font:600 20px/1.2 var(--sans);letter-spacing:-.015em;margin:0}
+.ma .live{font-family:var(--mono);font-size:10.5px;font-weight:600;letter-spacing:.08em;color:var(--accent);display:inline-flex;align-items:center;gap:6px}
+.ma .live::before{content:"";width:7px;height:7px;border-radius:99px;background:var(--accent)}
+.ma .sc .out{font:400 16px/1.45 var(--serif);color:var(--ink-2);margin:0}
+.ma .sc .dia-frame{background:var(--band);border-radius:10px;padding:12px 12px 8px}
+.ma .facts{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 12px;font-size:13px;color:var(--ink-2)}
+.ma .facts b{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);font-weight:500;padding-top:2px}
+.ma .sc .foot{display:flex;gap:12px;align-items:center;margin-top:auto;padding-top:4px}
+/* rubric list */
+.ma .dims{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--s4) var(--s6);counter-reset:d}
+.ma .dims div{display:grid;grid-template-columns:28px minmax(0,1fr);gap:8px;font-size:14px;color:var(--ink-2);padding:var(--s3) 0;border-top:1px solid var(--line)}
+.ma .dims div::before{counter-increment:d;content:"0" counter(d);font-family:var(--mono);font-size:12px;color:var(--accent);font-weight:600;padding-top:2px}
+.ma .dims b{display:block;color:var(--ink);font-size:15px}
+/* case study */
+.ma .cs-head{padding:var(--s7) 32px var(--s6);border-bottom:1px solid var(--line)}
+.ma .crumb{font-family:var(--mono);font-size:12px;color:var(--faint);margin-bottom:var(--s4)}
+.ma .cs-head h1{font-size:clamp(32px,4.2cqw,46px);max-width:24ch;margin-bottom:var(--s3)}
+.ma .cs-head .dek{font-size:20px;max-width:60ch}
+.ma .meta{display:flex;gap:var(--s5);flex-wrap:wrap;font-size:13px;color:var(--muted);margin:var(--s4) 0 var(--s5)}
+.ma .meta b{color:var(--ink);font-family:var(--mono);font-weight:500}
+.ma .tldr{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--s5);background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:12px;padding:var(--s4) var(--s5);margin:0 32px;transform:translateY(50%)}
+.ma .tldr b{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin-bottom:4px;font-weight:500}
+.ma .tldr p{margin:0;font-size:14.5px;color:var(--ink-2);line-height:1.5}
+.ma .tldr p strong{font-family:var(--mono);color:var(--accent)}
+.ma .cs-body{display:grid;grid-template-columns:180px minmax(0,1fr) 250px;gap:var(--s7);padding:calc(var(--s8) + 40px) 32px var(--s8);align-items:start}
+.ma .toc{position:sticky;top:20px;font-size:13.5px}
+.ma .toc b{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin-bottom:10px;font-weight:500}
+.ma .toc a{display:block;padding:6px 0 6px 12px;border-left:2px solid var(--line);color:var(--muted)}
+.ma .toc a.on{border-color:var(--accent);color:var(--ink);font-weight:600}
+.ma .toc .prog{height:3px;background:var(--line);border-radius:99px;margin-top:14px}
+.ma .toc .prog i{display:block;width:22%;height:100%;background:var(--accent);border-radius:99px}
+.ma .prose{max-width:68ch;font:18px/1.6 var(--serif);color:var(--ink-2)}
+.ma .prose h2{font:600 26px/1.2 var(--sans);letter-spacing:-.02em;color:var(--ink);margin:0 0 var(--s3);display:flex;gap:12px;align-items:baseline}
+.ma .prose h2 i{font:600 14px var(--mono);color:var(--accent);font-style:normal}
+.ma .prose .sum{font:500 19px/1.45 var(--sans);color:var(--ink);margin:0 0 var(--s4);text-wrap:pretty}
+.ma .prose p{margin:0 0 var(--s4);text-wrap:pretty}
+.ma .prose code{font-family:var(--mono);font-size:.82em;background:var(--accent-soft);color:var(--accent);padding:1px 5px;border-radius:4px}
+.ma .prose figure{margin:var(--s5) 0}
+.ma .prose figcaption{font:13px/1.5 var(--sans);color:var(--muted);margin-top:8px}
+.ma .prose figcaption b{color:var(--ink)}
+.ma .prose details{border:1px solid var(--line);border-radius:10px;padding:10px 14px;font:14.5px/1.5 var(--sans);margin:0 0 var(--s5)}
+.ma .prose summary{cursor:pointer;font-weight:600;color:var(--ink)}
+.ma .prose ul{padding-left:20px;margin:8px 0 0;font-family:var(--mono);font-size:12.5px;color:var(--muted)}
+.ma .rail{position:sticky;top:20px;display:flex;flex-direction:column;gap:var(--s4)}
+.ma .rail .box{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:var(--s4)}
+.ma .rail .box b{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin-bottom:8px;font-weight:500}
+.ma .mini{display:grid;gap:5px}
+.ma .mini div{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink-2)}
+.ma .mini i{width:10px;height:10px;border-radius:3px;flex:0 0 auto}
+.ma .mini i.y{background:var(--accent)}.ma .mini i.p{background:var(--amber)}.ma .mini i.d{border:1.5px dashed var(--line-2)}
+.ma .next{display:flex;justify-content:space-between;gap:var(--s4);padding:var(--s6) 32px;border-top:1px solid var(--line);font-size:14px}
+.ma .next b{display:block;font-size:17px;color:var(--ink)}
+/* narrow (container query) */
+@container (max-width: 700px){
+  .ma .nav{padding:12px 18px}
+  .ma .links{display:none}
+  .ma .hero{grid-template-columns:minmax(0,1fr);padding:40px 18px 32px;gap:28px}
+  .ma h1{font-size:34px}
+  .ma .proof{grid-template-columns:minmax(0,1fr);gap:18px;padding:24px 18px}
+  .ma .sec{padding:40px 18px}
+  .ma .sys{grid-template-columns:minmax(0,1fr)}
+  .ma .dims{grid-template-columns:minmax(0,1fr)}
+  .ma .mx{grid-template-columns:minmax(0,1.4fr) repeat(3,minmax(0,1fr))}
+  .ma .cs-body{grid-template-columns:minmax(0,1fr);padding:48px 18px}
+  .ma .toc,.ma .rail{position:static}
+  .ma .tldr{grid-template-columns:minmax(0,1fr);margin:0 18px;transform:none;margin-top:16px}
+}
+
+/* ==================================================================
+   MOCK B — "Monograph"  (scoped tokens)
+================================================================== */
+.mb{
+  --bg:#FBF8F1; --panel:#FFFDF8; --ink:#14120F; --ink-2:#36322B; --muted:#5A554C; --faint:#6F6A60;
+  --line:#E4DFD3; --line-2:#CFC8B8; --accent:#A63A22; --accent-ink:#fff; --accent-soft:#F6E4DE; --green:#2F6B3A; --green-soft:#E1EEE2; --amber:#8F5306;
+  --display:'Fraunces',Georgia,serif; --serif:'Source Serif 4',Georgia,serif; --mono:'JetBrains Mono',ui-monospace,monospace;
+  --s1:4px;--s2:8px;--s3:12px;--s4:16px;--s5:24px;--s6:32px;--s7:48px;--s8:64px;--s9:96px;--s10:128px;
+  background:var(--bg);color:var(--ink);font:17px/1.6 var(--serif);
+  background-image:radial-gradient(1200px 400px at 50% -10%,rgba(166,58,34,.06),transparent);
+}
+.mb[data-scheme=dark]{
+  --bg:#161412; --panel:#1C1916; --ink:#EDE8DF; --ink-2:#D2CBBE; --muted:#B0A99C; --faint:#8F887B;
+  --line:#2E2A25; --line-2:#443E36; --accent:#E2795F; --accent-ink:#1A100C; --accent-soft:#3B211A; --green:#7CC48A; --green-soft:#1E3324; --amber:#D99A4E;
+  background-image:radial-gradient(1200px 400px at 50% -10%,rgba(226,121,95,.08),transparent);
+}
+.mb *{box-sizing:border-box;min-width:0}
+.mb a{color:inherit;text-decoration:none}
+.mb .mast{display:flex;align-items:baseline;gap:var(--s5);padding:18px 40px;border-bottom:1px solid var(--ink)}
+.mb .mast .name{font:500 18px var(--display);letter-spacing:-.01em}
+.mb .mast nav{margin-left:auto;display:flex;gap:26px;font:500 12.5px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--ink-2)}
+.mb .mast nav a{border-bottom:1px solid transparent;transition:border-color .3s}
+.mb .mast nav a:hover{border-color:var(--accent)}
+.mb .mast .ct{font:500 12.5px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--accent-ink);background:var(--accent);padding:8px 14px;border-radius:3px}
+.mb .title{padding:var(--s9) 40px var(--s7);border-bottom:1px solid var(--line)}
+.mb .over{font:500 12.5px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin:0 0 var(--s5)}
+.mb h1{font:500 clamp(44px,7cqw,88px)/0.98 var(--display);font-variation-settings:"opsz" 144;letter-spacing:-.02em;margin:0 0 var(--s5);max-width:16ch;text-wrap:balance}
+.mb h1 i{font-style:italic;font-weight:400;color:var(--accent);margin-right:.06em}
+.mb .dek{font:400 22px/1.45 var(--serif);color:var(--ink-2);max-width:52ch;margin:0 0 var(--s6)}
+.mb .title .row{display:flex;gap:var(--s6);align-items:center;flex-wrap:wrap;font:14px var(--serif);color:var(--muted)}
+.mb .title .row b{font-family:var(--mono);font-weight:500;color:var(--ink);font-size:13px}
+.mb .btn{font:500 12.5px var(--mono);letter-spacing:.1em;text-transform:uppercase;background:var(--ink);color:var(--bg);padding:12px 18px;border-radius:3px;transition:background .3s}
+.mb .btn:hover{background:var(--accent);color:var(--accent-ink)}
+/* index */
+.mb .idx{padding:var(--s7) 40px;border-bottom:1px solid var(--line)}
+.mb .idx-h{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:var(--s5)}
+.mb .idx-h h2{font:500 14px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:0}
+.mb .idx-h span{font:13px var(--serif);color:var(--faint)}
+.mb .row-i{display:grid;grid-template-columns:64px minmax(0,1.5fr) minmax(0,1fr) 180px 40px;gap:var(--s5);align-items:center;padding:var(--s5) 0;border-top:1px solid var(--ink);transition:background .3s}
+.mb .row-i:hover{background:var(--panel)}
+.mb .row-i:last-child{border-bottom:1px solid var(--ink)}
+.mb .row-i .no{font:400 40px/1 var(--display);font-variation-settings:"opsz" 144;color:var(--accent);letter-spacing:-.03em}
+.mb .row-i h3{font:500 30px/1.05 var(--display);letter-spacing:-.015em;margin:0 0 6px}
+.mb .row-i .o{font:16px/1.45 var(--serif);color:var(--ink-2);margin:0}
+.mb .row-i .f{font:12.5px/1.7 var(--mono);color:var(--muted)}
+.mb .row-i .f b{color:var(--ink);font-weight:500}
+.mb .row-i .dia-frame{padding:0}
+.mb .row-i .go{font:400 30px var(--display);color:var(--accent);text-align:right}
+/* ledger */
+.mb .ledger{padding:var(--s7) 40px}
+.mb .ledger h2{font:500 30px/1.1 var(--display);letter-spacing:-.02em;margin:0 0 6px}
+.mb .ledger p{color:var(--muted);margin:0 0 var(--s5);max-width:70ch}
+.mb table{width:100%;border-collapse:collapse;font:14px var(--serif)}
+.mb th{font:500 11.5px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);text-align:left;padding:8px 10px;border-bottom:1px solid var(--ink)}
+.mb td{padding:11px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+.mb td.dn{font-weight:500;color:var(--ink);white-space:nowrap}
+.mb td.dn i{font:12px var(--mono);color:var(--faint);font-style:normal;margin-right:8px}
+.mb .st{display:inline-block;font:500 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:3px;margin-right:6px;vertical-align:1px}
+.mb .st.y{background:var(--green-soft);color:var(--green)}.mb .st.p{background:var(--accent-soft);color:var(--accent)}.mb .st.d{border:1px dashed var(--line-2);color:var(--muted)}.mb .st.n{color:var(--faint)}
+.mb td small{display:block;color:var(--muted);font-size:13px;margin-top:2px}
+/* monograph case study */
+.mb .cs{padding:var(--s9) 40px var(--s8);border-top:1px solid var(--ink)}
+.mb .cs .no{font:400 96px/1 var(--display);font-variation-settings:"opsz" 144;color:var(--accent);letter-spacing:-.04em;margin-bottom:var(--s4)}
+.mb .cs h1{font-size:clamp(40px,6cqw,72px)}
+.mb .cs .byline{display:flex;gap:var(--s5);flex-wrap:wrap;font:13px var(--mono);color:var(--muted);padding:var(--s4) 0;border-top:1px solid var(--ink);border-bottom:1px solid var(--line);margin:var(--s5) 0 var(--s7)}
+.mb .cs .byline b{color:var(--ink);font-weight:500}
+.mb .mono-grid{display:grid;grid-template-columns:minmax(0,66ch) 240px;gap:var(--s8);align-items:start}
+.mb .prose{font:19px/1.62 var(--serif);color:var(--ink-2)}
+.mb .prose h2{position:relative;font:500 30px/1.1 var(--display);letter-spacing:-.02em;color:var(--ink);margin:0 0 var(--s4)}
+.mb .prose h2 i{position:absolute;left:-64px;top:-6px;font:400 44px/1 var(--display);font-style:normal;color:var(--line-2)}
+.mb .prose .sum{font:400 22px/1.4 var(--display);color:var(--ink);margin:0 0 var(--s5);font-variation-settings:"opsz" 30}
+.mb .prose p{margin:0 0 var(--s4);text-wrap:pretty}
+.mb .prose code{font:.8em var(--mono);background:var(--accent-soft);color:var(--accent);padding:1px 5px;border-radius:3px}
+.mb .prose .fn{color:var(--accent);font:600 .7em var(--mono);vertical-align:super;margin-left:2px}
+.mb .side{position:sticky;top:20px;font:13.5px/1.5 var(--serif);color:var(--muted);display:flex;flex-direction:column;gap:var(--s5)}
+.mb .side .sn{border-top:1px solid var(--line-2);padding-top:8px}
+.mb .side .sn b{font:600 11.5px var(--mono);color:var(--accent);margin-right:6px}
+.mb .side .sn code{font:12px var(--mono);color:var(--ink-2);display:block;margin-top:4px;overflow-wrap:anywhere}
+.mb .score{margin-top:var(--s7)}
+.mb .score h2{font:500 30px/1.1 var(--display);margin:0 0 var(--s4)}
+.mb .score .tot{font:400 56px/1 var(--display);color:var(--ink);letter-spacing:-.03em}
+.mb .score .tot small{font:13px var(--mono);color:var(--muted);margin-left:12px;letter-spacing:.08em;text-transform:uppercase}
+@container (max-width: 700px){
+  .mb .mast{padding:14px 18px;gap:14px}
+  .mb .mast nav{display:none}
+  .mb .title{padding:48px 18px 32px}
+  .mb h1{font-size:44px}
+  .mb .dek{font-size:18px}
+  .mb .idx,.mb .ledger,.mb .cs{padding:40px 18px}
+  .mb .row-i{grid-template-columns:48px minmax(0,1fr);gap:12px 16px}
+  .mb .row-i .dia-frame,.mb .row-i .f{grid-column:2}
+  .mb .row-i .go{display:none}
+  .mb .row-i h3{font-size:26px}
+  .mb .mono-grid{grid-template-columns:minmax(0,1fr)}
+  .mb .side{position:static;border-top:1px solid var(--ink);padding-top:16px}
+  .mb .prose h2 i{position:static;display:block;font-size:32px;margin-bottom:4px}
+  .mb .cs .no{font-size:64px}
+}
+
+/* shared: the site's real .dia contract, so the inlined agent diagram renders inside both mocks */
+.dia{--dia-k:1;display:block;width:100%;height:auto;color:inherit;overflow:visible}
+.dia .nd{fill:var(--panel);stroke:currentColor;stroke-width:1;vector-effect:non-scaling-stroke}
+.dia .nd.hi{fill:var(--accent-soft);stroke:var(--accent)}
+.mb .dia .nd.hi{fill:var(--green-soft);stroke:var(--green)}
+.dia .nd.ext{fill:transparent;stroke:var(--faint);stroke-dasharray:3 2}
+.dia .tx{font-family:var(--mono);font-size:calc(8.6px * var(--dia-k));fill:currentColor;text-anchor:middle}
+.dia .tx.s{font-size:calc(7.6px * var(--dia-k));fill:var(--faint)}
+.dia .ed{stroke:currentColor;stroke-width:1;vector-effect:non-scaling-stroke;fill:none}
+.dia .cap{font-family:var(--mono);font-size:calc(8px * var(--dia-k));fill:var(--faint);text-anchor:start}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+</style>
+</head>
+<body>
+
+<div class="top"><div class="wrap">
+  <b>s05 · design evaluation</b>
+  <nav>
+    <a href="#verdict">Verdict</a><a href="#audit">Audit</a><a href="#learn">What the corpus says</a><a href="#exemplars">Exemplars</a><a href="#rubric">Rubric</a>
+    <a href="#scored">Current scored</a><a href="#optA">Option A</a><a href="#optB">Option B</a><a href="#compare">Compare</a>
+    <a href="#templates">Templates</a><a href="#plan">Plan</a><a href="#decide">Decide</a>
+  </nav>
+</div></div>
+
+<!-- ============================================================ VERDICT -->
+<section class="blk" id="verdict"><div class="wrap">
+  <p class="kicker">nmp-dsci.github.io · design evaluation · branch <code>design-evaluation</code> · measured 30 Aug 2026</p>
+  <h1>Your instinct is right. The site is honest and well-evidenced, but it is set too small, too uniformly, and too densely to be read.</h1>
+  <p class="lead" style="margin-top:14px">The content is the strongest thing on the page — proofs, file paths, a scorecard that admits what isn't built. The design works against it: 39 distinct text styles on the home page, most running text at 12.5px or smaller, a light theme that fails WCAG AA on roughly ten label classes, ~30 identical bordered panels with no hierarchy between them, and case studies where the first numbered section starts two full screens down and paragraphs run to 151 words with no lists, tables or map. A hiring manager scanning for 60–90 seconds is not getting what you built.</p>
+
+  <div class="verdict">
+    <div class="score cur"><div class="n" id="v-cur">—</div><div class="l">Current site · weighted rubric score</div><div class="bar"><i id="vb-cur"></i></div></div>
+    <div class="score a"><div class="n" id="v-a">—</div><div class="l">Option A · “Field Guide” (evolve the system)</div><div class="bar"><i id="vb-a"></i></div></div>
+    <div class="score b"><div class="n" id="v-b">—</div><div class="l">Option B · “Monograph” (editorial rebuild)</div><div class="bar"><i id="vb-b"></i></div></div>
+    <div class="score"><div class="n" style="font-size:22px;line-height:1.2">Recommend A</div><div class="l">A reaches ~94% at 3–4 build sessions and keeps the rubric matrix and scorecards as first-class structured surfaces — which is what a technical reviewer scans. B is the more beautiful object and scores within 4 points; it costs ~5–6 sessions, a full type change and a harder mobile story. A can borrow B's display type later without rework.</div></div>
+  </div>
+
+  <div class="three" style="margin-top:26px">
+    <div class="card"><h4>How this was built</h4><p class="small">Twenty saved transcripts in <code>transcript-rag-agent</code> (≈182k words: Sam Crawford, Envato Tuts+, Self-Made Web Designer ×5, Chris Raroque ×2, Ras Mic ×2, Codex ×2, Jono Catliff, Yashica Jain, Mikey, AI Foundations, Jack Roberts, Viktor Oddy, DesignCode) were digested into rules with timestamps; 71 web sources (NN/g, WCAG 2.2, Butterick, Baymard, web.dev, hiring-manager surveys, exemplar portfolios) were added; the live site was measured with DOM/contrast probes and screenshots at 1440px in both themes.</p></div>
+    <div class="card"><h4>What is <em>not</em> wrong</h4><p class="small">The seven-section spine, the nine-dimension rubric, the honest ●/◐/○ ratings, the inline SVG diagrams (bespoke, un-one-shottable — exactly the “custom asset” every video says separates a site from AI slop), the lint gate, and IBM Plex as an identity. None of that changes. The redesign is a presentation layer over the same front matter.</p></div>
+    <div class="card"><h4>Scope of the two options</h4><p class="small">Both fix the same root causes: type scale, measure, contrast, spacing rhythm, hierarchy, scan rails, CTA discipline. They differ in <b>how far</b> they move: A keeps the card/hub grammar and Plex; B replaces cards with an editorial index, adds a display serif and sidenotes, and reads like a printed monograph. Both are mocked below in real HTML and scored on the same rubric.</p></div>
+  </div>
+</div></section>
+
+<!-- ============================================================ AUDIT -->
+<section class="blk" id="audit"><div class="wrap">
+  <p class="kicker">1 · Audit of the live site</p>
+  <h2>What the measurements say</h2>
+  <p class="lead">Numbers from DOM probes on the production build (master <code>09893c4</code>), 1440×900, plus computed-colour contrast in both themes.</p>
+
+  <div class="tscroll" style="margin:18px 0 26px"><table>
+    <thead><tr><th>Surface</th><th>Measured</th><th>Threshold (from the rubric)</th><th>Read</th></tr></thead>
+    <tbody>
+      <tr><td><b>Home hub</b></td><td>4,166px tall (4.6 screens) · 1,843 words · <b>39 distinct text styles</b> · most common leaf style 12.5px · ~77 text nodes under 10px · content column 1080px · rubric explainer alone 1,625px tall</td><td>≤ 8–10 text styles per page · body ≥ 16px · running text ≥ 14px · one “star”</td><td class="s1">Systemic: no type scale; everything is a same-weight panel</td></tr>
+      <tr><td><b>System card</b></td><td>691px tall · title + badge + diagram + 60-word summary + metric + 70-word “Demo” paragraph at 11.5px + “Runs on” row + two buttons; the primary destination (case study) is the <em>ghost</em> button</td><td>Card ≤ 1 outcome sentence + 3 facts + 1 solid primary action</td><td class="s2">Overloaded; wrong button emphasised</td></tr>
+      <tr><td><b>Case study</b> (Data Pilot)</td><td>8,706px tall (9.7 screens) · 2,730 words in <b>19 paragraphs, longest 151 words</b> · 0 lists · 0 tables · first H2 at y = 1,772 (two screens of crumb/TL;DR/video-placeholder/skills before §1) · 672px column at 15.5px ≈ <b>84 characters per line</b> · no table of contents, no reading time</td><td>CPL 45–75 (target 66–68ch) · paragraphs ≤ 80 words · TOC on pages &gt; 1,200 words · §1 within 1 screen</td><td class="s1">Built for reading, delivered for scanning — and fails both</td></tr>
+      <tr><td><b>Contrast — light</b></td><td><code>--faint</code> #77837A on paper = <b>3.64:1</b> (fails AA 4.5) at 9.5–12px on kicker, tl;dr labels, fact keys, figcaptions, proof paths, rung states, matrix hint · <code>--signal</code> #17876B = 4.10:1 (fails at 11–15.5px: links, status glyphs, rr-score) · amber 3.89:1 · white-on-green live badge ≈ 4.1:1</td><td>4.5:1 normal text, 3:1 large/UI — both themes</td><td class="s1">≈ 12 classes fail in the default theme</td></tr>
+      <tr><td><b>Contrast — dark</b></td><td><code>--faint</code> 4.46:1 on bg, 4.10:1 on panels (fails on every card); body 11.2:1 fine</td><td>same</td><td class="s2">Borderline on bg, fails on panels</td></tr>
+      <tr><td><b>Colour use</b></td><td>Signal green carries links, metric numbers, live badge, status glyphs, diagram highlights, section rules, wordmark cursor, chip text and buttons</td><td>60/30/10 — accent reserved for the action and status</td><td class="s2">Accent means nothing because it means everything</td></tr>
+      <tr><td><b>Spacing</b></td><td>Section paddings 54 / 62 / 76 / 90px; card paddings 14 / 15 / 16 / 18px; radii 8 / 9 / 10 / 11 / 12px; 34px grid-line background on both themes</td><td>One 4/8-pt ladder; one radius; one section rhythm</td><td class="s2">Hand-tuned, not a system</td></tr>
+      <tr><td><b>About</b></td><td>498 words, 760px column, four H2s, no image, no terminal action</td><td>Who / what / proof / next step</td><td class="s3">Plain but serviceable</td></tr>
+      <tr><td><b>Global</b></td><td>Google Fonts CSS with 7 weights, render-blocking; blinking-cursor wordmark; hover on links has no transition; no styled <code>:focus-visible</code> except the matrix; no overflow at 360–1600 (good)</td><td>≤ 4 weights, self-hosted subset, focus ring, 300ms transitions</td><td class="s3">Hygiene items</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="two">
+    <figure><div class="shot"><img src="s05_assets/cur_home_top.jpg" alt="Current home page top, dark theme, 1440px"></div>
+      <figcaption><b>Home, above the fold.</b></figcaption>
+      <ol class="callouts">
+        <li>Headline fills 17ch on the left; the right 45% of the hero is empty grid-paper — the “Yale School of Art” anti-pattern both Crawford and Self-Made Web Designer cite.</li>
+        <li>Four metric cards with numbers but no baseline: “77.1%” of what, up from what? Research: outcome framing (“from 73.0% → 77.1%, gate refused v3.1”) beats a bare metric.</li>
+        <li>Cards begin with a diagram at ~8px labels, then 60 words of summary, then a 70-word demo paragraph at 11.5px — 691px per card.</li>
+        <li>Wordmark, kicker, metric labels, badge and card labels are all letter-spaced uppercase mono at 9.5–12px: one label style doing eight jobs.</li>
+      </ol></figure>
+    <figure><div class="shot"><img src="s05_assets/cur_home_rubric.jpg" alt="Current rubric explainer and matrix"></div>
+      <figcaption><b>Home, the rubric explainer.</b></figcaption>
+      <ol class="callouts">
+        <li>Nine near-identical cards each carrying ref + title + question + why at 12.5–14.5px; nothing tells the eye where to enter.</li>
+        <li>The matrix — the single most valuable artifact on the site — is a 12.5px table whose cells are eight truncated words with the rest in a tooltip that does not exist on touch.</li>
+        <li>The loop diagram is the right idea (bespoke asset) rendered at the wrong size and the wrong place: it should be the star, not a 560px thumbnail after 1,600px of cards.</li>
+      </ol></figure>
+    <figure><div class="shot"><img src="s05_assets/cur_study_top.jpg" alt="Current case study top"></div>
+      <figcaption><b>Case study, top.</b></figcaption>
+      <ol class="callouts">
+        <li>Crumb → kicker → H1 → summary → TL;DR box → 16:9 “video coming — being recorded” placeholder → seven skill rows → then §1. The first numbered section is 1,772px down. Research: skills lists placed above the work are the most common inversion, and an empty-state placeholder reads as unfinished.</li>
+        <li>Sticky fact box repeats the TL;DR, then a 9:16 “reel coming” placeholder occupies the rail for 8,000px.</li>
+        <li>Body at 15.5px in a 672px column: 84 characters per line, paragraphs of 100–150 words, no lists, no tables, no section map.</li>
+      </ol></figure>
+    <figure><div class="shot"><img src="s05_assets/cur_study_light.jpg" alt="Current case study, light theme"></div>
+      <figcaption><b>Case study, light theme.</b></figcaption>
+      <ol class="callouts">
+        <li>Every grey label here (AGENTS · DATA, WHAT / PROOF / SKILLS, STACK / REGION / RUNG, the fact-note) is #77837A on #F4F6F3 = 3.64:1 at 9.5–12px. WCAG AA needs 4.5:1. Chrome DevTools flags every one.</li>
+        <li>Signal green links and the “9 / 9” are 4.10:1 — passes only as large text; fails as body-size links.</li>
+        <li>The 34px grid background is decoration competing with 2,700 words of text; every video in the corpus that mentions backgrounds says texture must never ask for attention.</li>
+      </ol></figure>
+  </div>
+
+  <h3 style="margin-top:34px">Six root causes</h3>
+  <div class="three" style="margin-top:12px">
+    <div class="card"><h4>1 · No type scale</h4><p class="small">Sizes were chosen per element (9.5, 10, 10.5, 11, 11.5, 12, 12.5, 13, 13.5, 14, 14.5, 15, 15.5, 16, 17.5…). Tuts+ and Codex both put a named base × ratio scale first; without it, hierarchy cannot exist.</p></div>
+    <div class="card"><h4>2 · Mono-as-label everywhere</h4><p class="small">Letter-spaced uppercase mono at ≤12px is the site's only label idiom, used for kickers, keys, badges, captions, hints, states and paths. It is the one thing that makes it look “engineered”, and it is also why everything looks the same.</p></div>
+    <div class="card"><h4>3 · Panel inflation</h4><p class="small">Metrics, cards, rubric dims, matrix, rungs, practices, TL;DR, facts, scorecard rows: ~30 bordered panels with one radius, one border, one shadow. Equal weight = nothing is read (Crawford 21:02).</p></div>
+    <div class="card"><h4>4 · Contrast never checked</h4><p class="small">The light palette was tuned by eye. Three of five neutral steps and the accent fail AA at the sizes they are used. “Just because it looks clear to you doesn't mean it passes” (Self-Made Web Designer, 17:14).</p></div>
+    <div class="card"><h4>5 · Case study front-loaded with chrome</h4><p class="small">TL;DR + placeholder video + seven skill proofs before the work; then 2,700 words of prose with no map. NN/g: readers get through ≤ 28% of the words; there is no path that rewards the 28%.</p></div>
+    <div class="card"><h4>6 · Accent without a job</h4><p class="small">Green is links, numbers, status, badge, diagrams, cursor, chips and buttons. Every video's colour rule is the same: the accent points at the action. Here it points everywhere.</p></div>
+  </div>
+</div></section>
+
+<!-- ============================================================ LEARN -->
+<section class="blk" id="learn"><div class="wrap">
+  <p class="kicker">2 · What your saved corpus and the research agree on</p>
+  <h2>Fourteen rules that recurred across sources</h2>
+  <p class="lead">Each rule below appears in at least two of the twenty transcripts or is a numeric standard from WCAG / typography research. These are the rubric's thresholds; the digests (with timestamps) are in the session scratchpad.</p>
+  <div class="rules" style="margin-top:18px">
+    <div class="rule"><b>Hierarchy has three levers — size, contrast, space — and equal weight means nothing is read.</b>Biggest = most important; stand it off; give it room. One “star of the show” per surface.<div class="src">Crawford 15:36 · Self-Made 01:12, 04:24 · Layout guide 01:06 · Viktor Oddy 20:28</div></div>
+    <div class="rule"><b>A named type scale: base × ratio, ≤ 2 families, body type recedes.</b>Tuts+ used 21px × 1.414; research: 1.2–1.25 keeps four levels distinct in a 7-section document; body 16–19px; Plex Sans for UI, a serif or wider face for 3k-word body.<div class="src">Tuts+ 97:17 · Codex 15:41 · Crawford 22:07 · Butterick, wtfont, fontfyi</div></div>
+    <div class="rule"><b>Measure 45–75 characters; target 66–68ch; line-height ~1.6 for body.</b>Verify the page survives WCAG 1.4.12 text-spacing overrides.<div class="src">Bringhurst via UXPin · Butterick · Baymard · WCAG 2.2 1.4.12</div></div>
+    <div class="rule"><b>60/30/10 colour; accent reserved for the action; hue-tinted neutrals; every pair ≥ 4.5:1 in both themes.</b>Never pure black; derive the grey ramp as steps of one tinted near-black and contrast-check each.<div class="src">Crawford 28:46, 36:25 · Self-Made 02:10 · Tuts+ 68:46, 76:47 · WCAG 2.2 1.4.3</div></div>
+    <div class="rule"><b>Spacing is a system: 8-pt multiples and one section rhythm, reduced per breakpoint.</b>White space is a premium signal, not waste; cramped reads as “I don't know what matters”.<div class="src">Tuts+ 105:22, 157:18, 288:58 · Layout guide 02:17 · Jono 21:15</div></div>
+    <div class="rule"><b>People scan; build scan rails — numbers, rules, TL;DR, TOC, captions — and reward the read with progressive disclosure.</b>Lead with the result; reading time; numbered sections; figures whose caption states the takeaway; <code>&lt;details&gt;</code> for depth.<div class="src">NN/g website-reading · Lilian Weng · uxfol.io · 33 layouts 17:01 · Crawford 41:50</div></div>
+    <div class="rule"><b>Evidence beats assertion, placed high and next to the CTA, with the baseline in the same sentence.</b>“From 73.0% to 77.1%; the gate refused v3.1” not “77.1%”. Deployed systems + numbers + architecture diagrams are what reviewers hunt for.<div class="src">Crawford 65:00 · interviewnode 2025 · upskillist · Mikey 08:47</div></div>
+    <div class="rule"><b>Never ghost the primary action; every page ends in a next step; hero = plain headline + one CTA + reinforcing visual.</b>Two CTAs: primary filled in the accent, secondary lower-contrast, same size.<div class="src">Self-Made 01:12 · 33 layouts 10:16 · Crawford 08:17, 53:02, 73:31</div></div>
+    <div class="rule"><b>Tokens, one radius, one shadow ramp, one icon weight — mismatched radii is the #1 tell of an unsystematic build.</b>Dark mode is a token swap, including SVG strokes.<div class="src">Ras Mic 00:55, 01:56 · Jono 34:30 · Raroque 07:07 · Codex 04:34</div></div>
+    <div class="rule"><b>Transitions have duration (≈300ms, ease-out); instant state change reads as broken; motion is micro, staggered, and alternates with quiet sections.</b>Honour <code>prefers-reduced-motion</code>. No scroll-jacking, no autoplay video, no 3D hero for this audience.<div class="src">Jono 38:42 · Raroque 00:46 · Yashica 30:14 · Crawford 77:32 · WCAG 2.3.3 · line25 2026</div></div>
+    <div class="rule"><b>Bespoke assets are the differentiator; the named AI-slop signature is purple gradients, Inter, uniformly rounded cards, wide tracking, decorative 1px strokes.</b>Your inline SVG diagrams are the asset; strip the stroke-around-everything.<div class="src">Raroque 03:57 · Yashica 05:31 · Viktor 23:07, 17:53 · Ras Mic 01:06</div></div>
+    <div class="rule"><b>Mobile is a re-layout: stack, shorten labels, swap the type scale; never side-scroll the important table.</b>Container queries are mature; 24×24 targets.<div class="src">Crawford 83:04 · Tuts+ 280:47 · WCAG 2.2 2.5.8 · baseline 2026</div></div>
+    <div class="rule"><b>Write the brief and the never-do list down and commit them; then design in this order — structure → visual direction → per-element polish.</b>Three alternatives of one section, compared side by side, before grinding one.<div class="src">AI Foundations 10:07, 11:05 · Mikey 09:48, 14:36 · Jack Roberts 02:36 · Yashica 11:07</div></div>
+    <div class="rule"><b>The winning text-heavy portfolios win on typography and restraint, not motion.</b>Chungi Yoo (Awwwards), eugeneyan, lilianweng, danluu, rauno.me: curated entry point, countable proof, numbered long-form, near-zero ornament.<div class="src">Codex inspiration 07:50 · research §4</div></div>
+    <div class="rule"><b>Fonts: ≤ 4 weights, variable file, self-hosted subset, <code>font-display</code> chosen for CLS.</b>Plex Sans Variable exists; Latin subset of Sans + Serif + Mono ≈ 90KB.<div class="src">Tuts+ 86:57 · web.dev font best practices · Core Web Vitals</div></div>
+  </div>
+  <details style="margin-top:22px"><summary>Where the sources disagree (and how the rubric resolves it)</summary>
+    <ul class="small" style="margin-top:8px">
+      <li><b>F-pattern</b> — Self-Made calls it bogus; Crawford designs to it; NN/g still measures it. Resolution: hierarchy is the mechanism, F/Z is a placement heuristic downstream of it. The rubric scores hierarchy, not pattern.</li>
+      <li><b>Font count</b> — one family (Crawford's Astra rebuild) vs. cross-foundry pairing (Self-Made, level three). Resolution: ≤ 2 families scores full marks; a superfamily (Plex Sans/Serif/Mono) counts as one identity.</li>
+      <li><b>Motion volume</b> — Jono's “10× the animations” vs. Yashica's “visually exhausting” and the research's “motion overload is a portfolio failure mode”. Resolution for a hiring audience: micro only, weight 1 in the rubric.</li>
+      <li><b>Bento grids</b> — “all the rage” and “destroys where to look”. Resolution: allowed for an index of six pages, never for a body.</li>
+      <li><b>3D / video heroes</b> — DesignCode and Viktor build them; the portfolio research and Crawford (“awards-bait animation… not getting conversions”) reject them. Resolution: excluded; both options are typographic.</li>
+    </ul>
+  </details>
+</div></section>
+
+<!-- ============================================================ EXEMPLARS -->
+<section class="blk" id="exemplars"><div class="wrap">
+  <p class="kicker">3 · Who does this well</p>
+  <h2>Exemplar sites and GitHub Pages templates — verified live, with what to steal from each</h2>
+  <p class="lead">Eleven personal sites (most on <code>*.github.io</code> or static generators) and nine Jekyll themes, every URL fetched and confirmed on 31 Aug 2026. The point is not to adopt any of them — it's that each one has already solved one of this redesign's problems, and the two hardest pieces (a scroll-spy TOC, a three-state theme toggle) exist as ~200 lines of readable open source.</p>
+
+  <div class="two" style="margin-top:20px">
+    <figure><div class="shot"><img src="s05_assets/ex_eugeneyan.jpg" alt="eugeneyan.com home page"></div>
+      <figcaption><b>eugeneyan.com — the closest model for the home page.</b> A curated "Start Here" beside the chronology, credibility as plain numbers (212 posts · 31 talks · 19 prototypes), and article pages where every figure carries a literal <code>source:</code> line. This is Option A's proof-strip and evidence pattern, already working for an ML engineer at Anthropic.</figcaption></figure>
+    <figure><div class="shot"><img src="s05_assets/ex_lilianweng.jpg" alt="lilianweng.github.io post with TOC and reading time"></div>
+      <figcaption><b>lilianweng.github.io — the long-read furniture.</b> Reading time in the byline, a collapsible TOC above the fold, numbered components, captioned figures — a 31-minute post made navigable on a stock Hugo theme on GitHub Pages. Exactly the P3 case-study kit.</figcaption></figure>
+    <figure><div class="shot"><img src="s05_assets/ex_brittanychiang.jpg" alt="brittanychiang.com two-column scroll-spy layout"></div>
+      <figcaption><b>brittanychiang.com — token discipline.</b> The most-referenced dev portfolio (open-source v4: 8.3k★): one navy, one accent, one family, a left rail that scroll-spies About / Experience / Projects. The whole site is ~6 tokens — the standard Option A's token file is written to.</figcaption></figure>
+    <figure><div class="shot"><img src="s05_assets/ex_alfolio.jpg" alt="al-folio Jekyll theme demo"></div>
+      <figcaption><b>al-folio (16.1k★) — the strongest Jekyll precedent.</b> Light/dark via tokens with system detection, projects/news as collections, Distill-style post layout, Lighthouse 94/97. Steal the collections model and the theme mechanics; skip the academic framing.</figcaption></figure>
+    <figure><div class="shot"><img src="s05_assets/ex_chirpy.jpg" alt="Chirpy Jekyll theme demo"></div>
+      <figcaption><b>Chirpy (10.2k★) — the TOC and toggle to copy.</b> The best free auto-generated scroll-spy TOC on Jekyll, plus a three-state Light / Dark / System toggle done with CSS custom properties — the same mechanism this site already half-uses. Its sidebar chrome is too blog-shaped to adopt.</figcaption></figure>
+    <div class="card"><h4>gwern.net — the scorecard's precedent (no screenshot does it justice)</h4>
+      <p class="small">Every page opens with a metadata block carrying created/updated dates and explicit <b>confidence</b> and <b>importance</b> ratings — the nearest thing on the web to this site's production-readiness scorecard, and proof that publishing your own uncertainty reads as authority. Sidenotes attach evidence to the sentence that needs it (Option B's model). Caveat: its density would overwhelm a 90-second skim — borrow the metadata block, not the maximalism. <a href="https://gwern.net" target="_blank" rel="noopener">gwern.net ↗</a></p></div>
+  </div>
+
+  <h3 style="margin-top:34px">Eleven exemplar sites</h3>
+  <div class="tscroll" style="margin-top:12px"><table>
+    <thead><tr><th>Site</th><th>Stack</th><th>Steal this</th><th>Caveat</th></tr></thead>
+    <tbody>
+      <tr><td><a href="https://eugeneyan.com" target="_blank" rel="noopener"><b>eugeneyan.com</b></a></td><td>static / GitHub Pages-style</td><td>"Start Here" nav item; credibility counters as plain numbers; figures with a <code>source:</code> line; H2/H3 question rhythm ("Why X? · How to apply X?")</td><td>No dark mode; emoji tags would read unserious here</td></tr>
+      <tr><td><a href="https://lilianweng.github.io" target="_blank" rel="noopener"><b>lilianweng.github.io</b></a></td><td>Hugo + PaperMod · gh-pages</td><td>Index metadata (title · date · reading time · excerpt); collapsible TOC; long-form pacing</td><td>Stock theme — zero identity to learn from</td></tr>
+      <tr><td><a href="https://brittanychiang.com" target="_blank" rel="noopener"><b>brittanychiang.com</b></a> · <a href="https://github.com/bchiang7/v4" target="_blank" rel="noopener">v4 repo</a></td><td>Next.js (v4: Gatsby, 8.3k★)</td><td>Anchor-linked scroll-spy rail; ~6-token palette; "Skip to content"; a11y-first markup</td><td>Résumé-shaped: projects are teasers, not case studies</td></tr>
+      <tr><td><a href="https://rauno.me" target="_blank" rel="noopener"><b>rauno.me</b></a></td><td>Next.js, hand-crafted</td><td>Named collections (Craft / Field Notes / Projects) with a distinct promise each; copy-email micro-interaction</td><td>The polish budget is the aesthetic; copying the layout alone reads empty</td></tr>
+      <tr><td><a href="https://maggieappleton.com" target="_blank" rel="noopener"><b>maggieappleton.com</b></a></td><td>Astro</td><td>Content typed by epistemic status (Essays vs Notes vs Patterns), each defined on the index — a cousin of shipped/partial/designed</td><td>Depends entirely on custom illustration</td></tr>
+      <tr><td><a href="https://vickiboykis.com" target="_blank" rel="noopener"><b>vickiboykis.com</b></a></td><td>Hugo "Bear"</td><td>Radically plain dated index back to 2015; ~40-tag taxonomy as a second axis</td><td>Nothing for metrics or scorecards</td></tr>
+      <tr><td><a href="https://danluu.com" target="_blank" rel="noopener"><b>danluu.com</b></a></td><td>hand-written HTML</td><td>The performance bar: no images, no JS, one flat index — credibility through cost</td><td>Steal the budget, not the (absent) typography</td></tr>
+      <tr><td><a href="https://jalammar.github.io" target="_blank" rel="noopener"><b>jalammar.github.io</b></a></td><td>Jekyll · gh-pages</td><td>Diagram-first posts on a *.github.io Jekyll site that became the field's most-cited explainer — the direct precedent for the inline-SVG bet</td><td>Otherwise default theme</td></tr>
+      <tr><td><a href="https://huyenchip.com" target="_blank" rel="noopener"><b>huyenchip.com</b></a></td><td>static</td><td>Claims stated with evidence inline ("most read book on the O'Reilly platform in 2025"); nav split by artefact type</td><td>Visually plain wall of prose</td></tr>
+      <tr><td><a href="https://karpathy.github.io" target="_blank" rel="noopener"><b>karpathy.github.io</b></a></td><td>Jekyll · gh-pages</td><td>Longevity and consistency beat redesigns: one dated index, 2011→2026, still authoritative</td><td>Jekyll default; no tokens/dark/project layout</td></tr>
+      <tr><td><a href="https://gwern.net" target="_blank" rel="noopener"><b>gwern.net</b></a></td><td>Pandoc → HTML</td><td>Per-page confidence/importance metadata block; sidenotes; selective typographic detail; floating dark-mode toggle</td><td>Idiosyncratic density — wrong register for a 90-second skim</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3 style="margin-top:30px">Nine templates — steal patterns, don't adopt</h3>
+  <div class="tscroll" style="margin-top:12px"><table>
+    <thead><tr><th>Theme</th><th>★</th><th>What it does well</th><th>Verdict for this site</th></tr></thead>
+    <tbody>
+      <tr><td><a href="https://alshedivat.github.io/al-folio/" target="_blank" rel="noopener"><b>al-folio</b></a> · <a href="https://github.com/alshedivat/al-folio" target="_blank" rel="noopener">repo</a></td><td class="num">16.1k</td><td>Token-driven light/dark with system detection; projects/news collections; Distill-style posts; Mermaid/MathJax; Lighthouse 94/97</td><td>Steal the collections model + theme mechanics; academic framing is wrong</td></tr>
+      <tr><td><a href="https://academicpages.github.io/" target="_blank" rel="noopener"><b>academicpages</b></a> · <a href="https://github.com/academicpages/academicpages.github.io" target="_blank" rel="noopener">repo</a></td><td class="num">17.5k</td><td>Portfolio/talks/publications as ready-made collections; markdown generated from TSV</td><td>Steal only the "portfolio item = collection entry" data model (this site already does)</td></tr>
+      <tr><td><a href="https://mmistakes.github.io/minimal-mistakes/" target="_blank" rel="noopener"><b>Minimal Mistakes</b></a> · <a href="https://github.com/mmistakes/minimal-mistakes" target="_blank" rel="noopener">repo</a></td><td class="num">13.6k</td><td>Layout taxonomy: splash / single / archive / search; 11 skins; breadcrumbs</td><td>Steal the layout taxonomy; dark mode is a build-time skin, not runtime tokens — a real weakness</td></tr>
+      <tr><td><a href="https://chirpy.cotes.page/" target="_blank" rel="noopener"><b>Chirpy</b></a> · <a href="https://github.com/cotes2020/jekyll-theme-chirpy" target="_blank" rel="noopener">repo</a></td><td class="num">10.2k</td><td>Best free scroll-spy TOC; Light/Dark/System three-state toggle on custom properties; dark-mode image swapping; last-modified dates</td><td><b>Steal the TOC and the three-state toggle wholesale</b> — ~200 lines each</td></tr>
+      <tr><td><a href="https://just-the-docs.com/" target="_blank" rel="noopener"><b>Just the Docs</b></a> · <a href="https://github.com/just-the-docs/just-the-docs" target="_blank" rel="noopener">repo</a></td><td class="num">9.1k</td><td>Documentation-grade left nav + search; explicit typography scale; near-zero dependencies</td><td>Steal the typography scale and nav model — the strongest long-form reading kit of the set</td></tr>
+      <tr><td><a href="https://kitian616.github.io/jekyll-TeXt-theme/" target="_blank" rel="noopener"><b>TeXt</b></a> · <a href="https://github.com/kitian616/jekyll-TeXt-theme" target="_blank" rel="noopener">repo</a></td><td class="num">3.3k</td><td>Six skins incl. dark; TOC; Mermaid; semantic responsive HTML</td><td>Skin-variable structure worth reading; card aesthetic dated</td></tr>
+      <tr><td><a href="https://hydejack.com/" target="_blank" rel="noopener"><b>Hydejack</b></a> · <a href="https://github.com/hydecorp/hydejack" target="_blank" rel="noopener">repo</a></td><td class="num">1.6k</td><td>Works with JS disabled; smooth page transitions; strong PageSpeed</td><td>Don't adopt — portfolio/TOC/dark mode live in the $79 PRO tier; steal the no-JS baseline standard</td></tr>
+      <tr><td><a href="https://yousinix.github.io/portfolYOU/" target="_blank" rel="noopener"><b>portfolYOU</b></a> · <a href="https://github.com/YoussefRaafatNasry/portfolYOU" target="_blank" rel="noopener">repo</a></td><td class="num">1.2k</td><td>Project cards + blog in one MIT theme, gh-pages native, dark mode</td><td>Closest off-the-shelf shape, but Bootstrap-generic — steal the project-card schema only</td></tr>
+      <tr><td><a href="https://jitinnair1.github.io/gradfolio/" target="_blank" rel="noopener"><b>gradfolio</b></a> · <a href="https://github.com/jitinnair1/gradfolio" target="_blank" rel="noopener">repo</a></td><td class="num">331</td><td>Tiny surface area; dark mode respecting system preference</td><td>The best minimal dark-mode <em>code</em> to read before writing P0's toggle</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="three" style="margin-top:26px">
+    <div class="card"><h4>Three patterns they all share</h4><p class="small">① The index is a dense, dated, scannable text surface — never hero + card-grid spectacle (danluu, karpathy, vickiboykis; eugeneyan adds the one upgrade: a curated entry point above the chronology). ② Long-form pages carry navigation furniture and inline evidence — scroll-spy TOC, reading time, captioned figures with sources, per-page metadata blocks. ③ One restrained token system applied in both themes, on a Dan-Luu-grade performance budget. The redesign plan already encodes all three; these sites are the proof they work in the wild.</p></div>
+    <div class="card"><h4>Closest model per surface</h4><p class="small"><b>Home/index → eugeneyan.com</b>: curated "Start Here" (here: the rubric matrix), dated list of systems, plain-number proof. <b>Case study → gwern.net's metadata block + lilianweng's TOC</b> (Option A), or gwern's sidenotes proper (Option B). <b>Card/collection model → al-folio</b>, which this site's `_projects` collection already mirrors.</p></div>
+    <div class="card"><h4>How this feeds the plan</h4><p class="small">P0: read gradfolio's toggle + Chirpy's three-state switch before writing <code>tokens.css</code>. P3: Chirpy's TOC and lilianweng's byline are the reference implementations for <code>study.js</code>; eugeneyan's <code>source:</code> caption convention becomes the figure-caption lint rule. Verdict unchanged: no template adoption — the seven-section spine and scorecard are already a stronger content model than any theme ships.</p></div>
+  </div>
+</div></section>
+
+<!-- ============================================================ RUBRIC -->
+<section class="blk" id="rubric"><div class="wrap">
+  <p class="kicker">4 · The rubric</p>
+  <h2>Twelve dimensions, weighted, with pass thresholds</h2>
+  <p class="lead">Structure mirrors the site's own production rubric and Nielsen's severity scale: each dimension scored 0–5 (5 exemplary · 4 meets every threshold · 3 mostly · 2 visible failures · 1 systemic · 0 absent), multiplied by a weight of 1–3. Maximum weighted score 145. Applies to every surface: home hub, system card, case study, practice page, about, and the global chrome (nav, footer, tokens, themes).</p>
+  <div class="tscroll" style="margin-top:18px"><table id="rubric-table">
+    <thead><tr><th>#</th><th>Dimension</th><th>W</th><th>Pass threshold (score 4)</th><th>Surfaces where it bites hardest</th></tr></thead>
+    <tbody></tbody>
+  </table></div>
+  <p class="note" style="margin-top:12px">Weights: 3 for the dimensions the hiring research and the corpus name as decisive (clarity, hierarchy, type, colour, scan-ability, evidence); 2 for craft and structure; 1 for motion, which every source for this audience says to minimise.</p>
+</div></section>
+
+<!-- ============================================================ SCORED -->
+<section class="blk" id="scored"><div class="wrap">
+  <p class="kicker">5 · Current site, scored</p>
+  <h2>Score by dimension, with the evidence for each mark</h2>
+  <div class="tscroll" style="margin-top:18px"><table id="scored-table">
+    <thead><tr><th>Dimension</th><th>W</th><th>Score</th><th>Evidence</th></tr></thead>
+    <tbody></tbody>
+    <tfoot><tr><td colspan="2"><b>Weighted total</b></td><td class="num" id="scored-total"></td><td id="scored-pct"></td></tr></tfoot>
+  </table></div>
+
+  <h3 style="margin-top:30px">By surface</h3>
+  <p class="note">Same 0–5 scale, current site only, for the six dimensions that vary most by surface. Global chrome (nav, footer, tokens, themes) is scored in the table above under D4, D9, D11, D12.</p>
+  <div class="tscroll" style="margin-top:12px"><table>
+    <thead><tr><th>Surface</th><th>D1 Clarity</th><th>D2 Hierarchy</th><th>D3 Type</th><th>D6 Scan</th><th>D7 Evidence</th><th>D8 CTA</th><th>Biggest fix</th></tr></thead>
+    <tbody>
+      <tr><td><b>Home hub</b></td><td><span class="pill p3">3</span></td><td><span class="pill p2">2</span></td><td><span class="pill p1">1</span></td><td><span class="pill p2">2</span></td><td><span class="pill p3">3</span></td><td><span class="pill p3">3</span></td><td>Make the matrix the star; collapse nine cards to a numbered list; give metrics their baseline</td></tr>
+      <tr><td><b>System card</b></td><td><span class="pill p3">3</span></td><td><span class="pill p2">2</span></td><td><span class="pill p1">1</span></td><td><span class="pill p2">2</span></td><td><span class="pill p4">4</span></td><td><span class="pill p2">2</span></td><td>One outcome sentence + three facts; solid “Case study”, quiet “Live demo”</td></tr>
+      <tr><td><b>Case study</b></td><td><span class="pill p2">2</span></td><td><span class="pill p2">2</span></td><td><span class="pill p2">2</span></td><td><span class="pill p1">1</span></td><td><span class="pill p4">4</span></td><td><span class="pill p3">3</span></td><td>§1 within one screen; TOC + reading time; 68ch serif body; one-line section summaries; lists/tables; skills to the end</td></tr>
+      <tr><td><b>Practice page</b></td><td><span class="pill p3">3</span></td><td><span class="pill p2">2</span></td><td><span class="pill p2">2</span></td><td><span class="pill p2">2</span></td><td><span class="pill p4">4</span></td><td><span class="pill p2">2</span></td><td>Same reading template as the case study; terminal CTA to the systems it applies to</td></tr>
+      <tr><td><b>About</b></td><td><span class="pill p3">3</span></td><td><span class="pill p3">3</span></td><td><span class="pill p3">3</span></td><td><span class="pill p3">3</span></td><td><span class="pill p3">3</span></td><td><span class="pill p2">2</span></td><td>Who / what / proof / contact in one screen; optional photo; the “what I work with” list as the second screen</td></tr>
+    </tbody>
+  </table></div>
+</div></section>
+
+<!-- ============================================================ OPTION A -->
+<section class="blk" id="optA"><div class="wrap">
+  <p class="kicker">6 · Option A</p>
+  <h2>“Field Guide” — evolve the system: same identity, a real scale, the matrix as the star</h2>
+  <div class="opt-head">
+    <div>
+      <p class="lead">Keeps IBM Plex and the green-on-paper identity, but rebuilds it on tokens: Plex Sans for display and UI, <b>Plex Serif for reading</b>, Plex Mono only for numbers, code and paths. One 4/8-pt spacing ladder, one radius, one shadow. Cards lose their borders and sit on a tinted band. The nine-by-three rubric matrix becomes the hero's right-hand “star”, so evidence is in the first viewport. Case studies get a sticky section map with progress, a one-line summary under every heading, a 68ch serif column, and <code>&lt;details&gt;</code> for proofs and paths.</p>
+      <p class="small"><b>Structure preserved:</b> home → 3 systems → rubric → ladder → practices; seven-section case-study spine; all front matter; the lint script (extended, not replaced).</p>
+    </div>
+    <div class="card"><h4>Tokens</h4>
+      <ul class="small">
+        <li>Type: UI 16px; reading 18px / 1.6; scale 1.25 → 14.4 · 16 · 18 · 22.5 · 28 · 35 · 44 · 55</li>
+        <li>Measure 68ch; headings <code>text-wrap: balance</code>; paragraphs <code>pretty</code></li>
+        <li>Paper #F7F6F2 · ink #1A1D1B · muted #5B625E · faint #646B66 (4.6:1) · accent #0B6E58 (5.7:1) · amber #8F5306 (5.7:1)</li>
+        <li>Dark: #121614 · #E8EBE7 · accent #3DBB95 (7.6:1) — every pair AA, verified by script</li>
+        <li>Space 4·8·12·16·24·32·48·64·96; radius 10; one shadow; 300ms ease-out</li>
+      </ul>
+      <div class="swatches"><div class="sw"><i style="background:#F7F6F2"></i><span>paper</span></div><div class="sw"><i style="background:#EFEEE8"></i><span>band</span></div><div class="sw"><i style="background:#1A1D1B"></i><span>ink</span></div><div class="sw"><i style="background:#5B625E"></i><span>muted</span></div><div class="sw"><i style="background:#0B6E58"></i><span>accent</span></div><div class="sw"><i style="background:#8F5306"></i><span>amber</span></div></div>
+    </div>
+  </div>
+
+  <div class="frames">
+    <div class="frame-row">
+      <div class="frame"><div class="bar-ui"><i></i><i></i><i></i><span class="url">nmp-dsci.github.io — home · 1200px</span><button type="button" onclick="toggleScheme(this)">light</button></div>
+        <div class="ma" data-scheme="dark" id="mockA-home">
+          <div class="nav"><span class="brand">nathan phillips<small>applied AI</small></span>
+            <div class="links"><a>Work</a><a>Practices</a><a>About</a></div>
+            <div class="util"><span class="ic" title="GitHub">gh</span><span class="ic" title="LinkedIn">in</span><span class="ic" title="Theme">☾</span></div>
+            <a class="btn sm" style="margin-left:8px">Contact ↗</a></div>
+          <div class="hero">
+            <div>
+              <p class="kick">Applied AI engineer · three systems in production on AWS</p>
+              <h1>I ship gen-AI systems and <em>prove</em> they're production-ready.</h1>
+              <p class="dek">Evals in CI, guardrails between the model and the data, per-request traces, cost caps and a push-button deploy — scored honestly against one nine-dimension rubric, with the live app one click away.</p>
+              <div class="ctas"><a class="btn">See the three systems ↓</a><a class="lnk">How the rubric works</a></div>
+              <div class="proofline"><span><b>20 / 27</b> rubric dimensions shipped</span><span><b>77.1%</b> ConvFinQA, up from 73.0%</span><span><b>6.1×</b> fewer tokens at parity</span></div>
+            </div>
+            <div class="star">
+              <div class="t"><b>Production rubric · 3 systems × 9 dimensions</b><span>click a cell → the section that proves it</span></div>
+              <div class="mx">
+                <div class="h">Dimension</div><div class="h">Data Pilot</div><div class="h">ConvFinQA</div><div class="h">Transcript<br>RAG</div>
+                <div class="d"><i>R1</i>Evals & golden set</div><div class="c y">shipped</div><div class="c y">shipped</div><div class="c y">shipped</div>
+                <div class="d"><i>R2</i>LLM-as-judge</div><div class="c y">shipped</div><div class="c n">n/a</div><div class="c p">partial</div>
+                <div class="d"><i>R3</i>Regression gate</div><div class="c y">shipped</div><div class="c y">shipped</div><div class="c y">shipped</div>
+                <div class="d"><i>R4</i>Learning loop</div><div class="c y">shipped</div><div class="c y">shipped</div><div class="c p">partial</div>
+                <div class="d"><i>R5</i>Guardrails</div><div class="c y">shipped</div><div class="c p">partial</div><div class="c p">partial</div>
+                <div class="d"><i>R6</i>Tracing</div><div class="c y">shipped</div><div class="c y">shipped</div><div class="c y">shipped</div>
+                <div class="d"><i>R7</i>Cost control</div><div class="c y">shipped</div><div class="c y">shipped</div><div class="c y">shipped</div>
+                <div class="d"><i>R8</i>Deploy & release</div><div class="c y">shipped</div><div class="c y">shipped</div><div class="c y">shipped</div>
+                <div class="d"><i>R9</i>Scale path</div><div class="c y">shipped</div><div class="c d">designed</div><div class="c d">designed</div>
+              </div>
+              <div class="legend"><span><i style="background:var(--accent)"></i>shipped — built, measured, in the repo</span><span><i style="background:var(--amber-soft);border:1px solid var(--amber)"></i>partial — narrower than the rubric asks</span><span><i style="border:1.5px dashed var(--line-2)"></i>designed — written up, not built</span></div>
+            </div>
+          </div>
+          <div class="proof">
+            <div><div class="n">77.1%</div><div class="l">ConvFinQA accuracy, up from 73.0% (594 / 770)<small>the gate refused challenger v3.1 · prompts versioned like releases</small></div></div>
+            <div><div class="n">6.1×</div><div class="l">fewer tokens at 0.93 answer parity<small>Transcript RAG · 8 configs raced on one chunk-labelled golden set</small></div></div>
+            <div><div class="n">4.98×</div><div class="l">speed-up on 5 workers, linear<small>Data Pilot · drain time within 6% of ⌈N/W⌉×5 across 9 grid cells</small></div></div>
+          </div>
+          <div class="sec">
+            <div class="sec-h"><h2>Three systems, live on AWS</h2><span>demo mode · read-only · no keys on the public URL</span></div>
+            <div class="sys">
+              <div class="sc"><div class="top"><h3>Data Pilot</h3><span class="live">live</span></div>
+                <p class="out">Governed natural-language → SQL over 3.2M rows of NSW property data, with row-level security deciding what the model may touch.</p>
+                <div class="dia-frame"><svg class="dia" viewBox="0 0 320 100" role="img" aria-label="Data Pilot agent structure"><defs><marker id="ar-a" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="currentColor"/></marker></defs><g><rect class="nd" x="4" y="38" width="48" height="24" rx="6"/><text class="tx" x="28" y="53">question</text></g><g><rect class="nd hi" x="66" y="30" width="78" height="40" rx="6"/><text class="tx" x="105" y="46">agent loop</text><text class="tx s" x="105" y="58">tools · memory</text></g><g><rect class="nd" x="158" y="6" width="68" height="28" rx="6"/><text class="tx" x="192" y="18">SQL guard</text><text class="tx s" x="192" y="29">sqlglot AST</text></g><g><rect class="nd hi" x="158" y="44" width="68" height="30" rx="6"/><text class="tx" x="192" y="57">SELECT · RLS</text><text class="tx s" x="192" y="68">read-only</text></g><g><rect class="nd" x="242" y="6" width="72" height="28" rx="6"/><text class="tx" x="278" y="18">sandbox</text><text class="tx s" x="278" y="29">Pyodide WASM</text></g><g><rect class="nd hi" x="242" y="44" width="72" height="30" rx="6"/><text class="tx" x="278" y="57">report</text><text class="tx s" x="278" y="68">charts · SQL</text></g><path class="ed" d="M52,50 L64,50" marker-end="url(#ar-a)"/><path class="ed" d="M144,44 C150,34 152,24 156,21" marker-end="url(#ar-a)"/><path class="ed" d="M192,34 L192,42" marker-end="url(#ar-a)"/><path class="ed" d="M226,52 C232,40 236,26 240,21" marker-end="url(#ar-a)"/><path class="ed" d="M278,34 L278,42" marker-end="url(#ar-a)"/><text class="cap" x="4" y="92">graded G1–G3 · cross-family judge · every run traced</text></svg></div>
+                <div class="facts"><b>Score</b><span>9 / 9 shipped · rung-100 sizing measured</span><b>Demo</b><span>Explore + SQL editor live; chat replays 8 recorded runs</span><b>Runs on</b><span>CloudFront + S3 → App Runner → Aurora Serverless v2 · ap-southeast-2 · ~$8–18 / mo</span></div>
+                <div class="foot"><a class="btn sm">Read the case study →</a><a class="lnk">Open live demo ↗</a></div></div>
+              <div class="sc"><div class="top"><h3>ConvFinQA Agent</h3><span class="live">live</span></div>
+                <p class="out">Multi-turn financial Q&amp;A through four typed agents, prompts versioned and promoted like releases — the registry refused the auto-generated challenger.</p>
+                <div class="dia-frame" style="min-height:112px;display:flex;align-items:center;justify-content:center;font:12px var(--mono);color:var(--faint)">[ convfinqa-agent.svg — same contract ]</div>
+                <div class="facts"><b>Score</b><span>6 / 9 shipped · judge n/a · guardrails partial</span><b>Demo</b><span>Read-only operator console · 8 recorded conversations</span><b>Runs on</b><span>ECR → App Runner ×1 · no VPC · ~$5–10 / mo</span></div>
+                <div class="foot"><a class="btn sm">Read the case study →</a><a class="lnk">Open live demo ↗</a></div></div>
+              <div class="sc"><div class="top"><h3>Transcript RAG</h3><span class="live">live</span></div>
+                <p class="out">An evaluation-first retrieval workbench over 102 YouTube transcripts: eight configurations raced on one golden set; parity at 6.1× fewer tokens.</p>
+                <div class="dia-frame" style="min-height:112px;display:flex;align-items:center;justify-content:center;font:12px var(--mono);color:var(--faint)">[ transcript-rag.svg — same contract ]</div>
+                <div class="facts"><b>Score</b><span>5 / 9 shipped · 3 partial · scale designed</span><b>Demo</b><span>Corpus tree, Retrieval Lab, Scoreboard — read-only</span><b>Runs on</b><span>S3 demo data → App Runner ×1 · ~$8–12 / mo</span></div>
+                <div class="foot"><a class="btn sm">Read the case study →</a><a class="lnk">Open live demo ↗</a></div></div>
+            </div>
+          </div>
+          <div class="sec" style="padding-top:0">
+            <div class="sec-h"><h2>What “production” means here</h2><span>nine questions · one loop · <a class="lnk" style="font-family:var(--sans)">the eval-loop practice →</a></span></div>
+            <div class="dims">
+              <div><span><b>Evals & golden set</b>Is there a versioned set, and can anyone reproduce the score?</span></div>
+              <div><span><b>LLM-as-judge</b>Who grades the open-ended answers — and is it independent of the model?</span></div>
+              <div><span><b>Regression gate</b>What stops a worse version from shipping?</span></div>
+              <div><span><b>Learning loop</b>How does it get better, traceable to one lever?</span></div>
+              <div><span><b>Guardrails</b>What sits between the model and data, tools, money, users?</span></div>
+              <div><span><b>Tracing</b>Can you replay one request and see fleet health?</span></div>
+              <div><span><b>Cost control</b>What does one answer cost, and what caps the worst day?</span></div>
+              <div><span><b>Deploy & release</b>Is a merge a deploy, and does it prove itself?</span></div>
+              <div><span><b>Scale path</b>What's measured at 10, sized at 100, designed at 1,000?</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="frame narrow"><div class="bar-ui"><i></i><i></i><i></i><span class="url">390px</span></div>
+        <div class="ma" data-scheme="dark">
+          <div class="nav"><span class="brand">nathan phillips</span><div class="util" style="margin-left:auto"><span class="ic">☰</span></div></div>
+          <div class="hero">
+            <div><p class="kick">Applied AI engineer · three systems live on AWS</p><h1>I ship gen-AI systems and <em>prove</em> they're production-ready.</h1><p class="dek">Evals in CI, guardrails, traces, cost caps, push-button deploy — scored against one rubric.</p><div class="ctas"><a class="btn">See the three systems ↓</a></div><div class="proofline"><span><b>20 / 27</b> shipped</span><span><b>77.1%</b> from 73.0%</span></div></div>
+            <div class="star"><div class="t"><b>Rubric · 3 × 9</b><span>tap → proof</span></div>
+              <div class="mx"><div class="h">Dim.</div><div class="h">DP</div><div class="h">CF</div><div class="h">TR</div>
+                <div class="d"><i>R1</i>Evals</div><div class="c y">●</div><div class="c y">●</div><div class="c y">●</div>
+                <div class="d"><i>R2</i>Judge</div><div class="c y">●</div><div class="c n">—</div><div class="c p">◐</div>
+                <div class="d"><i>R3</i>Gate</div><div class="c y">●</div><div class="c y">●</div><div class="c y">●</div>
+                <div class="d"><i>R5</i>Guardrails</div><div class="c y">●</div><div class="c p">◐</div><div class="c p">◐</div>
+                <div class="d"><i>R9</i>Scale</div><div class="c y">●</div><div class="c d">○</div><div class="c d">○</div></div>
+              <div class="legend"><span><i style="background:var(--accent)"></i>shipped</span><span><i style="background:var(--amber-soft);border:1px solid var(--amber)"></i>partial</span><span><i style="border:1.5px dashed var(--line-2)"></i>designed</span></div></div>
+          </div>
+          <div class="proof"><div><div class="n">77.1%</div><div class="l">ConvFinQA, up from 73.0%<small>gate refused v3.1</small></div></div></div>
+          <div class="sec"><div class="sys"><div class="sc"><div class="top"><h3>Data Pilot</h3><span class="live">live</span></div><p class="out">Governed NL → SQL over 3.2M rows, with row-level security deciding what the model may touch.</p><div class="facts"><b>Score</b><span>9 / 9 shipped</span><b>Demo</b><span>Explore + SQL live; chat replays runs</span></div><div class="foot"><a class="btn sm">Case study →</a><a class="lnk">Demo ↗</a></div></div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="frame"><div class="bar-ui"><i></i><i></i><i></i><span class="url">nmp-dsci.github.io/projects/data-pilot/ — case study · 1200px</span><button type="button" onclick="toggleScheme(this)">light</button></div>
+      <div class="ma" data-scheme="dark">
+        <div class="cs-head">
+          <div class="crumb">← All systems · Data Pilot</div>
+          <h1>Data Pilot — governed NL→SQL in production</h1>
+          <p class="dek">Ask in plain English, get one read-only SELECT under Postgres row-level security, a sandboxed analysis and a typed report — over 3.2M rows of NSW property data.</p>
+          <div class="meta"><span><b>9 / 9</b> rubric shipped</span><span><b>live</b> · ap-southeast-2</span><span><b>~$8–18</b> / month, $0 inference</span><span><b>12 min</b> read · 7 sections</span></div>
+          <div class="ctas"><a class="btn">Open the live demo ↗</a><a class="lnk">Repository</a><a class="lnk">Jump to scorecard</a></div>
+        </div>
+        <div class="tldr"><div><b>What</b><p>Row-level security + an sqlglot AST guard decide what the model may touch; merge to main deploys the whole stack under GitHub OIDC with no stored keys.</p></div><div><b>Proof</b><p><strong>4.98×</strong> on 5 workers, linear · 32 goldens, graders G1–G3, cross-family judge · every write on the public URL refused server-side.</p></div><div><b>Skills</b><p>Agentic AI · Governance &amp; RBAC · MLOps · SQL · RAG · Evals · Product UI</p></div></div>
+        <div class="cs-body">
+          <div class="toc"><b>On this page</b><a class="on">1 · Purpose &amp; benefit</a><a>2 · Agent architecture</a><a>3 · Agent loop &amp; evaluation</a><a>4 · Deployed architecture</a><a>5 · Guardrails &amp; security</a><a>6 · Observability &amp; cost</a><a>7 · Readiness scorecard</a><a>Skills demonstrated</a><div class="prog"><i></i></div></div>
+          <div class="prose">
+            <h2><i>§1</i>Purpose &amp; benefit</h2>
+            <p class="sum">A data agent is only useful if the people using it can be trusted with the rows it returns — so governance is the product, not a feature.</p>
+            <p>Data Pilot answers a plain-English question with a chart, a written report and the single governed query that produced them. The user never sees rows they are not entitled to, because entitlement is enforced in Postgres — a per-request <code>app.current_user_id</code> and a read-only role — not in the prompt.</p>
+            <p>The demo on the public URL runs in read-only mode: Explore and the SQL editor are live against the real marts; chat replays eight recorded agent runs as paced server-sent events, so you can watch the plan → charts → report sequence without an inference bill.</p>
+            <figure><div class="dia-frame" style="background:var(--band);border-radius:10px;padding:16px;max-width:560px"><svg class="dia" viewBox="0 0 320 100" role="img" aria-label="Data Pilot agent structure"><g><rect class="nd" x="4" y="38" width="48" height="24" rx="6"/><text class="tx" x="28" y="53">question</text></g><g><rect class="nd hi" x="66" y="30" width="78" height="40" rx="6"/><text class="tx" x="105" y="46">agent loop</text><text class="tx s" x="105" y="58">tools · memory</text></g><g><rect class="nd" x="158" y="6" width="68" height="28" rx="6"/><text class="tx" x="192" y="18">SQL guard</text><text class="tx s" x="192" y="29">sqlglot AST</text></g><g><rect class="nd hi" x="158" y="44" width="68" height="30" rx="6"/><text class="tx" x="192" y="57">SELECT · RLS</text><text class="tx s" x="192" y="68">read-only</text></g><g><rect class="nd" x="242" y="6" width="72" height="28" rx="6"/><text class="tx" x="278" y="18">sandbox</text><text class="tx s" x="278" y="29">Pyodide WASM</text></g><g><rect class="nd hi" x="242" y="44" width="72" height="30" rx="6"/><text class="tx" x="278" y="57">report</text><text class="tx s" x="278" y="68">charts · SQL</text></g><path class="ed" d="M52,50 L64,50"/><path class="ed" d="M144,44 C150,34 152,24 156,21"/><path class="ed" d="M192,34 L192,42"/><path class="ed" d="M226,52 C232,40 236,26 240,21"/><path class="ed" d="M278,34 L278,42"/><text class="cap" x="4" y="92">graded G1–G3 · cross-family judge · every run traced</text></svg></div><figcaption><b>Fig 1 — The model never touches the database directly.</b> Every path from question to report passes the AST guard and then RLS; the sandbox has no network and no filesystem.</figcaption></figure>
+            <details><summary>Evidence &amp; paths for §1</summary><ul><li>db/init/02_rls.sql — per-user grants, read-only role</li><li>services/data-agent/agent/sql_guardrails.py — three-layer guard, sqlglot AST walk</li><li>services/backend-api/app/sql_exec.py — statement timeout, row cap</li></ul></details>
+            <h2><i>§2</i>Agent architecture</h2>
+            <p class="sum">One pydantic-ai loop with four narrow tools; a second, isolated agent only names conversations so it can never add latency to an answer.</p>
+            <p>The loop plans an extract, writes a single read-only <code>SELECT</code>, runs sandboxed pandas over the rows it gets back, and assembles a typed report…</p>
+          </div>
+          <div class="rail">
+            <div class="box"><b>Readiness · 9 / 9</b><div class="mini"><div><i class="y"></i>Evals &amp; golden set</div><div><i class="y"></i>LLM-as-judge</div><div><i class="y"></i>Regression gate</div><div><i class="y"></i>Learning loop</div><div><i class="y"></i>Guardrails</div><div><i class="y"></i>Tracing</div><div><i class="y"></i>Cost control</div><div><i class="y"></i>Deploy &amp; release</div><div><i class="y"></i>Scale path</div></div></div>
+            <div class="box"><b>Facts</b><div class="facts"><b>Stack</b><span>pydantic-ai · FastAPI · Aurora Sv2 + pgvector · React 19 · dlt + dbt · Terraform</span><b>Rung</b><span>10 deployed · 100 sized</span><b>Code</b><span><a class="lnk">nmp-dsci/data-qa-agent</a></span></div></div>
+          </div>
+        </div>
+        <div class="next"><div><span style="font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint)">Next system</span><b>ConvFinQA Agent →</b></div><div style="text-align:right"><span style="font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint)">Talk to me</span><b>Contact on LinkedIn ↗</b></div></div>
+      </div>
+    </div>
+  </div>
+  <p class="note" style="margin-top:14px">Both frames are live HTML with container queries — resize the browser and the desktop frame re-lays itself; the 390px frame is the same markup. The mocks reuse the site's real <code>.dia</code> SVG contract so the diagram is the actual Data Pilot include, not a picture of one. Mocks are shown in each option's dark tokens; the “light” button flips to the light palette.</p>
+</div></section>
+
+<!-- ============================================================ OPTION B -->
+<section class="blk" id="optB"><div class="wrap">
+  <p class="kicker">7 · Option B</p>
+  <h2>“Monograph” — an editorial rebuild: display serif, a numbered index instead of cards, sidenotes, a printed ledger</h2>
+  <div class="opt-head">
+    <div>
+      <p class="lead">Treats the site as a published monograph about three systems. <b>Fraunces</b> (variable optical-size serif) for display, <b>Source Serif 4</b> for reading, <b>JetBrains Mono</b> for data. Cream paper with a brick accent used only for the contact action, section numerals and “partial” status; green is reserved for “shipped”. No cards at all: the home page is a title block, a numbered index of the three systems ruled like a contents page, and the rubric as a full-width ledger table with words rather than glyphs. Case studies are set in a 66ch column with a 240px margin for sidenotes — file paths, figure notes and proof references live beside the sentence they support.</p>
+      <p class="small"><b>Structure changed:</b> practices become a small-caps list under the ledger; the scale ladder becomes one ruled table row per rung; skills move into the byline.</p>
+    </div>
+    <div class="card"><h4>Tokens</h4>
+      <ul class="small">
+        <li>Type: reading 19px / 1.62; UI 13px mono; scale 1.333 → 14 · 19 · 25 · 34 · 45 · 60 · 80 (display only above 34)</li>
+        <li>Measure 66ch + 240px sidenote column at ≥ 1100px; sidenotes collapse to inline footnote toggles below</li>
+        <li>Cream #FBF8F1 · ink #14120F · muted #5A554C · faint #6F6A60 (5.1:1) · brick #A63A22 (6.1:1) · green #2F6B3A (6.0:1)</li>
+        <li>Dark: #161412 · #EDE8DF · brick #E2795F (6.2:1) · green #7CC48A (8.9:1)</li>
+        <li>Space 8·16·24·32·48·64·96·128; radius 3; no shadows; 1px ink rules carry hierarchy</li>
+      </ul>
+      <div class="swatches"><div class="sw"><i style="background:#FBF8F1"></i><span>cream</span></div><div class="sw"><i style="background:#14120F"></i><span>ink</span></div><div class="sw"><i style="background:#5A554C"></i><span>muted</span></div><div class="sw"><i style="background:#A63A22"></i><span>brick</span></div><div class="sw"><i style="background:#2F6B3A"></i><span>green</span></div><div class="sw"><i style="background:#E4DFD3"></i><span>rule</span></div></div>
+    </div>
+  </div>
+
+  <div class="frames">
+    <div class="frame-row">
+      <div class="frame"><div class="bar-ui"><i></i><i></i><i></i><span class="url">nmp-dsci.github.io — home · 1200px</span><button type="button" onclick="toggleScheme(this)">light</button></div>
+        <div class="mb" data-scheme="dark">
+          <div class="mast"><span class="name">Nathan Phillips</span><nav><a>Systems</a><a>Rubric</a><a>Practices</a><a>About</a><a>GitHub</a></nav><a class="ct">Contact</a></div>
+          <div class="title">
+            <p class="over">Applied AI engineer · Sydney · three systems in production</p>
+            <h1>Gen-AI systems, <i>shipped</i> and scored.</h1>
+            <p class="dek">Three agents live on AWS — a governed data agent, a financial Q&amp;A pipeline and a retrieval workbench — each written up on the same seven-section spine and graded against one production rubric. The hollow marks are the point.</p>
+            <div class="row"><a class="btn">Read the index ↓</a><span><b>20 / 27</b> dimensions shipped</span><span><b>77.1%</b> ConvFinQA, from 73.0%</span><span><b>6.1×</b> fewer tokens at parity</span></div>
+          </div>
+          <div class="idx">
+            <div class="idx-h"><h2>Index of systems</h2><span>demo mode on every public URL — read-only, no keys, no inference</span></div>
+            <div class="row-i"><div class="no">01</div><div><h3>Data Pilot</h3><p class="o">Governed natural-language → SQL over 3.2M rows; row-level security decides what the model may touch.</p></div>
+              <div class="dia-frame"><svg class="dia" viewBox="0 0 320 100" role="img" aria-label="Data Pilot agent structure"><defs><marker id="ar-b" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="currentColor"/></marker></defs><g><rect class="nd" x="4" y="38" width="48" height="24" rx="2"/><text class="tx" x="28" y="53">question</text></g><g><rect class="nd hi" x="66" y="30" width="78" height="40" rx="2"/><text class="tx" x="105" y="46">agent loop</text><text class="tx s" x="105" y="58">tools · memory</text></g><g><rect class="nd" x="158" y="6" width="68" height="28" rx="2"/><text class="tx" x="192" y="18">SQL guard</text><text class="tx s" x="192" y="29">sqlglot AST</text></g><g><rect class="nd hi" x="158" y="44" width="68" height="30" rx="2"/><text class="tx" x="192" y="57">SELECT · RLS</text><text class="tx s" x="192" y="68">read-only</text></g><g><rect class="nd" x="242" y="6" width="72" height="28" rx="2"/><text class="tx" x="278" y="18">sandbox</text><text class="tx s" x="278" y="29">Pyodide WASM</text></g><g><rect class="nd hi" x="242" y="44" width="72" height="30" rx="2"/><text class="tx" x="278" y="57">report</text><text class="tx s" x="278" y="68">charts · SQL</text></g><path class="ed" d="M52,50 L64,50" marker-end="url(#ar-b)"/><path class="ed" d="M144,44 C150,34 152,24 156,21" marker-end="url(#ar-b)"/><path class="ed" d="M192,34 L192,42" marker-end="url(#ar-b)"/><path class="ed" d="M226,52 C232,40 236,26 240,21" marker-end="url(#ar-b)"/><path class="ed" d="M278,34 L278,42" marker-end="url(#ar-b)"/></svg></div>
+              <div class="f"><b>9 / 9</b> shipped<br>4.98× on 5 workers<br>ap-southeast-2 · ~$8–18 / mo</div><div class="go">→</div></div>
+            <div class="row-i"><div class="no">02</div><div><h3>ConvFinQA Agent</h3><p class="o">Four typed agents over report text and tables; prompts versioned and promoted like releases.</p></div><div class="dia-frame" style="font:12px var(--mono);color:var(--faint)">[ convfinqa-agent.svg ]</div><div class="f"><b>6 / 9</b> shipped<br>77.1%, from 73.0%<br>App Runner ×1 · ~$5–10 / mo</div><div class="go">→</div></div>
+            <div class="row-i"><div class="no">03</div><div><h3>Transcript RAG</h3><p class="o">Eight retrieval configurations raced on one chunk-labelled golden set over 102 transcripts.</p></div><div class="dia-frame" style="font:12px var(--mono);color:var(--faint)">[ transcript-rag.svg ]</div><div class="f"><b>5 / 9</b> shipped<br>6.1× fewer tokens at 0.93<br>App Runner ×1 · ~$8–12 / mo</div><div class="go">→</div></div>
+          </div>
+          <div class="ledger">
+            <h2>The production ledger</h2>
+            <p>Nine questions every gen-AI system should answer before real users touch it. Each cell names what exists; anything that isn't shipped says why in the same line.</p>
+            <table>
+              <thead><tr><th style="width:26%">Dimension</th><th>Data Pilot</th><th>ConvFinQA</th><th>Transcript RAG</th></tr></thead>
+              <tbody>
+                <tr><td class="dn"><i>R1</i>Evals &amp; golden set</td><td><span class="st y">shipped</span>32 cases, authored in-product<small>graders G1–G3</small></td><td><span class="st y">shipped</span>770 questions, scored deterministically</td><td><span class="st y">shipped</span>20-entry chunk-labelled set</td></tr>
+                <tr><td class="dn"><i>R2</i>LLM-as-judge</td><td><span class="st y">shipped</span>cross-family, refuses own family</td><td><span class="st n">n/a</span>task is exact-match by framing</td><td><span class="st p">partial</span>self-graded — frozen rubrics exist<small>independence not yet measured</small></td></tr>
+                <tr><td class="dn"><i>R5</i>Guardrails</td><td><span class="st y">shipped</span>RLS + sqlglot AST + WASM sandbox</td><td><span class="st p">partial</span>abuse controls, no policy gate</td><td><span class="st p">partial</span>deny-by-default boundary only</td></tr>
+                <tr><td class="dn"><i>R9</i>Scale path</td><td><span class="st y">shipped</span>rung 100 sized from a queue experiment</td><td><span class="st d">designed</span>rung 10 only; nothing measured beyond</td><td><span class="st d">designed</span>rung 10 only</td></tr>
+                <tr><td colspan="4" style="font:12.5px var(--mono);color:var(--faint);border-bottom:0;padding-top:10px">… R3 gate, R4 loop, R6 tracing, R7 cost, R8 release — all shipped on all three</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="frame narrow"><div class="bar-ui"><i></i><i></i><i></i><span class="url">390px</span></div>
+        <div class="mb" data-scheme="dark">
+          <div class="mast"><span class="name">Nathan Phillips</span><a class="ct" style="margin-left:auto">Contact</a></div>
+          <div class="title"><p class="over">Applied AI engineer · Sydney</p><h1>Gen-AI systems, <i>shipped</i> and scored.</h1><p class="dek">Three agents live on AWS, written up on one spine and graded against one rubric.</p><div class="row"><a class="btn">Read the index ↓</a><span><b>20 / 27</b> shipped</span></div></div>
+          <div class="idx"><div class="idx-h"><h2>Index</h2></div>
+            <div class="row-i"><div class="no">01</div><div><h3>Data Pilot</h3><p class="o">Governed NL → SQL over 3.2M rows; RLS decides what the model may touch.</p></div><div class="f"><b>9 / 9</b> shipped · 4.98× on 5 workers</div></div>
+            <div class="row-i"><div class="no">02</div><div><h3>ConvFinQA Agent</h3><p class="o">Four typed agents; prompts promoted like releases.</p></div><div class="f"><b>6 / 9</b> shipped · 77.1% from 73.0%</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="frame"><div class="bar-ui"><i></i><i></i><i></i><span class="url">nmp-dsci.github.io/projects/data-pilot/ — case study · 1200px</span><button type="button" onclick="toggleScheme(this)">light</button></div>
+      <div class="mb" data-scheme="dark">
+        <div class="cs">
+          <div class="no">01</div>
+          <h1>Data Pilot: a governed <i>data agent</i> in production.</h1>
+          <p class="dek">Ask in plain English; get one read-only SELECT under row-level security, a sandboxed analysis and a typed report — over 3.2M rows of NSW property data.</p>
+          <div class="byline"><span><b>9 / 9</b> rubric</span><span><b>live</b> ap-southeast-2 · ~$8–18 / mo</span><span><b>12 min</b> · 7 sections</span><span>Agentic AI · Governance · MLOps · SQL · RAG · Evals</span><span style="margin-left:auto"><a class="btn">Live demo ↗</a></span></div>
+          <div class="mono-grid">
+            <div class="prose">
+              <h2><i>1</i>Purpose &amp; benefit</h2>
+              <p class="sum">A data agent is only useful if the people using it can be trusted with the rows it returns — so governance is the product, not a feature.</p>
+              <p>Data Pilot answers a plain-English question with a chart, a written report and the single governed query that produced them. The user never sees rows they are not entitled to, because entitlement is enforced in Postgres — a per-request <code>app.current_user_id</code> and a read-only role — not in the prompt.<span class="fn">1</span></p>
+              <p>The demo on the public URL runs read-only: Explore and the SQL editor are live against the real marts; chat replays eight recorded agent runs as paced server-sent events, so you can watch plan → charts → report without an inference bill.<span class="fn">2</span></p>
+              <h2><i>2</i>Agent architecture</h2>
+              <p class="sum">One pydantic-ai loop with four narrow tools; a second, isolated agent only names conversations so it can never add latency to an answer.</p>
+              <p>The loop plans an extract, writes a single read-only <code>SELECT</code>, runs sandboxed pandas over the rows it gets back, and assembles a typed report…<span class="fn">3</span></p>
+              <div class="score"><h2>Readiness scorecard</h2><div class="tot">9 / 9<small>shipped · rung 100 sized</small></div>
+                <table style="margin-top:16px"><thead><tr><th>Dimension</th><th>Status</th><th>What exists</th><th>§</th></tr></thead><tbody>
+                  <tr><td class="dn"><i>R1</i>Evals &amp; golden set</td><td><span class="st y">shipped</span></td><td>32 cases across three governed datasets, T1–T7 ladder; graders G1–G3 deterministic</td><td>3</td></tr>
+                  <tr><td class="dn"><i>R5</i>Guardrails</td><td><span class="st y">shipped</span></td><td>RLS keyed to per-user grants · three-layer sqlglot AST guard · Pyodide sandbox, no network</td><td>5</td></tr>
+                  <tr><td class="dn"><i>R9</i>Scale path</td><td><span class="st y">shipped</span></td><td>rung 100 sized: drain time within 6% of ⌈N/W⌉×5 across nine grid cells</td><td>6</td></tr>
+                </tbody></table></div>
+            </div>
+            <aside class="side">
+              <div class="sn"><b>1</b>Entitlement is enforced by the database role, so a prompt injection that rewrote the query would still be filtered.<code>db/init/02_rls.sql</code></div>
+              <div class="sn"><b>2</b>The recorded runs are real traces, replayed at their original pacing.<code>services/backend-api/app/routers/replay.py</code></div>
+              <div class="sn"><b>3</b>Tools: dbt-manifest schema, value lookup, per-user pgvector memory, make_chart. Budget 22 requests / 600k tokens.<code>services/data-agent/agent/sandbox_agent.py</code></div>
+              <div class="sn"><b>Fig 1</b> The model never touches the database directly.</div>
+            </aside>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div></section>
+
+<!-- ============================================================ COMPARE -->
+<section class="blk" id="compare"><div class="wrap">
+  <p class="kicker">8 · Compare</p>
+  <h2>Current vs A vs B on the rubric</h2>
+  <p class="lead">Option scores are “as designed”: what the mock commits to, assuming the plan below is executed to its acceptance checks. The rationale column says what each option does — or fails to do — for that dimension.</p>
+  <div class="tscroll" style="margin-top:18px"><table id="compare-table">
+    <thead><tr><th>Dimension</th><th>W</th><th>Current</th><th>A · Field Guide</th><th>B · Monograph</th><th>Why the difference</th></tr></thead>
+    <tbody></tbody>
+    <tfoot><tr><td><b>Weighted / 145</b></td><td></td><td class="num" id="c-cur"></td><td class="num" id="c-a"></td><td class="num" id="c-b"></td><td id="c-note"></td></tr></tfoot>
+  </table></div>
+
+  <div class="three" style="margin-top:26px">
+    <div class="card"><h4>Cost of A</h4><ul class="small"><li>3–4 build sessions: tokens + global (1), home (1), case study + practice + about (1), QA + gate (½–1)</li><li>Content: an editorial pass splitting paragraphs to ≤ 80 words and writing one summary line per section (21 sections) — ~2 hours, shared with B</li><li>Fonts: +Plex Serif (≈ 30KB subset); still one superfamily</li><li>Lint: extend <code>lint_case_study.py</code> with section-summary and paragraph-length checks; add <code>scripts/contrast_audit.py</code></li></ul></div>
+    <div class="card"><h4>Cost of B</h4><ul class="small"><li>5–6 sessions: everything in A plus a full type change, the sidenote system (JS to collapse footnotes below 1100px), and a new index/ledger home</li><li>Content: same editorial pass, plus rewriting ~90 proof paths into sidenotes with a sentence each</li><li>Fonts: Fraunces + Source Serif 4 + JetBrains Mono ≈ 110KB even subset; three families</li><li>Risk: sidenotes and 80px display type are the two things most likely to break on phones and on WCAG 1.4.12 text-spacing overrides; the practices and ladder need new templates</li></ul></div>
+    <div class="card"><h4>Shared risks and how the plan de-risks them</h4><ul class="small"><li>Contrast regressions → <code>contrast_audit.py</code> in CI reads the token file and fails under 4.5:1 for any text pair, both themes</li><li>Kramdown heading ids / anchors → keep the JS <code>#s1…#s7</code> anchors; TOC is built from them</li><li>The case-study skill and lint drift from the layout → P3 updates both in the same PR</li><li>Diagrams: <code>.dia</code> contract unchanged; only token names map (<code>--signal → --accent</code>)</li><li>Both options remove the video/reel placeholders until real media exists — the demo screenshots already in <code>assets/img</code> replace them</li></ul></div>
+  </div>
+</div></section>
+
+<!-- ============================================================ TEMPLATES -->
+<section class="blk" id="templates"><div class="wrap">
+  <p class="kicker">9 · Templates</p>
+  <h2>Token sheet and page skeletons another session can build from</h2>
+  <p class="lead">Tokens are written so the theme toggle is a value swap and every colour pair is machine-checkable. Skeletons are Liquid, targeting the existing collections and front matter; nothing in <code>_projects/*.md</code> changes except an optional <code>sections:</code> summary list. Rendered with @pierre/diffs; the same files sit in the plan's P0–P3.</p>
+
+  <div class="codeblk"><p class="why"><b><code>assets/css/tokens.css</code> — Option A</b> · the whole colour, type and space system in one file; <code>[data-theme=dark]</code> only redefines colour. <code>--faint</code> is 4.6:1 on paper, 5.9:1 on the dark bg; every text/bg pair here passes AA.</p><div id="code-tokens-a"></div></div>
+  <div class="codeblk"><p class="why"><b><code>assets/css/tokens.css</code> — Option B</b> · same shape, editorial values; brick accent reserved for contact + numerals + partial, green for shipped.</p><div id="code-tokens-b"></div></div>
+  <div class="codeblk"><p class="why"><b><code>_layouts/home.html</code> skeleton (A)</b> · hero with the matrix as the star, proof strip with baselines, three systems, numbered rubric list, ladder, practices, terminal CTA. The matrix include is the existing <code>rubric-matrix.html</code> re-rendered as a grid.</p><div id="code-home"></div></div>
+  <div class="codeblk"><p class="why"><b><code>_layouts/project.html</code> skeleton (A)</b> · header → TL;DR → three columns (TOC · 68ch prose · rail) → scorecard → next/contact. Section summaries come from a new optional front-matter list <code>sections: [ {n: 1, summary: "…"}, … ]</code>, injected before each H2 by the same script that adds <code>#s1…#s7</code>.</p><div id="code-project"></div></div>
+  <div class="codeblk"><p class="why"><b><code>assets/js/study.js</code></b> · builds the TOC from the seven H2s, scroll-spies with IntersectionObserver, inserts section summaries, computes reading time. ~40 lines, no dependencies, honours reduced motion.</p><div id="code-js"></div></div>
+  <div class="codeblk"><p class="why"><b><code>scripts/contrast_audit.py</code></b> · reads <code>tokens.css</code>, computes WCAG contrast for every declared text-on-surface pair in both themes, exits non-zero under 4.5:1 (3:1 for the large/UI list). Runs in the existing <code>lint.yml</code> job. Invocation: <code>uv run --no-project python scripts/contrast_audit.py assets/css/tokens.css</code>.</p><div id="code-py"></div></div>
+
+  <script type="text/plain" id="src-tokens-a">/* assets/css/tokens.css — Option A "Field Guide" */
+:root{
+  color-scheme: light;
+  /* surfaces + ink (hue-tinted neutrals; never pure black) */
+  --bg:#F7F6F2; --panel:#FFFFFF; --band:#EFEEE8;
+  --ink:#1A1D1B; --ink-2:#3B403D; --muted:#5B625E; --faint:#646B66;   /* faint = 4.6:1 on --bg */
+  --line:#DCDAD2; --line-2:#C7C5BC;
+  /* the one accent (CTA, links, shipped) and the one warning (partial) */
+  --accent:#0B6E58; --accent-ink:#FFFFFF; --accent-soft:#DFEFE8;         /* 5.7:1 on --bg */
+  --amber:#8F5306; --amber-soft:#F6E6CF;                                  /* 5.7:1 on --bg */
+  /* type: Plex Sans (UI/display) · Plex Serif (reading) · Plex Mono (data) */
+  --sans:'IBM Plex Sans',system-ui,sans-serif;
+  --serif:'IBM Plex Serif',Georgia,serif;
+  --mono:'IBM Plex Mono',ui-monospace,monospace;
+  /* scale: 16 base × 1.25 (UI) ; reading base 18 */
+  --t-1:.9rem; --t0:1rem; --t1:1.125rem; --t2:1.406rem; --t3:1.75rem; --t4:2.19rem; --t5:2.75rem; --t6:3.44rem;
+  --lh-body:1.6; --lh-tight:1.15; --measure:68ch;
+  /* space: one ladder */
+  --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:24px; --s6:32px; --s7:48px; --s8:64px; --s9:96px;
+  --sec-gap:var(--s9);      /* between sections, desktop */
+  --sec-pad:var(--s7);      /* inside a section */
+  /* shape + elevation + motion */
+  --r:10px; --shadow:0 1px 2px rgb(20 25 22 / .05), 0 12px 28px -18px rgb(20 25 22 / .22);
+  --dur:300ms; --ease:cubic-bezier(.2,.7,.2,1);
+  --w:1180px;
+}
+:root[data-theme="dark"]{
+  color-scheme: dark;
+  --bg:#121614; --panel:#191E1B; --band:#161A18;
+  --ink:#E8EBE7; --ink-2:#C9CFC9; --muted:#A7AFA9; --faint:#8C948E;      /* 5.9:1 */
+  --line:#28302B; --line-2:#3A443E;
+  --accent:#3DBB95; --accent-ink:#0E1512; --accent-soft:#17382C;          /* 7.6:1 */
+  --amber:#D99A4E; --amber-soft:#3A2A14;                                   /* 7.6:1 */
+  --shadow:0 1px 2px rgb(0 0 0 / .4), 0 12px 28px -18px rgb(0 0 0 / .6);
+}
+@media (max-width:700px){ :root{ --sec-gap:var(--s8); --sec-pad:var(--s6); --t5:2.25rem; --t6:2.6rem } }
+@media (prefers-reduced-motion:reduce){ :root{ --dur:0ms } }
+
+/* contrast pairs the audit script checks (text, surface, min ratio) */
+/* @contrast --ink --bg 4.5 | --ink-2 --bg 4.5 | --muted --bg 4.5 | --faint --bg 4.5 | --faint --panel 4.5
+   @contrast --accent --bg 4.5 | --accent --panel 4.5 | --accent-ink --accent 4.5 | --amber --bg 4.5
+   @contrast --line-2 --bg 3.0 */</script>
+
+  <script type="text/plain" id="src-tokens-b">/* assets/css/tokens.css — Option B "Monograph" */
+:root{
+  color-scheme: light;
+  --bg:#FBF8F1; --panel:#FFFDF8;
+  --ink:#14120F; --ink-2:#36322B; --muted:#5A554C; --faint:#6F6A60;      /* faint 5.1:1 */
+  --line:#E4DFD3; --line-2:#CFC8B8; --rule:var(--ink);
+  --accent:#A63A22; --accent-ink:#FFFFFF; --accent-soft:#F6E4DE;          /* brick 6.1:1 — contact, numerals, partial */
+  --green:#2F6B3A; --green-soft:#E1EEE2;                                   /* shipped 6.0:1 */
+  --display:'Fraunces',Georgia,serif;          /* opsz 144 for titles, 30 for summaries */
+  --serif:'Source Serif 4',Georgia,serif;
+  --mono:'JetBrains Mono',ui-monospace,monospace;
+  /* scale: 19 reading base × 1.333; display steps only */
+  --t0:1.1875rem; --t1:1.5625rem; --t2:2.125rem; --t3:2.8125rem; --t4:3.75rem; --t5:5rem;
+  --ui:.8125rem;                                /* 13px mono for chrome */
+  --lh-body:1.62; --measure:66ch; --side:240px;
+  --s2:8px; --s4:16px; --s5:24px; --s6:32px; --s7:48px; --s8:64px; --s9:96px; --s10:128px;
+  --sec-gap:var(--s10); --sec-pad:var(--s8);
+  --r:3px; --shadow:none; --dur:300ms; --ease:cubic-bezier(.2,.7,.2,1);
+  --w:1220px;
+}
+:root[data-theme="dark"]{
+  color-scheme: dark;
+  --bg:#161412; --panel:#1C1916;
+  --ink:#EDE8DF; --ink-2:#D2CBBE; --muted:#B0A99C; --faint:#8F887B;     /* 5.2:1 */
+  --line:#2E2A25; --line-2:#443E36;
+  --accent:#E2795F; --accent-ink:#1A100C; --accent-soft:#3B211A;         /* 6.2:1 */
+  --green:#7CC48A; --green-soft:#1E3324;                                  /* 8.9:1 */
+}
+@media (max-width:1100px){ :root{ --side:0px } }          /* sidenotes collapse to footnote toggles */
+@media (max-width:700px){ :root{ --sec-gap:var(--s8); --sec-pad:var(--s6); --t4:2.75rem; --t5:3rem } }
+@media (prefers-reduced-motion:reduce){ :root{ --dur:0ms } }
+/* @contrast --ink --bg 4.5 | --muted --bg 4.5 | --faint --bg 4.5 | --faint --panel 4.5 | --accent --bg 4.5 | --green --bg 4.5 | --accent-ink --accent 4.5 */</script>
+
+  <script type="text/plain" id="src-home">---
+layout: default
+---
+{%- assign live = site.projects | where_exp: "p", "p.production.live == true" | sort: "production.order" -%}
+{%- assign dims = site.data.rubric.dimensions -%}
+<section class="hero" aria-labelledby="h1">
+  <div class="hero-copy">
+    <p class="kick">{{ site.data.site.role }} · three systems in production on AWS</p>
+    <h1 id="h1">{{ site.data.site.tagline }}</h1>          {# outcome-led, ≤ 12 words #}
+    <p class="dek">{{ site.data.site.strapline }}</p>
+    <div class="ctas">
+      <a class="btn" href="#work">See the three systems ↓</a>
+      <a class="lnk" href="#rubric">How the rubric works</a>
+    </div>
+    <p class="proofline">{% include proof-line.html %}</p> {# 3 numbers, each with its baseline #}
+  </div>
+  <aside class="star" aria-label="Production rubric across the live systems">
+    {% include rubric-matrix.html mode="grid" %}          {# words in cells, no tooltips; cell → /projects/x/#sN #}
+  </aside>
+</section>
+
+<section class="proof" aria-label="Headline results">
+  {% for m in site.data.site.proof %}                     {# {n, label, baseline} — baseline is REQUIRED by lint #}
+  <div><span class="n">{{ m.n }}</span><span class="l">{{ m.label }}<small>{{ m.baseline }}</small></span></div>
+  {% endfor %}
+</section>
+
+<section class="sec band" id="work" aria-labelledby="work-h">
+  <div class="sec-h"><h2 id="work-h">Three systems, live on AWS</h2><span>demo mode · read-only · no keys</span></div>
+  <div class="sys">{% for p in live %}{% include project-card.html project=p %}{% endfor %}</div>
+</section>
+
+<section class="sec" id="rubric" aria-labelledby="rubric-h">
+  <div class="sec-h"><h2 id="rubric-h">What “production” means here</h2>
+    <a class="lnk" href="{{ '/practices/eval-loop/' | relative_url }}">the eval-loop practice →</a></div>
+  <ol class="dims">                                        {# 9 rows, one line each — replaces 9 cards #}
+    {% for i in (1..9) %}{% for d in dims %}{% if d[1].order == i %}
+    <li id="rubric-{{ d[0] }}"><b>{{ d[1].label | escape }}</b>{{ d[1].question | escape }}</li>
+    {% endif %}{% endfor %}{% endfor %}
+  </ol>
+  <figure class="fig-loop">{% include diagrams/rubric-loop.svg %}<figcaption>…</figcaption></figure>
+</section>
+
+<section class="sec" id="scale">{% include scale-ladder.html %}</section>      {# one horizontal stepper #}
+<section class="sec" id="practices">{% include practice-list.html %}</section> {# 3 lines, not 3 cards #}
+<section class="cta-end">{% include contact-cta.html %}</section>              {# terminal action on every page #}</script>
+
+  <script type="text/plain" id="src-project">---
+layout: default
+---
+{%- assign p_score = page.production.score | default: "" | strip -%}
+<article class="study">
+  <header class="cs-head">
+    <p class="crumb"><a href="{{ '/#work' | relative_url }}">← All systems</a> · {{ page.title }}</p>
+    <h1>{{ page.headline | default: page.title }}</h1>     {# new optional field: outcome-led title #}
+    <p class="dek">{{ page.summary }}</p>
+    <p class="meta">
+      {% if p_score != "" %}<span><b>{{ p_score }}</b> rubric shipped</span>{% endif %}
+      {% if page.production.live %}<span><b>live</b> · {{ page.production.region }}</span>{% endif %}
+      <span><b>{{ page.production.cost }}</b></span>
+      <span><b data-reading-time></b> · 7 sections</span>
+    </p>
+    <div class="ctas">
+      <a class="btn" href="{{ page.links.demo }}" target="_blank" rel="noopener">Open the live demo ↗</a>
+      <a class="lnk" href="{{ page.links.repo }}">Repository</a>
+      <a class="lnk" href="#s7">Jump to scorecard</a>
+    </div>
+  </header>
+
+  <div class="tldr" role="region" aria-label="30-second version">
+    <div><b>What</b><p>{{ page.tldr }}</p></div>
+    <div><b>Proof</b><p>{{ page.proof_line }}</p></div>    {# new optional field; falls back to metric #}
+    <div><b>Skills</b><p>{% for s in page.skills %}{{ site.data.skills[s].label }}{% unless forloop.last %} · {% endunless %}{% endfor %}</p></div>
+  </div>
+
+  <div class="cs-body">
+    <nav class="toc" aria-label="On this page" data-toc></nav>        {# built by study.js from the H2s #}
+    <div class="prose" data-sections='{{ page.sections | jsonify | escape }}'>
+      {{ content }}                                                    {# the seven H2s; summaries injected under each #}
+      {% include production-readiness.html %}
+      {% if page.skills_detail %}{% include skills-demonstrated.html %}{% endif %}   {# moved AFTER the work #}
+      {% if page.media.walkthrough != "" %}{% include walkthrough.html %}{% endif %}  {# no placeholder when empty #}
+    </div>
+    <aside class="rail">
+      {% include readiness-mini.html %}                                {# 9 rows: square + label, links to #sN #}
+      {% include fact-box.html %}
+    </aside>
+  </div>
+
+  <footer class="next">{% include next-system.html %}{% include contact-cta.html %}</footer>
+</article>
+<script src="{{ '/assets/js/study.js' | relative_url }}" defer><\/script></script>
+
+  <script type="text/plain" id="src-js">// assets/js/study.js — TOC, scroll-spy, section summaries, reading time. No deps.
+(() => {
+  const prose = document.querySelector('.prose'); if (!prose) return;
+  const hs = [...prose.querySelectorAll('h2')];
+  const sums = JSON.parse(prose.dataset.sections || '[]');            // [{n:1, summary:"…"}, …]
+
+  // 1. stable anchors + one-line summaries under each numbered H2
+  hs.forEach((h, i) => {
+    const m = /^\s*(\d+)/.exec(h.textContent) ; const n = m ? +m[1] : i + 1;
+    h.id = h.id || 's' + n;
+    const s = sums.find(x => x.n === n);
+    if (s) { const p = document.createElement('p'); p.className = 'sum'; p.textContent = s.summary; h.after(p); }
+  });
+
+  // 2. table of contents
+  const toc = document.querySelector('[data-toc]');
+  if (toc) {
+    toc.innerHTML = '<b>On this page</b>' + hs.map(h => `<a href="#${h.id}">${h.textContent.trim()}</a>`).join('') + '<div class="prog"><i></i></div>';
+    const links = [...toc.querySelectorAll('a')];
+    const spy = new IntersectionObserver(es => es.forEach(e => {
+      if (e.isIntersecting) links.forEach(a => a.classList.toggle('on', a.hash === '#' + e.target.id));
+    }), { rootMargin: '-20% 0px -70% 0px' });
+    hs.forEach(h => spy.observe(h));
+    const bar = toc.querySelector('.prog i');
+    addEventListener('scroll', () => {
+      const d = document.documentElement; bar.style.width = (100 * d.scrollTop / (d.scrollHeight - d.clientHeight)).toFixed(1) + '%';
+    }, { passive: true });
+  }
+
+  // 3. reading time (230 wpm)
+  const rt = document.querySelector('[data-reading-time]');
+  if (rt) rt.textContent = Math.max(1, Math.round(prose.innerText.split(/\s+/).length / 230)) + ' min';
+})();</script>
+
+  <script type="text/plain" id="src-py">#!/usr/bin/env python3
+"""contrast_audit.py — fail CI when any declared text/surface pair in tokens.css is under WCAG AA.
+
+Reads the `@contrast` comment lines from the token file, resolves the hex values in the light
+block and the [data-theme="dark"] block, and prints one line per pair per theme.
+Exit 1 on any failure.  No dependencies.
+"""
+import re, sys
+
+def lum(h):
+    r, g, b = (int(h[i:i+2], 16) / 255 for i in (1, 3, 5))
+    f = lambda v: v / 12.92 if v <= 0.03928 else ((v + 0.055) / 1.055) ** 2.4
+    return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b)
+
+def ratio(a, b):
+    la, lb = lum(a), lum(b)
+    return (max(la, lb) + 0.05) / (min(la, lb) + 0.05)
+
+def block(css, selector):
+    m = re.search(re.escape(selector) + r"\s*\{(.*?)\}", css, re.S)
+    return dict(re.findall(r"(--[\w-]+)\s*:\s*(#[0-9A-Fa-f]{6})", m.group(1))) if m else {}
+
+def main(path):
+    css = open(path).read()
+    themes = {"light": block(css, ":root"), "dark": block(css, ':root[data-theme="dark"]')}
+    pairs = re.findall(r"(--[\w-]+)\s+(--[\w-]+)\s+([\d.]+)", " ".join(re.findall(r"@contrast(.*)", css)))
+    bad = 0
+    for theme, toks in themes.items():
+        for fg, bg, need in pairs:
+            if fg not in toks or bg not in toks:
+                print(f"{theme:5} {fg:14} on {bg:14}  MISSING"); bad += 1; continue
+            r = ratio(toks[fg], toks[bg]); ok = r >= float(need)
+            print(f"{theme:5} {fg:14} on {bg:14}  {r:5.2f}:1  need {need}  {'ok' if ok else 'FAIL'}")
+            bad += (not ok)
+    print(f"\n{len(pairs) * len(themes)} pairs checked, {bad} failing")
+    sys.exit(1 if bad else 0)
+
+if __name__ == "__main__":
+    main(sys.argv[1] if len(sys.argv) > 1 else "assets/css/tokens.css")</script>
+</div></section>
+
+<!-- ============================================================ PLAN -->
+<section class="blk" id="plan"><div class="wrap">
+  <p class="kicker">10 · Plan</p>
+  <h2>Six phases on <code>design-evaluation</code>, each with an acceptance check</h2>
+  <p class="lead">Ordered by the corpus's own rule — structure and tokens first, visual direction second, per-element polish last — so nothing is redone when a section moves. Every phase ends with the Docker Jekyll build, the case-study lint, and (from P0) the contrast audit. Written for Option A; B-only deltas are marked.</p>
+
+  <div class="phase"><div class="ph">P0<small>Brief + tokens<br>½ session</small></div><div>
+    <b>Commit the design brief and the token system before touching a layout.</b>
+    <ul class="small"><li><code>DESIGN.md</code>: audience (hiring managers, 60–90 s scan), the one action (open a case study → book a conversation), the rubric thresholds from §3, and the never-do list (no ghost primary, no text under 13px, no accent outside CTA/links/status, no grid background, no placeholders for media that doesn't exist, no scroll-jacking, no purple, no Inter).</li><li><code>assets/css/tokens.css</code> as above; <code>scripts/contrast_audit.py</code>; wire into <code>.github/workflows/lint.yml</code>.</li><li>Self-host Latin subsets: Plex Sans Variable, Plex Serif (400/500/600 + italic 400), Plex Mono (400/500) as woff2 under <code>assets/fonts/</code>; <code>font-display: optional</code> for body, <code>swap</code> for display; <code>size-adjust</code> fallbacks. <em>B: Fraunces + Source Serif 4 + JetBrains Mono instead.</em></li></ul>
+    <div class="files">Acceptance: contrast audit passes both themes · fonts ≤ 4 weights, ≤ 100KB total · Lighthouse CLS 0 on a text page</div></div></div>
+
+  <div class="phase"><div class="ph">P1<small>Global chrome<br>½ session</small></div><div>
+    <b>Nav, footer, buttons, links, focus, motion — the components every surface shares.</b>
+    <ul class="small"><li>Nav: wordmark (no blinking cursor) · Work / Practices / About · utility cluster (GitHub, LinkedIn as 32px icon targets, theme) · solid Contact. Collapses to a sheet under 700px.</li><li>One <code>.btn</code> (solid accent) and one <code>.lnk</code> (underlined) — the ghost button is deleted. 300ms ease-out on hover/focus; <code>:focus-visible</code> ring with offset; <code>prefers-reduced-motion</code> zeroes <code>--dur</code>.</li><li>Delete the grid-line background; body on paper; sections alternate paper / band.</li><li>Footer carries the terminal CTA include.</li></ul>
+    <div class="files">Files: _includes/nav.html · footer.html · contact-cta.html · assets/css/main.css (rewrite on tokens) · Acceptance: keyboard tab order visible on every page; 24×24 targets</div></div></div>
+
+  <div class="phase"><div class="ph">P2<small>Home hub<br>1 session</small></div><div>
+    <b>Hero with the matrix as the star; proof strip with baselines; three system cards; numbered rubric; ladder; practices.</b>
+    <ul class="small"><li><code>_data/site.yml</code>: outcome-led <code>tagline</code> (≤ 12 words), <code>strapline</code>, and a <code>proof:</code> list of three <code>{n, label, baseline}</code> — lint fails a proof without a baseline.</li><li><code>rubric-matrix.html</code> gains <code>mode="grid"</code>: words in cells (shipped / partial / designed / n/a), each cell linking to <code>/projects/x/#sN</code>; no tooltips, no truncation. Legend states what each word means.</li><li><code>project-card.html</code>: title · live · one outcome sentence (new <code>outcome:</code> field, ≤ 25 words, lint-checked) · diagram · three facts (Score / Demo / Runs on, ≤ 12 words each) · solid “Read the case study”, quiet “Open live demo ↗”. Borderless on the band; hover lift.</li><li>Rubric explainer → a numbered <code>&lt;ol&gt;</code> of nine one-liners in three columns, plus the loop diagram at figure size; nine cards deleted. Ladder → one horizontal stepper. Practices → three lines.</li><li><em>B: title block + index rows + ledger table + practices list instead; matrix cells carry a phrase, not a word.</em></li></ul>
+    <div class="files">Files: _layouts/home.html · _includes/{project-card,rubric-matrix,proof-line,practice-list,scale-ladder}.html · _data/site.yml · _projects/*.md (+outcome) · Acceptance: ≤ 10 text styles on the page (probe) · evidence in first viewport at 1280 and 390 · page ≤ 3 screens at 1440</div></div></div>
+
+  <div class="phase"><div class="ph">P3<small>Case study<br>1 session</small></div><div>
+    <b>The reading template: header → TL;DR → TOC · 68ch serif prose · rail → scorecard → skills → next.</b>
+    <ul class="small"><li><code>_layouts/project.html</code> per the skeleton; <code>assets/js/study.js</code>; <code>readiness-mini.html</code>; <code>next-system.html</code>. Skills demonstrated moves after the scorecard; video/reel placeholders removed — real screenshots from <code>assets/img/&lt;system&gt;/</code> become Fig 0 in §1 where they exist.</li><li>Front matter: optional <code>headline</code>, <code>proof_line</code>, <code>sections: [{n, summary}]</code>; the case-study skill (<code>.claude/skills/case-study/SKILL.md</code>) and <code>_templates/project.md</code> updated in the same PR.</li><li>Editorial pass on the three studies: split paragraphs to ≤ 80 words; turn enumerations into lists/tables (the three cost caps, the four tools, the eight configs, the graders); write the 21 summary lines; captions state the takeaway.</li><li><code>lint_case_study.py</code> adds: paragraph ≤ 80 words, summary per section, outcome ≤ 25 words, proof baseline present, no media placeholders.</li><li><em>B: sidenote system — <code>&lt;span class="fn"&gt;</code> markers, <code>&lt;aside class="side"&gt;</code> rendered from a <code>notes:</code> list; JS moves notes inline under 1100px.</em></li></ul>
+    <div class="files">Acceptance: §1 within one screen at 1280 · CPL 60–72 (probe) · TOC scroll-spy works with JS off (plain anchor list) · lint 6/6 PASS · WCAG 1.4.12 override test passes</div></div></div>
+
+  <div class="phase"><div class="ph">P4<small>Practice + About<br>½ session</small></div><div>
+    <b>Practice pages inherit the P3 reading template; About becomes one screen of who / what / proof / contact.</b>
+    <ul class="small"><li><code>_layouts/practice.html</code>: same TOC/prose/rail; “Applies to” chips → the rail; terminal CTA to the systems it applies to.</li><li><code>about.md</code> + <code>_layouts/page.html</code>: lead paragraph (who, what, where), three proof lines, contact button in the first screen; the “what I work with” list second; optional photo slot (no placeholder if absent).</li></ul>
+    <div class="files">Acceptance: every page ends in a next step (link check) · practice lint PASS</div></div></div>
+
+  <div class="phase"><div class="ph">P5<small>QA + gate<br>½–1 session</small></div><div>
+    <b>Measure the redesign against the rubric with the same probes used in §1, then ship through the gate.</b>
+    <ul class="small"><li>Probe script (scratch): text-style count, CPL, first-H2 offset, page height, contrast per class — both themes, 390 / 768 / 1280 / 1600. Target: every dimension ≥ 4; weighted ≥ 130.</li><li>Lighthouse mobile ≥ 95 performance / 100 accessibility; axe clean; keyboard walk-through; reduced-motion check.</li><li><code>no-mistakes axi run --intent "Redesign: tokens, type scale, hierarchy, scan rails; rubric ≥ 130/145"</code> → PR to master with the before/after score table in the description; merge; verify live.</li></ul>
+    <div class="files">Acceptance: rubric re-score published in the PR · Pages build green · live probes match</div></div></div>
+
+  <p class="note">Estimated total: Option A 3–4 sessions; Option B 5–6. The editorial pass on the three case studies (P3) is the only work that is content rather than presentation, and it is shared by both options — it is also the single change with the largest effect on D6 scan-ability, whichever option you choose.</p>
+</div></section>
+
+<!-- ============================================================ DECIDE -->
+<section class="blk" id="decide"><div class="wrap">
+  <p class="kicker">11 · Decide</p>
+  <h2>Three questions; answers queue as prompts for the build session</h2>
+
+  <form class="q" data-lavish-question="option" onsubmit="event.preventDefault();const f=new FormData(event.currentTarget);const c=f.get('option');if(!c)return;window.lavish.queuePrompt('Redesign direction: '+c+'. Proceed with the plan in s05 (P0–P5) on branch design-evaluation, building through the case-study skill and the lint gate.',{tag:'choice',text:'Option: '+c,element:event.currentTarget,data:{question:'option',answer:c}});event.currentTarget.querySelector('.queued').textContent='queued ✓';">
+    <h4>1 · Which direction?</h4>
+    <label><input type="radio" name="option" value="A — Field Guide (recommended)"> <b>A — Field Guide</b> · evolve the system: Plex superfamily, matrix as the star, cards kept, 3–4 sessions</label>
+    <label><input type="radio" name="option" value="B — Monograph"> <b>B — Monograph</b> · editorial rebuild: Fraunces + Source Serif, numbered index, sidenotes, ledger, 5–6 sessions</label>
+    <label><input type="radio" name="option" value="Hybrid — A structure with B display type (Fraunces headings, Plex Serif body, Plex Mono data)"> <b>Hybrid</b> · A's structure and tokens with B's display serif for H1/H2 only</label>
+    <button type="submit">Queue this answer</button><span class="queued"></span>
+  </form>
+
+  <form class="q" data-lavish-question="scope" onsubmit="event.preventDefault();const f=new FormData(event.currentTarget);const v=f.getAll('scope');if(!v.length)return;window.lavish.queuePrompt('Scope for the first build PR: '+v.join('; ')+'.',{tag:'scope',text:'Scope: '+v.join(', '),element:event.currentTarget,data:{question:'scope',answer:v}});event.currentTarget.querySelector('.queued').textContent='queued ✓';">
+    <h4>2 · What goes in the first PR?</h4>
+    <label><input type="checkbox" name="scope" value="P0 tokens + DESIGN.md + contrast audit in CI" checked> P0 — tokens, DESIGN.md, contrast audit in CI</label>
+    <label><input type="checkbox" name="scope" value="P1 global chrome" checked> P1 — nav, footer, buttons, focus, motion, fonts</label>
+    <label><input type="checkbox" name="scope" value="P2 home hub" checked> P2 — home hub</label>
+    <label><input type="checkbox" name="scope" value="P3 case-study template + editorial pass on the three studies"> P3 — case-study template + the editorial pass</label>
+    <label><input type="checkbox" name="scope" value="P4 practice + about"> P4 — practice pages and about</label>
+    <label><input type="checkbox" name="scope" value="P5 QA re-score + no-mistakes gate + PR"> P5 — QA re-score, gate, PR</label>
+    <button type="submit">Queue this answer</button><span class="queued"></span>
+  </form>
+
+  <form class="q" data-lavish-question="constraints" onsubmit="event.preventDefault();const f=new FormData(event.currentTarget);const t=(f.get('notes')||'').trim();const th=f.get('theme');const msg='Constraints for the redesign: default theme = '+th+(t?'. Notes: '+t:'');window.lavish.queuePrompt(msg,{tag:'constraints',text:'Constraints',element:event.currentTarget,data:{question:'constraints',theme:th,notes:t}});event.currentTarget.querySelector('.queued').textContent='queued ✓';">
+    <h4>3 · Constraints</h4>
+    <label><input type="radio" name="theme" value="follow the OS, light tokens are the reference" checked> Default theme follows the OS (light is the reference palette; dark is a token swap)</label>
+    <label><input type="radio" name="theme" value="light only"> Light only — drop the toggle</label>
+    <label><input type="radio" name="theme" value="dark only"> Dark only</label>
+    <label>Anything off-limits, or anything you want kept from the current site (the blinking cursor, the grid, the green)?<textarea name="notes" placeholder="e.g. keep the wordmark cursor; no serif; try a photo on About"></textarea></label>
+    <button type="submit">Queue this answer</button><span class="queued"></span>
+  </form>
+  <p class="note">Select, then press <b>Send to Agent</b> in the Lavish toolbar. You can also annotate any element in the mocks directly — a cell, a heading size, a button — and those come through as ordinary feedback.</p>
+</div></section>
+
+<script>
+/* ------------------------------------------------------------- data */
+const RUBRIC = [
+ {id:'D1',name:'First-screen clarity',w:3,thr:'Hero says who / what / for whom / next step in plain words; ≥ 1 proof number with its baseline in the first viewport; one solid primary CTA + ≤ 1 secondary; nothing misaligned above the fold',surf:'Home, case study, about',
+  cur:[3,'Plain headline and two CTAs; but no audience/outcome, metrics without baselines, right half of the hero empty, grid background competing'],
+  a:[5,'Outcome-led H1, audience in the kicker, proof line with baselines, and the rubric matrix in the first viewport'],
+  b:[5,'Title block with outcome and three baselined numbers; index directly below'],
+  why:'Both put evidence in the first viewport; the difference is only the star (matrix vs. index).'},
+ {id:'D2',name:'Visual hierarchy',w:3,thr:'Three levers used deliberately; one “star” per surface; no adjacent elements at equal weight; panels nested ≤ 1 level',surf:'Every surface',
+  cur:[2,'~30 identical bordered panels; nine rubric cards; no star; metrics, cards, dims, rungs and practices all the same weight'],
+  a:[4,'Matrix is the star; cards borderless on a band; rubric collapsed to a list — but cards, band and star are still three panel-like objects'],
+  b:[5,'Rules and type size carry all hierarchy; no panels at all; numerals and display type give one obvious entry point per section'],
+  why:'B removes panels entirely; A keeps cards, which is a deliberate trade for scannability of three parallel systems.'},
+ {id:'D3',name:'Typographic system',w:3,thr:'≤ 2 families (superfamily counts as one); named base × ratio, ≤ 10 text styles per page; body ≥ 16px (18 on reading pages); CPL 45–75; line-height 1.5–1.7; no running text < 13px',surf:'Every surface',
+  cur:[1,'39 styles on home; 12.5px dominant; 84 CPL; sub-10px labels; no scale'],
+  a:[5,'16/18 base × 1.25, ≤ 9 styles; Plex Sans/Serif/Mono; 68ch measure; labels ≥ 13px'],
+  b:[5,'19 × 1.333 with display steps; 66ch; three families but each with one job'],
+  why:'Equal; B spends more of its budget on display drama, A on reading comfort.'},
+ {id:'D4',name:'Colour & contrast',w:3,thr:'60/30/10; accent reserved for action + status; tinted neutral ramp; every text/surface pair ≥ 4.5:1 (3:1 large/UI) in both themes; status never colour-only',surf:'Global, matrix, scorecard',
+  cur:[2,'Light theme fails AA on ~12 classes (faint 3.64:1, signal 4.10:1, amber 3.89:1); accent used for everything'],
+  a:[5,'Every pair verified ≥ 4.6:1 both themes by script in CI; accent = CTA/links/shipped only; status has words'],
+  b:[5,'Same verification; two hues with disjoint jobs (brick: action/partial, green: shipped)'],
+  why:'Both are machine-checked; identical marks.'},
+ {id:'D5',name:'Spacing & rhythm',w:2,thr:'One 4/8-pt ladder; one section rhythm reduced per breakpoint; one job per section; white space as signal',surf:'Home, case study',
+  cur:[2,'Paddings 22/54/62/76/90; card paddings 14–18; five radii; sections cramped against each other'],
+  a:[5,'--s1…--s9 ladder; 96/48 desktop → 64/32 mobile; one radius; sections alternate paper/band'],
+  b:[5,'128/64 → 64/32; rules instead of boxes; generous margins are the identity'],
+  why:'Equal.'},
+ {id:'D6',name:'Scan-ability & progressive disclosure',w:3,thr:'TL;DR; section map (TOC) on pages > 1,200 words; paragraphs ≤ 80 words; lists/tables for enumerables; numbers/rules as scan rails; reading time; depth behind <details>',surf:'Case study, practice, home',
+  cur:[2,'TL;DR exists; no TOC; 151-word paragraphs; 0 lists/tables; §1 two screens down; matrix cells truncated to 8 words with touch-invisible tooltips'],
+  a:[5,'Sticky TOC + progress; one-line summary under every H2; ≤ 80-word paragraphs; proofs behind <details>; matrix cells are full words; reading time'],
+  b:[4,'Numbered display headings and summaries; sidenotes are excellent on desktop but collapse to footnote toggles on phones; no TOC (contents page is the index)'],
+  why:'A has an explicit map on every long page; B relies on typography and loses the sidenotes under 1100px.'},
+ {id:'D7',name:'Evidence presentation',w:3,thr:'Every metric carries baseline/denominator; proof adjacent to claim; honest ratings legible without tooltip; captions state the takeaway; code links within reach',surf:'Home, card, case study',
+  cur:[4,'Proof paths, honest ratings, and links are all there — the strongest dimension; but hero metrics lack baselines and matrix cells hide their sentence'],
+  a:[5,'Proof strip with baselines; matrix cells in words linking to the section; mini scorecard in the rail; evidence <details> under each section'],
+  b:[5,'Ledger cells carry a phrase and a reason; sidenotes put the path beside the sentence; printed scorecard'],
+  why:'Equal; both keep what already works and surface it earlier.'},
+ {id:'D8',name:'CTA & wayfinding',w:2,thr:'Primary solid and highest-contrast, no ghost primary; every page ends in a next step; nav ≤ 5 + utility; breadcrumb; next/previous system',surf:'Every surface',
+  cur:[3,'Case-study link is the ghost button; pages end at the footer with no next step; nav OK; breadcrumb OK'],
+  a:[5,'Solid “Read the case study”; quiet demo link; “Next system” + contact on every page; nav 3 + utility + Contact'],
+  b:[4,'Single mono “Contact” action and arrow links — elegant, but lower contrast between primary and secondary actions; next-system row present'],
+  why:'B’s restraint makes the primary action less obvious than A’s filled button.'},
+ {id:'D9',name:'Component consistency & craft',w:2,thr:'One card/button definition with variants; four interactive states; one radius/border/shadow; visual rhyming; bespoke assets; worst-case content still deliberate',surf:'Global, cards, scorecard',
+  cur:[3,'Consistent but undifferentiated; bespoke SVG diagrams are a real asset; no focus states; “video coming” placeholders'],
+  a:[4,'Tokens make radius/shadow/motion one value; hover/focus states; placeholders removed; matrix cell shape rhymes with scorecard squares'],
+  b:[4,'Rules and numerals rhyme across index, ledger and case study; ink rules are the motif; sidenotes need careful worst-case handling'],
+  why:'Equal; both are systematised. Neither claims 5 until built and inspected.'},
+ {id:'D10',name:'Responsive',w:2,thr:'Re-layout not scale-down; tables/matrix/diagrams have a narrow strategy other than side-scroll; 24×24 targets; type scale swaps per range',surf:'Home, matrix, case study',
+  cur:[3,'No overflow at 360–1600; but matrix side-scrolls, cards are 691px tall, diagram labels shrink to ~7px'],
+  a:[4,'Matrix abbreviates to glyph cells at 390 (shown); cards stack; type scale swaps; TOC/rail become inline; diagrams get --dia-k bump'],
+  b:[3,'Index rows and ledger re-stack, but 80px display type, sidenote collapse and a 4-column ledger on phones are three separate risks'],
+  why:'A’s grid/matrix has a demonstrated 390px state; B’s sidenotes and ledger are the hard cases.'},
+ {id:'D11',name:'Motion & feel',w:1,thr:'Micro-interactions only (hover, focus, reveal ≤ 300ms ease-out); reduced-motion honoured; no scroll-jacking; no layout shift',surf:'Global',
+  cur:[3,'Card hover lift; blinking cursor; link hover has no transition; reduced-motion honoured'],
+  a:[4,'300ms lift+shadow on cards, underline wipe in nav, staggered reveal on the matrix cells; --dur → 0 under reduced motion'],
+  b:[4,'Hover on index rows (background), border wipe on nav; deliberately quieter'],
+  why:'Equal; both micro. Weight 1 — every source for this audience says minimise.'},
+ {id:'D12',name:'Performance & a11y hygiene',w:2,thr:'Fonts self-hosted subset ≤ 4 weights, font-display for CLS; LCP < 2.5s, CLS < 0.1; one H1; landmarks; alt; visible focus; keyboard',surf:'Global',
+  cur:[3,'Google Fonts CSS with 7 weights, render-blocking; one H1; landmarks OK; focus styling only on the matrix'],
+  a:[5,'Three Plex faces subset ≈ 90KB, optional/swap; focus ring with offset; contrast audit + axe in the QA phase'],
+  b:[4,'Fraunces + Source Serif 4 + JetBrains Mono ≈ 110KB; opsz axis costs bytes; otherwise identical hygiene'],
+  why:'Font payload; B carries three families.'},
+];
+const MAX = RUBRIC.reduce((s,r)=>s+5*r.w,0);
+const tot = k => RUBRIC.reduce((s,r)=>s+r[k][0]*r.w,0);
+const pct = n => Math.round(100*n/MAX);
+const pill = s => `<span class="pill p${s}">${s}</span>`;
+
+/* verdict */
+for (const [k,id] of [['cur','cur'],['a','a'],['b','b']]) {
+  document.getElementById('v-'+id).textContent = pct(tot(k))+'%';
+  document.getElementById('vb-'+id).style.width = pct(tot(k))+'%';
+}
+/* rubric table */
+document.querySelector('#rubric-table tbody').innerHTML = RUBRIC.map(r=>`<tr><td class="num">${r.id}</td><td><b>${r.name}</b></td><td class="num">×${r.w}</td><td>${r.thr}</td><td class="small">${r.surf}</td></tr>`).join('');
+/* scored */
+document.querySelector('#scored-table tbody').innerHTML = RUBRIC.map(r=>`<tr><td><b>${r.id} · ${r.name}</b></td><td class="num">×${r.w}</td><td>${pill(r.cur[0])}</td><td>${r.cur[1]}</td></tr>`).join('');
+document.getElementById('scored-total').textContent = tot('cur')+' / '+MAX;
+document.getElementById('scored-pct').innerHTML = `<b>${pct(tot('cur'))}%</b> — evidence (D7) carries the site; type (D3), hierarchy (D2), colour (D4) and scan-ability (D6) drag it down`;
+/* compare */
+document.querySelector('#compare-table tbody').innerHTML = RUBRIC.map(r=>`<tr><td><b>${r.id} · ${r.name}</b></td><td class="num">×${r.w}</td><td>${pill(r.cur[0])} <span class="small">${r.cur[0]*r.w}</span></td><td>${pill(r.a[0])} <span class="small">${r.a[0]*r.w}</span></td><td>${pill(r.b[0])} <span class="small">${r.b[0]*r.w}</span></td><td class="small">${r.why}</td></tr>`).join('');
+document.getElementById('c-cur').innerHTML = `<b>${tot('cur')}</b> · ${pct(tot('cur'))}%`;
+document.getElementById('c-a').innerHTML = `<b>${tot('a')}</b> · ${pct(tot('a'))}%`;
+document.getElementById('c-b').innerHTML = `<b>${tot('b')}</b> · ${pct(tot('b'))}%`;
+document.getElementById('c-note').textContent = 'A leads on scan-ability, CTA clarity, responsive and font payload; B leads on hierarchy. Everything else ties.';
+
+/* mock theme toggle */
+function toggleScheme(btn){const m=btn.closest('.frame').querySelector('.ma,.mb');const d=m.getAttribute('data-scheme')==='dark';if(d){m.removeAttribute('data-scheme');btn.textContent='dark'}else{m.setAttribute('data-scheme','dark');btn.textContent='light'}}
+</script>
+<script type="module">
+  import { File } from "https://esm.sh/@pierre/diffs@1.2.10?bundle";
+  const theme = { light: "github-light", dark: "github-dark" };
+  const render = (src, target, name) => {
+    const el = document.getElementById(src); if (!el) return;
+    new File({ theme, themeType: "dark", overflow: "wrap" }).render({ containerWrapper: document.getElementById(target), file: { name, contents: el.textContent.replace('<\\/script>','<'+'/script>') } });
+  };
+  render('src-tokens-a','code-tokens-a','assets/css/tokens.css');
+  render('src-tokens-b','code-tokens-b','assets/css/tokens.css');
+  render('src-home','code-home','_layouts/home.html');
+  render('src-project','code-project','_layouts/project.html');
+  render('src-js','code-js','assets/js/study.js');
+  render('src-py','code-py','scripts/contrast_audit.py');
+</script>
+</body>
+</html>
