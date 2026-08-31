@@ -292,6 +292,7 @@ a.cell:hover{text-decoration:none;transform:scale(1.04);box-shadow:var(--shadow)
 .crumb{font-family:var(--mono);font-size:var(--t-2);color:var(--faint);margin-bottom:var(--s4)}
 .crumb a{color:var(--faint)}
 .crumb a:hover{color:var(--accent)}
+.page-head .kick{margin-bottom:var(--s3)}
 .page-head h1{font-size:var(--t4);max-width:24ch;margin-bottom:var(--s3)}
 .page-head .dek{font-family:var(--serif);font-size:var(--t2);line-height:1.4;
   color:var(--ink-2);max-width:56ch;margin-bottom:var(--s5)}

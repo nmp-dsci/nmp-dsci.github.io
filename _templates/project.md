@@ -50,6 +50,7 @@ sections:
   - {n: 5, summary: ""}
   - {n: 6, summary: ""}
   - {n: 7, summary: ""}
+tags: []                     # Category kicker above the case-study title, e.g. [Agents, Data]
 metric: ""                   # The headline number, e.g. "77.1%" or "6.1×"
 metric_label: ""             # What the number means, e.g. "accuracy · up from 73.0% (594/770)"
 stack: []                    # Technologies, most distinctive first. Source: README, pyproject/package.json, infra/

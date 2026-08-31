@@ -25,6 +25,9 @@ layout: default
 <article class="study">
   <header class="page-head wrap">
     <p class="crumb"><a href="{{ '/#work' | relative_url }}">← All systems</a> · {{ page.title }}</p>
+    {%- if page.tags and page.tags != empty %}
+    <p class="label kick">{% for t in page.tags %}{{ t }} · {% endfor %}case study</p>
+    {%- endif %}
     <h1>{{ p_head }}</h1>
     <p class="dek">{{ page.summary }}</p>
 
