@@ -115,7 +115,7 @@ SUMMARY_WORDS = 24        # one `sections[].summary`, in the reading rail
 PARAGRAPH_MAX = 80        # DESIGN.md §3 rule 12 — over this the lint fails
 PARAGRAPH_WARN = 65       # under the limit but close enough to say so
 PLACEHOLDER_MEDIA = {"planned", "coming", "soon", "tbd", "todo", "pending", "wip"}
-MEDIA_SLOTS = ["walkthrough", "poster", "reel"]
+MEDIA_SLOTS = ["walkthrough", "poster", "captions"]
 
 HOW_MIN = 40  # a reason shorter than this is a shrug, not an explanation
 ABBREV = re.compile(r"\b(e\.g|i\.e|etc|vs|approx|Dr|Mr|Ms|No|Fig|cf)\.", re.I)
