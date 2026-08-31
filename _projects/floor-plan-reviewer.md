@@ -28,7 +28,7 @@ media:
   walkthrough: /assets/video/floor-plan-reviewer/walkthrough.mp4
   poster: /assets/img/floor-plan/app-review.png
   captions: /assets/video/floor-plan-reviewer/walkthrough.vtt
-  reel: planned
+  reel: ""
 ---
 
 ## Architecture

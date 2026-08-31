@@ -1,70 +1,71 @@
 <svg class="dia" viewBox="0 0 340 200" role="img"
      aria-label="Rung 1,000, designed only: a WAF and CDN edge fronts a multi-AZ API fleet, which feeds one queue per workload class; an agent fleet of about five hundred slots drains the interactive queue and calls an LLM router across providers, a separate CPU-bound sandbox fleet reads a dedicated vector store, and an online judge samples a few percent of production answers while Aurora runs a writer plus readers and cost is shown back per tenant.">
   <defs>
-    <marker id="rg1k" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+    <marker id="rg1k" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
       <path d="M0,0 L8,4 L0,8 z" fill="currentColor"/>
     </marker>
   </defs>
 
-  <g><title>edge — CloudFront plus WAF, with per-tenant rate limits applied before anything reaches a fleet</title>
-    <rect class="nd" x="8" y="64" width="60" height="42" rx="6"/>
-    <text class="tx" x="38" y="82">edge</text>
-    <text class="tx s" x="38" y="94">WAF · CDN</text></g>
-
-  <g><title>API fleet — 10–20 tasks across availability zones behind an ALB per fleet; blue/green ships on weighted target groups</title>
-    <rect class="nd hi" x="80" y="64" width="56" height="42" rx="6"/>
-    <text class="tx" x="108" y="82">API</text>
-    <text class="tx s" x="108" y="94">fleet</text></g>
-
   <g><title>queues per workload class — interactive, batch and eval-sample, so a report backfill never queues behind a live user</title>
-    <rect class="nd" x="148" y="14" width="88" height="36" rx="6"/>
-    <text class="tx" x="192" y="30">queues</text>
-    <text class="tx s" x="192" y="42">one per class</text></g>
-
-  <g><title>agent fleet — about 500 slots for 1,000 askers at the same wait target, e.g. 60–120 tasks × 4–8 concurrency, autoscaled on backlog per task</title>
-    <rect class="nd hi" x="148" y="62" width="88" height="40" rx="6"/>
-    <text class="tx" x="192" y="79">agent fleet</text>
-    <text class="tx s" x="192" y="91">~500 slots</text></g>
-
-  <g><title>sandbox fleet — CPU-bound analysis kept on its own autoscaling group, isolated from the cheap high-concurrency LLM-wait workers</title>
-    <rect class="nd hi" x="148" y="112" width="88" height="32" rx="6"/>
-    <text class="tx" x="192" y="126">sandbox</text>
-    <text class="tx s" x="192" y="138">CPU-bound</text></g>
-
-  <g><title>online judge — samples a small percentage of production answers so a canary can be judged before it takes all the traffic</title>
-    <rect class="nd" x="148" y="156" width="88" height="32" rx="6"/>
-    <text class="tx" x="192" y="170">judge sample</text>
-    <text class="tx s" x="192" y="182">1–5% of prod</text></g>
+    <rect class="nd" x="102" y="6" width="112" height="34" rx="8"/>
+    <text class="tx" x="158" y="20">queues</text>
+    <text class="tx s" x="158" y="35">one per class</text></g>
 
   <g><title>Aurora — one writer plus N readers; marts partitioned by tenant and dataset, with schema-per-tenant where a customer demands physical isolation</title>
-    <rect class="nd hi" x="248" y="14" width="84" height="36" rx="6"/>
-    <text class="tx" x="290" y="30">Aurora</text>
-    <text class="tx s" x="290" y="42">+ N readers</text></g>
+    <rect class="nd hi" x="230" y="6" width="104" height="34" rx="8"/>
+    <text class="tx" x="282" y="20">Aurora</text>
+    <text class="tx s" x="282" y="35">+ N readers</text></g>
+
+  <g><title>edge — CloudFront plus WAF, with per-tenant rate limits applied before anything reaches a fleet</title>
+    <rect class="nd" x="6" y="54" width="80" height="34" rx="8"/>
+    <text class="tx" x="46" y="68">edge</text>
+    <text class="tx s" x="46" y="83">WAF · CDN</text></g>
+
+  <g><title>agent fleet — about 500 slots for 1,000 askers at the same wait target, e.g. 60–120 tasks × 4–8 concurrency, autoscaled on backlog per task</title>
+    <rect class="nd hi" x="102" y="54" width="112" height="34" rx="8"/>
+    <text class="tx" x="158" y="68">agent fleet</text>
+    <text class="tx s" x="158" y="83">~500 slots</text></g>
 
   <g><title>LLM router — 500 concurrent calls exceeds one provider's default quota, so this is per-tenant quotas, prompt caching and fallbacks across providers</title>
-    <rect class="nd ext" x="248" y="62" width="84" height="40" rx="6"/>
-    <text class="tx" x="290" y="79">LLM router</text>
-    <text class="tx s" x="290" y="91">N providers</text></g>
+    <rect class="nd ext" x="230" y="54" width="104" height="34" rx="8"/>
+    <text class="tx" x="282" y="68">LLM router</text>
+    <text class="tx s" x="282" y="83">N providers</text></g>
+
+  <g><title>API fleet — 10–20 tasks across availability zones behind an ALB per fleet; blue/green ships on weighted target groups</title>
+    <rect class="nd hi" x="6" y="102" width="80" height="34" rx="8"/>
+    <text class="tx" x="46" y="116">API</text>
+    <text class="tx s" x="46" y="131">fleet</text></g>
+
+  <g><title>sandbox fleet — CPU-bound analysis kept on its own autoscaling group, isolated from the cheap high-concurrency LLM-wait workers</title>
+    <rect class="nd hi" x="102" y="102" width="112" height="34" rx="8"/>
+    <text class="tx" x="158" y="116">sandbox</text>
+    <text class="tx s" x="158" y="131">CPU-bound</text></g>
 
   <g><title>vector store — pgvector graduates out of the database to a dedicated or partitioned service</title>
-    <rect class="nd hi" x="248" y="112" width="84" height="32" rx="6"/>
-    <text class="tx" x="290" y="126">vectors</text>
-    <text class="tx s" x="290" y="138">dedicated</text></g>
+    <rect class="nd hi" x="230" y="102" width="104" height="34" rx="8"/>
+    <text class="tx" x="282" y="116">vectors</text>
+    <text class="tx s" x="282" y="131">dedicated</text></g>
+
+  <g><title>online judge — samples a small percentage of production answers so a canary can be judged before it takes all the traffic</title>
+    <rect class="nd" x="102" y="150" width="112" height="34" rx="8"/>
+    <text class="tx" x="158" y="164">judge sample</text>
+    <text class="tx s" x="158" y="179">1–5% of prod</text></g>
 
   <g><title>cost showback — per-tenant spend, where the budget alarm becomes a per-tenant quota</title>
-    <rect class="nd" x="248" y="156" width="84" height="32" rx="6"/>
-    <text class="tx" x="290" y="170">showback</text>
-    <text class="tx s" x="290" y="182">per tenant</text></g>
+    <rect class="nd" x="230" y="150" width="104" height="34" rx="8"/>
+    <text class="tx" x="282" y="164">showback</text>
+    <text class="tx s" x="282" y="179">per tenant</text></g>
 
-  <path class="ed" d="M68,85 L78,85" marker-end="url(#rg1k)"/>
-  <path class="ed" d="M136,76 C144,52 142,38 146,32" marker-end="url(#rg1k)"/>
-  <path class="ed" d="M192,50 L192,60" marker-end="url(#rg1k)"/>
-  <path class="ed" d="M192,102 L192,110" marker-end="url(#rg1k)"/>
-  <path class="ed dash" d="M192,144 L192,154" marker-end="url(#rg1k)"/>
-  <path class="ed" d="M236,82 L246,82" marker-end="url(#rg1k)"/>
-  <path class="ed" d="M236,66 C242,52 242,40 246,34" marker-end="url(#rg1k)"/>
-  <path class="ed" d="M236,128 L246,128" marker-end="url(#rg1k)"/>
-  <path class="ed" d="M236,172 L246,172" marker-end="url(#rg1k)"/>
+  <path class="ed" d="M46,88 V100" marker-end="url(#rg1k)"/>
+  <path class="ed" d="M86,119 Q94,119 94,111 V31 Q94,23 102,23" marker-end="url(#rg1k)">
+    <title>every request is admitted through a queue, never straight to a worker</title></path>
+  <path class="ed" d="M158,40 V52" marker-end="url(#rg1k)"/>
+  <path class="ed" d="M158,88 V100" marker-end="url(#rg1k)"/>
+  <path class="ed dash" d="M158,136 V148" marker-end="url(#rg1k)"/>
+  <path class="ed" d="M214,71 H228" marker-end="url(#rg1k)"/>
+  <path class="ed" d="M214,60 H218 Q224,60 224,54 V29 Q224,23 230,23" marker-end="url(#rg1k)"/>
+  <path class="ed" d="M214,119 H228" marker-end="url(#rg1k)"/>
+  <path class="ed" d="M214,167 H228" marker-end="url(#rg1k)"/>
 
   <text class="cap" x="6" y="196">designed only · order-of-magnitude estimate</text>
 </svg>

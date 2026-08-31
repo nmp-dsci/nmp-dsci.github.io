@@ -29,7 +29,7 @@ skills_detail:
 links:
   repo: https://github.com/nmp-dsci/v2v-prod-agent
 media:
-  reel: planned
+  reel: ""
 ---
 
 ## Architecture

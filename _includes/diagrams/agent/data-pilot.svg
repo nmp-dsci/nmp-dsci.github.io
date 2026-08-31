@@ -1,45 +1,46 @@
-<svg class="dia" viewBox="0 0 320 100" role="img"
+<svg class="dia" viewBox="0 0 360 160" role="img"
      aria-label="Data Pilot agent structure: a question enters a pydantic-ai loop with schema knowledge, per-user memory and tools; the SQL it writes is checked by an sqlglot AST guard and then run as one governed read-only SELECT under Postgres row-level security; the rows go through a Pyodide WASM sandbox into a typed report that carries its own charts and SQL.">
   <defs>
-    <marker id="ar-data-pilot" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+    <marker id="ar-data-pilot" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
       <path d="M0,0 L8,4 L0,8 z" fill="currentColor"/>
     </marker>
   </defs>
 
   <g><title>question — plain English, typed in chat, Slack or the webhook</title>
-    <rect class="nd" x="4" y="38" width="48" height="24" rx="6"/>
-    <text class="tx" x="28" y="53">question</text></g>
+    <rect class="nd" x="6" y="16" width="80" height="44" rx="8"/>
+    <text class="tx" x="46" y="42">question</text></g>
 
   <g><title>the pydantic-ai loop — DeepSeek by default, Claude behind the same abstraction; tools are dbt-manifest schema knowledge, value lookup, per-user pgvector memory and make_chart</title>
-    <rect class="nd hi" x="66" y="30" width="78" height="40" rx="6"/>
-    <text class="tx" x="105" y="46">agent loop</text>
-    <text class="tx s" x="105" y="58">tools · memory</text></g>
+    <rect class="nd hi" x="102" y="16" width="110" height="44" rx="8"/>
+    <text class="tx" x="157" y="34">agent loop</text>
+    <text class="tx s" x="157" y="49">tools · memory</text></g>
 
   <g><title>the SQL guard — shape check, keyword denylist, then an sqlglot AST walk that rejects DML/DDL hidden in a CTE and privileged functions like set_config</title>
-    <rect class="nd" x="158" y="6" width="68" height="28" rx="6"/>
-    <text class="tx" x="192" y="18">SQL guard</text>
-    <text class="tx s" x="192" y="29">sqlglot AST</text></g>
+    <rect class="nd" x="228" y="16" width="90" height="44" rx="8"/>
+    <text class="tx" x="273" y="34">SQL guard</text>
+    <text class="tx s" x="273" y="49">sqlglot AST</text></g>
 
   <g><title>the governed action — one read-only SELECT, run as a read-only role under row-level security scoped to this user</title>
-    <rect class="nd hi" x="158" y="44" width="68" height="30" rx="6"/>
-    <text class="tx" x="192" y="57">SELECT · RLS</text>
-    <text class="tx s" x="192" y="68">read-only</text></g>
+    <rect class="nd hi" x="6" y="88" width="112" height="44" rx="8"/>
+    <text class="tx" x="62" y="106">SELECT · RLS</text>
+    <text class="tx s" x="62" y="121">read-only</text></g>
 
   <g><title>the analysis sandbox — model-written pandas executed in Pyodide/WASM with no network and no filesystem</title>
-    <rect class="nd" x="242" y="6" width="72" height="28" rx="6"/>
-    <text class="tx" x="278" y="18">sandbox</text>
-    <text class="tx s" x="278" y="29">Pyodide WASM</text></g>
+    <rect class="nd" x="134" y="88" width="96" height="44" rx="8"/>
+    <text class="tx" x="182" y="106">sandbox</text>
+    <text class="tx s" x="182" y="121">Pyodide WASM</text></g>
 
   <g><title>the answer — typed report objects streamed page by page over SSE, each carrying the query that produced it</title>
-    <rect class="nd hi" x="242" y="44" width="72" height="30" rx="6"/>
-    <text class="tx" x="278" y="57">report</text>
-    <text class="tx s" x="278" y="68">charts · SQL</text></g>
+    <rect class="nd hi" x="246" y="88" width="96" height="44" rx="8"/>
+    <text class="tx" x="294" y="106">report</text>
+    <text class="tx s" x="294" y="121">charts · SQL</text></g>
 
-  <path class="ed" d="M52,50 L64,50" marker-end="url(#ar-data-pilot)"/>
-  <path class="ed" d="M144,44 C150,34 152,24 156,21" marker-end="url(#ar-data-pilot)"/>
-  <path class="ed" d="M192,34 L192,42" marker-end="url(#ar-data-pilot)"/>
-  <path class="ed" d="M226,52 C232,40 236,26 240,21" marker-end="url(#ar-data-pilot)"/>
-  <path class="ed" d="M278,34 L278,42" marker-end="url(#ar-data-pilot)"/>
+  <path class="ed" d="M86,38 H100" marker-end="url(#ar-data-pilot)"/>
+  <path class="ed" d="M212,38 H226" marker-end="url(#ar-data-pilot)"/>
+  <path class="ed" d="M273,60 V68 Q273,74 267,74 H68 Q62,74 62,80 V86" marker-end="url(#ar-data-pilot)">
+    <title>only a query that clears the guard is ever executed</title></path>
+  <path class="ed" d="M118,110 H132" marker-end="url(#ar-data-pilot)"/>
+  <path class="ed" d="M230,110 H244" marker-end="url(#ar-data-pilot)"/>
 
-  <text class="cap" x="4" y="92">graded G1–G3 · cross-family judge · every run traced</text>
+  <text class="cap" x="6" y="152">graded G1–G3 · cross-family judge · every run traced</text>
 </svg>

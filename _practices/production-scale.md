@@ -16,6 +16,27 @@ evidence_note: >-
   `.lavish/s42_worker-scaling-results.html`, re-read and recomputed on
   2026-08-30. Only rung-10 costs are measured; every other dollar figure on this
   page is an order-of-magnitude estimate and is labelled as one.
+sections:
+  - n: 1
+    summary: >-
+      A 90-second answer holds a worker slot, so capacity is a slot count and
+      the unit is concurrent users.
+  - n: 2
+    summary: >-
+      Three rungs, each labelled with how real it is: rung 10 deployed, rung 100
+      measured but not deployed, rung 1,000 drawn.
+  - n: 3
+    summary: >-
+      All three sit on rung 10; only Data Pilot has measured any of rung 100
+      rather than naming the seam.
+  - n: 4
+    summary: >-
+      One queue experiment, recomputed on 2026-08-30, is what makes the rung-100
+      sizing arithmetic rather than a shape.
+  - n: 5
+    summary: >-
+      Six ways a scale story goes wrong, starting with presenting an estimate as
+      a measurement.
 ---
 
 ## Problem
@@ -27,9 +48,11 @@ box exists.
 There is a second problem specific to gen-AI. A web request is measured in
 milliseconds, so "requests per second" is the natural unit and headroom is
 enormous. An agent answer takes **around 90 seconds** and holds a worker slot for
-all of it. At that service time, capacity is not a throughput number, it is a
-slot count — and a hundred people asking at once is a genuinely different system
-from ten, not the same system with a bigger instance.
+all of it.
+
+At that service time, capacity is not a throughput number, it is a slot count —
+and a hundred people asking at once is a genuinely different system from ten,
+not the same system with a bigger instance.
 
 So the unit here is **concurrent users**, each rung is labelled with how real it
 is, and the sizing is arithmetic you can check rather than a shape.
@@ -46,7 +69,7 @@ order-of-magnitude only. Only rung-10 costs are measured.
 
 <figure class="fig">
   {% include diagrams/rung-10.svg %}
-  <figcaption>Rung 10 as deployed: App Runner is front door and compute in one, session and limit state lives in the process, and the model is never called on the public URL.</figcaption>
+  <figcaption><strong>The model is never called on the public URL, so the worst-case bill is a fixed ceiling.</strong> App Runner is front door and compute in one, and session and limit state lives in the process. Source: today's deployed configuration of the three demos.</figcaption>
 </figure>
 
 **~$5–18 / month per app · ≈ hundreds of visitors a month**
@@ -75,22 +98,26 @@ order-of-magnitude only. Only rung-10 costs are measured.
 
 <figure class="fig">
   {% include diagrams/rung-100.svg %}
-  <figcaption>Rung 100: the ALB and Fargate split apart what App Runner bundles, a queue absorbs the burst, and session state moves out to Redis.</figcaption>
+  <figcaption><strong>Rung 100 splits apart what App Runner bundles: ALB in front, Fargate behind, a queue to absorb the burst and Redis to hold session state.</strong> Sizing source: <code>out/wsweep/summary.json</code>. Not deployed.</figcaption>
 </figure>
 
 **≈ $0.5–1k / month + inference · ≈ 5–10k monthly users — estimates**
 
-Two terms, so the figure reads right. **ALB** (Application Load Balancer) is the
-front door — the job an API Gateway would otherwise do. **ECS Fargate** is the
-compute — where the FastAPI containers run, with no servers to manage. They are
-the two halves of what App Runner bundles at rung 10.
+Two terms, so the figure reads right. They are the two halves of what App Runner
+bundles at rung 10:
+
+- **ALB** (Application Load Balancer) — the front door, the job an API Gateway
+  would otherwise do.
+- **ECS Fargate** — the compute, where the FastAPI containers run, with no
+  servers to manage.
 
 **Why ALB, not API Gateway, for the chat path.** API Gateway's integration
 timeout is about 30 seconds. That cannot hold a 90-second agent answer, and it
-cannot hold an SSE stream. An ALB's idle timeout goes to 4,000 seconds. API
-Gateway earns a place *beside* the ALB, not instead of it, on keyed surfaces —
-Data Pilot's `dpk_` webhook and MCP keys — where per-key usage plans and
-throttling are the entire point.
+cannot hold an SSE stream. An ALB's idle timeout goes to 4,000 seconds.
+
+API Gateway earns a place *beside* the ALB, not instead of it, on keyed
+surfaces — Data Pilot's `dpk_` webhook and MCP keys — where per-key usage plans
+and throttling are the entire point.
 
 **The sizing is arithmetic.** The measured formula is drain time
 `⌈N ÷ slots⌉ × S`, and it held within 6% across every configuration tested.
@@ -105,8 +132,10 @@ Substituting the target:
 Then size the task from measured memory, not from a guess: a warm worker held
 **~300 MB at cruise and up to ~840 MB freshly warmed** (Pyodide plus ONNX), and
 one process running four concurrent slots peaked at **~1.45 GB including four
-in-flight jobs**. That puts 4–6 slots inside a 1 vCPU / 2 GB task, so ~50 slots
-is roughly **10 tasks**. Memory, not CPU, is what bounds worker count.
+in-flight jobs**.
+
+That puts 4–6 slots inside a 1 vCPU / 2 GB task, so ~50 slots is roughly **10
+tasks**. Memory, not CPU, is what bounds worker count.
 
 - **State out of process** — Redis for sessions and limits. This is exactly the
   seam ConvFinQA's `serving/limits.py` names in its own docstring; Data Pilot's
@@ -125,7 +154,7 @@ is roughly **10 tasks**. Memory, not CPU, is what bounds worker count.
 
 <figure class="fig">
   {% include diagrams/rung-1000.svg %}
-  <figcaption>Rung 1,000 as designed: fleets separated by role, one queue per workload class, a router in front of the providers, and an online judge sampling production.</figcaption>
+  <figcaption><strong>At rung 1,000 the provider, not the compute, is the binding constraint — hence a router in front of it.</strong> Fleets separate by role, one queue per workload class, and an online judge samples production. Source: design only, nothing deployed.</figcaption>
 </figure>
 
 **≈ $5–15k / month + inference · ≈ 50–100k monthly users — estimates**
@@ -163,6 +192,11 @@ is roughly **10 tasks**. Memory, not CPU, is what bounds worker count.
 | **LLM spend** | $0 (replayed) | Bounded by ~50 worker slots; daily caps → tenant quotas | Router + multi-provider + caching; per-tenant showback |
 | **Release** | Auto-deploy `:latest`, rollback by retag | Blue/green on ALB weighted target groups | Canary judged by the online eval sample |
 | **How you know** | 5xx alarm; ACU pinned; wait p95 ≫ service p95 | Backlog-per-task; reader CPU; cost × volume alarm | Autoscale max hit; reader lag; tenant starvation; provider 429s |
+
+**Every row moves state out of the process and every row costs money, which is
+why the rung you are on is the one worth sizing.** Source: rung 10 from the
+deployed configuration; rungs 100 and 1,000 from
+`.lavish/s42_worker-scaling-results.html` and the design.
 
 ## In the three systems
 
@@ -210,10 +244,12 @@ The rung-100 arithmetic rests on one experiment, in `data-qa-agent`:
 **10 cells · 150 of 150 answers ok · 0 shed · 0 errors · 0 timeouts.** Three
 workers gave 2.97–2.99×, five gave 4.87–4.98×, and the largest error in the grid
 was 6.0% — on the shortest cell, where a fixed ~1.8 s of per-wave overhead is a
-larger share of a 30-second run. The last row is the one that changed the design:
-one process running four coroutines drained the burst in 121.8 s against 152.3 s
-for three serial replicas, at 1.45 GB instead of 2.34 GB. Slots are slots,
-whether they come from processes or coroutines.
+larger share of a 30-second run.
+
+The last row is the one that changed the design: one process running four
+coroutines drained the burst in 121.8 s against 152.3 s for three serial
+replicas, at 1.45 GB instead of 2.34 GB. Slots are slots, whether they come from
+processes or coroutines.
 
 **The live-LLM validation (E9).** The grid used a stubbed service time to isolate
 queueing, so it was re-run with real answers: 10 users at once, through the queue
@@ -226,9 +262,10 @@ answered, zero errors.
 | direct · 1 container | **72.9 s** | 816% | 2.3 GB, one process | 10, unbounded |
 
 The prediction for the queue leg — ⌈10/3⌉ = 4 waves × 50–60 s ≈ 200–240 s —
-landed on a measured 197 s, so the stub arithmetic transfers to real answers. The
-direct leg's win was bought with **eight-plus idle cores**, which no App Runner
-instance at 1–2 vCPU has: the same burst there serialises on CPU and stretches
+landed on a measured 197 s, so the stub arithmetic transfers to real answers.
+
+The direct leg's win was bought with **eight-plus idle cores**, which no App
+Runner instance at 1–2 vCPU has: the same burst there serialises on CPU and stretches
 toward the 240-second timeout. The queue trades about two minutes for the last
 user in exchange for bounded CPU, bounded LLM spend and a clean 429 past depth 32.
 

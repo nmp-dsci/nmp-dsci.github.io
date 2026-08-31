@@ -1,60 +1,61 @@
-<svg class="dia" viewBox="0 0 340 190" role="img"
+<svg class="dia" viewBox="0 0 340 200" role="img"
      aria-label="Rung 100, sizing measured but not deployed: an Application Load Balancer is the front door in front of two to four stateless API tasks on ECS Fargate; the API writes to a job queue whose depth is the backlog signal, agent worker tasks holding about fifty slots drain it and make the bounded language-model calls, session and rate-limit state moves out to Redis, and Aurora runs with a minimum capacity above zero plus one reader.">
   <defs>
-    <marker id="rg100" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+    <marker id="rg100" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
       <path d="M0,0 L8,4 L0,8 z" fill="currentColor"/>
     </marker>
   </defs>
 
-  <g><title>users — about 100 concurrent askers, roughly 5–10k monthly users at a 1–2% concurrency rule of thumb</title>
-    <rect class="nd" x="8" y="62" width="58" height="38" rx="6"/>
-    <text class="tx" x="37" y="78">users</text>
-    <text class="tx s" x="37" y="90">~100</text></g>
-
   <g><title>Application Load Balancer plus WAF — the front door, doing the job an API Gateway would otherwise do. Its idle timeout goes to 4,000s, which is what lets a 90-second answer or an SSE stream survive.</title>
-    <rect class="nd" x="78" y="58" width="64" height="46" rx="6"/>
-    <text class="tx" x="110" y="76">ALB</text>
-    <text class="tx s" x="110" y="88">front door</text>
-    <text class="tx s" x="110" y="98">+ WAF</text></g>
+    <rect class="nd" x="6" y="8" width="82" height="50" rx="8"/>
+    <text class="tx" x="47" y="24">ALB</text>
+    <text class="tx s" x="47" y="38">front door</text>
+    <text class="tx s" x="47" y="52">+ WAF</text></g>
 
   <g><title>API tier — the same FastAPI app as an ECS service on Fargate: 2–4 stateless tasks autoscaled on CPU and request count</title>
-    <rect class="nd hi" x="152" y="20" width="84" height="42" rx="6"/>
-    <text class="tx" x="194" y="38">API ×2–4</text>
-    <text class="tx s" x="194" y="50">ECS Fargate</text></g>
-
-  <g><title>job queue — Redis Streams or SQS, with an admission depth that sheds past the cap; queue depth is the backlog signal autoscaling reads</title>
-    <rect class="nd" x="152" y="76" width="84" height="36" rx="6"/>
-    <text class="tx" x="194" y="92">queue</text>
-    <text class="tx s" x="194" y="104">backlog depth</text></g>
-
-  <g><title>agent workers — about 50 slots, for example 8–12 tasks × 4–6 concurrency; drain time follows the measured formula, ceiling of N over slots, times service time</title>
-    <rect class="nd hi" x="152" y="126" width="84" height="42" rx="6"/>
-    <text class="tx" x="194" y="144">workers</text>
-    <text class="tx s" x="194" y="156">~50 slots</text></g>
+    <rect class="nd hi" x="99" y="8" width="102" height="50" rx="8"/>
+    <text class="tx" x="150" y="29">API ×2–4</text>
+    <text class="tx s" x="150" y="44">ECS Fargate</text></g>
 
   <g><title>Aurora — minimum capacity above zero kills the cold start, one reader carries Explore and SQL; pgvector stays in the database</title>
-    <rect class="nd hi" x="252" y="20" width="80" height="42" rx="6"/>
-    <text class="tx" x="292" y="38">Aurora</text>
-    <text class="tx s" x="292" y="50">min ACU · reader</text></g>
+    <rect class="nd hi" x="212" y="8" width="122" height="50" rx="8"/>
+    <text class="tx" x="273" y="29">Aurora</text>
+    <text class="tx s" x="273" y="44">min ACU · reader</text></g>
+
+  <g><title>users — about 100 concurrent askers, roughly 5–10k monthly users at a 1–2% concurrency rule of thumb</title>
+    <rect class="nd" x="6" y="76" width="82" height="44" rx="8"/>
+    <text class="tx" x="47" y="94">users</text>
+    <text class="tx s" x="47" y="109">~100</text></g>
+
+  <g><title>job queue — Redis Streams or SQS, with an admission depth that sheds past the cap; queue depth is the backlog signal autoscaling reads</title>
+    <rect class="nd" x="99" y="76" width="102" height="44" rx="8"/>
+    <text class="tx" x="150" y="94">queue</text>
+    <text class="tx s" x="150" y="109">backlog depth</text></g>
 
   <g><title>Redis — sessions, rate limits and the demo pack out of process memory; this is the seam ConvFinQA's limits module already names</title>
-    <rect class="nd hi" x="252" y="76" width="80" height="36" rx="6"/>
-    <text class="tx" x="292" y="92">Redis</text>
-    <text class="tx s" x="292" y="104">session state</text></g>
+    <rect class="nd hi" x="212" y="76" width="122" height="44" rx="8"/>
+    <text class="tx" x="273" y="94">Redis</text>
+    <text class="tx s" x="273" y="109">session state</text></g>
+
+  <g><title>agent workers — about 50 slots, for example 8–12 tasks × 4–6 concurrency; drain time follows the measured formula, ceiling of N over slots, times service time</title>
+    <rect class="nd hi" x="99" y="138" width="102" height="44" rx="8"/>
+    <text class="tx" x="150" y="156">workers</text>
+    <text class="tx s" x="150" y="171">~50 slots</text></g>
 
   <g><title>LLM provider — in-flight calls are bounded by the worker slot count, which is where a single provider's rate limit starts to matter</title>
-    <rect class="nd ext" x="252" y="126" width="80" height="42" rx="6"/>
-    <text class="tx" x="292" y="144">LLM</text>
-    <text class="tx s" x="292" y="156">≤ 50 calls</text></g>
+    <rect class="nd ext" x="212" y="138" width="122" height="44" rx="8"/>
+    <text class="tx" x="273" y="156">LLM</text>
+    <text class="tx s" x="273" y="171">≤ 50 calls</text></g>
 
-  <path class="ed" d="M66,81 L76,81" marker-end="url(#rg100)"/>
-  <path class="ed" d="M142,74 C150,58 148,47 150,42" marker-end="url(#rg100)"/>
-  <path class="ed" d="M194,62 L194,74" marker-end="url(#rg100)"/>
-  <path class="ed" d="M194,112 L194,124" marker-end="url(#rg100)"/>
-  <path class="ed" d="M236,147 L250,147" marker-end="url(#rg100)"/>
-  <path class="ed" d="M236,41 L250,41" marker-end="url(#rg100)"/>
-  <path class="ed" d="M236,52 C244,66 244,82 250,90" marker-end="url(#rg100)"/>
-  <path class="ed dash" d="M236,134 C246,122 244,108 250,102" marker-end="url(#rg100)"/>
+  <path class="ed" d="M47,76 V60" marker-end="url(#rg100)"/>
+  <path class="ed" d="M88,33 H97" marker-end="url(#rg100)"/>
+  <path class="ed" d="M150,58 V74" marker-end="url(#rg100)"/>
+  <path class="ed" d="M150,120 V136" marker-end="url(#rg100)"/>
+  <path class="ed" d="M201,33 H210" marker-end="url(#rg100)"/>
+  <path class="ed" d="M180,58 V62 Q180,66 184,66 H269 Q273,66 273,70 V74" marker-end="url(#rg100)"/>
+  <path class="ed" d="M201,160 H210" marker-end="url(#rg100)"/>
+  <path class="ed dash" d="M180,138 V134 Q180,130 184,130 H269 Q273,130 273,126 V122" marker-end="url(#rg100)">
+    <title>session and rate-limit state moves out of process memory</title></path>
 
-  <text class="cap" x="6" y="183">sizing measured, not deployed</text>
+  <text class="cap" x="6" y="194">sizing measured, not deployed</text>
 </svg>

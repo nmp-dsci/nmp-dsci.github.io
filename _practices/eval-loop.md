@@ -15,6 +15,27 @@ evidence_note: >-
   Every count on this page was re-run against the three repos on 2026-08-30, with
   the command beside it. Where an older write-up's number no longer reproduces,
   the number here is the one the repo gives today.
+sections:
+  - n: 1
+    summary: >-
+      Without a fixed set and a per-case comparison, "the model got better" is a
+      story about the questions you remembered to ask.
+  - n: 2
+    summary: >-
+      Eight steps turn a guess into an attributable cycle, and the gate that
+      blocks per-case regressions is the one that says no.
+  - n: 3
+    summary: >-
+      The same eight steps look different in each repo because the task decides
+      what code can grade and what needs a judge.
+  - n: 4
+    summary: >-
+      Every count was re-run against the repos on 2026-08-30, with the command
+      beside it, so the numbers are today's.
+  - n: 5
+    summary: >-
+      Six ways an eval loop flatters itself, and what each system does to stop
+      it.
 ---
 
 ## Problem
@@ -59,26 +80,37 @@ automated.
 
 The eval set is a product surface: you ask a question in chat, and the run you
 liked is promoted to a golden — extraction SQL, sandbox objects and finished
-report pages all captured, then exported to `evals/cases/*.yaml`. The pack holds
+report pages all captured, then exported to `evals/cases/*.yaml`.
+
+The pack holds
 **32 cases** across three NSW property datasets on a T1–T7 question ladder, 2
 marked `ready` and 30 `draft`, so the scored pack is small and correct rather
 than large and noisy.
 
-Graders are layered and deterministic: **G1** grades the values the SQL returned
-(not the SQL text), **G2** the sandbox metrics, **G3** the report shape, **G4**
-ops — turns and latency, turns being the cost metric because it drives billed
-tokens. Only the *insight* half of G3 needs a judge, and `agent/eval_judge.py`
-will not grade its own family: with DeepSeek answering, Claude judges; with no
+Graders are layered and deterministic:
+
+- **G1** — the values the SQL returned, not the SQL text.
+- **G2** — the sandbox metrics.
+- **G3** — the report shape.
+- **G4** — ops: turns and latency, turns being the cost metric because it drives
+  billed tokens.
+
+Only the *insight* half of G3 needs a judge, and `agent/eval_judge.py` will not
+grade its own family: with DeepSeek answering, Claude judges; with no
 cross-family key configured it records `skipped` with a reason.
 
 `agent/version.py` composes the build fingerprint — provider, model, and content
 hashes over prompt sources, skills and knowledge. That is what makes a cycle
-attributable. Cycle 001 added one knowledge page and nothing else (prompt and
-skills hashes identical across builds): pass rate 0.0 → 1.0, G1 0.34 → 1.0, gate
-**PASS**. Cycle 002 put the same guidance in the system prompt: turns fell 24 →
-20.5, which was the stated goal — and the rent case broke. Pass rate 1.0 → 0.5,
-one regression, gate **FAIL**, reverted, not shipped. Cycle 003 scoped the
-guidance to trend questions over documented marts and passed.
+attributable: one change, one moving hash, one verdict.
+
+| cycle | the change | what moved | gate |
+|---|---|---|---|
+| 001 | one knowledge page and nothing else — prompt and skills hashes identical across builds | pass rate 0.0 → 1.0, G1 0.34 → 1.0 | **PASS** |
+| 002 | the same guidance moved into the system prompt | turns fell 24 → 20.5, the stated goal — and the rent case broke: pass rate 1.0 → 0.5, one regression | **FAIL**, reverted, not shipped |
+| 003 | the guidance scoped to trend questions over documented marts | no regression | **PASS** |
+
+**One change per cycle is what makes a verdict attributable, and 002 is the one
+that had to be thrown away.** Source: `docs/evals/` in `data-qa-agent`.
 
 ### ConvFinQA Agent — prompts as versioned code
 
@@ -118,11 +150,14 @@ three versions, 770 rows each, columns consistent, champion v2 77.14% against a
 ### Transcript RAG — labelled chunks, then an ablation
 
 The golden set is 20 entries and the expensive part is the labels:
-`expected_chunk_ids` name the exact chunks a good retriever must surface. 14
-`local`, 4 `global`, 2 `temporal`, across four domains (7 property, 6 ai-coding,
-6 career, 1 corpus) over a seven-video corpus. Validation enforces the id shape
-and cross-references video ids both ways, because a wrong label silently
-corrupts every recall number computed against it.
+`expected_chunk_ids` name the exact chunks a good retriever must surface. Over a
+seven-video corpus they break down two ways:
+
+- **by question type** — 14 `local`, 4 `global`, 2 `temporal`.
+- **by domain** — 7 property, 6 ai-coding, 6 career, 1 corpus.
+
+Validation enforces the id shape and cross-references video ids both ways,
+because a wrong label silently corrupts every recall number computed against it.
 
 Those labels buy a measurement with no LLM in it — recall@k, MRR, NDCG@10 — and
 the eight-config ablation is why they were worth the effort:
@@ -138,14 +173,16 @@ the eight-config ablation is why they were worth the effort:
 | HyDE | 0.591 | 0.669 | 0.525 |
 | contextual | 0.545 | 0.707 | 0.516 |
 
-Plain hybrid won. Adding a reranker on top of it *lost* recall. HyDE and
+**Plain hybrid won, and adding a reranker on top of it *lost* recall.** HyDE and
 contextual retrieval both scored below the plain semantic baseline. None of that
-is knowable from a demo.
+is knowable from a demo. Source: `evals/runs/ablation-20260801-051456.json`.
 
 For the open-ended half: RAGAS (faithfulness, answer relevancy, context
 precision) plus a `depth-v2` rubric weighting grounding 40% and depth 60% with a
-hard cap — depth cannot rescue an ungrounded answer. Runs record `judge_model`
-and set `self_graded` when generator and grader are the same model. `rejudge`
+hard cap — depth cannot rescue an ungrounded answer.
+
+Runs record `judge_model` and set `self_graded` when generator and grader are
+the same model. `rejudge`
 re-scores a committed run under a new rubric while deliberately reusing the
 stored grounding scores, so a ranking change is attributable to the rubric and
 not to judge nondeterminism.
@@ -175,14 +212,15 @@ Re-run on 2026-08-30, in each system's own repo.
 | RAG snapshots + CI gate | `ls evals/runs/*.json` · `pytest tests/evals/test_committed_runs.py -q` | **16** snapshots · 20 passed in 0.09s |
 
 Two earlier systems, not published as case studies, ran the same discipline.
-[v2v-prod-agent](https://github.com/nmp-dsci/v2v-prod-agent) grades a voice
-banking agent's red team on **bank state, not words** — nine scripted attacks
-driven by a model that is already fully compromised, each asserted with
-`test_the_bank_does_not_move[...]`, 9/9, deterministic, no API key.
-[CUAD-agent](https://github.com/nmp-dsci/CUAD-agent) scores 41 clause questions
-across 50 contracts for each of five retrieval context modes — 2,050 predictions
-per mode, **10,250** in the grid — with retrieval measured separately from the
-answer, so a bad number can be attributed to one of them.
+
+- [v2v-prod-agent](https://github.com/nmp-dsci/v2v-prod-agent) grades a voice
+  banking agent's red team on **bank state, not words** — nine scripted attacks
+  driven by a model that is already fully compromised, each asserted with
+  `test_the_bank_does_not_move[...]`, 9/9, deterministic, no API key.
+- [CUAD-agent](https://github.com/nmp-dsci/CUAD-agent) scores 41 clause questions
+  across 50 contracts for each of five retrieval context modes — 2,050
+  predictions per mode, **10,250** in the grid — with retrieval measured
+  separately from the answer, so a bad number can be attributed to one of them.
 
 ## Failure modes
 
@@ -204,15 +242,18 @@ reference-free metrics cannot measure what retrieval missed.
 **A "held-out" split that isn't.** ConvFinQA has two 60/40 splits over the same
 200 conversations, both seeded 42 — one from `pandas.sample`, one from
 `random.shuffle` as the DSPy backend actually performed it. They agree on only
-**78 of 120** conversations. Same seed, same data, different partition. Only the
-second supports a held-out claim, which is why `optimizer_split()` lives in the
-data loader with that fact in its docstring instead of being rediscovered later.
+**78 of 120** conversations. Same seed, same data, different partition.
+
+Only the second supports a held-out claim, which is why `optimizer_split()`
+lives in the data loader with that fact in its docstring instead of being
+rediscovered later.
 
 **A grader that measures the wrong thing.** Cycle 001's first attempt appeared to
 regress: a better answer returned `avg_weekly_rent` while the grader was pinned
-to `total_weekly_rent`, so G1 went to 0.0 on an improvement. Fixing the grader
-changed the pack version, and `eval_compare.py` refuses to compare across pack
-versions — the improvement had to be re-baselined and re-earned rather than
+to `total_weekly_rent`, so G1 went to 0.0 on an improvement.
+
+Fixing the grader changed the pack version, and `eval_compare.py` refuses to
+compare across pack versions — the improvement had to be re-baselined and re-earned rather than
 laundered across the boundary. That refusal is the defence against eval-tuning
 theatre, and it costs a full re-run every time it fires.
 

@@ -15,6 +15,27 @@ evidence_note: >-
   Every count was re-run on 2026-08-30 with the command given in Evidence, in
   each of the four repos. Numbers quoted in earlier write-ups that no longer
   reproduce have been replaced by today's.
+sections:
+  - n: 1
+    summary: >-
+      An agent that writes faster than one person can review turns a repo that
+      looks healthy into one nobody has checked.
+  - n: 2
+    summary: >-
+      Four things stand between an agent's output and main, and each of them is
+      allowed to refuse.
+  - n: 3
+    summary: >-
+      The same process leaves very different trails, and the thinnest trail
+      belongs to the repo that was built fastest.
+  - n: 4
+    summary: >-
+      Every count comes from a command you can run in the repo, and two of them
+      moved since the plan was written.
+  - n: 5
+    summary: >-
+      A process this optional leaves gaps: squash-merge, skipped gates and tidy
+      prefixes each hide a different one.
 ---
 
 ## Problem
@@ -34,21 +55,25 @@ Four things, each of which can refuse.
 
 ### Git
 
-One feature branch and one pull request per slice of work, conventional commit
-subjects, CI on every PR, and a deploy that fires on merge through GitHub OIDC
-with no stored AWS keys. The point is that the unit of review is a slice a person
-can hold in their head, not a week of accumulated edits. Isolated fixes get a
-worktree rather than a stash, so an in-flight branch never has to be unwound to
-chase something unrelated — `data-qa-agent` still carries
-`.claude/worktrees/golden-build` from exactly that.
+The unit of review is a slice a person can hold in their head, not a week of
+accumulated edits.
+
+- **One feature branch and one pull request per slice of work**, with
+  conventional commit subjects.
+- **CI on every PR**, and a deploy that fires on merge through GitHub OIDC with
+  no stored AWS keys.
+- **A worktree rather than a stash** for isolated fixes, so an in-flight branch
+  never has to be unwound to chase something unrelated — `data-qa-agent` still
+  carries `.claude/worktrees/golden-build` from exactly that.
 
 The rule is "never ship a red main", and it is worth being precise about how far
 that is actually enforced: only ConvFinQA's deploy is mechanically gated on it.
 Its workflow triggers on `workflow_run` after CI completes and checks the
 conclusion, with a comment in the file saying why — "their deploy fires on push
-regardless, which means a red main can ship". Data Pilot and Transcript RAG
-deploy on push to `main`. Two of three enforce the rule by discipline; one
-enforces it in YAML.
+regardless, which means a red main can ship".
+
+Data Pilot and Transcript RAG deploy on push to `main`. Two of three enforce the
+rule by discipline; one enforces it in YAML.
 
 ### Lavish
 
@@ -62,9 +87,10 @@ cites a figure.
 That is where the argument happens: reviewing a plan in a browser costs minutes
 and changes the whole diff, while reviewing the diff costs hours and changes a
 line. **69** artifacts across the four repos — and this rebuild was planned the
-same way, from this repo's `.lavish/s04_production-showcase-plan.html`. They are
-never gitignored, by workspace rule, which matters more than it sounds: an
-artifact you can `git log` is a decision record; one in a temp directory is a
+same way, from this repo's `.lavish/s04_production-showcase-plan.html`.
+
+They are never gitignored, by workspace rule, which matters more than it sounds:
+an artifact you can `git log` is a decision record; one in a temp directory is a
 screenshot.
 
 ### no-mistakes
@@ -76,12 +102,17 @@ not run on the default branch and it will not run on an uncommitted tree.
 Two properties make it more than a shell script. First, `--intent` is required
 and is *the user's goal in their own words*, not a description of the diff — the
 review step uses it to tell a deliberate decision apart from a mistake, so a thin
-intent makes the gate flag things you already chose. Second, findings are
-classified: `auto-fix` you may resolve on your own judgement, `no-op` is
-informational, and `ask-user` is a decision that belongs to the human because it
-challenges their stated intent or changes product behaviour. Review auto-fix is
-off by default, so blocking findings park at a gate instead of being silently
-self-healed.
+intent makes the gate flag things you already chose.
+
+Second, findings are classified:
+
+- **`auto-fix`** — you may resolve it on your own judgement.
+- **`no-op`** — informational.
+- **`ask-user`** — a decision that belongs to the human, because it challenges
+  their stated intent or changes product behaviour.
+
+Review auto-fix is off by default, so blocking findings park at a gate instead
+of being silently self-healed.
 
 Its findings land as commits you can count: `no-mistakes(review|document|lint|test): …`.
 **49** of them across the four repos. Two real catches, quoted from the log:
@@ -92,10 +123,11 @@ Data Pilot's Aurora pauses when idle, and `/health/db` is the unauthenticated
 probe the frontend uses to decide whether to narrate the wake. It was fenced by a
 client-channel header — but that header ships in the bundle, so anyone can copy
 it and hammer the endpoint to keep forcing fresh connects, defeating auto-pause,
-which is the dominant idle cost. The fix caches the result for five seconds so
-the path can only wake Aurora at a bounded rate regardless of request volume. A
-cost-and-abuse defect on a no-login demo, found by the review step rather than by
-a bill.
+which is the dominant idle cost.
+
+The fix caches the result for five seconds so the path can only wake Aurora at a
+bounded rate regardless of request volume. A cost-and-abuse defect on a no-login
+demo, found by the review step rather than by a bill.
 
 > `no-mistakes(review): Guard ws.onopen against listening-flash after cancel`
 
@@ -111,13 +143,17 @@ turns a repo into a case study through the same path — survey the repo, fill t
 front-matter contract, score the nine rubric dimensions, draw the two diagrams,
 lint, review — and `scripts/lint_case_study.py` is the gate at the end of it.
 
-The lint is deliberately unkind: the seven H2s present, exactly titled and in
-order; the scorecard section left empty for the layout to render; all nine rubric
-dimensions once each in `_data/rubric.yml`'s order with a status from the
-vocabulary; anything not `shipped` carrying a reason of at least forty
-characters; and — the load-bearing check — **every path token in a `proof:` field
-resolving in that system's own repo**. A model can write "shipped" for free. It
-cannot invent a path that exists.
+The lint is deliberately unkind. It checks:
+
+- the seven H2s present, exactly titled and in order;
+- the scorecard section left empty for the layout to render;
+- all nine rubric dimensions once each in `_data/rubric.yml`'s order, with a
+  status from the vocabulary;
+- anything not `shipped` carrying a reason of at least forty characters;
+- and — the load-bearing check — **every path token in a `proof:` field
+  resolving in that system's own repo**.
+
+A model can write "shipped" for free. It cannot invent a path that exists.
 
 ## In the three systems
 
@@ -132,6 +168,10 @@ sizes and were built at different times.
 | `.lavish/*.html` | 40 | 4 | 20 | 5 |
 | `no-mistakes(...)` commits | 27 | 0 | 16 | 6 |
 | gate branches on the `no-mistakes` remote | 20 | 1 | 9 | — |
+
+**The trail thins with the repo that was built fastest, and ConvFinQA's zero is
+squash-merge, not an absent gate.** Source: `gh pr list`, `git log`,
+`ls .lavish/*.html` and `git branch -r` in each repo, re-run 2026-08-30.
 
 **Data Pilot** is where the process is fully loaded: 33 PRs, 40 review
 artifacts, and 27 gate-fix commits split 10 review · 10 document · 4 lint · 3
@@ -196,9 +236,10 @@ strategy is part of the design, not a preference.
 
 **Review artifacts documenting a plan nobody followed.** A `.lavish/sNN_*.html`
 is only worth anything if the code that followed it either matches or the
-artifact is updated to say why not. The numbering helps here — a plan (`s41`)
-and its results (`s42`) sitting next to each other make the divergence visible —
-but nothing enforces it. `s42` was checked against `out/wsweep/summary.json`
+artifact is updated to say why not.
+
+The numbering helps here — a plan (`s41`) and its results (`s42`) sitting next
+to each other make the divergence visible — but nothing enforces it. `s42` was checked against `out/wsweep/summary.json`
 before it was cited on the scale page; the other thirty-nine were not.
 
 **Conventional commits as theatre.** 195 commits with tidy prefixes tells you

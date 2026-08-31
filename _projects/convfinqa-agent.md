@@ -1,5 +1,6 @@
 ---
 title: ConvFinQA Agent
+headline: "Prompts versioned as code, promotion gated on evidence"
 summary: >-
   Multi-turn financial Q&A over report text and tables — four typed pydantic-ai agents in a
   pipeline, with the prompts versioned and promoted like releases. The live URL is a read-only
@@ -8,11 +9,46 @@ summary: >-
 tldr: >-
   Four flash-tier agents in a typed pipeline with prompts versioned as code — a GEPA-tuned v2
   lifted accuracy 73.0% → 77.1%, and the same promotion contract then refused v3_1 at 76.2%.
+outcome: >-
+  Four typed agents answer multi-turn financial questions, and the promotion gate refused the
+  auto-generated challenger it was built to promote.
+proof_line: >-
+  A GEPA-tuned prompt set lifted execution accuracy to 77.1% (594/770 on the scored set) from
+  73.0%, and the same registry gate then refused the auto-generated v3_1 challenger at 76.2%.
 tags: [Agents]
 metric: "77.1%"
-metric_label: "accuracy · up from 73.0% (594/770)"
+metric_label: "accuracy (594/770) · up from 73.0%"
 featured: true
 order: 2
+sections:
+  - n: 1
+    summary: >-
+      Every point of the lift came from prompts, not a bigger model: the four production agents run
+      the same flash tier before and after.
+  - n: 2
+    summary: >-
+      Prompt sets are modules, not strings beside the call site, so every number on a screen is
+      attributable to a named bundle.
+  - n: 3
+    summary: >-
+      Committed prediction CSVs make every version reproducible offline, which is the only reason
+      the gate can run on every pull request.
+  - n: 4
+    summary: >-
+      All the evidence is baked into the image, so the public deployment serves the whole console
+      with no key, no database and no inference.
+  - n: 5
+    summary: >-
+      One choke point is what makes the demo gate real: a handler cannot route around a check it
+      does not know exists.
+  - n: 6
+    summary: >-
+      Serving, demo and eval turns are never blended, and an unmeasured tile shows an em dash with
+      a reason rather than a flattering zero.
+  - n: 7
+    summary: >-
+      Six of the nine dimensions shipped; the three that did not are named with their reasons
+      rather than quietly rounded up.
 stack: [pydantic-ai ×4 agents, DSPy/GEPA, FastAPI + Typer, React 18 + Vite, MLflow, Terraform + App Runner]
 
 # ---- skills -----------------------------------------------------------------
@@ -39,10 +75,12 @@ media:
   walkthrough:
   poster:
   captions:
-  reel: planned
+  reel: ""
 
 # ---- the AI / agent structure ----------------------------------------------
 architecture:
+  takeaway: >-
+    Every turn crosses the same four typed boundaries, which is what makes a prompt change attributable.
   diagram: "diagrams/agent/convfinqa-agent.svg"
   caption: "turn → triage → preprocess → retriever → calculator → answer; number turns short-circuit at the retriever, and all four agents load one versioned prompt set"
 
@@ -166,17 +204,20 @@ The live URL is a read-only operator console, not a chat toy. What a visitor can
 - **Chat** replays 8 recorded conversations. A real turn takes 30–60 seconds because four model
   calls run in sequence; the replay emits the same SSE events, paced so a turn plays in about
   four seconds and still shows the stages resolving one after another.
-- **All six admin pages are live** against the evidence baked into the image — Evaluations (all
-  770 questions, gold beside each version's answer), Experiments (accuracy trend and a
-  question-by-question version diff), Traces (every turn, stage by stage), Research, the admin
-  overview and the system debrief.
+- **All six admin pages are live** against the evidence baked into the image:
+  - **Evaluations** — all 770 questions, gold beside each version's answer.
+  - **Experiments** — accuracy trend, and a question-by-question version diff.
+  - **Traces** — every turn, stage by stage.
+  - **Research** — the diagnose, propose and verify runs behind the challenger.
+  - **Admin overview**.
+  - **System debrief**.
 - **Every write is refused.** `/admin/registry/promote`, `/admin/registry/challenger` and
   `/admin/research/start` all answer 403 with a reason — `owner_token_unset`, "Admin writes are
   disabled" — because an unset token means refused, not open.
 
 <figure class="evidence">
   <img src="/assets/img/convfinqa/demo-console.png" loading="lazy" alt="The ConvFinQA console landing page: status chips reading MODE replay · keyless, CHAMPION v2 and GATE v3_1 refused; an execution-accuracy tile at 77.1% and a never-seen-accuracy tile at 77.7%; four latency, cost, turns and error tiles rendering an em dash because no turns were replayed in the last 24 hours; a SOURCES panel explaining that accuracy is recomputed from the committed prediction CSVs with no API calls; and a triage → preprocess → retriever → calculator pipeline strip.">
-  <figcaption>The landing console, live. The two accuracy figures sit side by side and are never averaged: 77.1% is all 770 scored questions, seen and never-seen mixed; 77.7% is the 309 no optimizer ever saw. The latency, cost and error tiles render an em dash with a reason — nothing replayed in 24 hours — rather than a zero that would read as a measurement.</figcaption>
+  <figcaption><strong>The two accuracy figures sit side by side and are never averaged.</strong> 77.1% is all 770 scored questions, seen and never-seen mixed; 77.7% is the 309 no optimiser ever saw. The latency, cost and error tiles render an em dash with a reason (nothing replayed in 24 hours) rather than a zero that would read as a measurement. Source: <code>src/convfinqa/serving/routes/metrics.py</code>, <code>evaluation/predictions/</code>.</figcaption>
 </figure>
 
 Replaying chat is a cost decision, not an apology: a no-login public URL with a live model is an
@@ -201,12 +242,21 @@ Four pydantic-ai agents run in sequence, each with a typed output model rather t
   `divide`, `exp`, `greater`), never arithmetic in free text — the difference between a wrong
   answer you can debug and a plausible one you cannot.
 
-The differentiator sits above the agents. **Prompts are not strings next to the call site** — each
+The differentiator sits above the agents. **Prompts are not strings next to the call site.** Each
 version is its own module (`prompts/v1.py`, `v2.py`, the generated `v3_1.py`), auto-discovered by
 `prompts.latest_all()`, so a new variant appears in the comparison table and at `GET /eval/runs`
-with no registration step. A "version" here is a *bundle* — prompt set, GEPA overlay, both model
-ids, dataset hash, code SHA — and `/healthz` names the one it is serving (`65c8a3edd210`: prompts
-v2, flash and pro, code `bec0e68`), so a number on a screen is attributable to the build behind it.
+with no registration step.
+
+A "version" here is not a prompt file but a *bundle*:
+
+- the prompt set;
+- the GEPA overlay;
+- both model ids;
+- the dataset hash;
+- the code SHA.
+
+`/healthz` names the bundle it is serving — `65c8a3edd210`: prompts v2, flash and pro, code
+`bec0e68` — so a number on a screen is attributable to the build behind it.
 
 Every model is constructed in one module, `llm.py`: `deepseek-v4-flash` for all four production
 agents on every turn, `deepseek-v4-pro` only inside the optimisation harness. Nothing may build a
@@ -223,19 +273,30 @@ offline with no key — the only reason the gate can run on every pull request.
 
 <figure class="evidence">
   <div class="dash-embed"><iframe src="/assets/dash/convfinqa/predictions-v2.html" loading="lazy" title="ConvFinQA v2 evaluation report"></iframe></div>
-  <figcaption>The real v2 eval report — all 770 questions scored, each stage's IO inspectable · <a href="/assets/dash/convfinqa/predictions-v2.html" target="_blank" rel="noopener">open full-screen ↗</a></figcaption>
+  <figcaption><strong>All 770 questions are scored in the open, with each stage's IO inspectable.</strong> This is the real v2 report, and it is the artefact the gate re-scores on every pull request. Source: <code>evaluation/predictions/</code>, <code>src/convfinqa/evaluation/runner.py</code> · <a href="/assets/dash/convfinqa/predictions-v2.html" target="_blank" rel="noopener">open full-screen ↗</a></figcaption>
 </figure>
 
 Scoring is deterministic and doubled: `numeric_match` is execution accuracy, `program_match` asks
-whether it got there the annotator's way. "Held out" has to be earned — GEPA trained on 120 of
-the 200 conversations, so 770 is reported as *overall*, never held out, and the never-seen
-subset is 309 questions where v2 scores 77.7% against v1's 72.8%. The two same-seed 60/40 splits
-in the codebase agree on only 78 of 120 conversations, and `optimizer_split()` is the one GEPA
-actually ran against.
+whether it got there the annotator's way. "Held out" has to be earned, so the counts are kept
+apart rather than rolled into one flattering figure:
+
+| Count | What it is |
+|---|---|
+| 200 conversations / 770 questions | the scored set, reported as *overall* and never as held out |
+| 120 of the 200 conversations | what GEPA actually trained on, via `optimizer_split()` |
+| 309 questions | the never-seen subset: v2 scores 77.7% against v1's 72.8% |
+| 78 of 120 conversations | all the two same-seed 60/40 splits in the codebase agree on |
 
 GEPA (DSPy) — 1,964 metric calls, 65 full validation evals — moved the optimiser's own held-out
 score 56.5 → 65.3 and produced v2. The s7 harness ran **diagnose → propose → verify**
-over the 95 first-wrong cases, promoting 39 verified rules into `prompts/v3_1.py`.
+over the 95 first-wrong cases, promoting 39 verified rules into `prompts/v3_1.py`. Three prompt
+sets, one promotion contract:
+
+| Version | Where it came from | Scored accuracy | What the gate did |
+|---|---|---|---|
+| `v1` | the starting prompt set | 73.0% | champion, until v2 |
+| `v2` | a real GEPA run (DSPy) | 77.1% | promoted, and the champion `/healthz` still names |
+| `v3_1` | the s7 harness, 39 verified rules | 76.2% | **refused** — below champion, with pass→fail flips |
 
 **v3_1 scored 76.2% and was refused.** Promotion needs accuracy ≥ champion *and* no per-question
 pass→fail flips, and the cuts say why: +2.1 pp on number turns, −2.7 on program turns, −5.4 on
@@ -257,15 +318,24 @@ demo pack.
 It runs in **ap-southeast-1 rather than Sydney** for an unglamorous reason worth recording: AWS
 caps this account at two App Runner services per region and Sydney is already at it, so a
 neighbouring region has a fresh allowance. It costs an Australian visitor about 100 ms, which a
-replay-backed demo does not notice. Sizing is measured: 225 MiB RSS at rest, 315 MiB with every
-prediction CSV cached — which is what the answers explorer does on a first click. 512 MB survives
-at rest and then OOMs on that tab, so 1 GB is the floor.
+replay-backed demo does not notice.
+
+Sizing is measured, not guessed: 225 MiB RSS at rest, 315 MiB with every prediction CSV cached,
+which is what the answers explorer does on a first click. 512 MB survives at rest and then OOMs on
+that tab, so 1 GB is the floor.
 
 Merge to `main` → CI must conclude success → the workflow assumes its role by OIDC, no stored
-keys, pushes the image, App Runner auto-deploys `:latest`, Terraform reconciles, and
-`demo_smoke.sh` asserts the live URL is what it claims: `mode=demo`, a registered champion, the
-`never_seen` split, a non-empty demo pack, the three-source metrics shape, a 403 on a promote.
-Rollback: retag a previous `:sha` as `:latest`.
+keys, pushes the image, App Runner auto-deploys `:latest`, Terraform reconciles. Then
+`demo_smoke.sh` asserts the live URL is what it claims:
+
+- `mode=demo`;
+- a registered champion;
+- the `never_seen` split;
+- a non-empty demo pack;
+- the three-source metrics shape;
+- a 403 on a promote.
+
+Rollback is one step: retag a previous `:sha` as `:latest`.
 
 Rung 10, and only rung 10. Sessions and the rate limiter live in process memory and the backend
 runs `--workers 1` — the code names that as the seam rather than pretending it is not one.
@@ -286,9 +356,11 @@ call to use. A test pins it: every module must import with no API key.
 
 **Shed load before spending anything on it.** A global in-flight cap of 4 turns rejects instantly
 rather than queueing; a visitor told "busy" has a better time than one waiting 90 seconds behind
-three strangers. Then a per-IP sliding window of 30 requests / 60 s, pruned on a housekeeping loop
-so it cannot leak an entry per IP forever. `X-Forwarded-For` is trusted only when `trusted_proxy`
-is set, and the in-flight cap is deliberately *not* keyed by client so it holds either way.
+three strangers.
+
+Behind that sits a per-IP sliding window of 30 requests / 60 s, pruned on a housekeeping loop so it
+cannot leak an entry per IP forever. `X-Forwarded-For` is trusted only when `trusted_proxy` is set,
+and the in-flight cap is deliberately *not* keyed by client so it holds either way.
 
 **Admin writes need the owner token and a non-demo build**, both rather than either — and the
 token check is a route dependency, so on the public demo a promote answers 403 `owner_token_unset`
@@ -302,18 +374,31 @@ policy, a red-team suite.
 ## 6 · Observability & cost
 
 Every turn the system answers is kept. The trace store is a SQLite file in WAL mode, one row per
-turn — inputs, per-stage outputs, reasoning, the calculator's tool loop, tokens, latency, bundle
-id, correctness where gold exists — browsable at `/admin/traces` and filterable by report,
-session, correctness and bundle. A live serving turn and a scored eval turn write the same
-structure through the same code path, so "why did it answer that" is a question the product
-answers about itself rather than one you take to a vendor dashboard.
+turn, browsable at `/admin/traces` and filterable by report, session, correctness and bundle. Each
+row carries:
 
-`GET /metrics/production` groups by source — `serving`, `demo`, `eval` — and never blends them. A
-recording paced to four seconds did not take four seconds; an eval turn ran at concurrency 8 on a
-warm cache; only a serving turn's latency is one a person experienced. All three groups are always
-present with their own counts, and a tile with no metered data renders an em dash and a reason
-rather than a flattering zero — the smoke test asserts the *shape* of that payload and never a
-latency number. Not built: per-call spans, which are constructed and dropped in-process.
+- the inputs and every stage's output;
+- the reasoning;
+- the calculator's tool loop;
+- tokens and latency;
+- the bundle id;
+- correctness, where gold exists.
+
+A live serving turn and a scored eval turn write the same structure through the same code path, so
+"why did it answer that" is a question the product answers about itself rather than one you take to
+a vendor dashboard.
+
+`GET /metrics/production` groups by source and never blends them, because the three are not
+measuring the same thing:
+
+- `demo` — a recording paced to four seconds did not take four seconds;
+- `eval` — an eval turn ran at concurrency 8 on a warm cache;
+- `serving` — only this latency is one a person actually experienced.
+
+All three groups are always present with their own counts, and a tile with no metered data renders
+an em dash and a reason rather than a flattering zero; the smoke test asserts the *shape* of that
+payload and never a latency number. Not built: per-call spans, which are constructed and dropped
+in-process.
 
 Cost is accounted per turn from metrics the runner was already collecting and throwing away, with
 DeepSeek prices declared in code rather than fetched so re-scoring an old run cannot silently

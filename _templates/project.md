@@ -4,7 +4,9 @@
 #
 #   Contract:  every number has a repo path · all nine rubric dimensions
 #              present · anything not `shipped` says why · the seven H2s
-#              below appear in order, none skipped.
+#              below appear in order, none skipped · one `sections:` summary
+#              per H2 · no body paragraph over 80 words · no placeholder in
+#              `media:`. DESIGN.md is the brief behind all of it.
 #   Validate:  uv run --with pyyaml --no-project python scripts/lint_case_study.py \
 #                _projects/<slug>.md --repo ../<repo-dir>
 #   Generate:  /case-study ../<repo-dir>   (see .claude/skills/case-study/)
@@ -13,10 +15,41 @@
 # ============================================================================
 
 title: ""                    # Product name as it appears everywhere on the site
+
+# ---- the three lines a scanner reads ----------------------------------------
+# headline    ≤ 9 WORDS, outcome-led, and never the title again. First line of
+#             the home-page card and of the page header: what the system
+#             achieves, not what it is called.
+# outcome     ONE sentence, ≤ 25 words, under the headline on the card. The
+#             achievement with its stake — what would go wrong without it —
+#             not a feature list.
+# proof_line  ONE sentence for the TL;DR "Proof" cell. It MUST carry a number,
+#             and that number carries its baseline or denominator in the same
+#             sentence: "77.1%, up from 73.0% (594/770)", never a bare "77.1%".
+headline: ""
+outcome: >-
+  ""
+proof_line: >-
+  ""
+
 summary: >-                  # ≤ 2 sentences. What it is + the one thing that makes it notable.
   ""                         # Source: repo README first paragraph, rewritten for a hiring engineer.
 tldr: >-                     # ONE line for the 30-second strip. The claim, with its mechanism.
   ""
+
+# ---- section summaries ------------------------------------------------------
+# One entry per H2 below, `n` matching the number in the heading, 1..7 in order.
+# Each `summary` is ONE sentence of ≤ 24 words that states the POINT of the
+# section, not its topic: "Governance is the product, not a feature" —
+# never "This section covers governance". They render in the reading rail.
+sections:
+  - {n: 1, summary: ""}
+  - {n: 2, summary: ""}
+  - {n: 3, summary: ""}
+  - {n: 4, summary: ""}
+  - {n: 5, summary: ""}
+  - {n: 6, summary: ""}
+  - {n: 7, summary: ""}
 tags: []                     # Display chips on the card, e.g. [Agents, Data] / [RAG]
 metric: ""                   # The headline number, e.g. "77.1%" or "6.1×"
 metric_label: ""             # What the number means, e.g. "accuracy · up from 73.0% (594/770)"
@@ -37,11 +70,14 @@ links:
   demo: ""                   # The live URL. MUST answer 200 (demo builds answer mode: demo).
 
 # ---- media (optional) -------------------------------------------------------
+# A path or nothing. DESIGN.md rule 5: no placeholder for media that does not
+# exist — if it is not recorded, the slot is not rendered, so it is not promised
+# either. "planned", "tbd", "coming" and friends fail the lint; "" is correct.
 media:
   walkthrough: ""            # /assets/video/<slug>/walkthrough.mp4
   poster: ""                 # /assets/img/<slug>/poster.png
   captions: ""               # /assets/video/<slug>/walkthrough.vtt
-  reel: planned              # or a path; "planned" renders the placeholder
+  reel: ""                   # /assets/video/<slug>/reel.mp4
 
 # ---- the AI / agent structure ----------------------------------------------
 # The visual identity of the system: what the MODEL does. Shown on the home
@@ -82,7 +118,17 @@ production:
     - {dimension: scale,      status: shipped, how: "", proof: ""}
 
 # Screenshots, dashboards and other figures go INLINE in the body below, as
-# <figure class="evidence"> blocks, next to the claim they support.
+# <figure class="evidence"> blocks, next to the claim they support. A caption
+# states the TAKEAWAY first and then its source:
+#   **The model never touches the database directly.** Every path from question
+#   to report passes the AST guard and then RLS.
+#   Source: db/init/02_rls.sql, agent/sql_guardrails.py
+#
+# Two prose rules the lint enforces in the body below:
+#   · No paragraph over 80 words. Split at the natural seam; delete nothing.
+#   · Enumerations become lists or tables. Three or more parallel items in one
+#     sentence (three cost caps, four tools, graders G1–G3) belong in a markdown
+#     list or table, not in the sentence.
 ---
 
 ## 1 · Purpose & benefit
