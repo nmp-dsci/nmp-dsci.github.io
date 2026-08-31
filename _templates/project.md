@@ -50,11 +50,8 @@ sections:
   - {n: 5, summary: ""}
   - {n: 6, summary: ""}
   - {n: 7, summary: ""}
-tags: []                     # Display chips on the card, e.g. [Agents, Data] / [RAG]
 metric: ""                   # The headline number, e.g. "77.1%" or "6.1×"
 metric_label: ""             # What the number means, e.g. "accuracy · up from 73.0% (594/770)"
-featured: true               # true only for systems shown on the home page
-order: 1                     # Card order on the home page (1 = first)
 stack: []                    # Technologies, most distinctive first. Source: README, pyproject/package.json, infra/
 
 # ---- skills -----------------------------------------------------------------
@@ -89,7 +86,7 @@ architecture:
 # ---- how and where it runs --------------------------------------------------
 production:
   live: true                 # true = a real deployed URL; drives the live badge and the matrix
-  order: 1                   # order in the rubric matrix
+  order: 1                   # order on the home-page row list and in the rubric matrix
   surface: ""                # What a visitor can actually do in the demo, incl. what is replayed
   topology: ""               # One line, e.g. "App Runner → Aurora v2 · ECS jobs"
   topology_diagram: "diagrams/topology/<slug>.svg"   # DEPLOY diagram — case study §4 only
