@@ -6,10 +6,10 @@ and served by GitHub Pages, showcasing shipped agent/RAG/eval systems as case st
 ## Structure
 
 - `_projects/` — one Markdown file per case study. Front matter drives the
-  home-page card (title, summary, metric, tags), the project-page layout (tldr,
-  skills, skills_detail, stack, links, media) and the production scorecard
-  (`production.rubric`). Files carrying `published: false` stay in git and out
-  of the build.
+  home-page system row (title, outcome, production stats, agent diagram), the
+  project-page layout (headline, tldr, proof_line, skills, skills_detail,
+  stack, links, media) and the production scorecard (`production.rubric`).
+  Files carrying `published: false` stay in git and out of the build.
 - `_practices/` — the second collection: a practice is a generalised case study,
   one pattern shown across all three systems, on its own five-section spine.
 - `_data/site.yml` — name, role, tagline, and the GitHub/LinkedIn links used
@@ -27,11 +27,12 @@ and served by GitHub Pages, showcasing shipped agent/RAG/eval systems as case st
   system, per kind. They are *inlined* by the layout rather than loaded as
   `<img>`, which is what lets them use `currentColor` and be correct in both
   themes from one file.
-- `_layouts/` — `default` (shell + nav/footer/theme toggle), `home` (hero
-  metric strip, live-system project cards, rubric explainer), `project`
-  (case-study template with a TL;DR strip, media frame, "skills demonstrated"
-  proof list, scorecard and stack/links sidebar), `practice`, `page`
-  (About, etc).
+- `_layouts/` — `default` (shell + nav/footer/theme toggle), `home` (hero +
+  rubric matrix, live-system rows, rubric explainer — deliberately no headline
+  metric strip; DESIGN.md rule 6), `project` (case-study template with a TL;DR
+  strip, a media frame that only renders when a real file exists, "skills
+  demonstrated" proof list, scorecard and stack/links sidebar), `practice`,
+  `page` (About, etc).
 - `assets/img/`, `assets/video/`, `assets/audio/`, `assets/dash/` — evidence
   media (screenshots, captioned walkthroughs, sample call audio, self-contained
   HTML eval dashboards) referenced from a project's `media` front matter or
@@ -88,16 +89,20 @@ paths (`architecture.diagram`, `production.topology_diagram`) because the layout
 inlines them with `{% include %}` — that is what makes `currentColor` and the
 CSS custom properties resolve, so one file is correct in light and dark. The
 agent structure is the visual identity of the system and appears on the home
-card too; the deploy topology appears only in §4.
+row too; the deploy topology appears only in §4.
 
-**The rest still holds.** `tldr` is the one-line "What" in the 30-second strip
-(the strip also shows `metric`/`metric_label` as "Proof", the first five
-`skills`, and the `links.repo`/`links.demo` pair). Keys in `skills` and
+**The rest still holds.** `headline` and `outcome` are the two lines a scanner
+reads first, on both the home-page row and the page header; `tldr` is the
+one-line "What" in the 30-second strip. `proof_line` is that strip's "Proof"
+cell (falling back to `metric`/`metric_label` if unset), and it must carry a
+number with its baseline or denominator. The strip also shows the first six
+`skills`, and the `links.repo`/`links.demo` pair. Keys in `skills` and
 `skills_detail` must exist in `_data/skills.yml`. Media fields
 (`media.walkthrough`, `media.poster`, `media.captions`, `media.reel`) are
-optional and fall back to a placeholder; `media.captions` points at a WebVTT
-file attached as a default English caption track. `featured: true` puts the
-project in the home-page card grid; `order` sorts within it. `published: false`
+optional; DESIGN.md rule 5 means an unset one leaves the slot unrendered, not a
+placeholder. `media.captions` points at a WebVTT file attached as a default
+English caption track. `production.live: true` and `production.order` decide
+whether a system appears on the home page and in what order. `published: false`
 keeps a file in git and out of the build.
 
 Evidence is placed inline in the body as a `<figure class="evidence">`

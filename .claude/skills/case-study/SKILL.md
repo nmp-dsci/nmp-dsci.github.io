@@ -96,7 +96,7 @@ what you hoped it would.
 | Field | Limit | What it does |
 |---|---|---|
 | `headline` | ≤ **9 words**, never equal to `title` | The outcome, not the name. "Governed NL→SQL in production" — not "Data Pilot" |
-| `outcome` | **one sentence**, ≤ 25 words | The achievement with its stake, for the home-page card. What goes wrong without it |
+| `outcome` | **one sentence**, ≤ 25 words | The achievement with its stake, for the home-page row. What goes wrong without it |
 | `proof_line` | **one sentence**, and it MUST carry a number | The TL;DR "Proof" cell. The number brings its baseline or denominator with it: "77.1%, up from 73.0% (594/770)", never a bare "77.1%" |
 
 ### `sections:` — one summary per H2
@@ -154,7 +154,7 @@ One row per dimension in `_data/rubric.yml`, in that file's `order:`, each with
 status: shipped ●   built, measured, in the repo
         partial ◐   present but narrower than the rubric asks
         designed ○  written up, not built
-        na —        not needed by design (say why)
+        na —        not needed by design (still say why in `how`)
 ```
 
 Anything that is not `shipped` must carry its reason in `how`. This is not a

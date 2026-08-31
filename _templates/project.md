@@ -18,11 +18,11 @@ title: ""                    # Product name as it appears everywhere on the site
 
 # ---- the three lines a scanner reads ----------------------------------------
 # headline    ≤ 9 WORDS, outcome-led, and never the title again. First line of
-#             the home-page card and of the page header: what the system
+#             the home-page row and of the page header: what the system
 #             achieves, not what it is called.
-# outcome     ONE sentence, ≤ 25 words, under the headline on the card. The
-#             achievement with its stake — what would go wrong without it —
-#             not a feature list.
+# outcome     ONE sentence, ≤ 25 words, under the headline on the home-page
+#             row. The achievement with its stake — what would go wrong
+#             without it — not a feature list.
 # proof_line  ONE sentence for the TL;DR "Proof" cell. It MUST carry a number,
 #             and that number carries its baseline or denominator in the same
 #             sentence: "77.1%, up from 73.0% (594/770)", never a bare "77.1%".
@@ -81,7 +81,7 @@ media:
 
 # ---- the AI / agent structure ----------------------------------------------
 # The visual identity of the system: what the MODEL does. Shown on the home
-# card AND under "## 2 · Agent architecture". Never the AWS diagram.
+# row AND under "## 2 · Agent architecture". Never the AWS diagram.
 architecture:
   diagram: "diagrams/agent/<slug>.svg"      # path under _includes/, inlined by the layout
   caption: ""                # e.g. "question → agent loop → guarded SELECT → sandbox → report"

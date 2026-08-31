@@ -97,7 +97,7 @@ Committed as rules so they survive future sessions:
    "reel coming". If it isn't recorded, the slot isn't rendered.
 6. **No headline metric strip.** Three big numbers with no stakes read as a
    pitch deck, and benchmark figures are not wins. Proof belongs inside the
-   system card and the matrix, attached to the system it describes.
+   system row and the matrix, attached to the system it describes.
 7. **No bare hero.** The first viewport carries the rubric matrix — the evidence
    is the hero image.
 8. **No purple, no Inter, no gradient cards, no uniformly rounded pastel
