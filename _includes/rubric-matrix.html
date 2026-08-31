@@ -1,52 +1,53 @@
 {%- comment -%}
-  The compact rubric matrix for the home page: nine dimensions × the live systems.
-  A cell is the status glyph plus the first eight words of that system's `how`;
-  the tooltip carries the opening of the full sentence, and the case-study
-  scorecard carries all of it. The `how` values are multi-sentence paragraphs, so
-  a tooltip with the whole thing would be unreadable — hence the bounded excerpt.
-  The table scrolls inside its own container with the dimension column pinned, so
-  nothing overflows the page at 360px.
+  The star of the home page: nine dimensions × the live systems, in the first
+  viewport. Cells carry the STATUS WORD, not a truncated sentence behind a
+  tooltip — a tooltip is invisible on touch, and the word is the fact. Each cell
+  links to the section of that case study which proves it.
+
+  On a phone the dimension column keeps its label and the three status columns
+  abbreviate; the grid never scrolls sideways.
 {%- endcomment -%}
 {%- assign live = site.projects | where_exp: "p", "p.production.live == true" | sort: "production.order" -%}
 {%- assign dims = site.data.rubric.dimensions -%}
 {%- assign ndim = dims | size -%}
 {%- if live.size > 0 -%}
-<div class="rubric-matrix" tabindex="0" role="region" aria-label="Production rubric across the live systems — scrolls sideways">
-  <table>
-    <thead>
-      <tr>
-        <th scope="col" class="rm-dim">Dimension</th>
-        {%- for p in live %}<th scope="col">{{ p.title }}</th>{% endfor -%}
-      </tr>
-    </thead>
-    <tbody>
-      {%- for i in (1..ndim) -%}
-        {%- for d in dims -%}
-          {%- if d[1].order == i -%}
-            {%- assign key = d[0] -%}
-      <tr>
-        <th scope="row" class="rm-dim"><a href="#rubric-{{ key }}" title="{{ d[1].question | escape }}">{{ d[1].label | escape }}</a></th>
-        {%- for p in live -%}
-          {%- assign cell = p.production.rubric | where: "dimension", key | first -%}
-          {%- if cell -%}
-            {%- assign st = site.data.rubric.statuses[cell.status] -%}
-            {%- assign plain = cell.how | default: "" | strip_html | replace: '`', '' | strip -%}
-        <td><span class="status-glyph status-{{ cell.status }}" aria-hidden="true">{{ st.glyph | default: "·" }}</span><span class="sr-only">{{ st.label | default: cell.status }} — </span><span class="rm-how" title="{{ plain | truncate: 220 | escape }}">{{ plain | truncatewords: 8 | escape }}</span></td>
-          {%- else -%}
-        <td><span class="rm-how rm-none">not scored</span></td>
-          {%- endif -%}
-        {%- endfor -%}
-      </tr>
-          {%- endif -%}
-        {%- endfor -%}
+<div class="star">
+  <div class="star-head">
+    <b>Production rubric · {{ live.size }} systems × {{ ndim }} dimensions</b>
+    <span>every cell links to the section that proves it</span>
+  </div>
+
+  <div class="matrix" role="table" aria-label="Production rubric across the live systems">
+    <div class="mh" role="columnheader">Dimension</div>
+    {%- for p in live %}<div class="mh" role="columnheader">{{ p.title }}</div>{% endfor -%}
+
+    {%- for i in (1..ndim) -%}
+      {%- for d in dims -%}
+        {%- if d[1].order == i -%}
+          {%- assign key = d[0] -%}
+    <div class="md" role="rowheader"><i>{{ d[1].ref }}</i>
+      <a href="{{ '/' | relative_url }}#rubric-{{ key }}" title="{{ d[1].question | escape }}">{{ d[1].short | default: d[1].label | escape }}</a></div>
+          {%- for p in live -%}
+            {%- assign cell = p.production.rubric | where: "dimension", key | first -%}
+            {%- if cell -%}
+              {%- assign st = site.data.rubric.statuses[cell.status] -%}
+              {%- assign lbl = st.label | default: cell.status -%}
+    <a class="cell cell-{{ cell.status }}" role="cell"
+       href="{{ p.url | relative_url }}#s{{ d[1].section }}"
+       title="{{ p.title | escape }} — {{ d[1].label | escape }}: {{ lbl | escape }}">{{ lbl }}<span class="sr-only"> — {{ p.title | escape }}, {{ d[1].label | escape }}</span></a>
+            {%- else -%}
+    <div class="cell cell-na" role="cell">not scored</div>
+            {%- endif -%}
+          {%- endfor -%}
+        {%- endif -%}
       {%- endfor -%}
-    </tbody>
-  </table>
+    {%- endfor -%}
+  </div>
+
+  <p class="legend">
+    {%- for s in site.data.rubric.statuses -%}
+    <span><i class="l-{{ s[0] }}"></i>{{ s[1].label }} — {{ s[1].blurb }}</span>
+    {%- endfor -%}
+  </p>
 </div>
-<p class="rm-hint">
-  {%- for s in site.data.rubric.statuses -%}
-  <span class="rm-key"><span class="status-glyph status-{{ s[0] }}" aria-hidden="true">{{ s[1].glyph }}</span>{{ s[1].label }}</span>
-  {%- endfor -%}
-  <span class="rm-key rm-scroll">Hover a cell for more of the sentence; the case study carries all of it. On a narrow screen the table scrolls sideways.</span>
-</p>
 {%- endif -%}

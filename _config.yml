@@ -52,6 +52,13 @@ exclude:
   - tool_utils
   - resources
   - css
+  # unused vendor CSS/JS from the previous template
+  - assets/css/animated.css
+  - assets/css/fontawesome.css
+  - assets/css/owl.css
+  - assets/css/templatemo-digimedia-v2.css
+  - assets/js/animation.js
+  - assets/js/owl-carousel.js
   - assets/culture_map.json
   - assets/culture_surname.json
   - assets/POA_2016_NSW_reduced.geojson

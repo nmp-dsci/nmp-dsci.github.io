@@ -1,13 +1,16 @@
 {%- comment -%}
-Agent-structure figure. Rendered by the case-study Markdown, directly under
-"## 2 · Agent architecture". The SVG is INLINED (never <img>) so currentColor
-and the theme tokens resolve. Renders nothing if the front matter has no diagram.
+  The agent-structure figure inside a case study (§2). The caption states the
+  takeaway first; page.architecture.caption carries it.
 {%- endcomment -%}
-{%- assign dgm = page.architecture.diagram | default: "" | strip -%}
-{%- assign cap = page.architecture.caption | default: "" | strip -%}
-{%- if dgm != "" -%}
-<figure class="fig fig-agent">
-<div class="dia-frame">{% include {{ page.architecture.diagram }} %}</div>
-<figcaption><b>Agent structure</b>{% if cap != "" %} — {{ cap }}{% endif %} · the same figure as the home card.</figcaption>
+{%- assign dgm  = page.architecture.diagram  | default: "" | strip -%}
+{%- assign cap  = page.architecture.caption  | default: "" | strip -%}
+{%- assign take = page.architecture.takeaway | default: "" | strip -%}
+{%- if dgm != "" %}
+<figure class="fig">
+  <div class="dia-frame">{% include {{ page.architecture.diagram }} %}</div>
+  <figcaption>
+    <b>{% if take != "" %}{{ take }}{% else %}Agent structure.{% endif %}</b>
+    {%- if cap != "" %} {{ cap }}{% endif -%}
+  </figcaption>
 </figure>
-{%- endif -%}
+{%- endif %}

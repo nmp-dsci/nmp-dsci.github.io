@@ -1,0 +1,27 @@
+{%- comment -%}
+  The nine dimensions at a glance, in the case-study rail. Each row jumps to the
+  scorecard entry that explains it. Status is a swatch AND the word, never
+  colour alone.
+{%- endcomment -%}
+{%- if page.production.rubric -%}
+{%- assign dims = site.data.rubric.dimensions -%}
+{%- assign ndim = dims | size -%}
+{%- assign score = page.production.score | default: "" | strip -%}
+<div class="rail-box">
+  <b>Readiness{% if score != "" %} · {{ score }}{% endif %}</b>
+  <div class="mini">
+    {%- for i in (1..ndim) -%}
+      {%- for d in dims -%}
+        {%- if d[1].order == i -%}
+          {%- assign cell = page.production.rubric | where: "dimension", d[0] | first -%}
+          {%- if cell -%}
+          {%- assign st = site.data.rubric.statuses[cell.status] -%}
+    <a href="#s7"><i class="m-{{ cell.status }}"></i>{{ d[1].short | default: d[1].label | escape }}
+      <span class="sr-only">— {{ st.label | default: cell.status }}</span></a>
+          {%- endif -%}
+        {%- endif -%}
+      {%- endfor -%}
+    {%- endfor -%}
+  </div>
+</div>
+{%- endif -%}

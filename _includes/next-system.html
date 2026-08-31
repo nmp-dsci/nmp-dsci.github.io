@@ -1,0 +1,19 @@
+{%- comment -%}
+  Never dead-end a case study. Next live system by production.order, wrapping
+  round to the first; plus the way back to all of them.
+{%- endcomment -%}
+{%- assign live = site.projects | where_exp: "p", "p.production.live == true" | sort: "production.order" -%}
+{%- assign n = live.size -%}
+{%- if n > 1 -%}
+  {%- assign nextp = live.first -%}
+  {%- for p in live -%}
+    {%- if p.url == page.url -%}
+      {%- assign idx = forloop.index0 | plus: 1 -%}
+      {%- if idx < n -%}{%- assign nextp = live[idx] -%}{%- else -%}{%- assign nextp = live.first -%}{%- endif -%}
+    {%- endif -%}
+  {%- endfor -%}
+<nav class="next" aria-label="More systems">
+  <a href="{{ '/#work' | relative_url }}"><span class="label">Back to</span><b>All three systems</b></a>
+  <a href="{{ nextp.url | relative_url }}" style="text-align:right"><span class="label">Next system</span><b>{{ nextp.title }} →</b></a>
+</nav>
+{%- endif -%}

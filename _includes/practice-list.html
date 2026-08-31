@@ -1,0 +1,11 @@
+{%- assign practices = site.practices | sort: "order" -%}
+<div class="practices">
+  {%- for pr in practices -%}
+  {%- assign pt = pr.tldr | default: pr.summary | strip -%}
+  <article class="practice-item">
+    <span class="label">{{ pr.kicker | default: "practice" }}</span>
+    <h3><a href="{{ pr.url | relative_url }}">{{ pr.title }}</a></h3>
+    <p>{{ pt }}</p>
+  </article>
+  {%- endfor -%}
+</div>

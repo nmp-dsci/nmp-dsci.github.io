@@ -2,81 +2,76 @@
 layout: default
 ---
 {%- assign live = site.projects | where_exp: "p", "p.production.live == true" | sort: "production.order" -%}
-{%- assign dims = site.data.rubric.dimensions -%}
-{%- assign ndim = dims | size -%}
-{%- assign practices = site.practices | sort: "order" -%}
+{%- assign nsys = live.size -%}
 
+{%- comment -%}
+  The first viewport carries the claim on the left and the evidence on the
+  right. There is deliberately no strip of headline numbers: a benchmark figure
+  with no stakes is not a win, and proof reads better attached to the system it
+  describes (DESIGN.md, "never do this" #6).
+{%- endcomment -%}
 <section class="hero">
-  <div class="hero-inner">
-    <p class="kicker">// applied-ai · in production · demo mode</p>
-    <h1>{{ site.data.site.tagline | default: "I build gen-AI systems and run them in production." }}</h1>
-    <p class="hero-sub">{{ site.data.site.strapline | default: "Three systems live on AWS — each with evals in CI, guardrails between the model and the data, per-request traces, cost caps and a push-button deploy. Every one is scored against the same production rubric, and you can walk straight into the live app." }}</p>
-    <div class="cta-row">
-      <a class="btn-solid" href="#work">See the systems ↓</a>
-      <a class="btn-ghost" href="{{ site.data.site.linkedin }}" target="_blank" rel="noopener">Contact on LinkedIn ↗</a>
+  <div class="wrap hero-grid">
+    <div>
+      <p class="label kick">{{ site.data.site.role }} · Sydney · {{ nsys }} systems in production on AWS</p>
+      <h1>{{ site.data.site.tagline }}</h1>
+      <p class="dek">{{ site.data.site.strapline }}</p>
+      <div class="hero-cta">
+        <a class="btn" href="#work">See the {{ nsys }} systems ↓</a>
+        <a class="lnk" href="#rubric">What “production” means here</a>
+      </div>
     </div>
-    <div class="metrics" role="list">
-      <div class="met" role="listitem"><span class="met-n">3</span><span class="met-l">systems live on AWS · Terraform · OIDC deploys</span></div>
-      <div class="met" role="listitem"><span class="met-n">77.1%</span><span class="met-l">champion accuracy — v3.1 refused by the gate · ConvFinQA</span></div>
-      <div class="met" role="listitem"><span class="met-n">6.1×</span><span class="met-l">fewer tokens at 0.93 answer parity · Transcript RAG</span></div>
-      <div class="met" role="listitem"><span class="met-n">4.98×</span><span class="met-l">measured 5-worker speedup, linear · Data Pilot</span></div>
+    {% include rubric-matrix.html %}
+  </div>
+</section>
+
+<section class="section-band" id="work" aria-labelledby="work-h">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2 id="work-h">{% if nsys == 3 %}Three{% else %}{{ nsys }}{% endif %} systems, live on AWS</h2>
+      <span class="aside">demo mode on every public URL — read-only, no keys, no inference</span>
+    </div>
+    <div class="systems">
+      {%- for p in live %}{% include system-row.html project=p %}{% endfor -%}
     </div>
   </div>
 </section>
 
-<section class="work" id="work">
-  <div class="work-inner">
-
-    <div class="sec-head"><h2>Three systems, live on AWS</h2></div>
-    <div class="grid">
-      {%- for p in live %}{% include project-card.html project=p %}{% endfor -%}
+<section class="section" id="rubric" aria-labelledby="rubric-h">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2 id="rubric-h">What “production” means here</h2>
+      <a class="lnk aside" href="{{ '/practices/eval-loop/' | relative_url }}">the eval loop, in full →</a>
     </div>
+    <p class="sec-lead">Nine things a gen-AI system needs before real users touch it. Each system is
+      scored against all nine, honestly — the first four are the learning half, how a version gets
+      better without getting worse; the last five are the operating half, what happens once it is
+      live.</p>
+    {% include rubric-dims.html %}
 
-    <section class="rubric-explainer" id="rubric" aria-labelledby="rubric-h">
-      <div class="sec-head"><h2 id="rubric-h">What “production” means here</h2></div>
-      <p class="sec-lead">Nine things a gen-AI system needs before real users touch it. Each system is scored
-        honestly — a hollow dot with a reason beats a row of green ones. The first four are the learning half:
-        how a version gets better without getting worse. The last five are the operating half: what happens
-        once it is live.</p>
+    <figure class="fig" style="margin-top:var(--s7)">
+      <div class="dia-frame">{% include diagrams/rubric-loop.svg %}</div>
+      <figcaption><b>A version the gate refuses re-enters at diagnose, not at the user.</b>
+        Golden set → eval and judge → gate → ship → production → diagnose → next version. The nine
+        dimensions are the parts of this loop that have to exist before it can turn.</figcaption>
+    </figure>
+  </div>
+</section>
 
-      <figure class="fig fig-loop">
-        <div class="dia-frame">{% include diagrams/rubric-loop.svg %}</div>
-        <figcaption><b>The loop the nine dimensions describe</b> — golden set → eval + judge → gate → ship →
-          production → diagnose → next version. A version the gate refuses re-enters at diagnose, not at the user.</figcaption>
-      </figure>
+<section class="section-band" id="scale" aria-labelledby="scale-h">
+  <div class="wrap">
+    <div class="sec-head"><h2 id="scale-h">10 / 100 / 1,000 concurrent users</h2></div>
+    <p class="sec-lead">The same systems, one ladder. Only the first rung is deployed — the second is
+      sized from a measured queue experiment, the third is a design. Saying which is which is the point.</p>
+    {% include scale-ladder.html %}
+  </div>
+</section>
 
-      <div class="rubric-dims">
-        {%- for i in (1..ndim) -%}
-          {%- for d in dims -%}
-            {%- if d[1].order == i -%}
-        <div class="rubric-dim" id="rubric-{{ d[0] }}">
-          <span class="rd-ref">{{ d[1].ref }} · {{ d[0] }}</span>
-          <h3 class="rd-t">{{ d[1].label | escape }}</h3>
-          <p class="rd-q">{{ d[1].question | escape }}</p>
-          <p class="rd-w">{{ d[1].why | escape }}</p>
-        </div>
-            {%- endif -%}
-          {%- endfor -%}
-        {%- endfor -%}
-      </div>
-
-      {% include rubric-matrix.html %}
-    </section>
-
-    <section class="ladder-sec" id="scale" aria-labelledby="scale-h">
-      <div class="sec-head"><h2 id="scale-h">10 / 100 / 1,000 concurrent users</h2></div>
-      <p class="sec-lead">The same three systems, one ladder. Only the first rung is deployed — the second is
-        sized from a measured queue experiment, the third is a design. Saying which is which is the point.</p>
-      {% include scale-ladder.html %}
-    </section>
-
-    <section class="practices-sec" id="practices" aria-labelledby="practices-h">
-      <div class="sec-head"><h2 id="practices-h">Practices</h2></div>
-      <p class="sec-lead">How the three were built and kept honest — the parts that transfer to any gen-AI system.</p>
-      <div class="practices-grid">
-        {%- for pr in practices %}{% include practice-card.html practice=pr %}{% endfor -%}
-      </div>
-    </section>
-
+<section class="section" id="practices" aria-labelledby="practices-h">
+  <div class="wrap">
+    <div class="sec-head"><h2 id="practices-h">How they were built</h2></div>
+    <p class="sec-lead">The parts that transfer to any gen-AI system, written up once instead of
+      three times.</p>
+    {% include practice-list.html %}
   </div>
 </section>

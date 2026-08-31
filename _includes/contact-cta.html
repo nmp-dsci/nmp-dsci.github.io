@@ -1,0 +1,18 @@
+{%- comment -%}
+  The terminal action. Rendered by the default layout on every page, so no page
+  dead-ends at the footer (DESIGN.md § "the one action").
+{%- endcomment -%}
+<section class="cta" aria-labelledby="cta-h">
+  <div class="cta-inner">
+    <div>
+      <h2 id="cta-h">Want the detail behind any of this?</h2>
+      <p>Every system here is open source and running on AWS right now — read the code, open the demo, or ask me about the parts the write-ups skip.</p>
+    </div>
+    <div class="cta-actions">
+      {%- if site.data.site.linkedin != "" %}
+      <a class="btn" href="{{ site.data.site.linkedin }}" target="_blank" rel="noopener">Start a conversation ↗</a>
+      {%- endif %}
+      <a class="lnk" href="{{ site.data.site.github }}" target="_blank" rel="noopener">See the repositories ↗</a>
+    </div>
+  </div>
+</section>

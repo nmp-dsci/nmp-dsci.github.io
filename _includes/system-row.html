@@ -1,0 +1,49 @@
+{%- comment -%}
+  One live system, as a full-width row: text left, agent-structure diagram right.
+  A row rather than a card so the diagram gets ~545px to render in and the
+  outcome sentence gets a readable measure. Two destinations, so this is an
+  <article> with real links — never one anchor wrapping everything. The solid
+  button is the case study (the thing we want read); the demo is the quiet link.
+{%- endcomment -%}
+{%- assign p = include.project -%}
+{%- assign c_dgm  = p.architecture.diagram | default: "" | strip -%}
+{%- assign c_out  = p.outcome              | default: p.summary | strip -%}
+{%- assign c_scr  = p.production.score     | default: "" | strip -%}
+{%- assign c_surf = p.production.surface   | default: "" | strip -%}
+{%- assign c_topo = p.production.topology  | default: "" | strip -%}
+{%- assign c_cost = p.production.cost      | default: "" | strip -%}
+{%- assign c_reg  = p.production.region    | default: "" | strip -%}
+{%- assign c_demo = p.links.demo           | default: "" | strip -%}
+<article class="sys">
+  <div class="sys-body">
+    <div class="sys-top">
+      <h3><a href="{{ p.url | relative_url }}">{{ p.title }}</a></h3>
+      {%- if p.production.live %}<span class="live">live</span>{% endif -%}
+    </div>
+
+    <p class="sys-out">{{ c_out }}</p>
+
+    <dl class="sys-facts">
+      {%- if c_scr != "" %}
+      <dt>Rubric</dt><dd><b>{{ c_scr }}</b> dimensions shipped{% if p.production.rung %} · rung {{ p.production.rung }} deployed{% endif %}</dd>
+      {%- endif %}
+      {%- if c_surf != "" %}
+      <dt>Demo</dt><dd>{{ c_surf }}</dd>
+      {%- endif %}
+      {%- if c_topo != "" %}
+      <dt>Runs on</dt><dd>{{ c_topo }}{% if c_reg != "" %} · {{ c_reg }}{% endif %}{% if c_cost != "" %} · {{ c_cost }}{% endif %}</dd>
+      {%- endif %}
+    </dl>
+
+    <div class="sys-actions">
+      <a class="btn btn-sm" href="{{ p.url | relative_url }}">Read the case study</a>
+      {%- if c_demo != "" %}<a class="lnk" href="{{ c_demo }}" target="_blank" rel="noopener">Open the live demo ↗</a>{% endif -%}
+    </div>
+  </div>
+
+  {%- if c_dgm != "" %}
+  <div class="sys-fig">
+    <div class="dia-frame">{% include {{ p.architecture.diagram }} %}</div>
+  </div>
+  {%- endif %}
+</article>
