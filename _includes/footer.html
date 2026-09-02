@@ -1,11 +1,42 @@
+{%- comment -%}
+  The footer carries the page tree — the site's only index of itself. It is
+  generated from the same collections as the nav dropdown and #work, so the
+  three live systems, their rubric scores and the three practices stay correct
+  without anyone maintaining a list. Glyphs are decorative and aria-hidden; the
+  structure a screen reader hears is the nested list, not the box-drawing.
+{%- endcomment -%}
+{%- assign live = site.projects | where_exp: "p", "p.production.live == true" | sort: "production.order" -%}
+{%- assign prac = site.practices | sort: "order" -%}
+{%- assign ndim = site.data.rubric.dimensions | size -%}
 <footer class="footer">
   <div class="footer-inner">
-    <span>{{ site.data.site.name }} · {{ site.data.site.role }} · Sydney</span>
-    <span class="footer-links">
-      <a href="{{ site.data.site.github }}" target="_blank" rel="noopener">GitHub</a>
-      {% if site.data.site.linkedin != "" %}<a href="{{ site.data.site.linkedin }}" target="_blank" rel="noopener">LinkedIn</a>{% endif %}
-      {% if site.data.site.resume != "" %}<a href="{{ site.data.site.resume | relative_url }}">Résumé</a>{% endif %}
-      <a href="{{ '/about/' | relative_url }}">About</a>
-    </span>
+
+    <nav class="ptree" aria-label="Site map">
+      <b class="pt-root">{{ site.url | remove: "https://" | remove: "http://" }}</b>
+      <ul class="pt-list">
+        <li><i aria-hidden="true">├── </i><a href="{{ '/#work' | relative_url }}">case studies</a></li>
+        {%- for p in live %}
+        {%- assign p_scr = p.production.score | default: "" | strip -%}
+        <li><i aria-hidden="true">│   {% if forloop.last %}└── {% else %}├── {% endif %}</i><a href="{{ p.url | relative_url }}">{{ p.title | downcase }}</a>{% if p_scr != "" %}<span class="pt-s">{{ p_scr | remove: " " }} · live</span>{% endif %}</li>
+        {%- endfor %}
+        <li><i aria-hidden="true">├── </i><a href="{{ '/#practices' | relative_url }}">practices</a></li>
+        {%- for pr in prac %}
+        <li><i aria-hidden="true">│   {% if forloop.last %}└── {% else %}├── {% endif %}</i><a href="{{ pr.url | relative_url }}">{{ pr.short | default: pr.title | downcase }}</a></li>
+        {%- endfor %}
+        <li><i aria-hidden="true">├── </i><a href="{{ '/#rubric' | relative_url }}">the rubric</a><span class="pt-s">{{ ndim }} dimensions</span></li>
+        <li><i aria-hidden="true">└── </i><a href="{{ '/about/' | relative_url }}">about</a></li>
+      </ul>
+    </nav>
+
+    <div class="footer-meta">
+      <span>{{ site.data.site.name }} · {{ site.data.site.role }} · Sydney</span>
+      <span class="footer-links">
+        <a href="{{ site.data.site.github }}" target="_blank" rel="noopener">GitHub</a>
+        {% if site.data.site.linkedin != "" %}<a href="{{ site.data.site.linkedin }}" target="_blank" rel="noopener">LinkedIn</a>{% endif %}
+        {% if site.data.site.resume != "" %}<a href="{{ site.data.site.resume | relative_url }}">Résumé</a>{% endif %}
+        <a href="{{ '/about/' | relative_url }}">About</a>
+      </span>
+    </div>
+
   </div>
 </footer>

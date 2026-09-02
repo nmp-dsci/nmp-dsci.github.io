@@ -1,8 +1,13 @@
 {%- comment -%}
-  Logo left, links right, utility cluster last. Three destinations only — the
-  profile links live in the footer, where a hiring manager looks for them, so
-  the nav stays one line at every width. Under 820px it collapses to a sheet.
+  Logo left, links right, utility cluster last. "Case studies" is a native
+  <details> disclosure rather than a hand-rolled ARIA menu: the element gives us
+  keyboard support, the open/closed state and a working no-JavaScript fallback
+  for free. Its contents come from the same `where production.live` query the
+  home page uses, so the menu can never drift from #work and can never surface
+  an unpublished project. Under 820px the whole bar collapses to a sheet and the
+  panel renders inline and indented instead of floating.
 {%- endcomment -%}
+{%- assign live = site.projects | where_exp: "p", "p.production.live == true" | sort: "production.order" -%}
 <header class="nav" id="nav">
   <div class="nav-inner">
     <a class="brand" href="{{ '/' | relative_url }}">
@@ -14,7 +19,24 @@
             aria-expanded="false" aria-controls="nav-links" aria-label="Open menu">≡</button>
 
     <nav class="nav-links" id="nav-links" aria-label="Primary">
+      {%- if live.size > 0 %}
+      <details class="nav-drop" id="nav-drop">
+        <summary>Case studies<i aria-hidden="true">▾</i></summary>
+        <div class="nav-drop-panel">
+          {%- for p in live %}
+          {%- assign p_scr = p.production.score | default: "" | strip -%}
+          {%- assign p_sub = p.headline | default: "" | strip_html | split: "," | first | strip -%}
+          <a href="{{ p.url | relative_url }}">
+            <span><b>{{ p.title }}</b>{% if p_sub != "" %}<em>{{ p_sub }}</em>{% endif %}</span>
+            {%- if p_scr != "" %}<span class="nd-score">{{ p_scr | remove: " " }}</span>{% endif %}
+          </a>
+          {%- endfor %}
+          <a class="nd-all" href="{{ '/#work' | relative_url }}">All {{ live.size }} systems, side by side ↓</a>
+        </div>
+      </details>
+      {%- else %}
       <a href="{{ '/#work' | relative_url }}">Work</a>
+      {%- endif %}
       <a href="{{ '/#rubric' | relative_url }}">Rubric</a>
       <a href="{{ '/#practices' | relative_url }}">Practices</a>
       <a href="{{ '/about/' | relative_url }}">About</a>
@@ -38,6 +60,7 @@
     var btn  = document.getElementById('theme-toggle');
     var nav  = document.getElementById('nav');
     var tgl  = document.getElementById('nav-toggle');
+    var drop = document.getElementById('nav-drop');
 
     /* Three states, in this order: system → light → dark. "System" stores
        nothing, so a visitor who never touches this follows their OS forever. */
@@ -70,5 +93,16 @@
       tgl.setAttribute('aria-expanded', String(!open));
       tgl.setAttribute('aria-label', open ? 'Open menu' : 'Close menu');
     });
+
+    /* The disclosure closes itself on an outside click or Escape. Everything it
+       does still works with this block removed — that is the point of <details>. */
+    if (drop){
+      document.addEventListener('click', function(e){
+        if (drop.open && !drop.contains(e.target)) drop.open = false;
+      });
+      document.addEventListener('keydown', function(e){
+        if (e.key === 'Escape' && drop.open){ drop.open = false; drop.querySelector('summary').focus(); }
+      });
+    }
   })();
 </script>

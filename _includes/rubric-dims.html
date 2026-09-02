@@ -1,19 +1,30 @@
 {%- comment -%}
-  The nine dimensions as a numbered list, three columns — replaces nine
-  identical cards. Each <li> is the anchor target for every matrix cell and
-  every scorecard row on the site.
+  The nine dimensions, split into the two halves declared in _data/rubric.yml.
+  A 3×3 grid made all nine look like peers and hid the one distinction that
+  matters — the learning half is how a version gets better, the operating half
+  is what happens once it is live. Each <li> is still the anchor target for
+  every matrix cell and every scorecard row on the site.
 {%- endcomment -%}
 {%- assign dims = site.data.rubric.dimensions -%}
-{%- assign ndim = dims | size -%}
-<ol class="dims">
-  {%- for i in (1..ndim) -%}
-    {%- for d in dims -%}
-      {%- if d[1].order == i -%}
-  <li id="rubric-{{ d[0] }}">
-    <span class="ref">{{ d[1].ref }}</span>
-    <span><b>{{ d[1].label | escape }}</b><span>{{ d[1].question | escape }}</span></span>
-  </li>
-      {%- endif -%}
-    {%- endfor -%}
+{%- assign from = 1 -%}
+<div class="dims-split">
+  {%- for half in site.data.rubric.halves -%}
+  <section class="dims-half">
+    <p class="label">{{ half.label }} · {{ half.range }}</p>
+    <p class="dims-note">{{ half.blurb }}</p>
+    <ol class="dims">
+      {%- for i in (from..half.upto) -%}
+        {%- for d in dims -%}
+          {%- if d[1].order == i -%}
+      <li id="rubric-{{ d[0] }}">
+        <span class="ref">{{ d[1].ref }}</span>
+        <span><b>{{ d[1].label | escape }}</b><span>{{ d[1].question | escape }}</span></span>
+      </li>
+          {%- endif -%}
+        {%- endfor -%}
+      {%- endfor -%}
+    </ol>
+  </section>
+  {%- assign from = half.upto | plus: 1 -%}
   {%- endfor -%}
-</ol>
+</div>

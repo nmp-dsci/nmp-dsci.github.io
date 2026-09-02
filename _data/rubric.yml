@@ -10,6 +10,19 @@
 # Order matters — the matrix and the scorecard render in the order given by
 # `order:` below (R1 → R9: the learning half first, then the operating half).
 
+# The two halves of the loop. _includes/rubric-dims.html renders one column per
+# half, so the distinction the section lead makes is visible in the layout
+# instead of only in the prose. `upto` is the last `order:` in each half.
+halves:
+  - label: "The learning half"
+    range: "R1–R4"
+    upto: 4
+    blurb: "How a version gets better without getting worse."
+  - label: "The operating half"
+    range: "R5–R9"
+    upto: 9
+    blurb: "What happens once it is live, and who finds out first."
+
 dimensions:
   evals:
     order: 1

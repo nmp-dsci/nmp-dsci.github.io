@@ -1,5 +1,6 @@
 ---
 title: "Ways of working: Git · Lavish · no-mistakes"
+short: "Ways of working"
 summary: >-
   How three production systems were built by one engineer working with agents,
   without the usual slop. Plan in the browser, build on a branch, validate

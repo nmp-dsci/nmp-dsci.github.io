@@ -25,18 +25,18 @@
       {%- for d in dims -%}
         {%- if d[1].order == i -%}
           {%- assign key = d[0] -%}
-    <div class="md" role="rowheader"><i>{{ d[1].ref }}</i>
+    <div class="md" role="rowheader" style="--d:{{ i }}"><i>{{ d[1].ref }}</i>
       <a href="{{ '/' | relative_url }}#rubric-{{ key }}" title="{{ d[1].question | escape }}">{{ d[1].short | default: d[1].label | escape }}</a></div>
           {%- for p in live -%}
             {%- assign cell = p.production.rubric | where: "dimension", key | first -%}
             {%- if cell -%}
               {%- assign st = site.data.rubric.statuses[cell.status] -%}
               {%- assign lbl = st.label | default: cell.status -%}
-    <a class="cell cell-{{ cell.status }}" role="cell"
+    <a class="cell cell-{{ cell.status }}" role="cell" style="--d:{{ i }}"
        href="{{ p.url | relative_url }}#s{{ d[1].section }}"
        title="{{ p.title | escape }} — {{ d[1].label | escape }}: {{ lbl | escape }}">{{ lbl }}<span class="sr-only"> — {{ p.title | escape }}, {{ d[1].label | escape }}</span></a>
             {%- else -%}
-    <div class="cell cell-na" role="cell">not scored</div>
+    <div class="cell cell-na" role="cell" style="--d:{{ i }}">not scored</div>
             {%- endif -%}
           {%- endfor -%}
         {%- endif -%}

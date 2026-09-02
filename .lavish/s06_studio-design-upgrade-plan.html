@@ -1,0 +1,1303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ship Like a Studio → nmp-dsci.github.io</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* ===========================================================================
+   Design source: the subject project's own system.
+   Token values copied verbatim from nmp-dsci.github.io/assets/css/tokens.css
+   (light :root + the dark override), so every mock in this artifact renders in
+   the real palette, at the real type scale, in whichever theme you are in.
+   =========================================================================== */
+:root{
+  --bg:#F7F6F2; --panel:#FFFFFF; --band:#EFEEE8;
+  --ink:#1A1D1B; --ink-2:#3B403D; --muted:#4A514D; --faint:#5C635E;
+  --line:#DCDAD2; --line-2:#C7C5BC; --line-3:#8A8880;
+  --accent:#0A6552; --accent-ink:#FFFFFF; --accent-soft:#DFEFE8;
+  --amber:#8A5006; --amber-soft:#F6E6CF;
+  --sans:'IBM Plex Sans',system-ui,-apple-system,sans-serif;
+  --serif:'IBM Plex Serif',Georgia,'Times New Roman',serif;
+  --mono:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+  --t-2:0.8rem; --t-1:0.875rem; --t0:1rem; --t1:1.125rem;
+  --t2:1.406rem; --t3:1.758rem; --t4:2.197rem; --t5:2.75rem; --t6:3.4rem;
+  --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:24px;
+  --s6:32px; --s7:48px; --s8:64px; --s9:96px;
+  --r:10px; --r-sm:6px;
+  --shadow:0 1px 2px rgb(20 25 22 / .05), 0 12px 28px -18px rgb(20 25 22 / .22);
+  --dur:300ms; --ease:cubic-bezier(.2,.7,.2,1);
+  --w:1140px; --measure:68ch; --track-label:.08em;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#121614; --panel:#191E1B; --band:#161A18;
+    --ink:#E8EBE7; --ink-2:#C9CFC9; --muted:#AEB6B0; --faint:#98A09A;
+    --line:#28302B; --line-2:#3A443E; --line-3:#727E77;
+    --accent:#43C29A; --accent-ink:#0E1512; --accent-soft:#17382C;
+    --amber:#D99A4E; --amber-soft:#3A2A14;
+    --shadow:0 1px 2px rgb(0 0 0 / .4), 0 12px 28px -18px rgb(0 0 0 / .65);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#121614; --panel:#191E1B; --band:#161A18;
+  --ink:#E8EBE7; --ink-2:#C9CFC9; --muted:#AEB6B0; --faint:#98A09A;
+  --line:#28302B; --line-2:#3A443E; --line-3:#727E77;
+  --accent:#43C29A; --accent-ink:#0E1512; --accent-soft:#17382C;
+  --amber:#D99A4E; --amber-soft:#3A2A14;
+  --shadow:0 1px 2px rgb(0 0 0 / .4), 0 12px 28px -18px rgb(0 0 0 / .65);
+}
+@media (prefers-reduced-motion: reduce){ :root{ --dur:0.01ms } }
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:76px}
+body{margin:0;background:var(--bg);color:var(--ink-2);
+  font-family:var(--sans);font-size:var(--t0);line-height:1.6;
+  -webkit-font-smoothing:antialiased}
+h1,h2,h3,h4{color:var(--ink);margin:0;line-height:1.15;text-wrap:balance;
+  font-weight:600;letter-spacing:-.02em}
+h1{font-size:var(--t5)} h2{font-size:var(--t3)} h3{font-size:var(--t2)} h4{font-size:var(--t0)}
+p{margin:0 0 var(--s4);text-wrap:pretty}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline;text-underline-offset:.22em;text-decoration-thickness:1.5px}
+a:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible{
+  outline:2px solid var(--accent);outline-offset:2px;border-radius:2px}
+strong,b{color:var(--ink);font-weight:600}
+/* the site's own floor: nothing renders below --t-2 (12.8px), inline code included */
+code,kbd{font-family:var(--mono);font-size:max(var(--t-2),.86em);background:var(--band);
+  padding:.1em .35em;border-radius:var(--r-sm);color:var(--ink-2)}
+:where(p,li,dd,dt,td,th,figcaption,h1,h2,h3,h4){overflow-wrap:anywhere}
+
+.wrap{max-width:var(--w);margin-inline:auto;padding-inline:var(--s5)}
+.label{font-family:var(--mono);font-size:var(--t-2);font-weight:500;
+  letter-spacing:var(--track-label);text-transform:uppercase;color:var(--faint);margin:0}
+.lead{font-family:var(--serif);font-size:var(--t1);line-height:1.55;color:var(--ink-2);max-width:70ch}
+.small{font-size:var(--t-1);color:var(--muted)}
+.tiny{font-size:var(--t-2);color:var(--faint);font-family:var(--mono)}
+
+/* ---- nav ---- */
+.top{position:sticky;top:0;z-index:60;background:color-mix(in srgb,var(--bg) 88%,transparent);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.top-in{max-width:var(--w);margin-inline:auto;padding:var(--s3) var(--s5);
+  display:flex;align-items:center;gap:var(--s5);flex-wrap:wrap}
+.top b{font-family:var(--mono);font-size:var(--t-1);color:var(--ink);white-space:nowrap}
+.top nav{display:flex;gap:var(--s5);margin-left:auto;flex-wrap:wrap;
+  font-size:var(--t-1);font-weight:500}
+.top nav a{color:var(--ink-2)}
+.top nav a:hover{color:var(--accent);text-decoration:none}
+
+/* ---- section rhythm ---- */
+section.blk{padding-block:var(--s9) 0}
+section.blk:last-of-type{padding-bottom:var(--s9)}
+.hd{margin-bottom:var(--s6);max-width:78ch}
+.hd .label{margin-bottom:var(--s3)}
+.hd h2{margin-bottom:var(--s4)}
+.rule{height:1px;background:var(--line);border:0;margin:var(--s9) 0 0}
+
+/* ---- panels ---- */
+.panel{background:var(--panel);border-radius:var(--r);box-shadow:var(--shadow);padding:var(--s5)}
+.band{background:var(--band);border-radius:var(--r);padding:var(--s5)}
+.grid{display:grid;gap:var(--s5)}
+.g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+@media (max-width:900px){ .g3{grid-template-columns:minmax(0,1fr)} .g2{grid-template-columns:minmax(0,1fr)} }
+
+/* ---- verdict ---- */
+.verdict{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(0,1fr);gap:var(--s7);
+  align-items:start}
+@media (max-width:900px){ .verdict{grid-template-columns:minmax(0,1fr);gap:var(--s6)} }
+.tally{display:flex;flex-direction:column;gap:var(--s3)}
+.tally-row{display:grid;grid-template-columns:2.6rem minmax(0,1fr) auto;gap:var(--s3);
+  align-items:center;font-size:var(--t-1)}
+.tally-n{font-family:var(--mono);font-weight:600;font-size:var(--t2);color:var(--ink);
+  text-align:right;font-variant-numeric:tabular-nums}
+.bar{height:8px;border-radius:99px;background:var(--band);overflow:hidden}
+.bar i{display:block;height:100%;border-radius:99px}
+
+/* ---- status glyph + word (never colour alone) ---- */
+.st{display:inline-flex;align-items:center;gap:var(--s2);font-family:var(--mono);
+  font-size:var(--t-2);white-space:nowrap}
+.st::before{content:"";width:10px;height:10px;border-radius:3px;flex:none}
+.st-ok::before{background:var(--accent-soft);box-shadow:inset 0 0 0 1px var(--accent)}
+.st-ok{color:var(--accent)}
+.st-part::before{background:var(--amber-soft);box-shadow:inset 0 0 0 1px var(--amber)}
+.st-part{color:var(--amber)}
+.st-gap::before{box-shadow:inset 0 0 0 1.5px var(--line-3)}
+.st-gap{color:var(--muted)}
+
+/* ---- tables ---- */
+.tw-tight table{min-width:500px}
+.tw{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:var(--r);
+  box-shadow:var(--shadow);background:var(--panel)}
+table{border-collapse:collapse;width:100%;min-width:640px;font-size:var(--t-1)}
+caption{text-align:left;padding:var(--s4) var(--s5) 0;color:var(--muted);font-size:var(--t-1)}
+th,td{text-align:left;padding:var(--s3) var(--s4);border-bottom:1px solid var(--line);
+  vertical-align:top;line-height:1.45}
+thead th{font-family:var(--mono);font-size:var(--t-2);font-weight:500;color:var(--faint);
+  letter-spacing:var(--track-label);text-transform:uppercase;
+  border-bottom:1px solid var(--line-2);white-space:nowrap}
+tbody tr:last-child td{border-bottom:0}
+tbody tr:hover{background:var(--band)}
+td.n{font-family:var(--mono);color:var(--faint);white-space:nowrap;font-size:var(--t-2)}
+.grp td{background:var(--band);font-family:var(--mono);font-size:var(--t-2);
+  letter-spacing:var(--track-label);text-transform:uppercase;color:var(--faint);font-weight:500}
+.grp:hover td{background:var(--band)}
+
+/* ---- change cards ---- */
+.item{background:var(--panel);border-radius:var(--r);box-shadow:var(--shadow);
+  padding:var(--s5);display:flex;flex-direction:column;gap:var(--s3);
+  border-top:3px solid var(--line-2);transition:border-top-color var(--dur) var(--ease)}
+.item:hover{border-top-color:var(--accent)}
+.item.req{border-top-color:var(--accent)}
+.item h3{font-size:var(--t2)}
+.item p{margin:0}
+.item .meta{display:flex;gap:var(--s4);flex-wrap:wrap;font-family:var(--mono);
+  font-size:var(--t-2);color:var(--faint);padding-top:var(--s2);
+  border-top:1px solid var(--line);margin-top:auto}
+.item .meta b{color:var(--ink-2);font-weight:500}
+.kv{display:grid;grid-template-columns:6.4rem minmax(0,1fr);gap:var(--s2) var(--s4);
+  font-size:var(--t-1);margin:0}
+.kv dt{font-family:var(--mono);font-size:var(--t-2);letter-spacing:var(--track-label);
+  text-transform:uppercase;color:var(--faint);padding-top:.18em}
+.kv dd{margin:0;color:var(--ink-2)}
+
+/* ---- mock chrome: renders the real site inside a frame ---- */
+.mock{border:1px solid var(--line-2);border-radius:var(--r);overflow:hidden;background:var(--bg)}
+.mock-bar{display:flex;align-items:center;gap:var(--s2);padding:var(--s2) var(--s3);
+  background:var(--band);border-bottom:1px solid var(--line);
+  font-family:var(--mono);font-size:var(--t-2);color:var(--faint)}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--line-2);flex:none}
+.mock-body{padding:var(--s5)}
+.mock-cap{font-size:var(--t-2);font-family:var(--mono);color:var(--faint);
+  padding:var(--s2) var(--s3);border-top:1px solid var(--line);background:var(--band)}
+
+/* mock: the site nav */
+.m-nav{display:flex;align-items:center;gap:var(--s5);padding:var(--s3) var(--s4);
+  border-bottom:1px solid var(--line);background:var(--panel);flex-wrap:wrap}
+.m-brand{display:flex;align-items:baseline;gap:var(--s2);white-space:nowrap}
+.m-brand b{font-family:var(--mono);font-weight:600;font-size:var(--t0);
+  letter-spacing:-.02em;color:var(--ink)}
+.m-brand span{font-family:var(--mono);font-size:var(--t-2);color:var(--faint)}
+.m-links{display:flex;gap:var(--s5);margin-left:auto;align-items:center;
+  font-size:var(--t-1);font-weight:500;color:var(--ink-2)}
+.m-links .on{color:var(--ink);border-bottom:2px solid var(--accent);padding-bottom:2px}
+.m-ico{width:30px;height:30px;border:1px solid var(--line-2);border-radius:var(--r-sm);
+  display:inline-flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:var(--t-2);color:var(--ink-2)}
+
+/* mock: the dropdown panel */
+.m-drop{position:relative;margin-top:var(--s2);background:var(--panel);
+  border:1px solid var(--line-2);border-radius:var(--r);box-shadow:var(--shadow);
+  padding:var(--s2);width:min(340px,100%)}
+.m-drop a{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:var(--s3);
+  align-items:baseline;padding:var(--s2) var(--s3);border-radius:var(--r-sm);color:var(--ink)}
+.m-drop a:hover{background:var(--band);text-decoration:none}
+.m-drop a b{font-weight:600;font-size:var(--t-1)}
+.m-drop a em{display:block;font-style:normal;font-size:var(--t-2);color:var(--muted);
+  font-family:var(--sans);margin-top:1px}
+.m-drop .sep{height:1px;background:var(--line);margin:var(--s2) var(--s3)}
+.m-drop .all{color:var(--accent);font-family:var(--mono);font-size:var(--t-2)}
+
+/* mock: the page tree */
+.tree{font-family:var(--mono);font-size:var(--t-2);line-height:1.85;color:var(--muted);
+  margin:0;white-space:pre;overflow-x:auto}
+.tree b{color:var(--ink);font-weight:500}
+.tree a{color:var(--ink-2)}
+.tree a:hover{color:var(--accent)}
+.tree .sc{color:var(--accent)}
+.tree .sd{color:var(--faint)}
+
+/* mock: type specimen */
+.spec{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--s5)}
+@media (max-width:820px){ .spec{grid-template-columns:minmax(0,1fr)} }
+.spec > div{background:var(--panel);border-radius:var(--r);padding:var(--s5);
+  box-shadow:var(--shadow);display:flex;flex-direction:column;gap:var(--s3)}
+.spec .h{font-size:clamp(1.8rem,3.4vw,2.6rem);line-height:1.08;letter-spacing:-.03em;
+  color:var(--ink);font-weight:600}
+.spec .h em{font-style:normal;color:var(--accent)}
+.spec .sans{font-family:var(--sans)}
+.spec .serifd{font-family:var(--serif)}
+.spec .serifd em{font-style:italic;color:var(--accent)}
+.spec .sub{font-family:var(--serif);font-size:var(--t0);color:var(--ink-2);line-height:1.5;margin:0}
+.spec .tag{align-self:flex-start;font-family:var(--mono);font-size:var(--t-2);
+  letter-spacing:var(--track-label);text-transform:uppercase;color:var(--faint)}
+
+/* ---- figures ---- */
+figure{margin:0}
+.figframe{background:var(--band);border-radius:var(--r);padding:var(--s6);
+  max-width:1000px;margin-inline:auto}
+.dia{display:block;width:100%;height:auto;color:var(--ink-2);overflow:visible}
+.dia .tx{font-family:var(--mono);font-size:13px;fill:currentColor;text-anchor:middle}
+.dia .tx.s{font-size:11.5px;fill:var(--faint)}
+.dia .bx{fill:var(--panel);stroke:var(--line-2);stroke-width:1;rx:6}
+.dia .bx.hi{fill:var(--accent-soft);stroke:var(--accent)}
+.dia .ln{stroke:var(--line-3);stroke-width:1.2;fill:none}
+.dia .lb{font-family:var(--mono);font-size:11.5px;fill:var(--faint);letter-spacing:.08em;
+  text-transform:uppercase}
+figcaption{font-size:var(--t-1);color:var(--muted);line-height:1.5;
+  max-width:74ch;margin:var(--s4) auto 0}
+figcaption b{color:var(--ink)}
+
+/* ---- phases ---- */
+.phase{display:grid;grid-template-columns:auto minmax(0,1fr);gap:var(--s5);
+  padding-block:var(--s5);border-top:1px solid var(--line)}
+.phase:first-of-type{border-top:0;padding-top:0}
+.phase-n{font-family:var(--mono);font-size:var(--t-2);letter-spacing:var(--track-label);
+  text-transform:uppercase;color:var(--faint);white-space:nowrap;padding-top:.3em;width:5.5rem}
+@media (max-width:640px){ .phase{grid-template-columns:minmax(0,1fr);gap:var(--s3)}
+  .phase-n{width:auto} }
+.phase h3{font-size:var(--t2);margin-bottom:var(--s2)}
+.steps{list-style:none;margin:var(--s3) 0 0;padding:0;display:flex;
+  flex-direction:column;gap:var(--s2)}
+.steps li{display:grid;grid-template-columns:3.4rem minmax(0,1fr);gap:var(--s3);
+  font-size:var(--t-1);line-height:1.5}
+.steps code{background:transparent;padding:0;color:var(--faint);font-size:var(--t-2)}
+
+/* ---- guardrails ---- */
+.no{display:grid;grid-template-columns:1.6rem minmax(0,1fr);gap:var(--s3);
+  font-size:var(--t-1);line-height:1.5;padding-block:var(--s3);
+  border-bottom:1px solid var(--line)}
+.no:last-child{border-bottom:0}
+.no .x{font-family:var(--mono);color:var(--line-3);font-size:var(--t0);line-height:1.3}
+
+/* ---- decisions / input ---- */
+.q{background:var(--panel);border-radius:var(--r);box-shadow:var(--shadow);
+  padding:var(--s5);border-left:3px solid var(--accent);
+  display:flex;flex-direction:column;gap:var(--s4)}
+.q h3{font-size:var(--t2)}
+.q fieldset{border:0;margin:0;padding:0;display:flex;flex-direction:column;gap:var(--s2)}
+.q legend{padding:0;margin-bottom:var(--s3);font-size:var(--t-1);color:var(--muted);max-width:66ch}
+.opt{display:grid;grid-template-columns:auto minmax(0,1fr);gap:var(--s3);
+  align-items:start;padding:var(--s3);border-radius:var(--r-sm);
+  border:1px solid var(--line);cursor:pointer;
+  transition:border-color var(--dur) var(--ease),background var(--dur) var(--ease)}
+.opt:hover{border-color:var(--line-3);background:var(--band)}
+.opt:has(input:checked){border-color:var(--accent);background:var(--accent-soft)}
+.opt input{margin:.35em 0 0;accent-color:var(--accent);width:16px;height:16px;flex:none}
+.opt b{display:block;font-size:var(--t-1);color:var(--ink)}
+.opt span{display:block;font-size:var(--t-2);color:var(--muted);line-height:1.5;margin-top:2px}
+.opt .rec{font-family:var(--mono);font-size:var(--t-2);color:var(--accent);
+  letter-spacing:var(--track-label);text-transform:uppercase}
+.qfoot{display:flex;gap:var(--s4);align-items:center;flex-wrap:wrap;
+  padding-top:var(--s3);border-top:1px solid var(--line)}
+.btn{display:inline-flex;align-items:center;gap:var(--s2);background:var(--accent);
+  color:var(--accent-ink);font-family:var(--sans);font-size:var(--t-1);font-weight:600;
+  border:0;border-radius:var(--r-sm);padding:var(--s3) var(--s5);cursor:pointer;
+  transition:transform var(--dur) var(--ease),box-shadow var(--dur) var(--ease),
+             filter var(--dur) var(--ease)}
+.btn:hover{transform:translateY(-1px);box-shadow:var(--shadow);filter:saturate(1.15)}
+.btn:active{transform:translateY(0)}
+.btn[disabled]{opacity:.45;cursor:not-allowed;transform:none;box-shadow:none;filter:none}
+.qstat{font-family:var(--mono);font-size:var(--t-2);color:var(--faint)}
+.qstat.done{color:var(--accent)}
+textarea{width:100%;font-family:var(--sans);font-size:var(--t-1);color:var(--ink);
+  background:var(--bg);border:1px solid var(--line-2);border-radius:var(--r-sm);
+  padding:var(--s3);min-height:78px;resize:vertical;line-height:1.5}
+
+/* ---- footer ---- */
+.foot{border-top:1px solid var(--line);margin-top:var(--s9);padding-block:var(--s6);
+  font-family:var(--mono);font-size:var(--t-2);color:var(--faint)}
+.foot-in{max-width:var(--w);margin-inline:auto;padding-inline:var(--s5);
+  display:flex;justify-content:space-between;gap:var(--s4);flex-wrap:wrap}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="top-in">
+    <b>s06 · design upgrade plan</b>
+    <nav>
+      <a href="#audit">Audit</a>
+      <a href="#asks">Your three</a>
+      <a href="#upgrades">Upgrades</a>
+      <a href="#not">Guardrails</a>
+      <a href="#plan">Sequence</a>
+      <a href="#decide">Decide</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+<!-- ===================== HERO / VERDICT ===================== -->
+<section class="blk wrap" id="top">
+  <p class="label">Ship Like a Studio (s20) → nmp-dsci.github.io</p>
+  <h1 style="max-width:19ch;margin:var(--s4) 0 var(--s5)">The site already passes most of this. Three gaps are left.</h1>
+  <p class="lead">s20 distils 23 videos into a checklist for building sites that read as
+    beautiful, unique and engineered to scale. I scored the live site against every lever in
+    it that applies to a static portfolio, then folded in the three changes you asked for.
+    The honest result: the August redesign already banked most of s20's advice — so this plan
+    is small, specific, and adds <b>zero new assets</b>.</p>
+
+  <div class="verdict" style="margin-top:var(--s7)">
+    <div>
+      <div class="tw tw-tight">
+        <table>
+          <caption>32 applicable levers from s20 Parts 3–5, scored against the live site on 2 Sep 2026.</caption>
+          <thead><tr><th>Group</th><th>Met</th><th>Partial</th><th>Gap</th><th>The gap, in one line</th></tr></thead>
+          <tbody>
+            <tr><td><b>Typography</b></td><td class="n">1</td><td class="n">1</td><td class="n">2</td>
+              <td>No anchor display face; no decorated keyword.</td></tr>
+            <tr><td><b>Colour</b></td><td class="n">4</td><td class="n">0</td><td class="n">0</td>
+              <td>—</td></tr>
+            <tr><td><b>Hierarchy &amp; whitespace</b></td><td class="n">4</td><td class="n">1</td><td class="n">0</td>
+              <td>Three sections have three equal "main characters".</td></tr>
+            <tr><td><b>Layout vocabulary</b></td><td class="n">1</td><td class="n">1</td><td class="n">1</td>
+              <td>Four consecutive grid sections below the hero.</td></tr>
+            <tr><td><b>Premium-feel layer</b></td><td class="n">5</td><td class="n">0</td><td class="n">1</td>
+              <td>No staggered reveal — nothing arrives, everything is just there.</td></tr>
+            <tr><td><b>Conversion architecture</b></td><td class="n">3</td><td class="n">0</td><td class="n">1</td>
+              <td>~200 words of 14px prose sit in the home-page scan zone.</td></tr>
+            <tr><td><b>Unique / anti-slop</b></td><td class="n">1</td><td class="n">0</td><td class="n">2</td>
+              <td>No reference-and-mold step; no signature moment on any page.</td></tr>
+            <tr><td><b>Operating discipline</b></td><td class="n">2</td><td class="n">1</td><td class="n">0</td>
+              <td>The 137/145 audit was run once, not made repeatable.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="small" style="margin-top:var(--s4)">Everything s20 says about colour, contrast,
+        ghost buttons, the four horsemen, 300ms motion, frosted sticky nav and evidence gates is
+        <b>already shipped</b> — most of it enforced in CI by <code>scripts/contrast_audit.py</code>
+        and <code>DESIGN.md</code>'s twelve-item never-list. I am not going to re-propose those.</p>
+    </div>
+
+    <div class="panel">
+      <p class="label" style="margin-bottom:var(--s4)">Where the work is</p>
+      <div class="tally">
+        <div class="tally-row"><span class="tally-n">21</span>
+          <span class="bar"><i style="width:66%;background:var(--accent)"></i></span>
+          <span class="st st-ok">met</span></div>
+        <div class="tally-row"><span class="tally-n">4</span>
+          <span class="bar"><i style="width:12.5%;background:var(--amber)"></i></span>
+          <span class="st st-part">partial</span></div>
+        <div class="tally-row"><span class="tally-n">7</span>
+          <span class="bar"><i style="width:22%;background:var(--line-3)"></i></span>
+          <span class="st st-gap">gap</span></div>
+      </div>
+      <hr class="rule" style="margin:var(--s5) 0">
+      <p class="label" style="margin-bottom:var(--s3)">The three real gaps</p>
+      <ol class="small" style="margin:0;padding-left:1.2em;line-height:1.65">
+        <li><b>No anchor display face.</b> Every heading on the site is IBM Plex Sans 600. It reads
+          competent and completely interchangeable with every other engineer portfolio.</li>
+        <li><b>No layout variation.</b> Below the hero the home page is four grid sections in a row.</li>
+        <li><b>No scan layer.</b> The home page asks a 60-second visitor to read three 60-word
+          paragraphs at 14px.</li>
+      </ol>
+      <p class="small" style="margin:var(--s4) 0 0;color:var(--faint)">All three are fixable without
+        a new font file, a new colour, or a new dependency.</p>
+    </div>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- ===================== PART 1 · AUDIT ===================== -->
+<section class="blk wrap" id="audit">
+  <div class="hd">
+    <p class="label">Part one</p>
+    <h2>Every s20 lever, scored against the live site</h2>
+    <p class="lead">Verified by reading <code>assets/css/main.css</code>,
+      <code>assets/css/tokens.css</code> and <code>DESIGN.md</code>, and by loading all eight
+      pages. "Met" means I found the rule implemented, not that it sounds implemented.</p>
+  </div>
+
+  <div class="tw">
+    <table>
+      <thead><tr><th style="width:22%">s20 lever</th><th style="width:34%">What the live site does</th>
+        <th style="width:12%">Verdict</th><th>Evidence</th></tr></thead>
+      <tbody>
+        <tr class="grp"><td colspan="4">Typography</td></tr>
+        <tr><td><b>Anchor on the headline font</b> — it sets the page's personality</td>
+          <td>h1–h4 are all <code>var(--sans)</code> at weight 600. The serif exists but is
+            demoted to body prose only.</td>
+          <td><span class="st st-gap">gap</span></td>
+          <td class="n">main.css:25</td></tr>
+        <tr><td><b>Three tiers with distinct treatment</b> — even families</td>
+          <td>Sizes differ across the <code>--t-2…--t6</code> scale; family and weight do not.</td>
+          <td><span class="st st-part">partial</span></td>
+          <td class="n">tokens.css:45–53</td></tr>
+        <tr><td><b>Max 3 fonts, prefer 2</b></td>
+          <td>One superfamily, three optical roles. Self-hosted, 94 KB latin subset.</td>
+          <td><span class="st st-ok">met</span></td>
+          <td class="n">assets/fonts/</td></tr>
+        <tr><td><b>Decorate one keyword</b> — singular emphasis</td>
+          <td>The CSS hook exists — <code>.hero h1 em</code> is styled — but no page uses it.
+            The tagline ships as plain text.</td>
+          <td><span class="st st-gap">gap</span></td>
+          <td class="n">main.css:158</td></tr>
+
+        <tr class="grp"><td colspan="4">Colour</td></tr>
+        <tr><td><b>60 / 30 / 10, accent reserved for CTAs</b></td>
+          <td>Three surfaces, four ink steps, one accent. <code>DESIGN.md</code> restricts the
+            accent to action, link and "shipped".</td>
+          <td><span class="st st-ok">met</span></td>
+          <td class="n">DESIGN.md §2</td></tr>
+        <tr><td><b>3–5 colours total</b></td>
+          <td>Accent + amber, and amber means exactly one thing: <em>partial</em>.</td>
+          <td><span class="st st-ok">met</span></td>
+          <td class="n">tokens.css:32–37</td></tr>
+        <tr><td><b>Check every combination's contrast</b></td>
+          <td>Exceeds the advice: 50 declared pairs verified in <b>both themes</b> in CI, build
+            fails under 4.5:1.</td>
+          <td><span class="st st-ok">met</span></td>
+          <td class="n">contrast_audit.py</td></tr>
+        <tr><td><b>Carry the palette everywhere</b></td>
+          <td>Hovers, focus rings, chips, diagram fills and status glyphs all read tokens.</td>
+          <td><span class="st st-ok">met</span></td>
+          <td class="n">main.css</td></tr>
+
+        <tr class="grp"><td colspan="4">Hierarchy &amp; whitespace</td></tr>
+        <tr><td><b>Opacity hierarchy</b> — 100 / 87 / 60</td>
+          <td>Done with four solid ink steps instead of alpha, so contrast stays checkable.</td>
+          <td><span class="st st-ok">met</span></td>
+          <td class="n">tokens.css:21–25</td></tr>
+        <tr><td><b>One "main character" per section</b></td>
+          <td>The hero has one. "Three systems", "10/100/1,000" and "How they were built" each
+            present three equal-weight cards with no focal cell.</td>
+          <td><span class="st st-part">partial</span></td>
+          <td class="n">home.html</td></tr>
+        <tr><td><b>Whitespace; cramming reads as desperation</b></td>
+          <td>One 4/8 ladder, section rhythm stepped down at 900px and 560px.</td>
+          <td><span class="st st-ok">met</span></td>
+          <td class="n">tokens.css:61–66</td></tr>
+        <tr><td><b>Ghost buttons get ignored — fill the background</b></td>
+          <td>Banned outright: solid primary, underlined-link secondary.</td>
+          <td><span class="st st-ok">met</span></td>
+          <td class="n">DESIGN.md §3.1</td></tr>
+
+        <tr class="grp"><td colspan="4">Layout vocabulary</td></tr>
+        <tr><td><b>Split hero, 60/40 beats 50/50</b></td>
+          <td>Grid is <code>1.05fr / 1fr</code> — near-symmetrical — and
+            <code>align-items:center</code> leaves ~150px of dead space above the kicker.</td>
+          <td><span class="st st-part">partial</span></td>
+          <td class="n">main.css:155</td></tr>
+        <tr><td><b>Vary the layout as the page progresses</b></td>
+          <td>Below the hero: stacked rows → 3×3 grid → 3-up grid → 3-up grid. Four grid
+            sections, one rhythm, no change of shape.</td>
+          <td><span class="st st-gap">gap</span></td>
+          <td class="n">home.html</td></tr>
+        <tr><td><b>Never more than three columns; group above that</b></td>
+          <td>Nothing exceeds three; everything collapses to one at 820px.</td>
+          <td><span class="st st-ok">met</span></td>
+          <td class="n">main.css:249–279</td></tr>
+
+        <tr class="grp"><td colspan="4">The premium-feel layer</td></tr>
+        <tr><td><b>300ms is the magic number</b></td>
+          <td>One <code>--dur</code> token on every transition; zeroed by
+            <code>prefers-reduced-motion</code>.</td>
+          <td><span class="st st-ok">met</span></td>
+          <td class="n">tokens.css:72,114</td></tr>
+        <tr><td><b>Frosted, sticky, translucent nav</b></td>
+          <td>Sticky with <code>backdrop-filter:blur(10px)</code> behind an
+            <code>@supports</code> guard.</td>
+          <td><span class="st st-ok">met</span></td>
+          <td class="n">main.css:73–76</td></tr>
+        <tr><td><b>Nav underlines animate left-to-right</b></td>
+          <td>Implemented exactly, via an <code>::after</code> that animates <code>right</code>.</td>
+          <td><span class="st st-ok">met</span></td>
+          <td class="n">main.css:86–89</td></tr>
+        <tr><td><b>Cards lift on hover</b></td>
+          <td>System rows lift 3px with a deeper shadow; matrix cells scale 1.04.</td>
+          <td><span class="st st-ok">met</span></td>
+          <td class="n">main.css:191,217</td></tr>
+        <tr><td><b>Focus rings with an offset</b></td>
+          <td>2px accent ring, 2px offset, everywhere.</td>
+          <td><span class="st st-ok">met</span></td>
+          <td class="n">main.css</td></tr>
+        <tr><td><b>Staggered reveals, never simultaneous</b></td>
+          <td>Nothing on the site reveals. Every element is simply present at paint.</td>
+          <td><span class="st st-gap">gap</span></td>
+          <td class="n">no keyframes in main.css</td></tr>
+
+        <tr class="grp"><td colspan="4">Conversion architecture</td></tr>
+        <tr><td><b>The hero answers "is this for me?"</b></td>
+          <td>Headline, dek, one solid CTA, and the rubric matrix as the reinforcing visual.</td>
+          <td><span class="st st-ok">met</span></td>
+          <td class="n">home.html:14–26</td></tr>
+        <tr><td><b>People scan, they don't read</b></td>
+          <td>Each of the three system rows carries a ~60-word <code>DEMO</code> paragraph plus a
+            <code>RUNS ON</code> block at <code>--t-1</code>. ~200 words of dense small text in the
+            first two screens.</td>
+          <td><span class="st st-gap">gap</span></td>
+          <td class="n">system-row.html</td></tr>
+        <tr><td><b>Social proof with numbers, near every claim</b></td>
+          <td>The matrix, the per-system rubric counts and the cost figures all sit beside the
+            claim they support, each with its denominator.</td>
+          <td><span class="st st-ok">met</span></td>
+          <td class="n">DESIGN.md §2</td></tr>
+        <tr><td><b>Cut anything that shows off instead of helping</b></td>
+          <td>No parallax, no scroll-jacking, no autoplay, no 3D.</td>
+          <td><span class="st st-ok">met</span></td>
+          <td class="n">DESIGN.md §2</td></tr>
+
+        <tr class="grp"><td colspan="4">Unique — engineering away the slop</td></tr>
+        <tr><td><b>Ban the four horsemen</b></td>
+          <td>All seven slop signatures are named and banned: no purple, no Inter, no gradient
+            cards, no wide tracking on display type, no ghost primary.</td>
+          <td><span class="st st-ok">met</span></td>
+          <td class="n">DESIGN.md §3.8</td></tr>
+        <tr><td><b>Reference-and-mold</b> — replicate something great, then transform it</td>
+          <td>The site was designed from a rubric, not from a reference. That is why it is
+            correct and unmemorable.</td>
+          <td><span class="st st-gap">gap</span></td>
+          <td class="n">s05 artifact</td></tr>
+        <tr><td><b>One signature scroll-stopper per page</b></td>
+          <td>The diagrams are the best thing on the site and they are completely static.</td>
+          <td><span class="st st-gap">gap</span></td>
+          <td class="n">_includes/diagrams/</td></tr>
+
+        <tr class="grp"><td colspan="4">Operating discipline</td></tr>
+        <tr><td><b>One rules file the agent reads every session</b></td>
+          <td><code>DESIGN.md</code> — audience, numbers, and a twelve-item never-list.</td>
+          <td><span class="st st-ok">met</span></td>
+          <td class="n">DESIGN.md</td></tr>
+        <tr><td><b>Evidence, not claims; adversarial review</b></td>
+          <td>Contrast audit, case-study lint, Jekyll build in CI, plus the no-mistakes gate.</td>
+          <td><span class="st st-ok">met</span></td>
+          <td class="n">.github/workflows/lint.yml</td></tr>
+        <tr><td><b>Self-audit before launch; re-run until 80+</b></td>
+          <td>Scored 137/145 once, by hand, in the s05 artifact. Nothing re-runs it, so the next
+            change can quietly undo it.</td>
+          <td><span class="st st-part">partial</span></td>
+          <td class="n">s05 artifact</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- ===================== PART 2 · THE THREE ASKS ===================== -->
+<section class="blk wrap" id="asks">
+  <div class="hd">
+    <p class="label">Part two</p>
+    <h2>The three changes you asked for</h2>
+    <p class="lead">These ship together as one change. They are additive, they touch no colour
+      token, and they cannot break the contrast audit. Two of the three are also s20 advice —
+      wayfinding is what "people scan, they don't read" looks like in a navigation bar.</p>
+  </div>
+
+  <!-- A1 -->
+  <div class="item req" style="margin-bottom:var(--s6)">
+    <p class="label">A1 · requested</p>
+    <h3>"Applied AI Engineer" → "Data Science &amp; Gen AI"</h3>
+    <p>The string lives in one place and renders in four. Changing
+      <code>_data/site.yml</code> updates the nav, the hero kicker, the footer and the
+      Open&nbsp;Graph card at once — but five other files hard-code their own wording and
+      would drift if left alone.</p>
+
+    <div class="grid g2" style="margin-top:var(--s3)">
+      <div>
+        <p class="label" style="margin-bottom:var(--s3)">Every occurrence</p>
+        <div class="tw"><table style="min-width:0">
+          <thead><tr><th>File</th><th>Currently</th></tr></thead>
+          <tbody>
+            <tr><td class="n">_data/site.yml:2</td><td><code>role: Applied AI Engineer</code> — the source</td></tr>
+            <tr><td class="n">_config.yml:1</td><td><code>title: Nathan Phillips — Applied AI</code></td></tr>
+            <tr><td class="n">_config.yml:3</td><td><code>description:</code> "Applied-AI engineer — …"</td></tr>
+            <tr><td class="n">about.md:5</td><td><code>summary:</code> "Applied AI engineer — …"</td></tr>
+            <tr><td class="n">about.md:8</td><td>body: "an applied AI engineer in Sydney"</td></tr>
+            <tr><td class="n">readme.md:3</td><td>"Portfolio site for Nathan Phillips — applied AI engineer"</td></tr>
+          </tbody>
+        </table></div>
+        <p class="label" style="margin:var(--s5) 0 var(--s3)">Renders in</p>
+        <dl class="kv">
+          <dt>nav</dt><dd><code>role | downcase</code> → <code>data science &amp; gen ai</code></dd>
+          <dt>hero</dt><dd>uppercased by <code>.label</code> → <code>DATA SCIENCE &amp; GEN AI · SYDNEY · 3 SYSTEMS…</code></dd>
+          <dt>footer</dt><dd>as written → <code>Nathan Phillips · Data Science &amp; Gen AI · Sydney</code></dd>
+          <dt>og:site_name</dt><dd><code>Nathan Phillips — Data Science &amp; Gen AI</code></dd>
+        </dl>
+      </div>
+
+      <div>
+        <p class="label" style="margin-bottom:var(--s3)">Before / after, in the real chrome</p>
+        <div class="mock" style="margin-bottom:var(--s4)">
+          <div class="mock-bar"><span class="dot"></span> before</div>
+          <div class="m-nav">
+            <span class="m-brand"><b>nathanphillips</b><span>applied ai engineer</span></span>
+            <span class="m-links"><span>Work</span><span>Rubric</span><span>About</span></span>
+          </div>
+          <div class="mock-body" style="padding-bottom:var(--s3)">
+            <p class="label" style="margin:0">Applied AI Engineer · Sydney · 3 systems in production on AWS</p>
+          </div>
+        </div>
+        <div class="mock">
+          <div class="mock-bar"><span class="dot" style="background:var(--accent)"></span> after</div>
+          <div class="m-nav">
+            <span class="m-brand"><b>nathanphillips</b><span>data science &amp; gen ai</span></span>
+            <span class="m-links"><span>Work</span><span>Rubric</span><span>About</span></span>
+          </div>
+          <div class="mock-body" style="padding-bottom:var(--s3)">
+            <p class="label" style="margin:0">Data Science &amp; Gen AI · Sydney · 3 systems in production on AWS</p>
+          </div>
+        </div>
+        <p class="small" style="margin-top:var(--s4)">The ampersand is the only thing worth a second
+          look: it sets cleanly in Plex Mono at 12.8px in the nav, and the uppercase kicker keeps
+          it as <code>&amp;</code> rather than "and". <b>One open question below</b> — whether the
+          <code>about.md</code> prose should read "a data scientist working in gen AI" rather than
+          the label verbatim, which would be an odd English sentence.</p>
+      </div>
+    </div>
+    <p class="meta"><span><b>Files</b> 6</span><span><b>Risk</b> none</span>
+      <span><b>Checks</b> Jekyll build only</span><span><b>Effort</b> ~15 min</span></p>
+  </div>
+
+  <!-- A2 -->
+  <div class="item req" style="margin-bottom:var(--s6)">
+    <p class="label">A2 · requested</p>
+    <h3>A "Case studies" dropdown in the nav</h3>
+    <p>Today the nav's first link is <code>Work</code>, which scrolls to
+      <code>/#work</code>. From a case-study page there is no way to reach a sibling case study
+      without going home first. The dropdown fixes that and, in the site's idiom, carries its
+      evidence: each entry shows the system's rubric score, so the menu itself argues the case.</p>
+
+    <div class="grid g2" style="margin-top:var(--s3)">
+      <div>
+        <div class="mock">
+          <div class="mock-bar"><span class="dot" style="background:var(--accent)"></span> nav · case studies open</div>
+          <div class="m-nav">
+            <span class="m-brand"><b>nathanphillips</b><span>data science &amp; gen ai</span></span>
+            <span class="m-links">
+              <span class="on">Case&nbsp;studies ▾</span><span>Rubric</span><span>Practices</span><span>About</span>
+              <span class="m-ico">gh</span><span class="m-ico">in</span><span class="m-ico">◐</span>
+            </span>
+          </div>
+          <div class="mock-body" style="padding-top:var(--s2)">
+            <div class="m-drop" style="margin-left:auto">
+              <a href="#asks"><span><b>Data Pilot</b><em>Governed NL→SQL in production</em></span>
+                <span class="st st-ok">9/9</span></a>
+              <a href="#asks"><span><b>ConvFinQA Agent</b><em>Prompts versioned as code</em></span>
+                <span class="st st-ok">6/9</span></a>
+              <a href="#asks"><span><b>Transcript RAG</b><em>Retrieval you can prove</em></span>
+                <span class="st st-ok">5/9</span></a>
+              <div class="sep"></div>
+              <a class="all" href="#asks"><span>All three systems, side by side ↓</span><span></span></a>
+            </div>
+          </div>
+          <div class="mock-cap">rendered at 1280px · collapses into the existing mobile sheet as a nested list</div>
+        </div>
+      </div>
+
+      <div>
+        <p class="label" style="margin-bottom:var(--s3)">How it is built</p>
+        <dl class="kv">
+          <dt>Markup</dt><dd>A native <code>&lt;details class="nav-drop"&gt;</code> with a
+            <code>&lt;summary&gt;</code>. Keyboard support, <code>aria-expanded</code> and the
+            no-JavaScript fallback all come free from the element — no ARIA menu pattern to get wrong.</dd>
+          <dt>Source</dt><dd>The same Liquid query the home page already uses:
+            <code>site.projects | where production.live | sort production.order</code>. It cannot
+            drift from <code>#work</code>, and it can never surface the six unpublished projects.</dd>
+          <dt>JS</dt><dd>~10 lines: close on outside click and on <kbd>Escape</kbd>. Everything
+            still works with the script removed.</dd>
+          <dt>Motion</dt><dd>Opacity + 4px rise over <code>--dur</code>, so it inherits
+            <code>prefers-reduced-motion</code> like everything else.</dd>
+          <dt>Mobile</dt><dd>Inside the existing <code>.nav-links</code> sheet the panel renders
+            inline and indented instead of floating — no second overlay to manage.</dd>
+        </dl>
+        <p class="small" style="margin-top:var(--s4)">One decision embedded here: the nav item is
+          renamed <b>Case studies</b>, not kept as <b>Work</b>. "Work" is a portfolio word;
+          "case studies" says what the pages actually are and matches the kicker already printed
+          on every one of them (<code>RAG · CASE STUDY</code>).</p>
+      </div>
+    </div>
+    <p class="meta"><span><b>Files</b> nav.html, main.css</span><span><b>Risk</b> low</span>
+      <span><b>New JS</b> ~10 lines</span><span><b>Effort</b> ~1 h</span></p>
+  </div>
+
+  <!-- A3 -->
+  <div class="item req">
+    <p class="label">A3 · requested</p>
+    <h3>A page tree</h3>
+    <p>The site has no sitemap, no <code>/404</code> and no index of itself. A page tree is the
+      cheapest possible answer to "how big is this, and what else is here?" — and rendered in
+      Plex Mono it is on-brand rather than bolted on, because mono is already the site's voice
+      for structure and data.</p>
+
+    <div class="grid g2" style="margin-top:var(--s3)">
+      <div>
+        <div class="mock">
+          <div class="mock-bar"><span class="dot" style="background:var(--accent)"></span> footer · every page</div>
+          <div class="mock-body">
+<p class="tree"><b>nmp-dsci.github.io</b>
+├── <a href="#asks">case studies</a>
+│   ├── <a href="#asks">data pilot</a>            <span class="sc">9/9</span> · live
+│   ├── <a href="#asks">convfinqa agent</a>       <span class="sc">6/9</span> · live
+│   └── <a href="#asks">transcript rag</a>        <span class="sc">5/9</span> · live
+├── <a href="#asks">practices</a>
+│   ├── <a href="#asks">the eval loop</a>
+│   ├── <a href="#asks">ways of working</a>
+│   └── <a href="#asks">production at 10/100/1,000</a>
+├── <a href="#asks">the rubric</a>              <span class="sd">9 dimensions</span>
+└── <a href="#asks">about</a></p>
+          </div>
+          <div class="mock-cap">generated from the collections — never hand-maintained</div>
+        </div>
+      </div>
+      <div>
+        <p class="label" style="margin-bottom:var(--s3)">Why the footer</p>
+        <p class="small">It is present on all eight pages at zero navigation cost, it is where a
+          hiring manager already looks for links, and it gives the footer — currently one thin
+          line of text — a reason to exist. A dedicated <code>/map/</code> page would be a page
+          nobody visits; the case-study rail is already carrying a TOC and a readiness card.</p>
+        <p class="small">Like the dropdown it is generated from the collections, so the three
+          systems, their rubric scores and the three practices stay correct on their own. It
+          collapses to a single indent level under 560px.</p>
+        <p class="small" style="color:var(--faint)"><b>This one is a genuine choice</b> — placement
+          changes what the tree is for. Three options are laid out in the decisions section below.</p>
+      </div>
+    </div>
+    <p class="meta"><span><b>Files</b> footer.html, main.css</span><span><b>Risk</b> none</span>
+      <span><b>New JS</b> none</span><span><b>Effort</b> ~1 h</span></p>
+  </div>
+
+  <!-- IA diagram -->
+  <figure style="margin-top:var(--s8)">
+    <div class="figframe">
+      <svg class="dia" viewBox="0 0 760 300" role="img"
+           aria-labelledby="ia-t ia-d">
+        <title id="ia-t">Three navigation surfaces, one source of truth</title>
+        <desc id="ia-d">The nav dropdown, the home page work section and the footer page tree all
+          render from the same Liquid query over the projects collection.</desc>
+
+        <text class="lb" x="20" y="24">one query</text>
+        <rect class="bx hi" x="20" y="34" width="200" height="52"/>
+        <text class="tx" x="120" y="56" style="fill:var(--accent)">site.projects</text>
+        <text class="tx s" x="120" y="72">where production.live</text>
+
+        <path class="ln" d="M220 60 H300"/>
+        <path class="ln" d="M300 60 V38 H360"/>
+        <path class="ln" d="M300 60 H360"/>
+        <path class="ln" d="M300 60 V172 H360"/>
+        <path class="ln" d="M300 60 V244 H360"/>
+
+        <text class="lb" x="360" y="24">four surfaces · two new</text>
+        <rect class="bx" x="360" y="16" width="180" height="44"/>
+        <text class="tx" x="450" y="35">nav dropdown</text>
+        <text class="tx s" x="450" y="50">new · A2</text>
+
+        <rect class="bx" x="360" y="88" width="180" height="44"/>
+        <text class="tx" x="450" y="107">home · #work</text>
+        <text class="tx s" x="450" y="122">exists today</text>
+
+        <rect class="bx" x="360" y="150" width="180" height="44"/>
+        <text class="tx" x="450" y="169">footer page tree</text>
+        <text class="tx s" x="450" y="184">new · A3</text>
+
+        <rect class="bx" x="360" y="222" width="180" height="44"/>
+        <text class="tx" x="450" y="241">rubric matrix</text>
+        <text class="tx s" x="450" y="256">exists today</text>
+
+        <path class="ln" d="M540 38 H600 V141"/>
+        <path class="ln" d="M540 110 H600"/>
+        <path class="ln" d="M540 172 H600 V141"/>
+        <path class="ln" d="M540 244 H600 V141"/>
+
+        <text class="lb" x="620" y="106">the pages</text>
+        <rect class="bx hi" x="620" y="118" width="120" height="46"/>
+        <text class="tx" x="680" y="139" style="fill:var(--accent)">3 case</text>
+        <text class="tx" x="680" y="155" style="fill:var(--accent)">studies</text>
+      </svg>
+    </div>
+    <figcaption><b>Adding two navigation surfaces adds no new list to maintain.</b> The dropdown
+      and the page tree read the same <code>where production.live</code> query that already
+      renders <code>#work</code> and the rubric matrix — so the six unpublished projects stay
+      invisible everywhere by construction, not by remembering.</figcaption>
+  </figure>
+</section>
+
+<hr class="rule">
+
+<!-- ===================== PART 3 · UPGRADES ===================== -->
+<section class="blk wrap" id="upgrades">
+  <div class="hd">
+    <p class="label">Part three</p>
+    <h2>The s20 upgrades worth making</h2>
+    <p class="lead">Seven changes, ordered by impact per hour. B1 is the one that changes how the
+      site feels; the rest are corrections. None of them adds an asset, a dependency or a colour.</p>
+  </div>
+
+  <!-- B1 -->
+  <div class="item" style="margin-bottom:var(--s6);border-top-color:var(--accent)">
+    <p class="label">B1 · the big one</p>
+    <h3>Give the site an anchor display face</h3>
+    <p>s20's first typography lever: <em>anchor on the headline font, not the body — it sets the
+      page's whole personality.</em> Every heading here is IBM Plex Sans Semibold, which is exactly
+      the face a hiring manager has seen on the last forty engineer portfolios. Meanwhile
+      <b>IBM Plex Serif is already downloaded, already preloaded, and already on the page</b> —
+      it is what the dek and the case-study prose are set in, and it is the more distinctive voice
+      of the two.</p>
+    <p>The change is to invert the pairing: <b>serif for display, sans for interface</b>. It costs
+      <b>zero bytes</b> — <code>serif-normal-600.woff2</code> (15.6 KB) and
+      <code>serif-italic-400.woff2</code> (16 KB) already ship and are already in the preload list.</p>
+
+    <div class="spec" style="margin-top:var(--s4)">
+      <div>
+        <span class="tag">now · plex sans 600</span>
+        <div class="h sans">I ship gen-AI systems and prove they're production-ready.</div>
+        <p class="sub">Three systems live on AWS — each with evals in CI, guardrails between the
+          model and the data, per-request traces and cost caps.</p>
+        <p class="tiny">reads: correct, competent, interchangeable</p>
+      </div>
+      <div>
+        <span class="tag">proposed · plex serif 600 + one italic keyword</span>
+        <div class="h serifd">I ship gen-AI systems and <em>prove</em> they're production-ready.</div>
+        <p class="sub">Three systems live on AWS — each with evals in CI, guardrails between the
+          model and the data, per-request traces and cost caps.</p>
+        <p class="tiny">reads: authored, specific, field-guide</p>
+      </div>
+    </div>
+
+    <p class="small" style="margin-top:var(--s4)">Scope: <code>h1, h2</code> and the case-study
+      <code>.page-head h1</code> move to <code>var(--serif)</code>. <code>h3</code>, all UI, all
+      labels and every button <b>stay sans</b> — that is what makes it a three-tier hierarchy with
+      distinct treatment rather than a font swap. Mono is untouched.</p>
+    <p class="small" style="color:var(--amber)"><b>This contradicts DESIGN.md §2</b>, which
+      currently reads "IBM Plex Sans for display and UI, IBM Plex Serif for reading". The brief
+      says a disagreement means <em>the brief is wrong — fix it</em>, but it is your identity, so
+      it is a decision, not an edit. See D1 below.</p>
+    <p class="meta"><span><b>Files</b> main.css, DESIGN.md</span><span><b>New assets</b> none</span>
+      <span><b>Risk</b> identity change</span><span><b>Effort</b> ~2 h incl. re-measuring every page</span></p>
+  </div>
+
+  <div class="grid g2" style="margin-bottom:var(--s6)">
+    <!-- B2 -->
+    <div class="item">
+      <p class="label">B2</p>
+      <h3>One decorated keyword per page</h3>
+      <p class="small">s20: <em>decorate one keyword — singular emphasis, never scattered.</em>
+        The CSS hook already exists (<code>.hero h1 em</code>) and nothing uses it. Add
+        <code>&lt;em&gt;</code> to exactly one word in each h1: <em>prove</em> on the home page,
+        <em>prove</em> on Transcript RAG, <em>refused</em> on ConvFinQA, <em>governed</em> on
+        Data Pilot. One per page, enforced by a line in the case-study lint.</p>
+      <p class="meta"><span><b>Files</b> site.yml, 3 × _projects</span><span><b>Risk</b> none</span>
+        <span><b>Effort</b> ~30 min</span></p>
+    </div>
+    <!-- B3 -->
+    <div class="item">
+      <p class="label">B3</p>
+      <h3>Fix the hero's balance</h3>
+      <p class="small">The hero grid is <code>1.05fr / 1fr</code> with
+        <code>align-items:center</code>, which leaves roughly 150px of dead space above the kicker
+        while the matrix runs the full height. s20: <em>60/40 beats 50/50; balance is not
+        symmetry.</em> Change to <code>align-items:start</code> and a genuine 56/44 split, and let
+        the h1 breathe to 18ch. Two declarations.</p>
+      <p class="meta"><span><b>Files</b> main.css</span><span><b>Risk</b> none</span>
+        <span><b>Effort</b> ~30 min</span></p>
+    </div>
+  </div>
+
+  <!-- B4 -->
+  <div class="item" style="margin-bottom:var(--s6)">
+    <p class="label">B4 · the scan layer</p>
+    <h3>Stop asking the home page to be read</h3>
+    <p>s20 is blunt: <em>people scan, they don't read.</em> Each system row currently prints a
+      ~60-word <code>DEMO</code> paragraph and a <code>RUNS ON</code> line at 14px — about
+      <b>200 words of dense small text inside the first two screens</b>, all of it repeated
+      verbatim on the case study a click away. It is the least scannable thing on the site and
+      there are three of it.</p>
+    <div class="grid g2" style="margin-top:var(--s3)">
+      <div class="band">
+        <p class="label" style="margin-bottom:var(--s3)">Now · per system row</p>
+        <p class="small" style="margin:0">headline · one-sentence outcome · <b>DEMO: 60 words</b> ·
+          <b>RUNS ON: 25 words</b> · rubric count · two CTAs · architecture diagram</p>
+        <p class="tiny" style="margin:var(--s3) 0 0">≈ 110 words per row, ×3</p>
+      </div>
+      <div class="band" style="box-shadow:inset 0 0 0 1px var(--accent)">
+        <p class="label" style="margin-bottom:var(--s3);color:var(--accent)">Proposed</p>
+        <p class="small" style="margin:0">headline · one-sentence outcome · <b>three fact chips</b>
+          (rubric · region · monthly cost) · two CTAs · architecture diagram ·
+          <b>the demo detail behind a disclosure</b></p>
+        <p class="tiny" style="margin:var(--s3) 0 0">≈ 35 words per row visible; nothing deleted</p>
+      </div>
+    </div>
+    <p class="small" style="margin-top:var(--s4)">No content is lost — the demo paragraph moves
+      into a <code>&lt;details&gt;</code> labelled "what you can actually do in the demo", which
+      also makes it honest: the visitor opens it because they want it, not because it was in the
+      way. The <code>RUNS ON</code> line becomes three mono chips, which is what it already is
+      semantically.</p>
+    <p class="meta"><span><b>Files</b> system-row.html, main.css</span><span><b>Risk</b> low</span>
+      <span><b>Effort</b> ~2 h</span></p>
+  </div>
+
+  <div class="grid g2" style="margin-bottom:var(--s6)">
+    <!-- B5 -->
+    <div class="item">
+      <p class="label">B5</p>
+      <h3>Break the four-grid monotony</h3>
+      <p class="small">Below the hero the page is: stacked rows → 3×3 grid → 3-up grid → 3-up
+        grid. s20: <em>vary the layout as the page progresses — but only variation with a
+        purpose.</em> Two purposeful changes: split the nine rubric dimensions into the
+        <b>learning half (R1–R4)</b> and the <b>operating half (R5–R9)</b> as two labelled
+        columns — a distinction the page's own lead paragraph already makes but the layout hides;
+        and run the scale ladder as a left-to-right <b>progression</b> with the deployed rung
+        visually anchored, since 10 → 100 → 1,000 is a sequence, not three peers.</p>
+      <p class="meta"><span><b>Files</b> rubric-dims.html, scale-ladder.html, main.css</span>
+        <span><b>Risk</b> low</span><span><b>Effort</b> ~2 h</span></p>
+    </div>
+    <!-- B6 -->
+    <div class="item">
+      <p class="label">B6</p>
+      <h3>One signature moment, in the site's own register</h3>
+      <p class="small">s20 wants a scroll-stopper per page; <code>DESIGN.md</code> bans
+        parallax, 3D and autoplay. Both can be satisfied by animating the thing that is already
+        the best asset: the diagrams. On first view only, <b>stroke-draw the rubric-loop figure</b>
+        and <b>stagger the matrix cells in at 30ms intervals</b>. It reads as craft, it uses the
+        existing <code>--dur</code>, and <code>prefers-reduced-motion</code> disables it by
+        changing one token. Nothing moves on scroll; nothing repeats.</p>
+      <p class="meta"><span><b>Files</b> main.css, ~20 lines JS</span><span><b>Risk</b> low</span>
+        <span><b>Effort</b> ~2 h</span></p>
+    </div>
+  </div>
+
+  <!-- B7 -->
+  <div class="item">
+    <p class="label">B7 · durability</p>
+    <h3>Make the design audit repeatable</h3>
+    <p>s20's prompt #09 is the pre-launch audit, re-run until the score clears the bar. The site
+      scored 137/145 <em>once</em>, by hand, in the s05 artifact — which means the next change can
+      quietly undo it and nothing will say so. Add <code>.claude/skills/design-audit/</code>
+      holding the twelve-dimension rubric and <code>DESIGN.md</code>'s never-list, so "audit the
+      site" is one command that returns a scored, comparable report. The contrast audit already
+      proves this pattern works; this extends it from colour to composition.</p>
+    <p class="meta"><span><b>Files</b> new skill</span><span><b>Risk</b> none</span>
+      <span><b>Effort</b> ~1 h</span></p>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- ===================== PART 4 · GUARDRAILS ===================== -->
+<section class="blk wrap" id="not">
+  <div class="hd">
+    <p class="label">Part four</p>
+    <h2>What I am deliberately not taking from s20</h2>
+    <p class="lead">s20 is a general guide for building marketing sites with agents. A good half of
+      it is either already banked here or actively wrong for a portfolio whose whole argument is
+      restraint. Recording the rejections so they do not get re-litigated in six weeks.</p>
+  </div>
+
+  <div class="panel">
+    <div class="no"><span class="x">✕</span><span><b>Hero video, generated imagery, a scroll-scrubbed
+      focal image.</b> <code>DESIGN.md</code> rule 7: the rubric matrix <em>is</em> the hero image.
+      The evidence outperforms any picture we could generate, and s20's own warning applies —
+      "the most enthralling site reviewed was also the least comprehensible".</span></div>
+    <div class="no"><span class="x">✕</span><span><b>Count-up numbers and animated statistics.</b>
+      You already cut the three-metric strip in the last round ("they suck as wins"). Animating
+      numbers would reintroduce the pitch-deck register through the back door.</span></div>
+    <div class="no"><span class="x">✕</span><span><b>Reference-and-mold from an award site.</b>
+      s20's strongest anti-generic technique, and the wrong tool here: this site's distinctiveness
+      should come from the evidence being real, not from wearing another studio's clothes. B1
+      buys the same distinctiveness from a font that is already on the page.</span></div>
+    <div class="no"><span class="x">✕</span><span><b>A 5–7 page sitemap derived from niche
+      research.</b> The page count is already correct and deliberately small. The page tree (A3)
+      is the part of that advice that applies.</span></div>
+    <div class="no"><span class="x">✕</span><span><b>Shader effects, three.js, cursor-following
+      3D, spring physics.</b> Ruled out by the motion section of the brief, and every one of them
+      is a speed tax on a page whose visitor is scanning for 60 seconds.</span></div>
+    <div class="no"><span class="x">✕</span><span><b>Component libraries and design-system
+      extraction from a reference brand.</b> <code>tokens.css</code> is already a real design
+      system with CI enforcement — stricter than what s20 asks for. Importing another would be a
+      regression.</span></div>
+    <div class="no"><span class="x">✕</span><span><b>The whole of s20 Parts 2, 5 and 6</b> —
+      pipeline, org design and the prompt library. That is how to build sites with agents, not
+      what to change on this one. Worth keeping as process reference; nothing to ship.</span></div>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- ===================== PART 5 · SEQUENCE ===================== -->
+<section class="blk wrap" id="plan">
+  <div class="hd">
+    <p class="label">Part five</p>
+    <h2>Sequence</h2>
+    <p class="lead">Structural before cosmetic, per s20's own ordering rule. Each phase is a
+      separate commit on one branch and leaves the site shippable — so you can stop after any of
+      them.</p>
+  </div>
+
+  <div class="panel">
+    <div class="phase">
+      <div class="phase-n">Phase 0<br><span style="color:var(--accent)">requested</span></div>
+      <div>
+        <h3>The three asks</h3>
+        <p class="small" style="margin:0">Additive, no design risk, ships on its own. Do this
+          first whatever you decide about the rest.</p>
+        <ul class="steps">
+          <li><code>A1</code><span>Rename the role across 6 files; verify all 4 render sites.</span></li>
+          <li><code>A2</code><span>Case-studies dropdown as a native <code>&lt;details&gt;</code>, sourced from the live-projects query.</span></li>
+          <li><code>A3</code><span>Footer page tree, generated from the same collections.</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-n">Phase 1</div>
+      <div>
+        <h3>The anchor face</h3>
+        <p class="small" style="margin:0">The identity move. Gated on decision D1 — nothing else
+          in this plan depends on it, so it can be dropped without disturbing the rest.</p>
+        <ul class="steps">
+          <li><code>B1</code><span>Plex Serif to <code>h1, h2, .page-head h1</code>; sans keeps h3 and all UI.</span></li>
+          <li><code>B2</code><span>One <code>&lt;em&gt;</code> keyword per h1, plus a lint rule capping it at one.</span></li>
+          <li><code>—</code><span>Update <code>DESIGN.md</code> §2 so the brief and the CSS agree again.</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-n">Phase 2</div>
+      <div>
+        <h3>Balance and the scan layer</h3>
+        <p class="small" style="margin:0">The two changes that most affect a 60-second visitor.</p>
+        <ul class="steps">
+          <li><code>B3</code><span>Hero to <code>align-items:start</code> and a real 56/44 split.</span></li>
+          <li><code>B4</code><span>System rows: fact chips visible, demo paragraph behind a disclosure.</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-n">Phase 3</div>
+      <div>
+        <h3>Rhythm and the signature moment</h3>
+        <p class="small" style="margin:0">Cosmetic, and correctly last — s20's rule is that polish
+          applied before the structure settles gets redone.</p>
+        <ul class="steps">
+          <li><code>B5</code><span>Rubric as learning/operating halves; ladder as a progression.</span></li>
+          <li><code>B6</code><span>Stroke-draw the loop diagram; stagger the matrix cells. First view only.</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-n">Phase 4</div>
+      <div>
+        <h3>Make it stick</h3>
+        <ul class="steps" style="margin-top:0">
+          <li><code>B7</code><span>The <code>design-audit</code> skill, so the score is re-checkable.</span></li>
+          <li><code>—</code><span>Re-score all eight pages and record the new number beside 137/145.</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid g2" style="margin-top:var(--s6)">
+    <div class="band">
+      <p class="label" style="margin-bottom:var(--s3)">Checks every phase must pass</p>
+      <ul class="small" style="margin:0;padding-left:1.2em;line-height:1.7">
+        <li><code>contrast_audit.py</code> — 50 pairs, both themes. No phase adds a colour, so this
+          should stay at 0 failing throughout.</li>
+        <li><code>lint_case_study.py --all --no-net</code> — plus the new one-keyword rule in Phase 1.</li>
+        <li>Jekyll build in the Docker image.</li>
+        <li>Measured sweep across 8 pages × 2 themes × 390/768/1280: 0 nodes under 12.8px,
+          0 horizontal overflow, 0 SVG label overflow — the same sweep the last redesign passed.</li>
+      </ul>
+    </div>
+    <div class="band">
+      <p class="label" style="margin-bottom:var(--s3)">Risks, honestly</p>
+      <ul class="small" style="margin:0;padding-left:1.2em;line-height:1.7">
+        <li><b>B1 is a taste call, not a correctness call.</b> Serif display is warmer and more
+          authored; it is also slightly less "systems engineer". If you want the site to read
+          colder, keep the sans and take everything else — the plan still works.</li>
+        <li><b>B4 hides content behind a disclosure.</b> Anyone who wanted the demo detail on the
+          home page now needs a click. I think that trade is right for a 60-second scan; it is
+          reversible in one commit if it isn't.</li>
+        <li><b>B6 adds the site's first animation.</b> Small blast radius — it reads
+          <code>--dur</code>, so reduced-motion already disables it — but it is new JS on a page
+          that currently has almost none.</li>
+        <li><b>A1 leaves prose to rewrite.</b> "an applied AI engineer in Sydney" in
+          <code>about.md</code> needs a human sentence, not a find-and-replace. Flagged in D3.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- ===================== DECISIONS ===================== -->
+<section class="blk wrap" id="decide">
+  <div class="hd">
+    <p class="label">Your call</p>
+    <h2>Four decisions</h2>
+    <p class="lead">Answered in the Lavish review on 2 Sep 2026 — all four on the recommended
+      option, plus "okay do the full build". Recorded here so this artifact stays the decision
+      record; the forms below are kept as written for the same reason.</p>
+
+    <div class="panel" style="margin-bottom:var(--s7)">
+      <p class="label" style="margin-bottom:var(--s4)">Decided, and shipped on branch <code>studio-design-upgrade</code></p>
+      <dl class="kv" style="grid-template-columns:3.4rem minmax(0,1fr)">
+        <dt>D1</dt><dd><b>Serif for h1 and h2</b>, sans keeps h3 and all UI. Zero new bytes;
+          <code>DESIGN.md</code> §2 rewritten to match.</dd>
+        <dt>D2</dt><dd><b>Footer page tree</b>, on every page, generated from the collections.</dd>
+        <dt>D3</dt><dd><b>"a data scientist working in gen AI, in Sydney"</b> in the About prose;
+          the label itself stays exactly as written wherever it is a label.</dd>
+        <dt>D4</dt><dd><b>Phases 0–4</b>, in four commits.</dd>
+      </dl>
+      <p class="small" style="margin:var(--s4) 0 0;color:var(--faint)">One defect found and fixed
+        during the build, not in this plan: the first draft of the B6 reveal faded the matrix cells
+        from <code>opacity:0</code> under <code>animation-fill-mode: backwards</code>, which would
+        have left the site's hero evidence permanently invisible on any browser where the animation
+        did not run. Both reveals now animate only properties that cannot hide content, and the
+        failure case is verified rather than assumed.</p>
+    </div>
+  </div>
+
+  <div class="grid" style="gap:var(--s6)">
+
+    <!-- D1 -->
+    <form class="q" data-lavish-question="anchor-face" onsubmit="return lq(event,'anchor-face','D1 anchor display face')">
+      <div>
+        <p class="label" style="margin-bottom:var(--s3)">D1 · the identity call</p>
+        <h3>Should the display face become IBM Plex Serif?</h3>
+      </div>
+      <fieldset>
+        <legend>This is the one change that alters how the site feels. Zero new bytes either way —
+          the serif is already downloaded and preloaded. Compare the two specimens in B1 above.</legend>
+        <label class="opt"><input type="radio" name="anchor-face" value="serif-h1-h2">
+          <span><b>Yes — serif for h1 and h2, sans keeps h3 and all UI</b> <span class="rec">recommended</span>
+            <span>The full three-tier hierarchy s20 asks for. Reads authored and field-guide-like.
+              Updates DESIGN.md §2 to match.</span></span></label>
+        <label class="opt"><input type="radio" name="anchor-face" value="serif-h1-only">
+          <span><b>Half-step — serif on h1 only</b>
+            <span>Page titles and the hero get the new voice; every section heading stays sans.
+              Smaller change, weaker effect.</span></span></label>
+        <label class="opt"><input type="radio" name="anchor-face" value="keep-sans">
+          <span><b>No — keep Plex Sans throughout</b>
+            <span>Accepts the "no anchor face" gap and stays deliberately cold and systems-y.
+              Everything else in the plan still ships.</span></span></label>
+      </fieldset>
+      <div class="qfoot"><button class="btn" type="submit">Queue this answer</button>
+        <span class="qstat" data-for="anchor-face">nothing queued yet</span></div>
+    </form>
+
+    <!-- D2 -->
+    <form class="q" data-lavish-question="page-tree" onsubmit="return lq(event,'page-tree','D2 page tree placement')">
+      <div>
+        <p class="label" style="margin-bottom:var(--s3)">D2 · placement</p>
+        <h3>Where should the page tree live?</h3>
+      </div>
+      <fieldset>
+        <legend>Placement changes what the tree is <em>for</em>: a persistent orientation device,
+          a destination, or a reading aid.</legend>
+        <label class="opt"><input type="radio" name="page-tree" value="footer">
+          <span><b>Footer, on every page</b> <span class="rec">recommended</span>
+            <span>Always available at zero navigation cost, and it gives the currently one-line
+              footer a reason to exist. Mocked in A3.</span></span></label>
+        <label class="opt"><input type="radio" name="page-tree" value="footer-plus-mobile">
+          <span><b>Footer + inside the mobile nav sheet</b>
+            <span>Same tree, also shown when the hamburger opens — so phone visitors, who are more
+              than half the traffic, get the whole map in one tap.</span></span></label>
+        <label class="opt"><input type="radio" name="page-tree" value="map-page">
+          <span><b>A dedicated <code>/map/</code> page</b>
+            <span>Room for descriptions and a real sitemap, linked from the footer. Honest risk:
+              almost nobody clicks through to a site map.</span></span></label>
+        <label class="opt"><input type="radio" name="page-tree" value="rail">
+          <span><b>In the case-study left rail, under the TOC</b>
+            <span>Helps a deep reader move sideways between systems — but the rail already carries
+              a TOC, a progress bar and a readiness card.</span></span></label>
+      </fieldset>
+      <div class="qfoot"><button class="btn" type="submit">Queue this answer</button>
+        <span class="qstat" data-for="page-tree">nothing queued yet</span></div>
+    </form>
+
+    <!-- D3 -->
+    <form class="q" data-lavish-question="role-wording" onsubmit="return lq(event,'role-wording','D3 role wording in prose')">
+      <div>
+        <p class="label" style="margin-bottom:var(--s3)">D3 · wording</p>
+        <h3>"Data Science &amp; Gen AI" is a label — what do the sentences say?</h3>
+      </div>
+      <fieldset>
+        <legend>The label sets cleanly in the nav, the kicker and the footer. But
+          <code>about.md</code> currently contains the sentence <em>"I'm Nathan Phillips, an
+          applied AI engineer in Sydney"</em>, and "an data science &amp; gen AI in Sydney" is not
+          English. Same question for the <code>&lt;title&gt;</code> and the meta description.</legend>
+        <label class="opt"><input type="radio" name="role-wording" value="ds-working-in-genai">
+          <span><b>"a data scientist working in gen AI, in Sydney"</b> <span class="rec">recommended</span>
+            <span>Label stays exactly as you wrote it everywhere it is a label; the prose reads
+              naturally and says the same thing.</span></span></label>
+        <label class="opt"><input type="radio" name="role-wording" value="ds-and-genai-engineer">
+          <span><b>"a data science &amp; gen-AI engineer in Sydney"</b>
+            <span>Keeps the label's exact words in the sentence. Slightly stiffer, perfectly
+              readable.</span></span></label>
+        <label class="opt"><input type="radio" name="role-wording" value="rewrite-lead">
+          <span><b>Rewrite the About lead entirely</b>
+            <span>Take the opportunity to open with what you do rather than what you are called.
+              I would draft it and you would edit.</span></span></label>
+      </fieldset>
+      <div class="qfoot"><button class="btn" type="submit">Queue this answer</button>
+        <span class="qstat" data-for="role-wording">nothing queued yet</span></div>
+    </form>
+
+    <!-- D4 -->
+    <form class="q" data-lavish-question="scope" onsubmit="return lq(event,'scope','D4 scope')">
+      <div>
+        <p class="label" style="margin-bottom:var(--s3)">D4 · scope</p>
+        <h3>How much of this should I build now?</h3>
+      </div>
+      <fieldset>
+        <legend>Every phase leaves the site shippable, so stopping early costs nothing.</legend>
+        <label class="opt"><input type="radio" name="scope" value="all">
+          <span><b>Everything — Phases 0 through 4</b> <span class="rec">recommended</span>
+            <span>One branch, five commits, one PR through the no-mistakes gate. Roughly a day.</span></span></label>
+        <label class="opt"><input type="radio" name="scope" value="p0-p2">
+          <span><b>Phases 0–2</b>
+            <span>The three asks, the anchor face and the scan layer — everything that changes what
+              a 60-second visitor sees. Leaves rhythm and motion for later.</span></span></label>
+        <label class="opt"><input type="radio" name="scope" value="p0">
+          <span><b>Phase 0 only</b>
+            <span>Just the role rename, the dropdown and the page tree. Ships in an hour or two.</span></span></label>
+      </fieldset>
+      <label style="display:block">
+        <span class="label" style="display:block;margin-bottom:var(--s2)">Anything else</span>
+        <textarea name="notes" placeholder="Corrections, things I've mis-read, or anything on this page you want changed."></textarea>
+      </label>
+      <div class="qfoot"><button class="btn" type="submit">Queue this answer</button>
+        <span class="qstat" data-for="scope">nothing queued yet</span></div>
+    </form>
+
+  </div>
+</section>
+
+</main>
+
+<footer class="foot">
+  <div class="foot-in">
+    <span>s06 · design upgrade plan · nmp-dsci.github.io</span>
+    <span>sources: s20_ship-like-a-studio.html · the live site · DESIGN.md · compiled 2 Sep 2026</span>
+  </div>
+</footer>
+
+<script>
+/* One queued prompt per question, on submit only — radio changes stay local
+   so the answer is reversible until it is explicitly sent. */
+function lq(ev, key, label){
+  ev.preventDefault();
+  var form = ev.currentTarget;
+  var fd = new FormData(form);
+  var answer = fd.get(key);
+  var notes = (fd.get('notes') || '').toString().trim();
+  if (!answer && !notes) return false;
+
+  var opt = form.querySelector('input:checked');
+  var text = opt ? opt.closest('.opt').querySelector('b').textContent.trim() : '';
+  var msg = label + ' — ' + (answer ? ('chosen: ' + answer + ' (' + text + ')') : 'no option chosen')
+          + (notes ? ('\nNotes: ' + notes) : '');
+
+  if (window.lavish && window.lavish.queuePrompt){
+    window.lavish.queuePrompt(msg, {
+      tag: 'decision', text: label + ': ' + (text || 'notes only'),
+      element: form, queueKey: key,
+      data: { question: key, answer: answer || null, notes: notes || null }
+    });
+  }
+  var stat = document.querySelector('.qstat[data-for="' + key + '"]');
+  if (stat){ stat.textContent = 'queued · ' + (text || 'notes'); stat.classList.add('done'); }
+  return false;
+}
+</script>
+</body>
+</html>

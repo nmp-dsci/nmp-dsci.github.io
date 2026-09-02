@@ -34,9 +34,15 @@ should look like a template, and nothing should look like a pitch deck.
 ## 2. The rules
 
 ### Type
-- Two voices from one superfamily: **IBM Plex Sans** for display and UI, **IBM
-  Plex Serif** for reading, **IBM Plex Mono** for data — numbers, paths, keys,
-  status words. Mono is never used for prose or for a heading.
+- Three voices from one superfamily, each with one job. **IBM Plex Serif** is the
+  anchor display face — `h1`, `h2` and the reading column. **IBM Plex Sans** is
+  the interface — `h3`, labels, buttons, nav, table headers. **IBM Plex Mono** is
+  data — numbers, paths, keys, status words. Mono is never used for prose or for
+  a heading, and the serif is never used for a control.
+- **One decorated keyword per page, and only inside an `h1` or `h2`:** a single
+  `<em>`, set in serif italic at weight 400 in `--accent`. It is the one place
+  emphasis is allowed to be a colour. Two is scatter, and
+  `scripts/lint_case_study.py` fails the build on the second one.
 - One scale: 16px UI base × 1.25, declared as `--t-2 … --t6`. No size outside it.
 - **Nothing on the site is smaller than `--t-2` (12.8px).** The old site had ~77
   text nodes under 10px; that is the single biggest reason it was unreadable.
@@ -109,6 +115,12 @@ Committed as rules so they survive future sessions:
     as a substitute for a full stop three times in one paragraph.
 11. **No side-scrolling the rubric matrix on a phone.** It abbreviates instead.
 12. **No paragraph over 80 words in a case study.** The lint fails the build.
+13. **No second decorated keyword.** One `<em>` per page, in the `h1`. A page
+    with two emphasised words has emphasised nothing.
+14. **No navigation surface with a hand-maintained list.** The nav dropdown, the
+    footer page tree and `#work` all read the same
+    `where production.live` query, so an unpublished project cannot leak into
+    one of them by being forgotten in another.
 
 ---
 
