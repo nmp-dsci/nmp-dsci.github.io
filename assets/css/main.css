@@ -229,8 +229,11 @@ a.chip:hover{text-decoration:none;filter:brightness(.97)}
 
 /* ------------------------------------------------------------- 5 · the hero */
 .hero{padding-block:var(--sec-gap) var(--sec-pad)}
-.hero-grid{display:grid;gap:var(--s8);grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);
-  align-items:center}
+/* 56/44, not 50/50, and both columns anchored to the top. Centring the shorter
+   text column against the taller matrix left ~150px of dead space above the
+   kicker; balance is not symmetry. */
+.hero-grid{display:grid;gap:var(--s8);grid-template-columns:minmax(0,1.28fr) minmax(0,1fr);
+  align-items:start}
 .hero h1{font-size:var(--t6);letter-spacing:-.015em;margin-bottom:var(--s4);max-width:18ch}
 .hero .dek{font-family:var(--serif);font-size:var(--t1);line-height:1.5;color:var(--ink-2);
   max-width:50ch;margin-bottom:var(--s5)}
@@ -306,6 +309,20 @@ a.cell:hover{text-decoration:none;transform:scale(1.04);box-shadow:var(--shadow)
   text-transform:uppercase;color:var(--faint);padding-top:2px}
 .sys-facts dd{margin:0}
 .sys-facts b{font-family:var(--mono);font-weight:600;color:var(--ink)}
+/* three facts a scanner can read, and the detail behind a disclosure */
+.sys-chips{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:var(--s2)}
+.sys-chips li{font-family:var(--mono);font-size:var(--t-2);line-height:1.5;color:var(--muted);
+  background:var(--band);border-radius:var(--r-sm);padding:var(--s1) var(--s3)}
+.sys-chips b{font-weight:600;color:var(--ink)}
+.sys-more{margin:0}
+.sys-more > summary{list-style:none;cursor:pointer;display:inline-flex;align-items:center;
+  gap:var(--s2);font-family:var(--mono);font-size:var(--t-2);color:var(--accent);
+  padding-block:var(--s1)}
+.sys-more > summary::-webkit-details-marker{display:none}
+.sys-more > summary::before{content:"+";font-weight:600;width:1ch;text-align:center}
+.sys-more[open] > summary::before{content:"−"}
+.sys-more > summary:hover{text-decoration:underline;text-underline-offset:.22em}
+.sys-more .sys-facts{margin-top:var(--s3)}
 .sys-actions{display:flex;gap:var(--s5);align-items:center;flex-wrap:wrap;margin-top:var(--s1)}
 @media (max-width:900px){
   .sys{grid-template-columns:minmax(0,1fr);gap:var(--s5);padding:var(--s5)}

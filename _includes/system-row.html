@@ -23,17 +23,31 @@
 
     <p class="sys-out">{{ c_out }}</p>
 
-    <dl class="sys-facts">
-      {%- if c_scr != "" %}
-      <dt>Rubric</dt><dd><b>{{ c_scr }}</b> dimensions shipped{% if p.production.rung %} · rung {{ p.production.rung }} deployed{% endif %}</dd>
-      {%- endif %}
-      {%- if c_surf != "" %}
-      <dt>Demo</dt><dd>{{ c_surf }}</dd>
-      {%- endif %}
-      {%- if c_topo != "" %}
-      <dt>Runs on</dt><dd>{{ c_topo }}{% if c_reg != "" %} · {{ c_reg }}{% endif %}{% if c_cost != "" %} · {{ c_cost }}{% endif %}</dd>
-      {%- endif %}
-    </dl>
+    {%- comment -%}
+      The scan layer. A visitor gives the home page 60 seconds, so the row shows
+      three facts they can read at a glance and puts the demo walk-through and
+      the full topology behind a disclosure. Nothing is deleted — the same words
+      are one click away here and in full on the case study.
+    {%- endcomment -%}
+    <ul class="sys-chips">
+      {%- if c_scr != "" %}<li><b>{{ c_scr | remove: " " }}</b> rubric{% if p.production.rung %} · rung {{ p.production.rung }}{% endif %}</li>{% endif -%}
+      {%- if c_reg  != "" %}<li>{{ c_reg }}</li>{% endif -%}
+      {%- if c_cost != "" %}<li>{{ c_cost }}</li>{% endif -%}
+    </ul>
+
+    {%- if c_surf != "" or c_topo != "" %}
+    <details class="sys-more">
+      <summary>What you can actually do in the demo</summary>
+      <dl class="sys-facts">
+        {%- if c_surf != "" %}
+        <dt>Demo</dt><dd>{{ c_surf }}</dd>
+        {%- endif %}
+        {%- if c_topo != "" %}
+        <dt>Runs on</dt><dd>{{ c_topo }}{% if c_reg != "" %} · {{ c_reg }}{% endif %}{% if c_cost != "" %} · {{ c_cost }}{% endif %}</dd>
+        {%- endif %}
+      </dl>
+    </details>
+    {%- endif %}
 
     <div class="sys-actions">
       <a class="btn btn-sm" href="{{ p.url | relative_url }}">Read the case study</a>
