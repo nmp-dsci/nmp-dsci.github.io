@@ -1123,8 +1123,27 @@ textarea{width:100%;font-family:var(--sans);font-size:var(--t-1);color:var(--ink
   <div class="hd">
     <p class="label">Your call</p>
     <h2>Four decisions</h2>
-    <p class="lead">Answer what you care about and send — anything you skip, I will take the
-      recommended option. You can also just annotate any element on this page.</p>
+    <p class="lead">Answered in the Lavish review on 2 Sep 2026 — all four on the recommended
+      option, plus "okay do the full build". Recorded here so this artifact stays the decision
+      record; the forms below are kept as written for the same reason.</p>
+
+    <div class="panel" style="margin-bottom:var(--s7)">
+      <p class="label" style="margin-bottom:var(--s4)">Decided, and shipped on branch <code>studio-design-upgrade</code></p>
+      <dl class="kv" style="grid-template-columns:3.4rem minmax(0,1fr)">
+        <dt>D1</dt><dd><b>Serif for h1 and h2</b>, sans keeps h3 and all UI. Zero new bytes;
+          <code>DESIGN.md</code> §2 rewritten to match.</dd>
+        <dt>D2</dt><dd><b>Footer page tree</b>, on every page, generated from the collections.</dd>
+        <dt>D3</dt><dd><b>"a data scientist working in gen AI, in Sydney"</b> in the About prose;
+          the label itself stays exactly as written wherever it is a label.</dd>
+        <dt>D4</dt><dd><b>Phases 0–4</b>, in four commits.</dd>
+      </dl>
+      <p class="small" style="margin:var(--s4) 0 0;color:var(--faint)">One defect found and fixed
+        during the build, not in this plan: the first draft of the B6 reveal faded the matrix cells
+        from <code>opacity:0</code> under <code>animation-fill-mode: backwards</code>, which would
+        have left the site's hero evidence permanently invisible on any browser where the animation
+        did not run. Both reveals now animate only properties that cannot hide content, and the
+        failure case is verified rather than assumed.</p>
+    </div>
   </div>
 
   <div class="grid" style="gap:var(--s6)">
