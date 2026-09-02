@@ -1,5 +1,6 @@
 ---
 title: Transcript RAG
+short: "RAG"   # the matrix column header on a phone
 summary: >-
   An evaluation-first RAG workbench over 102 YouTube transcripts — hybrid BM25 + dense
   retrieval, cross-encoder reranking and a Neo4j entity/claim graph, with four answer paths

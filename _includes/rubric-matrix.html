@@ -18,13 +18,22 @@
   </div>
 
   <div class="matrix" role="table" aria-label="Production rubric across the live systems">
+    {%- comment -%}
+      role="row" wrappers are `display:contents`, so they carry the ARIA
+      structure a table requires without becoming grid items. Without them the
+      columnheaders and cells have no required parent, which axe reports as two
+      critical violations and a screen reader reads as a broken table.
+    {%- endcomment -%}
+    <div class="mrow" role="row">
     <div class="mh" role="columnheader">Dimension</div>
-    {%- for p in live %}<div class="mh" role="columnheader">{{ p.title }}</div>{% endfor -%}
+    {%- for p in live %}<div class="mh" role="columnheader"><span class="mh-full">{{ p.title }}</span><span class="mh-abbr">{{ p.short | default: p.title }}</span></div>{% endfor -%}
+    </div>
 
     {%- for i in (1..ndim) -%}
       {%- for d in dims -%}
         {%- if d[1].order == i -%}
           {%- assign key = d[0] -%}
+    <div class="mrow" role="row">
     <div class="md" role="rowheader" style="--d:{{ i }}"><i>{{ d[1].ref }}</i>
       <a href="{{ '/' | relative_url }}#rubric-{{ key }}" title="{{ d[1].question | escape }}">{{ d[1].short | default: d[1].label | escape }}</a></div>
           {%- for p in live -%}
@@ -32,13 +41,14 @@
             {%- if cell -%}
               {%- assign st = site.data.rubric.statuses[cell.status] -%}
               {%- assign lbl = st.label | default: cell.status -%}
-    <a class="cell cell-{{ cell.status }}" role="cell" style="--d:{{ i }}"
+    <div class="cell cell-{{ cell.status }}" role="cell" style="--d:{{ i }}"><a
        href="{{ p.url | relative_url }}#s{{ d[1].section }}"
-       title="{{ p.title | escape }} — {{ d[1].label | escape }}: {{ lbl | escape }}">{{ lbl }}<span class="sr-only"> — {{ p.title | escape }}, {{ d[1].label | escape }}</span></a>
+       title="{{ p.title | escape }} — {{ d[1].label | escape }}: {{ lbl | escape }}">{{ lbl }}<span class="sr-only"> — {{ p.title | escape }}, {{ d[1].label | escape }}</span></a></div>
             {%- else -%}
     <div class="cell cell-na" role="cell" style="--d:{{ i }}">not scored</div>
             {%- endif -%}
           {%- endfor -%}
+    </div>
         {%- endif -%}
       {%- endfor -%}
     {%- endfor -%}

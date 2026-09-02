@@ -161,7 +161,7 @@ A model can write "shipped" for free. It cannot invent a path that exists.
 Same process, three different amounts of it, because the repos are different
 sizes and were built at different times.
 
-| | Data Pilot | ConvFinQA Agent | Transcript RAG | this site |
+| metric | Data Pilot | ConvFinQA Agent | Transcript RAG | this site |
 |---|---|---|---|---|
 | merged PRs | 33 | 4 | 13 | 2 |
 | commits on `main` | 195 | 14 | 80 | 56 |

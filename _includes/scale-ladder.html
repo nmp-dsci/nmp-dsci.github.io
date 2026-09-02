@@ -19,6 +19,7 @@
     <span class="cost">{{ rung.cost }}<em>{% if rung.state == "deployed" %}measured{% else %}estimate{% endif %}</em></span>
     <span class="reach">{{ rung.reach }}</span>
   </div>
+  {%- unless forloop.last %}<span class="ladder-step" aria-hidden="true">→</span>{% endunless -%}
   {%- endfor -%}
 </div>
 <p class="ladder-note">Rung 10 is what is deployed today and its cost is the measured demo bill. Rung 100's sizing

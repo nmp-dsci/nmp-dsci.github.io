@@ -1,5 +1,6 @@
 ---
 title: Data Pilot
+short: "Pilot"   # the matrix column header on a phone
 summary: >-
   A conversational data agent over ~3.2M rows of NSW property data — ask in plain
   English, get governed SQL, a chart and a written report, over only the rows you

@@ -76,7 +76,9 @@ REQUIRED = [
     "tags", "metric", "metric_label", "featured", "order", "stack", "skills",
     "skills_detail", "links", "architecture", "production",
 ]
-OPTIONAL = ["published", "media", "evidence", "layout", "permalink", "date"]
+OPTIONAL = ["published", "media", "evidence", "layout", "permalink", "date",
+            # the abbreviated column header the rubric matrix uses under 560px
+            "short"]
 REQUIRED_NESTED = {
     "links": ["repo", "demo"],
     "architecture": ["diagram", "caption"],

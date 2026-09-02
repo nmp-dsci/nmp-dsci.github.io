@@ -257,23 +257,53 @@ a.chip:hover{text-decoration:none;filter:brightness(.97)}
   text-transform:uppercase;color:var(--faint);padding-bottom:var(--s2);text-align:center;
   align-self:end;line-height:1.25}
 .matrix .mh:first-child{text-align:left}
+.matrix .mh-abbr{display:none}
 .matrix .md{display:flex;align-items:center;gap:var(--s2);font-size:var(--t-1);
   color:var(--ink-2);line-height:1.3;padding-block:var(--s1)}
 .matrix .md i{font-family:var(--mono);font-size:var(--t-2);font-style:normal;
   color:var(--faint);flex:0 0 auto}
 .matrix .md a{color:var(--ink-2)}
 .matrix .md a:hover{color:var(--accent)}
+/* The row wrapper carries ARIA only — display:contents keeps the cells as
+   direct grid items of .matrix. */
+.mrow{display:contents}
 .cell{display:flex;align-items:center;justify-content:center;text-align:center;
-  min-height:36px;border-radius:var(--r-sm);padding:var(--s1);
+  min-height:36px;border-radius:var(--r-sm);
   font-family:var(--mono);font-size:var(--t-2);font-weight:600;line-height:1.15;
   transition:transform var(--dur) var(--ease),box-shadow var(--dur) var(--ease)}
-a.cell:hover{text-decoration:none;transform:scale(1.04);box-shadow:var(--shadow)}
+.cell:not(:has(a)){padding:var(--s1)}
+.cell > a{display:flex;align-items:center;justify-content:center;
+  width:100%;height:100%;padding:var(--s1);color:inherit;border-radius:inherit}
+.cell > a:hover{text-decoration:none;color:inherit}
+.cell:has(> a):hover{transform:scale(1.04);box-shadow:var(--shadow)}
 .cell-shipped{background:var(--accent);color:var(--accent-ink)}
 .cell-partial{background:var(--amber-soft);color:var(--amber);
   box-shadow:inset 0 0 0 1px var(--amber)}
 .cell-designed{background:transparent;color:var(--muted);
   box-shadow:inset 0 0 0 1.5px var(--line-3)}
 .cell-na{background:transparent;color:var(--faint)}
+
+/* DESIGN.md rule 11: the matrix never side-scrolls on a phone — it abbreviates.
+   Under 560px the three system columns take the short label from each project's
+   front matter, the tracking comes off (it was costing ~9px a header), and the
+   columns equalise. Without this the headers collided and "TRANSCRIPT" spilled
+   past the panel edge at 390px. */
+@media (max-width:560px){
+  .matrix{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .matrix .mh{letter-spacing:0}
+  .matrix .mh-full{display:none}
+  .matrix .mh-abbr{display:inline}
+  .matrix .md{font-size:var(--t-2);gap:var(--s1)}
+  /* The ref and the label flow as one text run instead of sitting side by side,
+     so a long label wraps under its ref rather than being squeezed beside it.
+     Hyphenation handles the one label that still cannot fit on a line
+     ("Observability") via a soft hyphen in _data/rubric.yml. `overflow-wrap:
+     anywhere` and `hyphens:auto` are both deliberately absent: the first breaks
+     words at meaningless points, and the second silently does nothing when the
+     browser has no hyphenation dictionary. */
+  .matrix .md{display:block}
+  .matrix .md i{margin-right:var(--s1)}
+}
 
 .legend{display:flex;gap:var(--s4);flex-wrap:wrap;margin-top:var(--s4);
   font-size:var(--t-2);color:var(--muted);line-height:1.5}
@@ -348,12 +378,14 @@ a.cell:hover{text-decoration:none;transform:scale(1.04);box-shadow:var(--shadow)
 
 /* ----------------------------------------------------- 9 · the scale ladder */
 /* 10 → 100 → 1,000 is a sequence, not three peers: the rungs are connected,
-   and the one that is actually deployed carries the accent. */
-.ladder{display:grid;gap:var(--s6);grid-template-columns:repeat(3,minmax(0,1fr))}
-.ladder .rung{position:relative}
-.ladder .rung:not(:last-child)::after{content:"→";position:absolute;
-  right:calc(var(--s6) * -1);width:var(--s6);top:50%;transform:translateY(-50%);
-  text-align:center;font-family:var(--mono);font-size:var(--t0);color:var(--line-3)}
+   and the one that is actually deployed carries the accent. The connector is a
+   real grid cell rather than a pseudo-element hanging outside the card — an
+   absolutely-positioned one overflowed its rung, which is a thing the audit
+   should be free to flag anywhere else. */
+.ladder{display:grid;gap:var(--s4);align-items:stretch;
+  grid-template-columns:minmax(0,1fr) auto minmax(0,1fr) auto minmax(0,1fr)}
+.ladder-step{display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:var(--t0);color:var(--line-3)}
 .rung.deployed{box-shadow:inset 0 3px 0 var(--accent),var(--shadow)}
 .rung{background:var(--panel);border-radius:var(--r);padding:var(--s5);box-shadow:var(--shadow);
   display:flex;flex-direction:column;gap:var(--s2)}
@@ -369,10 +401,8 @@ a.cell:hover{text-decoration:none;transform:scale(1.04);box-shadow:var(--shadow)
 .rung .reach{font-size:var(--t-1);color:var(--muted);line-height:1.45}
 .ladder-note{font-size:var(--t-1);color:var(--muted);max-width:78ch;margin:var(--s5) 0 0}
 @media (max-width:820px){
-  .ladder{grid-template-columns:minmax(0,1fr);gap:var(--s5)}
-  .ladder .rung:not(:last-child)::after{content:"↓";right:auto;left:50%;top:auto;
-    bottom:calc(var(--s5) * -1);width:var(--s5);height:var(--s5);
-    transform:translateX(-50%);line-height:var(--s5)}
+  .ladder{grid-template-columns:minmax(0,1fr);gap:var(--s3)}
+  .ladder-step{transform:rotate(90deg);padding-block:var(--s1)}
 }
 
 /* --------------------------------------------------------- 10 · practices */
@@ -670,3 +700,27 @@ a.cell:hover{text-decoration:none;transform:scale(1.04);box-shadow:var(--shadow)
   from{transform:translateY(8px)}
   to{transform:none}
 }
+
+/* ------------------------------------------- 17 · target size (WCAG 2.5.8 AA)
+   Standalone controls are at least 24x24 CSS px. Measured at 390px, these were
+   17-22px tall: the scorecard's section links were the worst at 15x17. Links
+   set inline in a sentence are exempt under the criterion's own inline
+   exception and are deliberately left alone — padding them would wreck the
+   line rhythm of the prose. */
+.row-sec{min-width:24px;min-height:24px;display:inline-flex;
+  align-items:center;justify-content:center}
+.row-dim a,.mini a,.footer-links a,.pt-list a,.legend span{
+  min-height:24px;display:inline-flex;align-items:center}
+/* the matrix row header has to wrap as ordinary text, so it reaches its 24px
+   with padding rather than by becoming a flex box */
+.matrix .md a{display:inline-block;min-height:24px;padding-block:3px}
+.mini a,.legend span{gap:var(--s2)}
+.pt-list a{align-items:baseline}
+
+/* ----------------------------------- 18 · links in text (WCAG 1.4.1 SC 1.4.1)
+   `.prose a` was already underlined; these blocks are prose too and were not,
+   so their links were distinguished from the surrounding text by colour alone.
+   axe reported it as `link-in-text-block`, serious, on five pages. */
+.ladder-note a,.score-note a,.evidence-note a,.sec-lead a,.summary a,
+.rung a,.dims span a,figcaption a,.aside a,.rail-box dd a,.sys-facts dd a{
+  text-decoration:underline;text-underline-offset:.18em;text-decoration-thickness:1px}

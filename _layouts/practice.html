@@ -67,4 +67,5 @@ layout: default
     </aside>
   </div>
 </article>
-<script src="{{ '/assets/js/study.js' | relative_url }}" defer></script>
+{%- if site.github.build_revision -%}{%- assign av = site.github.build_revision | slice: 0, 8 -%}{%- else -%}{%- assign av = site.time | date: "%Y%m%d%H%M%S" -%}{%- endif -%}
+<script src="{{ '/assets/js/study.js' | relative_url }}?v={{ av }}" defer></script>
