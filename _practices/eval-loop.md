@@ -1,5 +1,6 @@
 ---
 title: The eval loop
+short: "The eval loop"
 summary: >-
   How a gen-AI system gets better without getting worse — a versioned golden
   set, deterministic graders and an independent judge, a gate that blocks

@@ -1,6 +1,6 @@
 # nmp-dsci.github.io
 
-Portfolio site for Nathan Phillips — applied AI engineer. A Jekyll site, built
+Portfolio site for Nathan Phillips — data science & gen AI. A Jekyll site, built
 and served by GitHub Pages, showcasing shipped agent/RAG/eval systems as case studies.
 
 ## Structure

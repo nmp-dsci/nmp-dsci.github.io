@@ -105,7 +105,10 @@ PRACTICE_REQUIRED = ["title", "summary", "tldr", "order", "kicker", "systems",
 # A practice has no home-page system card, so the three card lines and the
 # section summaries are optional there — but linted the same way when present.
 PRACTICE_OPTIONAL = ["published", "layout", "permalink", "date", "tags", "featured",
-                     "headline", "outcome", "proof_line", "sections"]
+                     "headline", "outcome", "proof_line", "sections",
+                     # `short` is the label the footer page tree prints, for the
+                     # practices whose full title is a sentence.
+                     "short"]
 PRACTICE_SPINE = ["Problem", "Pattern", "In the three systems", "Evidence",
                   "Failure modes"]
 
@@ -500,8 +503,15 @@ def check_prose(rep: Report, fm: dict) -> None:
 
 
 def check_headline(rep: Report, fm: dict) -> None:
-    """The card's first line: the outcome in nine words, not the product name."""
-    headline, words = words_in(fm.get("headline"))
+    """The card's first line: the outcome in nine words, not the product name.
+
+    The headline may carry exactly one <em>, the page's single decorated keyword
+    (DESIGN.md §2). Tags do not count as words, and two of them is scatter, which
+    is the thing the rule exists to prevent.
+    """
+    raw, _ = words_in(fm.get("headline"))
+    headline = re.sub(r"<[^>]+>", "", raw).strip()
+    words = len(headline.split()) if headline else 0
     title, _ = words_in(fm.get("title"))
     faults = []
     if not headline:
@@ -510,7 +520,18 @@ def check_headline(rep: Report, fm: dict) -> None:
         faults.append(f"{words} words, and the line holds {HEADLINE_WORDS}: {headline}")
     if headline and headline.casefold() == title.casefold():
         faults.append(f"identical to title ({title!r}) — say the outcome, not the name again")
-    rep.verdict(not faults, f"headline: {words} {plural(words, 'word')}, not the title",
+
+    opens, closes = raw.count("<em>"), raw.count("</em>")
+    if opens > 1:
+        faults.append(f"{opens} <em> keywords — decorate one word, or none (DESIGN.md §2)")
+    if opens != closes:
+        faults.append(f"unbalanced emphasis: {opens} <em> against {closes} </em>")
+    stray = re.sub(r"</?em>", "", raw)
+    if "<" in stray:
+        faults.append("markup other than <em> in the headline — it renders raw into the <h1>")
+
+    emph = " · 1 keyword" if opens == 1 else ""
+    rep.verdict(not faults, f"headline: {words} {plural(words, 'word')}, not the title{emph}",
                 *faults, fail_msg=f"headline: {words} {plural(words, 'word')}")
 
 

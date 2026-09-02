@@ -1,6 +1,6 @@
-title: Nathan Phillips — Applied AI
+title: Nathan Phillips — Data Science & Gen AI
 description: >-
-  Applied-AI engineer — three gen-AI systems live on AWS, each with evals in CI,
+  Data science and gen AI — three gen-AI systems live on AWS, each with evals in CI,
   guardrails between the model and the data, per-request traces and cost caps.
 url: "https://nmp-dsci.github.io"
 baseurl: ""

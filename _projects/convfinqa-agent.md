@@ -1,6 +1,6 @@
 ---
 title: ConvFinQA Agent
-headline: "Prompts versioned as code, promotion gated on evidence"
+headline: "Prompts versioned as code, promotion gated on <em>evidence</em>"
 summary: >-
   Multi-turn financial Q&A over report text and tables — four typed pydantic-ai agents in a
   pipeline, with the prompts versioned and promoted like releases. The live URL is a read-only

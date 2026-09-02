@@ -7,7 +7,7 @@ summary: >-
   are live against the real marts, and chat replays recorded agent runs.
 tldr: >-
   Governed NL→SQL in production — Postgres row-level security and an sqlglot AST guard decide what the model may touch, and merging to main deploys the whole stack under GitHub OIDC with no stored keys.
-headline: "Governed NL→SQL in production"
+headline: "<em>Governed</em> NL→SQL in production"
 outcome: >-
   Governed natural-language → SQL over ~3.2M rows of NSW property data, with row-level
   security deciding what the model may touch.

@@ -1,5 +1,6 @@
 ---
 title: "Production at 10 / 100 / 1,000 concurrent users"
+short: "Production at scale"
 summary: >-
   What actually runs today at ten concurrent users, what changes at a hundred
   and at a thousand, and which of those three is deployed, which is measured and

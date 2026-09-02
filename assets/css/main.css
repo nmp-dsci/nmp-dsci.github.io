@@ -22,7 +22,21 @@ body{
   text-rendering:optimizeLegibility;
 }
 
-h1,h2,h3,h4{
+/* The anchor face. Display is IBM Plex Serif — already downloaded, already
+   preloaded, and the more distinctive of the two voices we ship. The interface
+   (h3, labels, buttons, nav) stays Plex Sans, which is what makes this a real
+   three-tier hierarchy rather than a font swap. Serif needs less negative
+   tracking than the sans did. See DESIGN.md §2. */
+h1,h2{
+  font-family:var(--serif);
+  font-weight:600;
+  line-height:var(--lh-tight);
+  letter-spacing:-.01em;
+  color:var(--ink);
+  margin:0;
+  text-wrap:balance;
+}
+h3,h4{
   font-family:var(--sans);
   font-weight:600;
   line-height:var(--lh-tight);
@@ -31,6 +45,9 @@ h1,h2,h3,h4{
   margin:0;
   text-wrap:balance;
 }
+/* One decorated keyword per page, never more (DESIGN.md §2). Weight 400 because
+   that is the only serif italic we ship — asking for 600 would synthesise it. */
+h1 em,h2 em{font-style:italic;font-weight:400;color:var(--accent)}
 p{margin:0 0 var(--s4);text-wrap:pretty}
 :where(p,li,dd,td,th,figcaption,h1,h2,h3,h4){overflow-wrap:anywhere}
 img,svg,video{max-width:100%;height:auto}
@@ -87,6 +104,42 @@ a:hover{text-decoration:underline;text-underline-offset:.22em;text-decoration-th
   background:var(--accent);transition:right var(--dur) var(--ease)}
 .nav-links a:hover{text-decoration:none;color:var(--ink)}
 .nav-links a:hover::after{right:0}
+/* the case-studies disclosure — a native <details>, so keyboard support, the
+   open state and the no-JS fallback all come from the element */
+.nav-drop{position:relative}
+.nav-drop > summary{list-style:none;cursor:pointer;color:var(--ink-2);
+  font-size:var(--t-1);font-weight:500;padding-block:var(--s2);position:relative;
+  display:inline-flex;align-items:center;gap:var(--s2)}
+.nav-drop > summary::-webkit-details-marker{display:none}
+.nav-drop > summary::after{content:"";position:absolute;left:0;right:100%;bottom:2px;
+  height:2px;background:var(--accent);transition:right var(--dur) var(--ease)}
+.nav-drop > summary:hover{color:var(--ink)}
+.nav-drop > summary:hover::after,.nav-drop[open] > summary::after{right:0}
+.nav-drop > summary i{font-style:normal;font-size:var(--t-2);color:var(--faint);
+  transition:transform var(--dur) var(--ease)}
+.nav-drop[open] > summary i{transform:rotate(180deg)}
+.nav-drop-panel{position:absolute;top:calc(100% + var(--s3));left:50%;
+  transform:translateX(-50%);width:min(340px,84vw);z-index:70;
+  background:var(--panel);border:1px solid var(--line-2);border-radius:var(--r);
+  box-shadow:var(--shadow);padding:var(--s2)}
+@media (prefers-reduced-motion:no-preference){
+  .nav-drop[open] .nav-drop-panel{animation:nav-drop-in var(--dur) var(--ease)}
+}
+@keyframes nav-drop-in{
+  from{opacity:0;transform:translate(-50%,-4px)} to{opacity:1;transform:translate(-50%,0)}
+}
+.nav-drop-panel a{display:grid;grid-template-columns:minmax(0,1fr) auto;
+  gap:var(--s3);align-items:baseline;padding:var(--s2) var(--s3);
+  border-radius:var(--r-sm);color:var(--ink)}
+.nav-drop-panel a:hover{background:var(--band);text-decoration:none}
+.nav-drop-panel b{display:block;font-weight:600;font-size:var(--t-1);line-height:1.3}
+.nav-drop-panel em{display:block;font-style:normal;font-size:var(--t-2);
+  color:var(--muted);line-height:1.4;margin-top:1px}
+.nd-score{font-family:var(--mono);font-size:var(--t-2);color:var(--accent);white-space:nowrap}
+.nd-all{display:block!important;margin-top:var(--s2);padding-top:var(--s3)!important;
+  border-top:1px solid var(--line);font-family:var(--mono);font-size:var(--t-2);
+  color:var(--accent)}
+
 .nav-util{display:flex;gap:var(--s2);align-items:center;margin-left:var(--s2)}
 .icon-btn{width:36px;height:36px;display:inline-flex;align-items:center;justify-content:center;
   border:1px solid var(--line-2);border-radius:var(--r-sm);background:transparent;
@@ -101,6 +154,12 @@ a:hover{text-decoration:underline;text-underline-offset:.22em;text-decoration-th
     padding:var(--s3) var(--gutter) var(--s4);box-shadow:var(--shadow);margin:0}
   .nav-links a{padding-block:var(--s3);font-size:var(--t0)}
   .nav-links a::after{display:none}
+  .nav-drop{width:100%}
+  .nav-drop > summary{padding-block:var(--s3);font-size:var(--t0);width:100%}
+  .nav-drop > summary::after{display:none}
+  .nav-drop-panel{position:static;transform:none;width:auto;animation:none;
+    border:0;border-left:1px solid var(--line);border-radius:0;box-shadow:none;
+    background:transparent;padding:0 0 var(--s2) var(--s4);margin-left:var(--s2)}
   .nav[data-open="true"] .nav-links{display:flex}
   .nav-toggle{display:inline-flex;margin-left:auto}
   .nav-util{margin-left:0}
@@ -113,10 +172,28 @@ a:hover{text-decoration:underline;text-underline-offset:.22em;text-decoration-th
 }
 
 .footer{border-top:1px solid var(--line);background:var(--band)}
-.footer-inner{max-width:var(--w);margin-inline:auto;padding:var(--s6) var(--gutter);
-  display:flex;justify-content:space-between;gap:var(--s4);flex-wrap:wrap;
+.footer-inner{max-width:var(--w);margin-inline:auto;padding:var(--s7) var(--gutter);
+  display:flex;flex-direction:column;gap:var(--s6);
   font-size:var(--t-1);color:var(--muted)}
+.footer-meta{display:flex;justify-content:space-between;gap:var(--s4);flex-wrap:wrap;
+  padding-top:var(--s5);border-top:1px solid var(--line)}
 .footer-links{display:flex;gap:var(--s5);flex-wrap:wrap}
+
+/* the page tree — the site's only index of itself, generated from the
+   collections. Mono because mono is already this site's voice for structure. */
+.ptree{font-family:var(--mono);font-size:var(--t-2);line-height:1.9}
+.pt-root{display:block;color:var(--ink);font-weight:500;margin-bottom:var(--s1)}
+.pt-list{list-style:none;margin:0;padding:0}
+.pt-list li{display:flex;align-items:baseline;gap:0;min-width:0}
+.pt-list i{white-space:pre;font-style:normal;color:var(--line-3);flex:none}
+.pt-list a{color:var(--ink-2);min-width:24ch}
+.pt-list a:hover{color:var(--accent)}
+.pt-s{color:var(--faint);white-space:nowrap}
+@media (max-width:640px){
+  .pt-list a{min-width:0}
+  .pt-list li{gap:var(--s3)}
+  .pt-s{margin-left:auto}
+}
 
 /* ------------------------------------------------------- 4 · buttons, chips */
 .btn{display:inline-flex;align-items:center;gap:var(--s2);
@@ -154,8 +231,7 @@ a.chip:hover{text-decoration:none;filter:brightness(.97)}
 .hero{padding-block:var(--sec-gap) var(--sec-pad)}
 .hero-grid{display:grid;gap:var(--s8);grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);
   align-items:center}
-.hero h1{font-size:var(--t6);letter-spacing:-.03em;margin-bottom:var(--s4);max-width:16ch}
-.hero h1 em{font-style:normal;color:var(--accent)}
+.hero h1{font-size:var(--t6);letter-spacing:-.015em;margin-bottom:var(--s4);max-width:18ch}
 .hero .dek{font-family:var(--serif);font-size:var(--t1);line-height:1.5;color:var(--ink-2);
   max-width:50ch;margin-bottom:var(--s5)}
 .hero .kick{margin-bottom:var(--s4)}

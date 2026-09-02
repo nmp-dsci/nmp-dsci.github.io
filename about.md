@@ -2,10 +2,10 @@
 layout: page
 title: About
 permalink: /about/
-summary: Applied AI engineer — three gen-AI systems live on AWS, each with evals in CI, guardrails between the model and the data, and a cost ceiling.
+summary: Data scientist working in gen AI — three gen-AI systems live on AWS, each with evals in CI, guardrails between the model and the data, and a cost ceiling.
 ---
 
-I'm **Nathan Phillips**, an applied AI engineer in Sydney. I build gen-AI systems end-to-end —
+I'm **Nathan Phillips**, a data scientist working in gen AI, in Sydney. I build gen-AI systems end-to-end —
 from the data layer through the agent loop to the eval harness — and then I run them. Three are
 live on AWS right now, and you can open every one of them from the [home page](/).
 

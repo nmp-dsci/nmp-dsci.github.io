@@ -7,7 +7,7 @@ summary: >-
 tldr: >-
   RAG matches full-transcript answers at 6.1× fewer tokens — measured on a chunk-labelled
   golden set with an 8-config retrieval ablation and a CI gate that re-scores every committed run.
-headline: "Retrieval you can prove, at 6.1× fewer tokens"
+headline: "Retrieval you can <em>prove</em>, at 6.1× fewer tokens"
 outcome: >-
   A RAG workbench over 102 transcripts where eight retrieval configurations are raced on a
   chunk-labelled golden set, and CI re-scores every committed run.
