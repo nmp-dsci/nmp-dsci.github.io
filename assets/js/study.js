@@ -113,6 +113,17 @@
     onScroll();
   }
 
+  /* ---- 3b. scrollable code blocks are keyboard-reachable ----------------
+     A <pre> that scrolls horizontally is a scrollable region; without a
+     tabindex a keyboard-only visitor cannot scroll it and cannot read the part
+     that is cut off. axe reports it as `scrollable-region-focusable`. */
+  Array.prototype.forEach.call(document.querySelectorAll('pre'), function (pre) {
+    if (pre.scrollWidth > pre.clientWidth + 2 && !pre.hasAttribute('tabindex')) {
+      pre.setAttribute('tabindex', '0');
+      pre.setAttribute('aria-label', 'Code block, scroll to read');
+    }
+  });
+
   /* ---- 4. reading time ---------------------------------------------------
      230 words a minute, the usual figure for technical prose. Rendered into the
      slot the layout already reserved, so there is no layout shift. */

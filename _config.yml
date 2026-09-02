@@ -29,6 +29,7 @@ markdown: kramdown
 
 exclude:
   # tooling — not part of the published site
+  - node_modules
   - vendor
   - .lavish
   - .claude

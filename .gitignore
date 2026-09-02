@@ -13,3 +13,7 @@ __pycache__/
 _o/
 _o_*/
 _probe*/
+
+# audit tooling installed on demand (npm i --no-save playwright axe-core)
+node_modules/
+package-lock.json

@@ -1,5 +1,6 @@
 ---
 title: ConvFinQA Agent
+short: "ConvFinQA"   # the matrix column header on a phone
 headline: "Prompts versioned as code, promotion gated on <em>evidence</em>"
 summary: >-
   Multi-turn financial Q&A over report text and tables — four typed pydantic-ai agents in a

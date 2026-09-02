@@ -40,14 +40,31 @@
 
 {%- comment -%}
   Fonts are self-hosted (assets/fonts, 94 KB latin subset), so there is no
-  third-party connection to warm up. The two faces that render above the fold
-  are preloaded; the rest arrive with the stylesheet.
+  third-party connection to warm up. The three faces that render above the fold
+  are preloaded; the rest arrive with the stylesheet. Serif 600 is on that list
+  because it sets every h1 and h2 — leaving it off cost a measurable layout
+  shift on the case studies, where the headline swapped from Georgia after
+  first paint and pushed the summary down.
 {%- endcomment -%}
 <link rel="preload" as="font" type="font/woff2" href="{{ '/assets/fonts/sans-normal-400_600.woff2' | relative_url }}" crossorigin>
 <link rel="preload" as="font" type="font/woff2" href="{{ '/assets/fonts/serif-normal-400.woff2' | relative_url }}" crossorigin>
-<link rel="stylesheet" href="{{ '/assets/css/fonts.css' | relative_url }}">
-<link rel="stylesheet" href="{{ '/assets/css/tokens.css' | relative_url }}">
-<link rel="stylesheet" href="{{ '/assets/css/main.css' | relative_url }}">
+<link rel="preload" as="font" type="font/woff2" href="{{ '/assets/fonts/serif-normal-600.woff2' | relative_url }}" crossorigin>
+{%- comment -%}
+  Asset URLs carry the commit they were built from. GitHub Pages serves these
+  files with `cache-control: max-age=600`, so without a version in the URL a
+  returning visitor can get a ten-minute window of new HTML against the old
+  stylesheet — which is exactly how the site looked unstyled to us after the
+  last two deploys. `site.github.build_revision` is set by Pages; the site.time
+  fallback keeps local Docker builds working.
+{%- endcomment -%}
+{%- if site.github.build_revision -%}
+  {%- assign av = site.github.build_revision | slice: 0, 8 -%}
+{%- else -%}
+  {%- assign av = site.time | date: "%Y%m%d%H%M%S" -%}
+{%- endif -%}
+<link rel="stylesheet" href="{{ '/assets/css/fonts.css' | relative_url }}?v={{ av }}">
+<link rel="stylesheet" href="{{ '/assets/css/tokens.css' | relative_url }}?v={{ av }}">
+<link rel="stylesheet" href="{{ '/assets/css/main.css' | relative_url }}?v={{ av }}">
 
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-BG4T0343HQ"></script>
 <script>

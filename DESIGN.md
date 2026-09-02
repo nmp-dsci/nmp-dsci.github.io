@@ -113,7 +113,12 @@ Committed as rules so they survive future sessions:
    the existing GA4 tag.**
 10. **No em dash cluttering** — em dashes are fine in prose, but do not use them
     as a substitute for a full stop three times in one paragraph.
-11. **No side-scrolling the rubric matrix on a phone.** It abbreviates instead.
+11. **No side-scrolling the rubric matrix on a phone.** It abbreviates instead:
+    under 560px the system columns take each project's `short:` label, the
+    tracking comes off, and the row header stacks under its ref. This was
+    written as a rule long before it was implemented, and in the meantime the
+    headers collided and "TRANSCRIPT" ran off the panel edge at 390px — which
+    is why `scripts/audit_pages.mjs` now measures it.
 12. **No paragraph over 80 words in a case study.** The lint fails the build.
 13. **No second decorated keyword.** One `<em>` per page, in the `h1`. A page
     with two emphasised words has emphasised nothing.
@@ -121,6 +126,16 @@ Committed as rules so they survive future sessions:
     footer page tree and `#work` all read the same
     `where production.live` query, so an unpublished project cannot leak into
     one of them by being forgotten in another.
+15. **No standalone control under 24×24px** (WCAG 2.5.8). Links set inline in a
+    sentence are exempt and are left alone — padding them would wreck the line
+    rhythm of the prose.
+16. **No link distinguished from its surrounding text by colour alone**
+    (WCAG 1.4.1). Inside any block of prose a link is underlined, not just
+    tinted.
+17. **No asset URL without its build revision.** GitHub Pages serves CSS and JS
+    with `max-age=600`, so an unversioned URL gives returning visitors up to ten
+    minutes of new HTML against an old stylesheet. It happened on two
+    consecutive deploys before the `?v=` was added.
 
 ---
 
@@ -159,5 +174,15 @@ modern browser User-Agent, keep only the `/* latin */` blocks, download those
 | Contrast, both themes | `uv run --no-project python scripts/contrast_audit.py` |
 | Case-study schema, paragraphs, summaries, proofs | `uv run --with pyyaml --no-project python scripts/lint_case_study.py --all --no-net` |
 | Build | `docker run --rm -e JEKYLL_NO_BUNDLER_REQUIRE=true -v "$PWD":/site -w /site ghp-jekyll:local jekyll build -d /site/_o -q` |
+| Layout, type floor, target size, axe, motion | `node scripts/audit_pages.mjs http://127.0.0.1:8801` |
 
-All three run in `.github/workflows/lint.yml` on every push and pull request.
+The first three run in `.github/workflows/lint.yml` on every push and pull
+request. The fourth needs a browser, so it is a local and pre-merge check: it
+sweeps eight pages × three widths × two themes, runs axe-core over all of them,
+and asserts the motion contract (reduced motion, the frozen-animation case, and
+no-JavaScript). Setup is `npm i --no-save playwright axe-core`.
+
+**The standard the site is held to:** axe-core reports **0 violations** across
+every page in both themes, and Lighthouse scores **100 accessibility, 100 best
+practices, 100 SEO** with performance in the high 90s. A change that drops any
+of those is a regression, not a trade-off.

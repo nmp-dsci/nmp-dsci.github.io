@@ -73,7 +73,11 @@ dimensions:
     order: 6
     ref: R6
     label: "Observability & tracing"
-    short: "Observability"
+    # U+00AD soft hyphen. This is the one rubric label too long for a matrix
+    # column at phone width; the break point is chosen here rather than left to
+    # the browser, which had no hyphenation dictionary and split it as
+    # "Observa/bility". Invisible unless the word actually has to wrap.
+    short: "Observ\u00ADability"
     question: "Can you replay exactly what the agent did on one request, and see the fleet's health on one screen?"
     why: "Per-run traces plus SLOs with error budgets; the dashboard signal is what tells you when to scale."
     section: 6

@@ -36,11 +36,31 @@ uv run --with pyyaml --no-project python scripts/lint_case_study.py --all --no-n
 # 2 · build, and serve the build (never audit the source)
 docker run --rm -e JEKYLL_NO_BUNDLER_REQUIRE=true \
   -v "$PWD":/site -w /site ghp-jekyll:local jekyll build -d /site/_o -q
-(cd _o && python3 -m http.server 8792 &)
+(cd _o && python3 -m http.server 8801 &)
+
+# 3 · the measured half — every M-check below, in a real browser
+npm i --no-save playwright axe-core        # first run only
+npx playwright install chromium            # first run only
+node scripts/audit_pages.mjs http://127.0.0.1:8801
+
+# 4 · Lighthouse, on one page of each kind
+export CHROME_PATH="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+for u in / /projects/convfinqa-agent/ /practices/eval-loop/; do
+  npx lighthouse "http://127.0.0.1:8801$u" --quiet \
+    --chrome-flags="--headless=new" --only-categories=performance,accessibility,best-practices,seo
+done
 ```
 
-Then sweep **all eight pages** — `/`, `/about/`, three `/projects/*/`, three
-`/practices/*/` — at **390 / 768 / 1280 px**, in **both themes**.
+`scripts/audit_pages.mjs` sweeps **all eight pages** — `/`, `/about/`, three
+`/projects/*/`, three `/practices/*/` — at **390 / 768 / 1280 px** in **both
+themes**, runs axe-core over every page in both themes, asserts the motion
+contract, and exits non-zero on any failure. Do not re-derive these by hand;
+extend the script instead, so the next audit is comparable to this one.
+
+**Lighthouse is flaky on a cold run.** A single bad sample reported performance
+54 and LCP 17.8s on a page that scores 98 on three consecutive runs. Run it at
+least twice before believing a performance number, and never report the first
+run alone.
 
 ## The measured floor
 
@@ -57,8 +77,12 @@ here is a bug, not a preference.
 | M6 | Contrast | `contrast_audit.py` reports 0 failing across both themes |
 | M7 | Reduced motion | With `prefers-reduced-motion: reduce`, no element animates |
 | M8 | Reveal safety | With every animation frozen at its start state, **nothing is invisible** — 0 cells under 50% opacity, 0 SVG connectors left dashed |
-| M9 | Focus | Every interactive element shows a visible ring with an offset |
+| M9 | Target size | Every standalone control is at least 24×24 (WCAG 2.5.8); links inline in a sentence are exempt |
 | M10 | No-JS | With scripting off: the page reads, the nav dropdown still opens, no content is hidden |
+| M11 | axe-core | 0 violations on every page, in both themes, at WCAG 2.0/2.1/2.2 A+AA plus best-practice |
+| M12 | Lighthouse | 100 accessibility, 100 best practices, 100 SEO; performance ≥ 90 on a repeated run |
+| M13 | Focus | Every interactive element shows a visible ring with an offset |
+| M14 | Asset URLs | Every CSS and JS href carries `?v=` — Pages caches for 10 minutes (never-do #17) |
 
 **M8 is not optional.** A reveal that hides content until it completes has made
 the animation load-bearing. That bug shipped once in this repo — the matrix
@@ -97,6 +121,14 @@ that breaks one is a regression, not an improvement.
 - What you could not check, and why — an unmeasured dimension is reported as
   unmeasured, never scored on a guess
 
-Lighthouse and axe have no runner in this repo. If they have not been run
-against the live URL, dimension 12 is reported as partial with that reason
-stated, not scored out of optimism.
+Both Lighthouse and axe now have runners, so dimension 12 is scored on
+measurement. The baseline to beat, taken 3 Sep 2026 on the built site:
+
+| | Result |
+|---|---|
+| `audit_pages.mjs` | 0 failing checks — 48 layout combinations, 16 axe runs, 4 motion checks |
+| Lighthouse | performance 97–98, accessibility 100, best practices 100, SEO 100 |
+| Core Web Vitals | CLS 0.004 home / 0 elsewhere, LCP 2.1s |
+
+If a run cannot be completed, say so and report the dimension as unmeasured.
+An unmeasured dimension is never scored out of optimism.
