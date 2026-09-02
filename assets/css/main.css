@@ -330,8 +330,13 @@ a.cell:hover{text-decoration:none;transform:scale(1.04);box-shadow:var(--shadow)
 }
 
 /* ------------------------------------------------- 8 · the nine dimensions */
-.dims{list-style:none;margin:0;padding:0;display:grid;gap:0 var(--s7);
-  grid-template-columns:repeat(3,minmax(0,1fr))}
+/* Two columns, one per half of the loop — not a 3×3 grid of nine peers. The
+   distinction the section lead makes is now visible in the layout. */
+.dims-split{display:grid;gap:var(--s7);grid-template-columns:minmax(0,4fr) minmax(0,5fr)}
+.dims-half > .label{margin-bottom:var(--s1)}
+.dims-note{font-size:var(--t-1);color:var(--muted);margin:0 0 var(--s2);max-width:44ch}
+.dims{list-style:none;margin:0;padding:0;display:grid;gap:0;
+  grid-template-columns:minmax(0,1fr)}
 .dims li{display:grid;grid-template-columns:2.4rem minmax(0,1fr);gap:var(--s2);
   padding-block:var(--s4);border-top:1px solid var(--line);scroll-margin-top:5rem}
 .dims .ref{font-family:var(--mono);font-size:var(--t-2);font-weight:600;color:var(--accent);
@@ -339,11 +344,17 @@ a.cell:hover{text-decoration:none;transform:scale(1.04);box-shadow:var(--shadow)
 .dims b{display:block;font-size:var(--t0);color:var(--ink);line-height:var(--lh-snug)}
 .dims span{font-size:var(--t-1);color:var(--muted);line-height:1.45}
 .dims li:target b{color:var(--accent)}
-@media (max-width:900px){ .dims{grid-template-columns:repeat(2,minmax(0,1fr));gap:0 var(--s6)} }
-@media (max-width:620px){ .dims{grid-template-columns:minmax(0,1fr)} }
+@media (max-width:820px){ .dims-split{grid-template-columns:minmax(0,1fr);gap:var(--s6)} }
 
 /* ----------------------------------------------------- 9 · the scale ladder */
-.ladder{display:grid;gap:var(--s5);grid-template-columns:repeat(3,minmax(0,1fr))}
+/* 10 → 100 → 1,000 is a sequence, not three peers: the rungs are connected,
+   and the one that is actually deployed carries the accent. */
+.ladder{display:grid;gap:var(--s6);grid-template-columns:repeat(3,minmax(0,1fr))}
+.ladder .rung{position:relative}
+.ladder .rung:not(:last-child)::after{content:"→";position:absolute;
+  right:calc(var(--s6) * -1);width:var(--s6);top:50%;transform:translateY(-50%);
+  text-align:center;font-family:var(--mono);font-size:var(--t0);color:var(--line-3)}
+.rung.deployed{box-shadow:inset 0 3px 0 var(--accent),var(--shadow)}
 .rung{background:var(--panel);border-radius:var(--r);padding:var(--s5);box-shadow:var(--shadow);
   display:flex;flex-direction:column;gap:var(--s2)}
 .rung.here{box-shadow:inset 0 0 0 2px var(--accent),var(--shadow)}
@@ -357,7 +368,12 @@ a.cell:hover{text-decoration:none;transform:scale(1.04);box-shadow:var(--shadow)
   margin-left:var(--s2)}
 .rung .reach{font-size:var(--t-1);color:var(--muted);line-height:1.45}
 .ladder-note{font-size:var(--t-1);color:var(--muted);max-width:78ch;margin:var(--s5) 0 0}
-@media (max-width:820px){ .ladder{grid-template-columns:minmax(0,1fr)} }
+@media (max-width:820px){
+  .ladder{grid-template-columns:minmax(0,1fr);gap:var(--s5)}
+  .ladder .rung:not(:last-child)::after{content:"↓";right:auto;left:50%;top:auto;
+    bottom:calc(var(--s5) * -1);width:var(--s5);height:var(--s5);
+    transform:translateX(-50%);line-height:var(--s5)}
+}
 
 /* --------------------------------------------------------- 10 · practices */
 .practices{display:grid;gap:var(--s5);grid-template-columns:repeat(3,minmax(0,1fr))}
@@ -632,3 +648,25 @@ a.cell:hover{text-decoration:none;transform:scale(1.04);box-shadow:var(--shadow)
 .evidence-note b{display:block;font-family:var(--mono);font-size:var(--t-2);font-weight:500;
   letter-spacing:var(--track-label);text-transform:uppercase;color:var(--faint);
   margin-bottom:var(--s2)}
+
+/* --------------------------------------------------- 16 · the one animation
+   The site's only reveal, added by assets/js/reveal.js on first view of the
+   matrix. `--d` is the cell's row, so the matrix arrives a row at a time rather
+   than all thirty-six cells at once.
+
+   It animates transform and nothing else. An earlier version faded opacity from
+   0, which meant that any browser where the animation did not run — a throttled
+   background tab, a rendering hiccup — left the site's most important evidence
+   permanently invisible behind `animation-fill-mode: backwards`. The reveal is
+   not allowed to be load-bearing: the worst it can now do on failure is leave a
+   row sitting 8px low. Without the script `.is-in` never lands at all and every
+   cell is simply present, which is the correct page. */
+@media (prefers-reduced-motion:no-preference){
+  .star.is-in .md,.star.is-in .cell{
+    animation:cell-in var(--dur) var(--ease) backwards;
+    animation-delay:calc(var(--d,0) * 45ms)}
+}
+@keyframes cell-in{
+  from{transform:translateY(8px)}
+  to{transform:none}
+}

@@ -12,7 +12,7 @@
     {%- assign rk = r[0] | append: "" -%}
     {%- assign rung = r[1] -%}
     {%- assign rkd = rk | replace: "1000", "1,000" -%}
-  <div class="rung{% if hl and rk == hl %} here{% endif %}">
+  <div class="rung{% if rung.state == "deployed" %} deployed{% endif %}{% if hl and rk == hl %} here{% endif %}">
     <span class="n">rung {{ rkd }}{% if hl and rk == hl %} · this system{% endif %}</span>
     <h3>{{ rung.label }}</h3>
     <span class="state">{{ rung.state }}{% if rung.tag %} · {{ rung.tag }}{% endif %}</span>
