@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ConvFinQA write-up refresh · eval loop</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Design source: the subject project's own system — tokens copied from
+   nmp-dsci.github.io/assets/css/tokens.css (light :root + dark override). */
+:root{
+  --bg:#F7F6F2; --panel:#FFFFFF; --band:#EFEEE8;
+  --ink:#1A1D1B; --ink-2:#3B403D; --muted:#4A514D; --faint:#5C635E;
+  --line:#DCDAD2; --line-2:#C7C5BC; --line-3:#8A8880;
+  --accent:#0A6552; --accent-ink:#FFFFFF; --accent-soft:#DFEFE8;
+  --amber:#8A5006; --amber-soft:#F6E6CF;
+  --sans:'IBM Plex Sans',system-ui,-apple-system,sans-serif;
+  --serif:'IBM Plex Serif',Georgia,'Times New Roman',serif;
+  --mono:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+  --t-2:0.8rem; --t-1:0.875rem; --t0:1rem; --t1:1.125rem; --t2:1.406rem; --t3:1.758rem; --t4:2.197rem; --t5:2.75rem;
+  --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:24px; --s6:32px; --s7:48px; --s8:64px; --s9:96px;
+  --r:10px; --r-sm:6px;
+  --shadow:0 1px 2px rgb(20 25 22 / .05), 0 12px 28px -18px rgb(20 25 22 / .22);
+  --w:1140px; --track-label:.08em;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#121614; --panel:#191E1B; --band:#161A18;
+    --ink:#E8EBE7; --ink-2:#C9CFC9; --muted:#AEB6B0; --faint:#98A09A;
+    --line:#28302B; --line-2:#3A443E; --line-3:#727E77;
+    --accent:#43C29A; --accent-ink:#0E1512; --accent-soft:#17382C;
+    --amber:#D99A4E; --amber-soft:#3A2A14;
+    --shadow:0 1px 2px rgb(0 0 0 / .4), 0 12px 28px -18px rgb(0 0 0 / .65);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#121614; --panel:#191E1B; --band:#161A18;
+  --ink:#E8EBE7; --ink-2:#C9CFC9; --muted:#AEB6B0; --faint:#98A09A;
+  --line:#28302B; --line-2:#3A443E; --line-3:#727E77;
+  --accent:#43C29A; --accent-ink:#0E1512; --accent-soft:#17382C;
+  --amber:#D99A4E; --amber-soft:#3A2A14;
+  --shadow:0 1px 2px rgb(0 0 0 / .4), 0 12px 28px -18px rgb(0 0 0 / .65);
+}
+*,*::before,*::after{box-sizing:border-box}
+:where(.grid,.flex,.cards)>*{min-width:0}
+:where(p,h1,h2,h3,h4,li,dd,figcaption,td,th,.badge,.label){overflow-wrap:anywhere}
+:where(img,svg,video,iframe){max-width:100%;height:auto}
+html{scroll-behavior:smooth;scroll-padding-top:72px}
+body{margin:0;background:var(--bg);color:var(--ink-2);font-family:var(--sans);font-size:var(--t0);line-height:1.55;-webkit-font-smoothing:antialiased}
+h1,h2,h3,h4{color:var(--ink);margin:0;line-height:1.15;font-weight:600;letter-spacing:-.02em;text-wrap:balance}
+h1{font-size:var(--t4)} h2{font-size:var(--t3)} h3{font-size:var(--t1)} h4{font-size:var(--t0)}
+p{margin:0 0 var(--s4);text-wrap:pretty}
+a{color:var(--accent);text-decoration:none} a:hover{text-decoration:underline;text-underline-offset:.2em}
+strong,b{color:var(--ink);font-weight:600}
+code{font-family:var(--mono);font-size:max(var(--t-2),.86em);background:var(--band);padding:.08em .32em;border-radius:var(--r-sm);color:var(--ink-2)}
+.wrap{max-width:var(--w);margin-inline:auto;padding-inline:var(--s5)}
+.label{font-family:var(--mono);font-size:var(--t-2);font-weight:500;letter-spacing:var(--track-label);text-transform:uppercase;color:var(--faint);margin:0}
+.lead{font-family:var(--serif);font-size:var(--t1);line-height:1.5;color:var(--ink-2);max-width:72ch}
+.small{font-size:var(--t-1);color:var(--muted)} .tiny{font-size:var(--t-2);color:var(--faint);font-family:var(--mono)}
+.top{position:sticky;top:0;z-index:60;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.top-in{max-width:var(--w);margin-inline:auto;padding:var(--s3) var(--s5);display:flex;align-items:center;gap:var(--s4);flex-wrap:wrap}
+.top b{font-family:var(--mono);font-size:var(--t-1);color:var(--ink);white-space:nowrap}
+.top nav{display:flex;gap:var(--s4);margin-left:auto;flex-wrap:wrap;font-size:var(--t-1);font-weight:500}
+.top nav a{color:var(--ink-2)} .top nav a:hover{color:var(--accent);text-decoration:none}
+header.hero{padding:var(--s7) 0 var(--s5)}
+.chips{display:flex;gap:var(--s2);flex-wrap:wrap;margin:var(--s4) 0 0}
+.chip{font-family:var(--mono);font-size:var(--t-2);padding:.3em .6em;border:1px solid var(--line-2);border-radius:var(--r-sm);color:var(--ink-2);background:var(--panel)}
+.chip.ok{border-color:var(--accent);color:var(--accent)} .chip.warn{border-color:var(--amber);color:var(--amber)}
+section.blk{padding-top:var(--s8)} section.blk:last-of-type{padding-bottom:var(--s9)}
+.hd{margin-bottom:var(--s5);max-width:80ch} .hd .label{margin-bottom:var(--s2)} .hd h2{margin-bottom:var(--s3)}
+.panel{background:var(--panel);border-radius:var(--r);box-shadow:var(--shadow);padding:var(--s5)}
+.band{background:var(--band);border-radius:var(--r);padding:var(--s4) var(--s5)}
+.grid{display:grid;gap:var(--s4)} .g3{grid-template-columns:repeat(3,minmax(0,1fr))} .g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+@media (max-width:900px){.g3,.g2{grid-template-columns:minmax(0,1fr)}}
+.card h3{margin-bottom:var(--s2)} .card p{margin-bottom:var(--s2);font-size:var(--t-1)} .card p:last-child{margin:0}
+.st{display:inline-flex;align-items:center;gap:var(--s2);font-family:var(--mono);font-size:var(--t-2);white-space:nowrap}
+.st::before{content:"";width:10px;height:10px;border-radius:3px;flex:none}
+.st-ok::before{background:var(--accent-soft);box-shadow:inset 0 0 0 1px var(--accent)} .st-ok{color:var(--accent)}
+.st-part::before{background:var(--amber-soft);box-shadow:inset 0 0 0 1px var(--amber)} .st-part{color:var(--amber)}
+.st-gap::before{box-shadow:inset 0 0 0 1.5px var(--line-3)} .st-gap{color:var(--muted)}
+.st-na::before{background:var(--line)} .st-na{color:var(--faint)}
+.tw{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:var(--r);box-shadow:var(--shadow);background:var(--panel)}
+table{border-collapse:collapse;width:100%;min-width:680px;font-size:var(--t-1)}
+caption{text-align:left;padding:var(--s4) var(--s5) var(--s2);color:var(--muted);font-size:var(--t-1);caption-side:top}
+th,td{text-align:left;padding:var(--s3) var(--s4);border-bottom:1px solid var(--line);vertical-align:top;line-height:1.45}
+thead th{font-family:var(--mono);font-size:var(--t-2);font-weight:500;color:var(--faint);letter-spacing:var(--track-label);text-transform:uppercase;border-bottom:1px solid var(--line-2);white-space:nowrap}
+tbody tr:last-child td{border-bottom:0}
+td.sub{font-weight:600;color:var(--ink);white-space:nowrap}
+td.num{font-family:var(--mono);font-size:var(--t-2);font-variant-numeric:tabular-nums;min-width:16ch}
+td .path{display:block;font-family:var(--mono);font-size:var(--t-2);color:var(--faint);margin-top:2px}
+.fig{margin:0} .fig svg{display:block;width:100%;height:auto} .fig figcaption{font-size:var(--t-1);color:var(--muted);margin-top:var(--s3)}
+.fig figcaption b{color:var(--ink)}
+.dia .nd{fill:var(--panel);stroke:var(--line-2);stroke-width:1}
+.dia .hi{stroke:var(--accent);stroke-width:1.6}
+.dia .tt{font:600 12.5px var(--sans);fill:var(--ink)}
+.dia .tx{font:10.5px var(--sans);fill:var(--ink-2)}
+.dia .lb{font:10px var(--mono);fill:var(--faint)}
+.dia .ed{stroke:var(--line-3);fill:none;stroke-width:1.2;marker-end:url(#arr)}
+.dia .dash{stroke-dasharray:4 3}
+.dia .bandbox{fill:var(--band);stroke:none}
+.dia .n{font:500 10px var(--mono);fill:var(--accent)}
+.steps{counter-reset:s;list-style:none;padding:0;margin:0;display:grid;gap:var(--s3)}
+.steps li{display:grid;grid-template-columns:2rem minmax(0,1fr);gap:var(--s3);align-items:start;font-size:var(--t-1)}
+.steps li::before{counter-increment:s;content:counter(s,decimal-leading-zero);font-family:var(--mono);color:var(--accent);font-weight:500;padding-top:2px}
+form.q{background:var(--panel);border-radius:var(--r);box-shadow:var(--shadow);padding:var(--s5);display:grid;gap:var(--s3)}
+form.q h3{margin:0} form.q .why{font-size:var(--t-1);color:var(--muted);margin:0}
+form.q label{display:grid;grid-template-columns:1.2rem minmax(0,1fr);gap:var(--s2);align-items:start;font-size:var(--t-1);padding:var(--s2) var(--s3);border:1px solid var(--line);border-radius:var(--r-sm);cursor:pointer}
+form.q label:has(input:checked){border-color:var(--accent);background:var(--accent-soft)}
+form.q input[type=radio]{margin:3px 0 0;accent-color:var(--accent)}
+form.q textarea{width:100%;font:inherit;font-size:var(--t-1);padding:var(--s2) var(--s3);border:1px solid var(--line-2);border-radius:var(--r-sm);background:var(--bg);color:var(--ink-2);min-height:3.2rem;resize:vertical}
+form.q .row{display:flex;gap:var(--s3);align-items:center;flex-wrap:wrap}
+.btn{font:500 var(--t-1) var(--sans);background:var(--accent);color:var(--accent-ink);border:0;border-radius:var(--r-sm);padding:.55em 1em;cursor:pointer}
+.btn:hover{filter:brightness(1.05)}
+.queued{font-family:var(--mono);font-size:var(--t-2);color:var(--accent);min-height:1.2em}
+.rec{font-family:var(--mono);font-size:var(--t-2);color:var(--accent);margin-left:.4em}
+ul.tight{margin:0;padding-left:1.1em;font-size:var(--t-1)} ul.tight li{margin-bottom:var(--s1)}
+footer{border-top:1px solid var(--line);padding:var(--s5) 0;font-size:var(--t-2);color:var(--faint);font-family:var(--mono)}
+</style>
+</head>
+<body>
+<div class="top"><div class="top-in"><b>s07 · ConvFinQA write-up refresh</b>
+<nav><a href="#verdict">Verdict</a><a href="#loop">The loop</a><a href="#diff">Repo vs page</a><a href="#evidence">Evidence</a><a href="#structure">Structure</a><a href="#edits">Edits</a><a href="#decisions">Decisions</a><a href="#plan">Work plan</a></nav></div></div>
+
+<header class="hero"><div class="wrap">
+  <p class="label">plan · branch <code>convfinqa-eval-loop</code> · 2026-09-03</p>
+  <h1>Bring <code>_projects/convfinqa-agent.md</code> up to the eval loop</h1>
+  <p class="lead">ConvFinQA-agent PR #6 (merged today) replaced two one-shot optimisers and a flip-veto gate with a repeatable loop: sealed splits, a teacher that blames one agent, one-agent challengers, per-agent prompt lineage, a net-positive gate on unseen test evidence. The live demo already serves the result. The page still describes the old world.</p>
+  <div class="chips">
+    <span class="chip ok">live /healthz → champion v5 · t3.p4.r3.c3 · code dc3efb2</span>
+    <span class="chip warn">page → champion v2 · 65c8a3edd210 · code bec0e68</span>
+    <span class="chip">174 tests · 16.5k lines added · 136 files</span>
+    <span class="chip">lint on current page: PASS (6 paragraphs near 80 words)</span>
+  </div>
+</div></header>
+
+<section class="blk" id="verdict"><div class="wrap">
+  <div class="hd"><p class="label">00 · verdict</p><h2>Three things, in order of consequence</h2></div>
+  <div class="grid g3">
+    <div class="panel card"><p class="label">stale</p><h3>The page is a version behind, and the story changed</h3>
+      <p>Champion, bundle id, code SHA, the promotion rule, the split table, "six admin pages", "not built: per-call spans" — every one of those is now wrong. Verified against the repo and the live URL, not the README.</p>
+      <p>The bigger change is the argument: from "GEPA lifted accuracy and the gate refused v3_1" to "a loop that attributes every miss to one agent, changes one agent, and promotes only on evidence the optimiser never saw."</p></div>
+    <div class="panel card"><p class="label">angle</p><h3>Design that scales, measured honestly — not a bigger number</h3>
+      <p>The headline should be the loop's shape and its refusals, with accuracy as the proof the measurement works. v5's +2.1 pp is not significant (McNemar p=0.50, n=187) and the write-up should say so in the same sentence it reports it.</p>
+      <p>What earns the claim: sealed holdout (opened 0 times), attribution before change, one lever per challenger, every verdict on an append-only history, served bundle asserted equal to the registry champion.</p></div>
+    <div class="panel card"><p class="label">blocked</p><h3>Two upstream defects before the page can claim them</h3>
+      <p><b><code>/eval/dataset</code> answers 500 on the live demo.</b> The Dockerfile copies predictions, diagnostics, registry and snapshot but never <code>evaluation/splits/</code>, so the new Dataset page has no manifest to read.</p>
+      <p><b><code>/eval/runs</code> lists only v1, v2, v3_1.</b> The champion's evidence lives under <code>predictions/evalloop/</code>, so the Evaluations page cannot show v5 beside gold. The κ sheet is committed but unlabelled: no trust number yet.</p></div>
+  </div>
+</div></section>
+
+<section class="blk" id="loop"><div class="wrap">
+  <div class="hd"><p class="label">01 · the loop, with the libraries at each step</p><h2>One cycle: split → run → trace → score → diagnose → propose → register → gate → release → deploy → observe</h2>
+  <p class="small">Every node is verified against a path in <code>ConvFinQA-agent</code>. Highlighted nodes are the point of the system. This is the proposed third figure for §3 of the case study, drawn in the site's SVG contract.</p></div>
+  <figure class="fig panel">
+  <svg class="dia" viewBox="0 0 960 372" role="img" aria-label="The ConvFinQA eval loop: a split manifest feeds a run, every LLM call is traced to MLflow, turns are scored against gold with a per-agent panel, a teacher diagnoses each report's first wrong turn and blames one agent, a one-agent challenger is proposed and registered as a composition, a net-positive gate on the unseen test split decides promotion, a sealed holdout opens once for release, CI deploys and a smoke test asserts the served bundle is the champion, and production traces feed the next cycle.">
+    <defs><marker id="arr" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="var(--line-3)"/></marker></defs>
+    <!-- top row -->
+    <g id="n1"><title>Split manifest — evalloop/splits.py: committed report_id lists (train 53 / test 54 / holdout 56 reports; 202 / 201 / 207 questions), seed 2026, stratified on Type II, pool excludes the 260 conversations GEPA and s7 saw</title>
+      <rect class="nd" x="10" y="28" width="144" height="100" rx="8"/><text class="n" x="20" y="44">01</text>
+      <text class="tt" x="20" y="60">Split manifest</text><text class="tx" x="20" y="76">train · test · holdout</text><text class="tx" x="20" y="90">53 / 54 / 56 reports</text>
+      <text class="lb" x="20" y="108">evalloop/splits.py</text><text class="lb" x="20" y="121">seed 2026 · json</text></g>
+    <g id="n2"><title>Run — evalloop/runner.py: one split × version = one MLflow run; every turn of a report answered with the agent's own earlier answers as history; four pydantic-ai agents on deepseek-v4-flash</title>
+      <rect class="nd" x="169" y="28" width="144" height="100" rx="8"/><text class="n" x="179" y="44">02</text>
+      <text class="tt" x="179" y="60">Run</text><text class="tx" x="179" y="76">one split × version</text><text class="tx" x="179" y="90">= one MLflow run</text>
+      <text class="lb" x="179" y="108">pydantic-ai ×4 · flash</text><text class="lb" x="179" y="121">evalloop/runner.py</text></g>
+    <g id="n3"><title>Trace — tracking/tracing.py: mlflow.pydantic_ai.autolog records every agent invocation as spans; report and question spans added; stamped with version, split, run name</title>
+      <rect class="nd" x="328" y="28" width="144" height="100" rx="8"/><text class="n" x="338" y="44">03</text>
+      <text class="tt" x="338" y="60">Trace</text><text class="tx" x="338" y="76">span per LLM call</text><text class="tx" x="338" y="90">run → report → q → stage</text>
+      <text class="lb" x="338" y="108">mlflow autolog</text><text class="lb" x="338" y="121">tracking/tracing.py</text></g>
+    <g id="n4"><title>Score — evaluation/metrics.py and evalloop/stage_scores.py: numeric match, program match, cascade flag, plus a per-agent panel derived from gold with zero API calls</title>
+      <rect class="nd" x="487" y="28" width="144" height="100" rx="8"/><text class="n" x="497" y="44">04</text>
+      <text class="tt" x="497" y="60">Score</text><text class="tx" x="497" y="76">numeric + program match</text><text class="tx" x="497" y="90">per-agent gold panel</text>
+      <text class="lb" x="497" y="108">metrics.py · pandas</text><text class="lb" x="497" y="121">stage_scores.py</text></g>
+    <g id="n5"><title>Diagnose — evalloop/teacher.py: a teacher on deepseek-v4-pro reads each report's first wrong turn with all four stage captures and the gold program, blames exactly one agent using a frozen 11-mode taxonomy, flags gold_suspect, proposes one rule; prior diagnoses are read back from MLflow as memory</title>
+      <rect class="nd hi" x="646" y="28" width="144" height="100" rx="8"/><text class="n" x="656" y="44">05</text>
+      <text class="tt" x="656" y="60">Diagnose · teacher</text><text class="tx" x="656" y="76">first-wrong turn → 1 agent</text><text class="tx" x="656" y="90">11 modes · gold_suspect</text>
+      <text class="lb" x="656" y="108">pydantic-ai · v4-pro</text><text class="lb" x="656" y="121">evalloop/teacher.py</text></g>
+    <g id="n6"><title>Propose — the prompt-writer merges that agent's rules into at most five, writes a generated module that changes exactly one agent's prompt (prompts/v5.py = v3_1 + preprocess p4); prompt_ledger records the new lineage entry</title>
+      <rect class="nd hi" x="805" y="28" width="144" height="100" rx="8"/><text class="n" x="815" y="44">06</text>
+      <text class="tt" x="815" y="60">Propose</text><text class="tx" x="815" y="76">≤ 5 merged rules</text><text class="tx" x="815" y="90">→ one-agent challenger</text>
+      <text class="lb" x="815" y="108">prompts/v5.py</text><text class="lb" x="815" y="121">prompt_ledger.py</text></g>
+    <!-- middle band -->
+    <g id="choke"><title>llm.py — the single LLM choke point: deepseek-v4-flash for the four agents on every turn, deepseek-v4-pro only for the teacher; retry, timeout and the demo gate live here and nowhere else</title>
+      <rect class="bandbox" x="110" y="152" width="300" height="44" rx="8"/>
+      <text class="tt" x="122" y="171">llm.py · one choke point</text><text class="lb" x="122" y="187">flash: 4 agents · pro: teacher only</text></g>
+    <g id="human"><title>Human — evalloop/kappa.py: a 30-case labelling sheet checks teacher-vs-human agreement (bar κ ≥ 0.7; sheet committed, not yet labelled); gold_suspect rows are settled at /admin/dataset</title>
+      <rect class="bandbox" x="424" y="152" width="286" height="44" rx="8"/>
+      <text class="tt" x="436" y="171">Human · κ sheet, 30 cases</text><text class="lb" x="436" y="187">unlabelled · gold_suspect → /admin/dataset</text></g>
+    <!-- bottom row (right to left) -->
+    <g id="n7"><title>Register — tracking/registry.py and prompt_ledger.py: a bundle is a composition of four per-agent prompt hashes (t3.p4.r3.c3) plus both model ids, dataset hash and code SHA; prompts mirror into MLflow's prompt registry with champion aliases</title>
+      <rect class="nd" x="805" y="224" width="144" height="100" rx="8"/><text class="n" x="815" y="240">07</text>
+      <text class="tt" x="815" y="256">Register</text><text class="tx" x="815" y="272">bundle = t3.p4.r3.c3</text><text class="tx" x="815" y="286">+ models · data hash · SHA</text>
+      <text class="lb" x="815" y="304">registry.json</text><text class="lb" x="815" y="317">MLflow prompts · alias</text></g>
+    <g id="n8"><title>Gate on the test split — tracking/comparator.py and evalloop/gate.py: net-positive paired comparison on the shared questions, exact McNemar p recorded and flagged when not significant; --promote is refused on train-split evidence; gate-targeted also requires the target agent's own metric to move</title>
+      <rect class="nd hi" x="646" y="224" width="144" height="100" rx="8"/><text class="n" x="656" y="240">08</text>
+      <text class="tt" x="656" y="256">Gate · test split</text><text class="tx" x="656" y="272">net-positive paired test</text><text class="tx" x="656" y="286">McNemar p on the verdict</text>
+      <text class="lb" x="656" y="304">comparator.py · pandas</text><text class="lb" x="656" y="317">evalloop/gate.py</text></g>
+    <g id="n9"><title>Release — evalloop/release.py: the holdout opens once, for the current champion only, behind an explicit acknowledgement flag; every opening is appended to registry history; opened 0 times so far and tested with stubs only</title>
+      <rect class="nd" x="487" y="224" width="144" height="100" rx="8"/><text class="n" x="497" y="240">09</text>
+      <text class="tt" x="497" y="256">Release · holdout</text><text class="tx" x="497" y="272">opens once, champion only</text><text class="tx" x="497" y="286">opened: 0 · stubs only</text>
+      <text class="lb" x="497" y="304">evalloop/release.py</text><text class="lb" x="497" y="317">registry history</text></g>
+    <g id="n10"><title>Deploy — .github/workflows: the offline eval-regression gate re-scores the champion from its own committed CSV on every PR; deploy assumes an AWS role by OIDC, pushes to ECR, App Runner auto-deploys, Terraform reconciles, and demo_smoke.sh asserts the served bundle equals the registry champion</title>
+      <rect class="nd" x="328" y="224" width="144" height="100" rx="8"/><text class="n" x="338" y="240">10</text>
+      <text class="tt" x="338" y="256">Deploy</text><text class="tx" x="338" y="272">CI gate → OIDC → ECR</text><text class="tx" x="338" y="286">smoke: served = champion</text>
+      <text class="lb" x="338" y="304">Actions · Terraform</text><text class="lb" x="338" y="317">App Runner · smoke.sh</text></g>
+    <g id="n11"><title>Observe — tracking/traces.py and serving/routes/metrics.py: one row per turn in SQLite (WAL), split by serving / demo / eval and never blended; serving opts into MLflow spans with MLFLOW_TRACING=1</title>
+      <rect class="nd" x="169" y="224" width="144" height="100" rx="8"/><text class="n" x="179" y="240">11</text>
+      <text class="tt" x="179" y="256">Observe</text><text class="tx" x="179" y="272">row per turn, by source</text><text class="tx" x="179" y="286">serving · demo · eval</text>
+      <text class="lb" x="179" y="304">traces.py · SQLite</text><text class="lb" x="179" y="317">MLFLOW_TRACING=1</text></g>
+    <!-- edges -->
+    <g id="edges"><title>The request path: left to right across the top, down at Propose, right to left across the bottom, and back to the manifest for the next cycle; a refused challenger returns to the teacher with its evidence kept</title>
+      <path class="ed" d="M154,78 H167"/><path class="ed" d="M313,78 H326"/><path class="ed" d="M472,78 H485"/><path class="ed" d="M631,78 H644"/><path class="ed" d="M790,78 H803"/>
+      <path class="ed" d="M877,128 V222"/>
+      <path class="ed" d="M805,274 H792"/><path class="ed" d="M646,274 H633"/><path class="ed" d="M487,274 H474"/><path class="ed" d="M328,274 H315"/>
+      <path class="ed" d="M241,324 V358 H60 V132"/>
+      <path class="ed dash" d="M718,224 V130"/><text class="lb" x="724" y="180">refused → keeps evidence</text>
+      <text class="lb" x="70" y="347">next cycle · the promoted challenger is the new baseline</text></g>
+  </svg>
+  <figcaption><b>The loop changes one agent per cycle and promotes only on evidence the teacher never saw.</b> Nodes 05, 06 and 08 are what is new since the page was written; 09 exists but has never been opened; "production failures join train" (11 → 01) is designed, not built. Source: <code>src/convfinqa/evalloop/</code>, <code>src/convfinqa/tracking/</code>, <code>evaluation/registry.json</code>.</figcaption>
+  </figure>
+
+  <div class="tw" style="margin-top:var(--s5)"><table>
+    <caption>Tool libraries in the loop, and what each one is trusted with. Versions from <code>pyproject.toml</code> and <code>docker-compose.yml</code>.</caption>
+    <thead><tr><th>Library</th><th>Role in the loop</th><th>Where</th></tr></thead>
+    <tbody>
+      <tr><td class="sub">pydantic-ai ≥ 0.2</td><td>The four typed pipeline agents, and the teacher (typed <code>Diagnosis</code> output). Six calculator tools, never free-text maths.</td><td><span class="path">backends/pydantic.py · evalloop/teacher.py · pipeline/tools.py</span></td></tr>
+      <tr><td class="sub">MLflow ≥ 3.11 (server v3.12.0)</td><td>Runs, tracing (autolog spans), prompt registry with champion aliases, teacher memory (prior diagnoses read back). Server in docker compose, always on.</td><td><span class="path">tracking/mlflow_log.py · tracking/tracing.py · docker-compose.yml</span></td></tr>
+      <tr><td class="sub">DeepSeek v4 (flash / pro)</td><td>Flash for every production turn; pro only for the teacher. Both built in one module, behind the demo gate.</td><td><span class="path">llm.py · backends/pydantic.py::lm_max</span></td></tr>
+      <tr><td class="sub">pandas</td><td>Scoring, the per-agent panel, the paired comparison; McNemar exact p is implemented in the comparator itself, no scipy.</td><td><span class="path">tracking/comparator.py · evalloop/stage_scores.py</span></td></tr>
+      <tr><td class="sub">Logfire + tenacity</td><td>Serving spans (kept on a separate tracer provider from MLflow); retry with jitter and the 120 s ceiling in the choke point.</td><td><span class="path">llm.py · AGENTS.md (provider note)</span></td></tr>
+      <tr><td class="sub">FastAPI · React 18 + Vite</td><td>The console: seven admin pages read-only in demo, including the new Dataset page for settling <code>gold_suspect</code> rows.</td><td><span class="path">serving/routes/evaluation.py · frontend/src/features/admin/DatasetReview.tsx</span></td></tr>
+      <tr><td class="sub">GitHub Actions · Terraform · App Runner</td><td>Offline eval-regression gate on every PR; OIDC deploy; smoke test asserts served bundle equals champion.</td><td><span class="path">.github/workflows/ci.yml · deploy-aws.yml · scripts/demo_smoke.sh</span></td></tr>
+      <tr><td class="sub">DSPy / GEPA · s7 harness</td><td>Produced v2 and v3_1. Still in the repo and the Research page; no longer the promotion path. Iteration logs archived.</td><td><span class="path">optimization/gepa.py · diagnosis/ · archive/README.md</span></td></tr>
+    </tbody></table></div>
+</div></section>
+
+<section class="blk" id="diff"><div class="wrap">
+  <div class="hd"><p class="label">02 · repo vs page</p><h2>What the repo says now, what the page still says, what to do</h2></div>
+  <div class="tw"><table>
+    <thead><tr><th>Subject</th><th>Repo now (verified)</th><th>Page today</th><th>Action</th></tr></thead>
+    <tbody>
+      <tr><td class="sub">Champion</td><td>v5, composition t3.p4.r3.c3, bundle 9a1bbd5900e8, code dc3efb2 — on the live <code>/healthz</code>.</td><td>v2, bundle 65c8a3edd210, code bec0e68; "GATE v3_1 refused" chips in the screenshot.</td><td>Rewrite card lines, §2 bundle paragraph, retake <code>demo-console.png</code>.</td></tr>
+      <tr><td class="sub">Promotion rule</td><td>Net-positive paired comparison, exact McNemar p recorded and flagged; flips listed, not a veto; <code>--promote</code> refused on train evidence.</td><td>"accuracy ≥ champion <em>and</em> no pass→fail flips."</td><td>Rewrite §3 contract and rubric rows gate + loop. Practice page step 5 conflicts (see D3).</td></tr>
+      <tr><td class="sub">Splits</td><td>Committed manifest: 53/54/56 reports, 202/201/207 questions, seed 2026, stratified; pool excludes the 260 conversations GEPA and s7 saw; holdout opened 0 times.</td><td>770 / 309 / "78 of 120" table; "held out has to be earned".</td><td>Replace the counts table; keep the 78-of-120 lesson as the reason the manifest, not the seed, is truth.</td></tr>
+      <tr><td class="sub">Teacher</td><td>deepseek-v4-pro via pydantic-ai, frozen 11-mode taxonomy, one rule per first-wrong case, ≤ 5 merged into a one-agent challenger, memory from MLflow. The s04 plan said Opus via the Agent SDK; the repo wins.</td><td>s7 "diagnose → propose → verify" harness, 39 rules.</td><td>New §3 core; s7 becomes one line of history.</td></tr>
+      <tr><td class="sub">Per-agent lineage</td><td>Each agent has its own versioned prompt (t1–t3, p1–p4, r1–r4, c1–c3); a bundle is a lockfile of four hashes; per-agent gold panel with zero API calls.</td><td>"Prompts are modules, not strings" — version-level only.</td><td>Update §2 differentiator and the agent SVG's prompt-set node.</td></tr>
+      <tr><td class="sub">Tracing</td><td>MLflow autolog spans run → report → question → stage → <code>Agent.run</code> for every eval run; serving opt-in; Logfire kept separate.</td><td>"Not built: per-call spans, constructed and dropped in-process."</td><td>Rewrite §6 and rubric trace <code>how</code>. Still not in the demo container: say so.</td></tr>
+      <tr><td class="sub">Release gate</td><td>Holdout opens once per champion behind an acknowledgement flag; recorded in history; tested with stubs only.</td><td>Not mentioned.</td><td>One paragraph in §3; rubric release <code>how</code> gains a sentence, status stays shipped for the deploy path.</td></tr>
+      <tr><td class="sub">Console</td><td>Seven admin pages (Dataset is new) — but <code>/eval/dataset</code> is 500 on the live demo and <code>/eval/runs</code> omits v5.</td><td>"All six admin pages are live."</td><td>Fix upstream first (D5) or write "six live, Dataset dev-only".</td></tr>
+      <tr><td class="sub">CI gate</td><td>Floor-checks evalloop champions from their own test-split CSV; legacy champions from the 770-row CSV; no longer bails when legacy CSVs are absent.</td><td>"re-scores the committed CSVs" (still true, one denominator).</td><td>Add the branch-on-source sentence to rubric gate.</td></tr>
+      <tr><td class="sub">Cost & budget</td><td><code>--n-questions 50</code> per-run subsample; a 50-report cycle is two train runs, two test runs, 30 teacher calls on pro.</td><td>Cost paragraph is about serving and the 1 GB instance.</td><td>Add one cost line for a cycle in §6.</td></tr>
+      <tr><td class="sub">Deployment</td><td>Unchanged: ap-southeast-1, one App Runner instance, smoke now asserts served == champion.</td><td>Correct.</td><td>§4 keeps; add the smoke assertion; topology SVG unchanged.</td></tr>
+    </tbody></table></div>
+</div></section>
+
+<section class="blk" id="evidence"><div class="wrap">
+  <div class="hd"><p class="label">03 · evidence</p><h2>Every cycle, its deliverable, its number</h2>
+  <p class="small">Accuracy is listed as proof the loop measures correctly, not as the achievement. Every number reproduces from a committed file; the per-agent row was recomputed from the two test-split CSVs today.</p></div>
+  <div class="tw"><table>
+    <thead><tr><th>Subject</th><th>Deliverable</th><th>Accuracy · evidence</th><th>Verdict</th></tr></thead>
+    <tbody>
+      <tr><td class="sub">Cycle 0 · GEPA → v2</td><td>Full prompt set from a real DSPy/GEPA run.<span class="path">prompts/v2.py · runs/gepa_real_20260502_005251/</span></td><td class="num">770 q: 73.0 → 77.1 · never-seen 309: 72.8 → 77.7</td><td><span class="st st-ok">promoted</span></td></tr>
+      <tr><td class="sub">Cycle 1 · s7 → v3_1</td><td>39 verified rules over 95 first-wrong cases.<span class="path">prompts/v3_1.py · evaluation/diagnostics/rules_*_v3_1.jsonl</span></td><td class="num">770 q: 76.2 vs 77.1 · then train-10: 54.5 → 61.4 on 44 q</td><td><span class="st st-part">refused, then loop baseline</span></td></tr>
+      <tr><td class="sub">Smoke · teacher → v4</td><td>Retriever-only challenger (r4) on 10 reports.<span class="path">prompts/v4.py · predictions/evalloop/*test10-v4*</span></td><td class="num">test: retriever recall .744 → .780 · overall −11.8 pp</td><td><span class="st st-gap">refused · rolled back</span></td></tr>
+      <tr><td class="sub">Cycle 2 · teacher → v5</td><td>Preprocess-only challenger (p4), 5 rules from 30 diagnoses.<span class="path">prompts/v5.py · diagnoses_v3_1_20260902_220936.jsonl · *test50-v5*</span></td><td class="num">train 66.8 → 70.5 · test 77.5 → 79.7 (187 q, 12 fixed / 8 broken, p = 0.50)</td><td><span class="st st-ok">champion · not significant</span></td></tr>
+      <tr><td class="sub">Per-agent panel · v3_1 → v5</td><td>Gold-derived, zero API calls, on the same 187 test questions.<span class="path">evalloop/stage_scores.py · columns in the run CSVs</span></td><td class="num">triage .925 → .920 · preprocess skeleton .415 → .447 (123 program turns) · retriever recall .752 → .772 · calculator .455 → .465 · cascade .166 → .134</td><td><span class="st st-ok">target moved, rest flat</span></td></tr>
+      <tr><td class="sub">Teacher attribution</td><td>30 first-faults on train-50: preprocess 14 · retriever 10 · calculator 3 · triage 3 · 4 gold_suspect.<span class="path">evaluation/diagnostics/evalloop/diagnoses_v3_1_20260902_220936.jsonl</span></td><td class="num">3 of 30 modes fell outside the frozen taxonomy ("new:")</td><td><span class="st st-ok">recorded</span></td></tr>
+      <tr><td class="sub">Teacher trust · κ</td><td>30-case labelling sheet, human columns empty.<span class="path">evaluation/diagnostics/evalloop/labelling_sheet_30cases.csv · evalloop/kappa.py</span></td><td class="num">bar κ ≥ 0.7 · no number yet</td><td><span class="st st-part">unlabelled</span></td></tr>
+      <tr><td class="sub">Holdout</td><td>56 reports / 207 questions, sealed; release mechanism stub-tested.<span class="path">evaluation/splits/eval_loop_v1.json (opened: 0) · evalloop/release.py</span></td><td class="num">never measured</td><td><span class="st st-gap">designed · sealed</span></td></tr>
+    </tbody></table></div>
+  <p class="small" style="margin-top:var(--s3)"><b>The awkward row is v3_1.</b> The page says the gate refused it (true, on 770 questions under the old flip-veto rule). The registry history also shows it promoted over v2 on a 44-question train-10 comparison at 04:59 on 2026-09-02, before the "test evidence only" rule landed at 11:34 with a rollback of v4 that named v3_1 champion again. Both entries are public. Decision D2 asks how to tell it.</p>
+</div></section>
+
+<section class="blk" id="structure"><div class="wrap">
+  <div class="hd"><p class="label">03b · page structure · your question</p><h2>Three levels: the pattern, the scan, the setup you maintain</h2>
+  <p class="small">Yes, it makes sense. The site already has two page types with two lint contracts; a deep page is a third, and it fixes a real problem: the case study is capped at a 60–90 second scan, and the loop's setup and cycle log will not fit there without breaking that. The case study keeps the figure, one table and the link. The depth gets a page that is allowed to be long, dated, and edited every cycle.</p></div>
+  <div class="tw"><table>
+    <thead><tr><th>Level</th><th>Page</th><th>For whom · length</th><th>What lives there</th><th>Maintained when</th></tr></thead>
+    <tbody>
+      <tr><td class="sub">Pattern</td><td><code>_practices/eval-loop.md</code><span class="path">/practices/eval-loop/</span></td><td>Second click · ~2,000 words</td><td>The eight steps, the three systems side by side, failure modes. System-agnostic.</td><td>When the pattern changes (D3 changes step 5 now).</td></tr>
+      <tr><td class="sub">Scan</td><td><code>_projects/convfinqa-agent.md</code><span class="path">/projects/convfinqa-agent/</span></td><td>The matrix visitor · under 2,400 words, seven H2s</td><td>§3 becomes: the loop figure, the versions table with verdicts, one paragraph on the contract, and <b>go deep →</b>. Card lines and rubric rows stay here; the matrix reads only this page.</td><td>Per promotion: card lines, metric, rubric proofs.</td></tr>
+      <tr><td class="sub">Setup</td><td><code>_deep/convfinqa-agent/eval-loop.md</code><span class="path">/projects/convfinqa-agent/eval-loop/</span></td><td>You, and the interviewer who asks "how" · unbounded, command-heavy</td><td>Compose + MLflow server, the manifest, the cycle protocol with the commands that reproduce each number, the teacher taxonomy, the per-agent panel definitions, the tool-library table, screenshots, and a <b>cycle log</b>: date · version · composition · split · fixed/broken · p · verdict.</td><td>Every cycle: append a log row, re-date <code>evidence_note</code>.</td></tr>
+    </tbody></table></div>
+  <div class="grid g2" style="margin-top:var(--s4)">
+    <div class="panel card"><p class="label">what it costs · about half a day</p>
+      <ul class="tight" style="margin-top:var(--s2)">
+        <li>A <code>deep</code> collection in <code>_config.yml</code> with permalink <code>/projects/:path/</code>, so the file path is the URL.</li>
+        <li><code>_layouts/deep.html</code> cloned from <code>practice.html</code>: same rail, same evidence-note banner, a "part of" crumb back to the case study.</li>
+        <li><code>_templates/deep.md</code> on a five-H2 spine: Setup → One cycle → Gate & promote → Cycle log → What changed since.</li>
+        <li>Lint: a <code>--deep</code> contract with the same prose rules; <code>project:</code> must resolve to a case study, <code>evidence_note</code> required, every number in the log next to a command.</li>
+        <li>A <code>deep:</code> key on the project front matter; the layout renders the §3 link from it and the lint checks the target exists.</li>
+      </ul></div>
+    <div class="panel card"><p class="label">what to watch</p>
+      <ul class="tight" style="margin-top:var(--s2)">
+        <li><b>Not a second README.</b> The repo README already documents the CLI. The deep page adds what the README cannot: the reasoning, the dated evidence, the log of refusals. Paste only the commands that reproduce a number; link the README for the rest.</li>
+        <li><b>Drift is the failure mode of a maintained page.</b> The practice page's rule already answers it: every count carries the command and the date it was last re-run.</li>
+        <li><b>The matrix never links the deep page.</b> The scorecard and card lines stay the case study's job, so the two pages cannot disagree about the headline.</li>
+        <li><b>Scope now vs later.</b> The collection is a one-off cost; the first deep page is mostly content this artifact already holds (the loop table, the evidence table, the tool table).</li>
+      </ul></div>
+  </div>
+</div></section>
+
+<section class="blk" id="edits"><div class="wrap">
+  <div class="hd"><p class="label">04 · proposed edits</p><h2>Front matter, rubric, sections</h2></div>
+  <div class="grid g2">
+    <div class="panel">
+      <p class="label">card lines · limits from the case-study skill</p>
+      <div class="tw" style="box-shadow:none;margin-top:var(--s3)"><table style="min-width:0">
+        <thead><tr><th>Field</th><th>Proposed</th></tr></thead>
+        <tbody>
+          <tr><td class="sub">headline</td><td>Prompts changed one agent at a time, promoted on unseen evidence <span class="tiny">(9 words)</span></td></tr>
+          <tr><td class="sub">tldr</td><td>Four flash-tier agents, each with its own prompt lineage. A pro-tier teacher blames one agent per miss; the challenger changes only that agent and promotes only on a sealed test split. v5 is champion at 79.7% (149/187) over 77.5%, and the loop refused v4 on the way.</td></tr>
+          <tr><td class="sub">outcome</td><td>A teacher-driven loop changes one agent per cycle and promotes only on evidence the optimiser never saw, or refuses.</td></tr>
+          <tr><td class="sub">proof_line</td><td>v5 promoted on the unseen test split at 79.7% (149/187) over v3_1's 77.5%, 12 fixed against 8 broken, McNemar p 0.50 recorded on the verdict; v4 refused the same way.</td></tr>
+          <tr><td class="sub">metric · label</td><td>See D1. Default: <code>79.7%</code> · "unseen test split (149/187) · v5 over 77.5%"</td></tr>
+          <tr><td class="sub">stack</td><td>pydantic-ai ×4 + teacher · MLflow tracking/tracing/prompt registry · DeepSeek v4 flash/pro · FastAPI + Typer · React 18 + Vite · Terraform + App Runner. DSPy/GEPA moves to the body.</td></tr>
+          <tr><td class="sub">skills_detail</td><td>Add <code>mlops</code> (registry, lineage, tracing, gate — all in <code>_data/skills.yml</code>); keep prompt-versioning, model-evaluation, agentic-ai, prompt-engineering, llms, python.</td></tr>
+        </tbody></table></div>
+    </div>
+    <div class="panel">
+      <p class="label">rubric rows · status deltas</p>
+      <div class="tw" style="box-shadow:none;margin-top:var(--s3)"><table style="min-width:0">
+        <thead><tr><th>Row</th><th>Today</th><th>Proposed</th><th>Why</th></tr></thead>
+        <tbody>
+          <tr><td class="sub">R1 evals</td><td><span class="st st-ok">shipped</span></td><td><span class="st st-ok">shipped</span></td><td>Manifest replaces the 770/309 story; CSVs still committed; gate re-scores the champion from its own split.</td></tr>
+          <tr><td class="sub">R2 judge</td><td><span class="st st-na">na</span></td><td><span class="st st-na">na</span> (D6)</td><td>Answers still graded by code. The teacher attributes, never scores; its trust check is the unlabelled κ sheet.</td></tr>
+          <tr><td class="sub">R3 gate</td><td><span class="st st-ok">shipped</span></td><td><span class="st st-ok">shipped</span></td><td>Net-positive + McNemar; train evidence refused; CI branches on champion source.</td></tr>
+          <tr><td class="sub">R4 loop</td><td><span class="st st-ok">shipped</span></td><td><span class="st st-ok">shipped</span></td><td>Full rewrite: teacher, one-agent challengers, lineage, two verdicts on history, holdout designed.</td></tr>
+          <tr><td class="sub">R5 guardrails</td><td><span class="st st-part">partial</span></td><td><span class="st st-part">partial</span></td><td>Unchanged; add that the teacher runs behind the same choke point.</td></tr>
+          <tr><td class="sub">R6 trace</td><td><span class="st st-ok">shipped</span></td><td><span class="st st-ok">shipped</span></td><td>Per-call spans now exist for eval and opt-in serving; not in the demo container.</td></tr>
+          <tr><td class="sub">R7 cost</td><td><span class="st st-ok">shipped</span></td><td><span class="st st-ok">shipped</span></td><td>Add the per-cycle budget flag and the pro-tier teacher's share.</td></tr>
+          <tr><td class="sub">R8 release</td><td><span class="st st-ok">shipped</span></td><td><span class="st st-ok">shipped</span></td><td>Smoke asserts served == champion; holdout release gate named as designed-only inside <code>how</code>.</td></tr>
+          <tr><td class="sub">R9 scale</td><td><span class="st st-gap">designed</span></td><td><span class="st st-gap">designed</span></td><td>Unchanged. Score stays 6 / 9.</td></tr>
+        </tbody></table></div>
+    </div>
+  </div>
+
+  <div class="tw" style="margin-top:var(--s4)"><table>
+    <caption>Section by section. Target: the page gets shorter, not longer — the six near-80-word paragraphs become tables.</caption>
+    <thead><tr><th>§</th><th>Keep</th><th>Change</th><th>Figure</th></tr></thead>
+    <tbody>
+      <tr><td class="sub">1 Purpose</td><td>The cost decision (replay, DEMO_MODE baked in); the write-refusal list.</td><td>Benefit claim becomes the loop's shape; admin pages as a 7-row table with what each reads. Retake the console screenshot with the v5 chips.</td><td><code>demo-console.png</code> (retake)</td></tr>
+      <tr><td class="sub">2 Architecture</td><td>Four agents, six tools, the choke point, no-model-at-import test.</td><td>"A version is a bundle" becomes "a bundle is a composition of four lineages"; <code>/healthz</code> paragraph uses today's payload.</td><td>agent SVG: prompt-set node → "4 prompt lineages · t3.p4.r3.c3"; teacher shown off-path on pro</td></tr>
+      <tr><td class="sub">3 Loop & eval</td><td>Deterministic double scoring; "a loop that deletes its failures is marketing".</td><td>Under D0: the loop figure, the versions table (v1–v5 with composition and verdict), one paragraph on the contract, v3_1 per D2, then <b>go deep →</b>. Commands, taxonomy, panel definitions and the cycle log move to the deep page.</td><td>New loop SVG (above) inline via <code>_includes/diagrams/loop/convfinqa-agent.svg</code>; keep or drop the 6 MB v2 iframe (D4)</td></tr>
+      <tr><td class="sub">4 Deployed</td><td>All of it.</td><td>Add the served == champion smoke assertion; bundle id in the rollback sentence.</td><td>topology SVG unchanged</td></tr>
+      <tr><td class="sub">5 Guardrails</td><td>All of it.</td><td>One sentence: the teacher and prompt-writer are built by the same choke point, so the demo container cannot run a cycle.</td><td>—</td></tr>
+      <tr><td class="sub">6 Observability</td><td>Three sources never blended; em dash not zero.</td><td>Replace "not built: per-call spans" with the MLflow span tree and the provider-separation rule; cost line for a 50-report cycle.</td><td>Optional MLflow screenshot (D4)</td></tr>
+      <tr><td class="sub">7 Scorecard</td><td>Rendered by the layout.</td><td>Front-matter rows only.</td><td>—</td></tr>
+    </tbody></table></div>
+</div></section>
+
+<section class="blk" id="decisions"><div class="wrap">
+  <div class="hd"><p class="label">05 · decisions</p><h2>Seven choices that change the text</h2><p class="small">Pick, add a note if you like, queue. Nothing is sent until you press Send to Agent in Lavish. My recommendation is first in each list.</p></div>
+  <div class="grid g2">
+
+    <form class="q" data-lavish-question="D0" onsubmit="return qsubmit(event,'D0 page structure')">
+      <h3>D0 · Page structure</h3><p class="why">Your question from the review: a maintained deep page under the case study, with the case study as the visual summary and a go-deep link. Section 03b above has the cost and the risks.</p>
+      <label><input type="radio" name="a" value="three levels: add the deep collection, layout, template and lint contract now; case study section 3 becomes figure + versions table + go-deep link; the deep page holds setup, protocol, taxonomy, tool table, screenshots and the cycle log" checked> <span>Three levels now: build the deep collection in this PR; §3 becomes figure + table + link; the depth moves to <code>/projects/convfinqa-agent/eval-loop/</code>.<span class="rec">recommended</span></span></label>
+      <label><input type="radio" name="a" value="two levels: keep all the depth inside case study section 3 and the practice page; no new page type"> <span>Two levels: keep the depth in §3 and the practice. No new page type, longer case study.</span></label>
+      <label><input type="radio" name="a" value="case study now sized for a later deep page; build the deep collection in a follow-up PR"> <span>Case study now, sized so §3 can be trimmed later; deep collection in a follow-up PR.</span></label>
+      <textarea name="note" placeholder="notes (optional) — e.g. a different URL or spine for the deep page"></textarea>
+      <div class="row"><button class="btn" type="submit">Queue answer</button><span class="queued" data-q="D0"></span></div>
+    </form>
+
+    <form class="q" data-lavish-question="D1" onsubmit="return qsubmit(event,'D1 card metric')">
+      <h3>D1 · The matrix metric</h3><p class="why">The home-page column needs one number with its denominator. The user's brief: design over improvement.</p>
+      <label><input type="radio" name="a" value="79.7% on the unseen test split (149/187), label 'v5 over 77.5%'" checked> <span>79.7% · "unseen test split (149/187) · v5 over 77.5%"<span class="rec">recommended</span></span></label>
+      <label><input type="radio" name="a" value="keep 77.1% on 770 as the metric and put v5 in prose only"> <span>Keep 77.1% (594/770); v5 in the prose only. Stable but describes the retired path.</span></label>
+      <label><input type="radio" name="a" value="a design metric such as '1 agent / cycle' with accuracy in proof_line only"> <span>A design metric ("1 agent / cycle · 0 holdout openings"); accuracy stays in proof_line.</span></label>
+      <textarea name="note" placeholder="notes (optional)"></textarea>
+      <div class="row"><button class="btn" type="submit">Queue answer</button><span class="queued" data-q="D1"></span></div>
+    </form>
+
+    <form class="q" data-lavish-question="D2" onsubmit="return qsubmit(event,'D2 how to tell v3_1')">
+      <h3>D2 · How to tell the v3_1 story</h3><p class="why">Refused on 770 under the flip-veto rule; promoted on 44 train questions the morning the loop first turned; kept as baseline by the owner's rollback. All three are on the public registry history.</p>
+      <label><input type="radio" name="a" value="tell all three events in one short table row and name the 44-question promotion as the reason the test-only rule exists" checked> <span>Tell all three in one row, and make the 44-question promotion the origin of the "test evidence only" rule.<span class="rec">recommended</span></span></label>
+      <label><input type="radio" name="a" value="say v3_1 was refused on 770 and then chosen as the loop's baseline by owner decision; omit the train-10 promotion"> <span>Refused on 770, then chosen as the loop's baseline by owner decision. Omit the train-10 event.</span></label>
+      <textarea name="note" placeholder="notes (optional)"></textarea>
+      <div class="row"><button class="btn" type="submit">Queue answer</button><span class="queued" data-q="D2"></span></div>
+    </form>
+
+    <form class="q" data-lavish-question="D3" onsubmit="return qsubmit(event,'D3 practice page')">
+      <h3>D3 · The eval-loop practice page</h3><p class="why"><code>_practices/eval-loop.md</code> still says champion v2, quotes the flip-veto refusal, and its pattern step 5 ("any pass→fail blocks") now contradicts ConvFinQA. The lint runs <code>--all</code>, so both pages ship together.</p>
+      <label><input type="radio" name="a" value="update the practice page in the same PR: ConvFinQA section, evidence table, and soften pattern step 5 to flip-veto or net-positive with significance recorded" checked> <span>Same PR: refresh the ConvFinQA section and evidence table; step 5 becomes "per-case flips, or a net-positive paired test with its p recorded".<span class="rec">recommended</span></span></label>
+      <label><input type="radio" name="a" value="only update the ConvFinQA facts on the practice page, leave step 5 as is and note ConvFinQA as the exception"> <span>Facts only; keep step 5, note ConvFinQA as the exception with its reason.</span></label>
+      <label><input type="radio" name="a" value="leave the practice page for a later PR"> <span>Leave the practice page for a later PR.</span></label>
+      <textarea name="note" placeholder="notes (optional)"></textarea>
+      <div class="row"><button class="btn" type="submit">Queue answer</button><span class="queued" data-q="D3"></span></div>
+    </form>
+
+    <form class="q" data-lavish-question="D4" onsubmit="return qsubmit(event,'D4 media')">
+      <h3>D4 · Media</h3><p class="why">Eight MLflow screenshots (1220×972) exist under the agent repo's <code>.lavish/s05_assets/</code>. The 6 MB v2 prediction report iframe is now evidence for the retired path.</p>
+      <label><input type="radio" name="a" value="add one MLflow screenshot (challenger trace tree, 08_challenger_tree.jpg) to section 6 and drop the 6 MB v2 iframe" checked> <span>One MLflow screenshot in §6 (the challenger trace tree); drop the v2 iframe.<span class="rec">recommended</span></span></label>
+      <label><input type="radio" name="a" value="add one MLflow screenshot and keep the v2 iframe"> <span>Add the screenshot, keep the iframe.</span></label>
+      <label><input type="radio" name="a" value="no screenshots; console retake only"> <span>No MLflow screenshots; only the console retake.</span></label>
+      <textarea name="note" placeholder="notes (optional)"></textarea>
+      <div class="row"><button class="btn" type="submit">Queue answer</button><span class="queued" data-q="D4"></span></div>
+    </form>
+
+    <form class="q" data-lavish-question="D5" onsubmit="return qsubmit(event,'D5 upstream fixes')">
+      <h3>D5 · The two upstream defects</h3><p class="why">Dockerfile never copies <code>evaluation/splits/</code> (Dataset page 500 in demo); <code>/eval/runs</code> omits v5. Fixing is a small PR in ConvFinQA-agent plus a smoke assertion.</p>
+      <label><input type="radio" name="a" value="open a small fix PR in ConvFinQA-agent first (Dockerfile COPY evaluation/splits, smoke asserts /eval/dataset, /eval/runs includes evalloop runs), then write the page claiming seven pages" checked> <span>Fix upstream first, then the page claims seven live pages.<span class="rec">recommended</span></span></label>
+      <label><input type="radio" name="a" value="write the page now saying six pages are live and Dataset is dev-only; fix upstream later"> <span>Write the page now: six live, Dataset dev-only. Fix later.</span></label>
+      <textarea name="note" placeholder="notes (optional)"></textarea>
+      <div class="row"><button class="btn" type="submit">Queue answer</button><span class="queued" data-q="D5"></span></div>
+    </form>
+
+    <form class="q" data-lavish-question="D6" onsubmit="return qsubmit(event,'D6 judge row')">
+      <h3>D6 · Rubric R2 judge</h3><p class="why">Scoring is still deterministic. The teacher is an LLM in the loop's judgement path, but it attributes rather than grades, and its κ check has no number yet.</p>
+      <label><input type="radio" name="a" value="keep judge = na, add a sentence that the teacher attributes and never scores, with the kappa sheet named as the pending trust check" checked> <span>Keep <code>na</code>; add the teacher-attributes-never-scores sentence and name the pending κ check.<span class="rec">recommended</span></span></label>
+      <label><input type="radio" name="a" value="set judge = partial: the teacher is an LLM judge of failure cause and its kappa check is unlabelled"> <span>Set <code>partial</code>: the teacher judges cause; κ unlabelled is the reason.</span></label>
+      <textarea name="note" placeholder="notes (optional)"></textarea>
+      <div class="row"><button class="btn" type="submit">Queue answer</button><span class="queued" data-q="D6"></span></div>
+    </form>
+  </div>
+</div></section>
+
+<section class="blk" id="plan"><div class="wrap">
+  <div class="hd"><p class="label">06 · work plan and risks</p><h2>Nine steps on this branch</h2></div>
+  <div class="grid g2">
+    <div class="panel">
+      <ol class="steps">
+        <li>(D0) Wire the deep level: <code>deep</code> collection, <code>_layouts/deep.html</code>, <code>_templates/deep.md</code>, the <code>--deep</code> lint contract, the <code>deep:</code> key on projects.</li>
+        <li>(D5) Fix PR in ConvFinQA-agent: Dockerfile copies <code>evaluation/splits/</code>; smoke asserts <code>/eval/dataset?split=test</code> is 200; <code>/eval/runs</code> lists evalloop runs. Redeploy, re-probe.</li>
+        <li>Rewrite front matter: card lines, stack, skills_detail (+mlops), sections summaries, nine rubric rows with proof paths that resolve.</li>
+        <li>Rewrite §1–§6 to the tables above; §3 shrinks to figure + versions table + link. Every near-80-word paragraph becomes a table or list. Target under 2,200 words.</li>
+        <li>Write <code>_deep/convfinqa-agent/eval-loop.md</code> from this artifact: setup, one cycle with commands, gate and promote, the cycle log, what changed since. Dated evidence note.</li>
+        <li>Diagrams: update the agent SVG's prompt-set node; add the loop SVG under <code>_includes/diagrams/loop/</code> in the site contract (viewBox, <code>class="dia"</code>, <code>&lt;title&gt;</code> per group, marker id <code>lp-convfinqa</code>); topology unchanged.</li>
+        <li>Media: retake <code>demo-console.png</code> from the live v5 console; copy the chosen MLflow screenshot to <code>assets/img/convfinqa/</code> (D4).</li>
+        <li>(D3) Practice page: ConvFinQA section, evidence table with today's commands, step 5 wording, failure mode "a gate that vetoes on flips it cannot power".</li>
+        <li><code>lint_case_study.py --all</code> (with net, to confirm the demo URL), container build, <code>/design-audit</code> if the figure changes the page, then <code>/no-mistakes</code> and a PR to master.</li>
+      </ol>
+    </div>
+    <div class="panel">
+      <p class="label">risks · what could make the page wrong again</p>
+      <ul class="tight" style="margin-top:var(--s3)">
+        <li><b>Significance.</b> p = 0.50 on 187 questions. Any sentence that says "improved" without "not significant" beside it is the flattering-zero failure the page itself warns about.</li>
+        <li><b>The Opus teacher that never shipped.</b> The s04 plan and its diagram say Claude Agent SDK / Opus 5; the code says deepseek-v4-pro via pydantic-ai. The page follows the code; the plan is history.</li>
+        <li><b>Seven pages.</b> Until D5 lands, the live Dataset page is a 500. A claim the smoke test does not assert is a claim a visitor can falsify.</li>
+        <li><b>Denominators.</b> 770 (corpus), 187 (test-50 shared set), 44 (train-10), 123 (program turns). Every number carries its own.</li>
+        <li><b>Practice drift.</b> The practice's step 5 and ConvFinQA's rule now disagree; the lint cannot see that, only a reader can.</li>
+        <li><b>MLflow snapshot has 0 runs.</b> <code>evaluation/mlflow_snapshot.json</code> exports registry and versions only, so the demo Experiments tab shows versions, not runs. Verify in the browser before describing it.</li>
+      </ul>
+    </div>
+  </div>
+</div></section>
+
+<footer><div class="wrap">design source: the subject project's own tokens (nmp-dsci.github.io/assets/css/tokens.css) · facts verified 2026-09-03 against ConvFinQA-agent @ dc3efb2 and the live demo</div></footer>
+
+<script>
+function qsubmit(ev, title){
+  ev.preventDefault();
+  const f = ev.currentTarget, fd = new FormData(f);
+  const a = fd.get('a'); if(!a) return false;
+  const note = (fd.get('note')||'').toString().trim();
+  const q = f.getAttribute('data-lavish-question');
+  const prompt = title + ': ' + a + (note ? ' — note: ' + note : '');
+  const out = f.querySelector('.queued');
+  if (window.lavish && window.lavish.queuePrompt){
+    window.lavish.queuePrompt(prompt, { tag:'decision', text: q + ': ' + a, element: f, queueKey: q, data:{ question:q, answer:a, note } });
+    out.textContent = 'queued · ' + q;
+  } else { out.textContent = 'selected (open in Lavish to queue) · ' + q; }
+  return false;
+}
+</script>
+</body>
+</html>

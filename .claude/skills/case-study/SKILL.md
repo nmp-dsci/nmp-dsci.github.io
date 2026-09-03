@@ -293,6 +293,27 @@ less, and why. Every count under "Evidence" needs the command that reproduces
 it, and "Failure modes" needs a named failure with its fix, not a list of
 virtues.
 
+## `/case-study deep <slug> <name>`
+
+The third level. A deep page is one system's setup in full, under its case
+study, maintained every cycle — the case study stays the 60–90 second scan and
+links down with "go deep"; the matrix never reads from the deep page.
+
+```bash
+mkdir -p _deep/<slug>
+cp _templates/deep.md _deep/<slug>/<name>.md          # → /projects/<slug>/<name>/
+uv run --with pyyaml --no-project python scripts/lint_case_study.py _deep/<slug>/<name>.md
+```
+
+Its contract: `project: <slug>` and the case study's `deep: [<name>]` must both
+resolve (the link runs both ways), `updated:` is a date the `evidence_note`
+repeats, the spine is Setup → One cycle → Gate & promote → Cycle log → What
+changed since, and the same prose rules apply. It is not a second README:
+paste only the commands that reproduce a number, link the README for the rest.
+Every cycle, append a row to the cycle log and re-date the note. The case
+study's §3 can also carry `architecture.loop_diagram` (+ `loop_takeaway`,
+`loop_caption`), rendered by `fig-loop.html` and linted like the other two SVGs.
+
 ## Why a skill and not just a template
 
 A template can hold the shape. It cannot do the part that is actually hard.

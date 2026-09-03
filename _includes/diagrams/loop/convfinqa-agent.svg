@@ -1,0 +1,97 @@
+<svg class="dia" viewBox="0 0 360 236" role="img"
+     aria-label="The ConvFinQA eval loop as a ring: a committed split manifest feeds a run, every LLM call is traced to MLflow, turns are scored against gold with a per-agent panel, a teacher on the pro tier blames one agent for each report's first wrong turn, a challenger that changes only that agent is proposed and registered as a composition of four prompt lineages, a net-positive gate on the unseen test split decides promotion, a sealed holdout opens once for release, CI deploys and a smoke test asserts the served bundle is the champion, production traces are kept by source, and the promoted challenger becomes the next cycle's baseline; off the ring sit the single LLM choke point and the human checks.">
+  <defs>
+    <marker id="lp-convfinqa" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="currentColor"/>
+    </marker>
+  </defs>
+
+  <!-- top row: split → run → trace → score -->
+  <g><title>01 · split manifest — evalloop/splits.py writes evaluation/splits/eval_loop_v1.json: train 53, test 54, holdout 56 reports (202 / 201 / 207 questions), seed 2026, stratified on Type II, drawn from the conversations neither GEPA nor s7 ever saw; the committed id lists, not the seed, are the truth</title>
+    <rect class="nd" x="6" y="8" width="80" height="34" rx="6"/>
+    <text class="tx" x="46" y="22">manifest</text>
+    <text class="tx s" x="46" y="35">3 splits</text></g>
+
+  <g><title>02 · run — evalloop/runner.py: one split × one version = one MLflow run; every turn of a report is answered with the agent's own earlier answers as history, so a wrong turn poisons the turns below it exactly as in production; four pydantic-ai agents on deepseek-v4-flash</title>
+    <rect class="nd" x="96" y="8" width="80" height="34" rx="6"/>
+    <text class="tx" x="136" y="22">run</text>
+    <text class="tx s" x="136" y="35">per version</text></g>
+
+  <g><title>03 · trace — tracking/tracing.py: mlflow.pydantic_ai.autolog records every agent invocation as spans, run → report → question → agent stage → Agent.run, stamped with version, split and run name</title>
+    <rect class="nd" x="186" y="8" width="80" height="34" rx="6"/>
+    <text class="tx" x="226" y="22">trace</text>
+    <text class="tx s" x="226" y="35">every call</text></g>
+
+  <g><title>04 · score — evaluation/metrics.py and evalloop/stage_scores.py: numeric match and program match per turn, a cascade flag, and a per-agent panel derived from the gold program with zero API calls (triage turn type, preprocess skeleton, retriever operand recall, calculator execution)</title>
+    <rect class="nd" x="276" y="8" width="80" height="34" rx="6"/>
+    <text class="tx" x="316" y="22">score</text>
+    <text class="tx s" x="316" y="35">gold panel</text></g>
+
+  <!-- right column: teacher → propose -->
+  <g><title>05 · teacher — evalloop/teacher.py on deepseek-v4-pro: reads each report's first wrong turn with all four stage captures and the gold program, blames exactly one agent using a frozen failure taxonomy, flags gold_suspect, and proposes one rule; prior diagnoses are read back from MLflow so it extends rather than repeats</title>
+    <rect class="nd hi" x="276" y="58" width="80" height="34" rx="6"/>
+    <text class="tx" x="316" y="72">teacher</text>
+    <text class="tx s" x="316" y="85">one agent</text></g>
+
+  <g><title>06 · propose — the prompt-writer merges that agent's rules into at most five and writes a generated module that changes only that agent's prompt: prompts/v5.py is v3_1 with preprocess p4; the other three prompts are imported unchanged</title>
+    <rect class="nd hi" x="276" y="108" width="80" height="34" rx="6"/>
+    <text class="tx" x="316" y="122">propose</text>
+    <text class="tx s" x="316" y="135">challenger</text></g>
+
+  <!-- bottom row, right to left: register → gate → release → deploy -->
+  <g><title>07 · register — tracking/registry.py and prompt_ledger.py: a bundle is a composition of four per-agent prompt hashes (t3.p4.r3.c3) plus both model ids, the dataset hash and the code SHA; prompts mirror into MLflow's prompt registry with a champion alias; specs are never deleted</title>
+    <rect class="nd" x="276" y="158" width="80" height="34" rx="6"/>
+    <text class="tx" x="316" y="172">register</text>
+    <text class="tx s" x="316" y="185">t3.p4.r3.c3</text></g>
+
+  <g><title>08 · gate — tracking/comparator.py and evalloop/gate.py, on the unseen test split only: net-positive paired comparison on the shared questions, exact McNemar p recorded on every verdict and flagged when the sample cannot support significance; --promote is refused on train-split evidence; the targeted gate also needs the changed agent's own metric to move</title>
+    <rect class="nd hi" x="186" y="158" width="80" height="34" rx="6"/>
+    <text class="tx" x="226" y="172">gate</text>
+    <text class="tx s" x="226" y="185">test split</text></g>
+
+  <g><title>09 · release — evalloop/release.py: the holdout opens once, for the current champion only, behind an explicit acknowledgement flag; every opening is appended to the registry history so no later version can claim it as unseen; opened 0 times so far, mechanism tested with stubs</title>
+    <rect class="nd" x="96" y="158" width="80" height="34" rx="6"/>
+    <text class="tx" x="136" y="172">release</text>
+    <text class="tx s" x="136" y="185">holdout ×1</text></g>
+
+  <g><title>10 · deploy — the offline eval-regression gate re-scores the champion from its own committed CSV on every PR; merge to main deploys by GitHub OIDC to ECR and App Runner, Terraform reconciles, and demo_smoke.sh asserts the served bundle equals the registry champion</title>
+    <rect class="nd" x="6" y="158" width="80" height="34" rx="6"/>
+    <text class="tx" x="46" y="172">deploy</text>
+    <text class="tx s" x="46" y="185">smoke test</text></g>
+
+  <!-- left column: observe, then back to the manifest -->
+  <g><title>11 · observe — tracking/traces.py and serving/routes/metrics.py: one row per turn in SQLite, split by serving / demo / eval and never blended; serving opts into MLflow spans with MLFLOW_TRACING=1; the promoted challenger is the next cycle's baseline</title>
+    <rect class="nd" x="6" y="108" width="80" height="34" rx="6"/>
+    <text class="tx" x="46" y="122">observe</text>
+    <text class="tx s" x="46" y="135">by source</text></g>
+
+  <!-- off the ring: the choke point and the human -->
+  <g><title>llm.py — the single LLM choke point: deepseek-v4-flash for the four agents on every turn, deepseek-v4-pro only for the teacher and prompt-writer; retry, the 120 s ceiling and the demo gate live here and nowhere else, so the keyless demo container can run neither a turn nor a cycle</title>
+    <rect class="nd ext" x="96" y="58" width="170" height="34" rx="6"/>
+    <text class="tx" x="181" y="72">llm.py choke point</text>
+    <text class="tx s" x="181" y="85">flash ×4 · pro teacher</text></g>
+
+  <g><title>the human checks — evalloop/kappa.py: a 30-case labelling sheet measures teacher-vs-human agreement on which agent failed (bar κ ≥ 0.7; the sheet is committed and not yet labelled); the gold_suspect rows the teacher flags are settled at /admin/dataset</title>
+    <rect class="nd ext" x="96" y="108" width="170" height="34" rx="6"/>
+    <text class="tx" x="181" y="122">human · κ sheet</text>
+    <text class="tx s" x="181" y="135">30 cases · gold_suspect</text></g>
+
+  <g><title>the ring: the promoted challenger becomes the baseline of the next cycle; a refused challenger keeps its bundle, its runs and its verdict on the registry</title>
+    <text class="tx s" x="52" y="72">next</text>
+    <text class="tx s" x="52" y="84">cycle</text></g>
+
+  <path class="ed" d="M86,25 H94" marker-end="url(#lp-convfinqa)"/>
+  <path class="ed" d="M176,25 H184" marker-end="url(#lp-convfinqa)"/>
+  <path class="ed" d="M266,25 H274" marker-end="url(#lp-convfinqa)"/>
+  <path class="ed" d="M316,42 V56" marker-end="url(#lp-convfinqa)"/>
+  <path class="ed" d="M316,92 V106" marker-end="url(#lp-convfinqa)"/>
+  <path class="ed" d="M316,142 V156" marker-end="url(#lp-convfinqa)"/>
+  <path class="ed" d="M276,175 H268" marker-end="url(#lp-convfinqa)"/>
+  <path class="ed" d="M186,175 H178" marker-end="url(#lp-convfinqa)"/>
+  <path class="ed" d="M96,175 H88" marker-end="url(#lp-convfinqa)"/>
+  <path class="ed" d="M46,158 V144" marker-end="url(#lp-convfinqa)"/>
+  <path class="ed" d="M46,108 V44" marker-end="url(#lp-convfinqa)"/>
+
+  <text class="cap" x="6" y="212">pydantic-ai · MLflow · pandas · GH Actions</text>
+  <text class="cap" x="6" y="226">champion v5 · v4 refused · holdout unopened</text>
+</svg>

@@ -1,0 +1,18 @@
+{%- comment -%}
+  The eval-loop figure inside a case study (§3), rendered when
+  page.architecture.loop_diagram is set. Same contract as fig-agent: the SVG is
+  inlined, the caption states the takeaway first (loop_takeaway) and then the
+  detail (loop_caption).
+{%- endcomment -%}
+{%- assign dgm  = page.architecture.loop_diagram  | default: "" | strip -%}
+{%- assign cap  = page.architecture.loop_caption  | default: "" | strip -%}
+{%- assign take = page.architecture.loop_takeaway | default: "" | strip -%}
+{%- if dgm != "" %}
+<figure class="fig">
+  <div class="dia-frame">{% include {{ page.architecture.loop_diagram }} %}</div>
+  <figcaption>
+    <b>{% if take != "" %}{{ take }}{% else %}The eval loop.{% endif %}</b>
+    {%- if cap != "" %} {{ cap }}{% endif -%}
+  </figcaption>
+</figure>
+{%- endif %}

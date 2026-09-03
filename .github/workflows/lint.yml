@@ -33,6 +33,7 @@ on:
     paths:
       - "_projects/**"
       - "_practices/**"
+      - "_deep/**"
       - "_data/**"
       - "_includes/diagrams/**"
       - "_templates/**"
@@ -45,6 +46,7 @@ on:
     paths:
       - "_projects/**"
       - "_practices/**"
+      - "_deep/**"
       - "_data/**"
       - "_includes/diagrams/**"
       - "assets/css/tokens.css"

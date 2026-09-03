@@ -1,5 +1,5 @@
 <svg class="dia" viewBox="0 0 360 160" role="img"
-     aria-label="ConvFinQA agent structure: a turn — the question plus the filing and the conversation history — passes through four typed pydantic-ai agents in sequence, triage then preprocess then retriever then calculator, all four loading one versioned prompt set; number turns short-circuit at the retriever and go straight to the answer, while program turns are computed through six explicit calculator tools.">
+     aria-label="ConvFinQA agent structure: a turn — the question plus the filing and the conversation history — passes through four typed pydantic-ai agents in sequence, triage then preprocess then retriever then calculator, each loading its own versioned prompt lineage so a bundle is a composition of four; number turns short-circuit at the retriever and go straight to the answer, while program turns are computed through six explicit calculator tools.">
   <defs>
     <marker id="ar-convfinqa" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
       <path d="M0,0 L8,4 L0,8 z" fill="currentColor"/>
@@ -21,10 +21,10 @@
     <text class="tx" x="227" y="30">preprocess</text>
     <text class="tx s" x="227" y="45">program</text></g>
 
-  <g><title>the versioned prompt set — v1, v2, generated v3_1; a module per version, auto-discovered, loaded by all four agents</title>
+  <g><title>four prompt lineages — each agent's prompt is versioned on its own (triage t3, preprocess p4, retriever r3, calculator c3); a bundle is the composition, so "v5 changed only preprocess" is a fact the registry can state</title>
     <rect class="nd" x="288" y="12" width="64" height="44" rx="8"/>
-    <text class="tx" x="320" y="30">prompt</text>
-    <text class="tx s" x="320" y="45">set v2</text></g>
+    <text class="tx" x="320" y="30">prompts</text>
+    <text class="tx s" x="320" y="45">t3·p4·r3·c3</text></g>
 
   <g><title>retriever agent — pulls the raw values out of the report's text and table, and answers number turns directly</title>
     <rect class="nd hi" x="6" y="80" width="88" height="44" rx="8"/>
@@ -51,6 +51,6 @@
   <path class="ed dash" d="M320,56 V58 Q320,64 314,64 H250 Q244,64 244,58" marker-end="url(#ar-convfinqa)">
     <title>one versioned prompt set is loaded by all four agents</title></path>
 
-  <text class="cap" x="6" y="140">champion v2 · v3_1 refused by the gate</text>
-  <text class="cap" x="6" y="154">every turn traced</text>
+  <text class="cap" x="6" y="140">champion v5 · v4 refused · 1 agent per cycle</text>
+  <text class="cap" x="6" y="154">every turn traced · teacher on the pro tier</text>
 </svg>

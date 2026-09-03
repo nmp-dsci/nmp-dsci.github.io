@@ -1,0 +1,76 @@
+---
+layout: default
+---
+{%- comment -%}
+  A deep page is one system's setup in full — the level under a case study.
+  The case study is the 60–90 second scan; this page is allowed to be long,
+  command-heavy and dated, and it is maintained every cycle. It is reached only
+  from its parent case study's "go deep" link, never from the matrix, so the
+  headline numbers stay the case study's job. Same reading surface as a
+  practice: TOC, prose column, evidence note, rail.
+{%- endcomment -%}
+{%- assign dims = site.data.rubric.dimensions -%}
+{%- assign ndim = dims | size -%}
+{%- assign nrub = page.rubric | size -%}
+{%- assign pk = page.kicker | default: "deep dive" | strip -%}
+{%- assign pnote = page.evidence_note | default: "" | strip -%}
+{%- assign pupd = page.updated | default: "" -%}
+{%- assign parent = nil -%}
+{%- for p in site.projects -%}{%- if p.slug == page.project -%}{%- assign parent = p -%}{%- endif -%}{%- endfor -%}
+<article class="practice deep">
+  <header class="page-head wrap">
+    <p class="crumb">{% if parent %}<a href="{{ parent.url | relative_url }}">← {{ parent.title }}</a>{% else %}<a href="{{ '/#work' | relative_url }}">← All systems</a>{% endif %} · {{ pk }}</p>
+    <h1>{{ page.title }}</h1>
+    <p class="dek">{{ page.summary }}</p>
+    <p class="meta">
+      <span><b data-reading-time>—</b> read</span>
+      {%- if pupd != "" %}<span>maintained · numbers last re-run <b>{{ pupd }}</b></span>{% endif -%}
+    </p>
+  </header>
+
+  <div class="wrap reader">
+    <nav class="toc" data-toc aria-label="On this page"></nav>
+
+    <div class="prose" data-sections="{{ page.sections | default: empty | jsonify | escape }}">
+      {{ content }}
+
+      {%- if pnote != "" %}
+      <aside class="evidence-note">
+        <b>How to re-run these numbers</b>
+        {{ pnote }}
+      </aside>
+      {%- endif %}
+    </div>
+
+    <aside class="rail">
+      <div class="rail-box">
+        <b>Where this sits</b>
+        <div class="applies">
+          {%- if parent %}
+          <div class="applies-row">
+            <span class="label">Part of</span>
+            <span class="chips"><a class="chip" href="{{ parent.url | relative_url }}">{{ parent.title }} →</a></span>
+          </div>
+          {%- endif %}
+          {%- if nrub > 0 %}
+          <div class="applies-row">
+            <span class="label">Explains</span>
+            <span class="chips">
+              {%- for i in (1..ndim) -%}
+                {%- for d in dims -%}
+                  {%- if d[1].order == i and page.rubric contains d[0] -%}
+              <a class="chip" href="{{ '/' | relative_url }}#rubric-{{ d[0] }}" title="{{ d[1].question | escape }}">{{ d[1].ref }} · {{ d[1].short | default: d[1].label | escape }}</a>
+                  {%- endif -%}
+                {%- endfor -%}
+              {%- endfor -%}
+            </span>
+          </div>
+          {%- endif %}
+        </div>
+        <p class="rail-note">The scan is the case study; this page is the setup behind it, and it changes every cycle. The matrix and the card lines never read from here.</p>
+      </div>
+    </aside>
+  </div>
+</article>
+{%- if site.github.build_revision -%}{%- assign av = site.github.build_revision | slice: 0, 8 -%}{%- else -%}{%- assign av = site.time | date: "%Y%m%d%H%M%S" -%}{%- endif -%}
+<script src="{{ '/assets/js/study.js' | relative_url }}?v={{ av }}" defer></script>

@@ -17,7 +17,13 @@
         <li><i aria-hidden="true">├── </i><a href="{{ '/#work' | relative_url }}">case studies</a></li>
         {%- for p in live %}
         {%- assign p_scr = p.production.score | default: "" | strip -%}
-        <li><i aria-hidden="true">│   {% if forloop.last %}└── {% else %}├── {% endif %}</i><a href="{{ p.url | relative_url }}">{{ p.title | downcase }}</a>{% if p_scr != "" %}<span class="pt-s">{{ p_scr | remove: " " }} · live</span>{% endif %}</li>
+        {%- assign p_last = forloop.last -%}
+        <li><i aria-hidden="true">│   {% if p_last %}└── {% else %}├── {% endif %}</i><a href="{{ p.url | relative_url }}">{{ p.title | downcase }}</a>{% if p_scr != "" %}<span class="pt-s">{{ p_scr | remove: " " }} · live</span>{% endif %}</li>
+        {%- comment -%} the deep pages under this system, one level further in {%- endcomment -%}
+        {%- assign dd = site.deep | where: "project", p.slug | sort: "order" -%}
+        {%- for d in dd %}
+        <li><i aria-hidden="true">│   {% if p_last %}    {% else %}│   {% endif %}{% if forloop.last %}└── {% else %}├── {% endif %}</i><a href="{{ d.url | relative_url }}">{{ d.short | default: d.title | downcase }}</a><span class="pt-s">deep</span></li>
+        {%- endfor %}
         {%- endfor %}
         <li><i aria-hidden="true">├── </i><a href="{{ '/#practices' | relative_url }}">practices</a></li>
         {%- for pr in prac %}
