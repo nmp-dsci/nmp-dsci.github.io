@@ -299,13 +299,13 @@ Promotion is decided on the unseen test split and nowhere else: a net-positive p
 on the shared questions, with the exact McNemar p recorded on the verdict and flagged when the
 sample cannot support significance. `--promote` on train evidence is refused by the tool.
 
-| Version | Composition | Where it came from | Evidence | What the gate did |
-|---|---|---|---|---|
-| `v1` | t1.p1.r1.c1 | the starting prompt set | 770 q: 73.0% | champion, until v2 |
-| `v2` | t2.p2.r2.c2 | a real GEPA run (DSPy) | 770 q: 77.1% · never-seen 309: 77.7% | promoted |
-| `v3_1` | t3.p3.r3.c3 | the s7 harness, 39 verified rules | 770 q: 76.2% | refused on 770 under the old flip-veto rule; the loop's baseline since |
-| `v4` | t3.p3.r4.c3 | teacher, retriever only | test-10: recall .744 → .780, accuracy 79.4% → 67.6% | **refused** — the calculator collapsed downstream |
-| `v5` | t3.p4.r3.c3 | teacher, preprocess only, 5 rules from 30 diagnoses | test-50: 77.5% → 79.7% (187 q), 12 fixed / 8 broken, p 0.50 | **promoted** · champion |
+| Subject | Deliverable | Accuracy | Verdict |
+|---|---|---|---|
+| `v1` · t1.p1.r1.c1 | the starting prompt set | 770 q: 73.0% | champion, until v2 |
+| `v2` · t2.p2.r2.c2 | a real GEPA run (DSPy) | 770 q: 77.1% · never-seen 309: 77.7% | promoted |
+| `v3_1` · t3.p3.r3.c3 | the s7 harness, 39 verified rules | 770 q: 76.2% | refused on 770 under the old flip-veto rule; the loop's baseline since |
+| `v4` · t3.p3.r4.c3 | teacher, retriever only · `prompts/v4.py` | test-10: recall .744 → .780, accuracy 79.4% → 67.6% | **refused** — the calculator collapsed downstream |
+| `v5` · t3.p4.r3.c3 | teacher, preprocess only, 5 rules from 30 diagnoses · `prompts/v5.py` | test-50: 77.5% → 79.7% (187 q), 12 fixed / 8 broken, p 0.50 | **promoted** · champion |
 
 **The v3_1 row carries three events, all public on the registry.** Refused on the full 770 under
 the flip-veto rule; promoted over v2 on a 44-question train run the morning the loop first

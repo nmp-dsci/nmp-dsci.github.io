@@ -149,16 +149,16 @@ champions from the 770-row corpus CSV. Before 2026-09-03 the gate would have loo
 
 Newest first. Accuracies recomputed from the committed CSVs; verdicts from the registry history.
 
-| Date | Cycle | Version · composition | Changed | Split · n | Result | Verdict |
-|---|---|---|---|---|---|---|
-| 2026-09-02 | 2 | v5 · t3.p4.r3.c3 | preprocess (5 merged rules from 14 of 30 diagnoses) | test-50 · 187 | 77.5% → 79.7% · 12 fixed / 8 broken · p 0.503 | **promoted** · champion |
-| 2026-09-02 | 2 | v5 · t3.p4.r3.c3 | as above | train-50 · 193 | 66.8% → 70.5% · first-faults 30 → 27 | optimisation signal only |
-| 2026-09-02 | 2 | teacher pass on v3_1 | — | train-50 · 30 first-wrong | preprocess 14 · retriever 10 · calculator 3 · triage 3 · 4 `gold_suspect` | 4 labels drifted from the frozen spelling; none used `new:` |
-| 2026-09-02 | smoke | v4 · t3.p3.r4.c3 | retriever (3 of 6 diagnosed faults) | test-10 · 34 | recall .744 → .780 · accuracy 79.4% → 67.6% · calculator .618 → .500 | **refused** |
-| 2026-09-02 | smoke | v4 · t3.p3.r4.c3 | as above | train-10 · 44 | 63.6% → 72.7% · 5 fixed / 1 broken · p 0.219 | promoted, then **rolled back** 11:34 (protocol change) |
-| 2026-09-02 | 0 | v3_1 over v2 | — | train-10 · 44 | 54.5% → 61.4% · 5 fixed / 2 broken · p 0.453 | promoted under the first net-positive rule, before "test only" |
-| 2026-08-28 | — | v2 · t2.p2.r2.c2 | GEPA (DSPy), full prompt set | corpus · 770 (never-seen 309) | 73.0% → 77.1% (77.7% never-seen) | champion by backfill |
-| 2026-05 | — | v3_1 · t3.p3.r3.c3 | s7 harness, 39 verified rules | corpus · 770 | 77.1% → 76.2% · 61 fixed / 68 broken | refused under the flip-veto rule |
+| Date | Subject | Deliverable | Split · n | Accuracy | Verdict |
+|---|---|---|---|---|---|
+| 2026-09-02 (cycle 2) | v5 · t3.p4.r3.c3 | preprocess (5 merged rules from 14 of 30 diagnoses) | test-50 · 187 | 77.5% → 79.7% · 12 fixed / 8 broken · p 0.503 | **promoted** · champion |
+| 2026-09-02 (cycle 2) | v5 · t3.p4.r3.c3 | as above | train-50 · 193 | 66.8% → 70.5% · first-faults 30 → 27 | optimisation signal only |
+| 2026-09-02 (cycle 2) | teacher pass on v3_1 | — | train-50 · 30 first-wrong | preprocess 14 · retriever 10 · calculator 3 · triage 3 · 4 `gold_suspect` | 4 labels drifted from the frozen spelling; none used `new:` |
+| 2026-09-02 (smoke) | v4 · t3.p3.r4.c3 | retriever (3 of 6 diagnosed faults) | test-10 · 34 | recall .744 → .780 · accuracy 79.4% → 67.6% · calculator .618 → .500 | **refused** |
+| 2026-09-02 (smoke) | v4 · t3.p3.r4.c3 | as above | train-10 · 44 | 63.6% → 72.7% · 5 fixed / 1 broken · p 0.219 | promoted, then **rolled back** 11:34 (protocol change) |
+| 2026-09-02 (cycle 0) | v3_1 over v2 | — | train-10 · 44 | 54.5% → 61.4% · 5 fixed / 2 broken · p 0.453 | promoted under the first net-positive rule, before "test only" |
+| 2026-08-28 | v2 · t2.p2.r2.c2 | GEPA (DSPy), full prompt set | corpus · 770 (never-seen 309) | 73.0% → 77.1% (77.7% never-seen) | champion by backfill |
+| 2026-05 | v3_1 · t3.p3.r3.c3 | s7 harness, 39 verified rules | corpus · 770 | 77.1% → 76.2% · 61 fixed / 68 broken | refused under the flip-veto rule |
 
 Two numbers the log keeps beside the promotion so it cannot be read as more than it is:
 p = 0.503 means the 12-versus-8 split is what chance produces about half the time on 20
