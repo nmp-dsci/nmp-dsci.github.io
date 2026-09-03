@@ -39,6 +39,13 @@ contract: the practice front matter, `systems:` slugs that resolve to
 _projects/ files, `rubric:` keys that resolve in _data/rubric.yml, and the
 five-H2 spine.
 
+Deep pages (--deep, or any file under _deep/<project>/) are one system's
+setup in full, maintained every cycle: `project:` resolves to a case study
+that lists the page under `deep:` (the link runs both ways), `updated:` is a
+date the `evidence_note` repeats, and the spine is Setup → One cycle →
+Gate & promote → Cycle log → What changed since. A case study may also carry
+`architecture.loop_diagram`, linted like the other two SVGs.
+
 Usage
     uv run --with pyyaml --no-project python scripts/lint_case_study.py \
         _projects/data-pilot.md --repo ../data-qa-agent
@@ -78,7 +85,9 @@ REQUIRED = [
 ]
 OPTIONAL = ["published", "media", "evidence", "layout", "permalink", "date",
             # the abbreviated column header the rubric matrix uses under 560px
-            "short"]
+            "short",
+            # names of the deep pages under _deep/<slug>/ this case study links to
+            "deep"]
 REQUIRED_NESTED = {
     "links": ["repo", "demo"],
     "architecture": ["diagram", "caption"],
@@ -113,6 +122,17 @@ PRACTICE_OPTIONAL = ["published", "layout", "permalink", "date", "tags", "featur
                      "short"]
 PRACTICE_SPINE = ["Problem", "Pattern", "In the three systems", "Evidence",
                   "Failure modes"]
+
+# A deep page is one system's setup in full, under its case study. It is
+# maintained every cycle, so the contract is about staying true over time: a
+# two-way link to the case study, a date the evidence note repeats, and a spine
+# whose last two sections are the ones that grow.
+DEEP_REQUIRED = ["title", "summary", "tldr", "kicker", "project", "rubric",
+                 "evidence_note", "updated"]
+DEEP_OPTIONAL = ["published", "layout", "permalink", "date", "tags", "featured", "order",
+                 "headline", "outcome", "proof_line", "sections", "short"]
+DEEP_SPINE = ["Setup", "One cycle", "Gate & promote", "Cycle log", "What changed since"]
+ISO_DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 
 HEADLINE_WORDS = 9        # the card's first line, read at a glance
 OUTCOME_WORDS = 25        # one sentence under it, on the home-page card
@@ -719,6 +739,9 @@ def lint_project(path: Path, repo: Path | None, why: str, no_net: bool) -> Repor
     check_diagram(rep, architecture.get("diagram") or "", "agent", "architecture.diagram")
     check_diagram(rep, production.get("topology_diagram") or "", "topology",
                   "production.topology_diagram")
+    if architecture.get("loop_diagram"):
+        check_diagram(rep, architecture["loop_diagram"], "loop", "architecture.loop_diagram")
+    check_deep_links(rep, fm, path)
     check_spine(rep, body)
     check_score(rep, production, rows)
     check_prose(rep, fm)
@@ -771,6 +794,93 @@ def lint_practice(path: Path) -> Report:
     return rep
 
 
+def check_deep_links(rep: Report, fm: dict, path: Path) -> None:
+    """`deep:` names the pages under _deep/<slug>/ this case study goes deep
+    into; each must exist and point back at this case study via `project:`."""
+    names = fm.get("deep")
+    if names is None:
+        return
+    if not isinstance(names, list):
+        rep.bad(f"deep: {names!r} is not a list of page names")
+        return
+    slug = path.stem
+    faults = []
+    for name in names:
+        target = SITE_ROOT / "_deep" / slug / f"{name}.md"
+        if not target.is_file():
+            faults.append(f"{name}: _deep/{slug}/{name}.md not found")
+            continue
+        try:
+            back = read_front_matter(target)[0].get("project")
+        except Exception as exc:  # the deep page's own lint will say more
+            faults.append(f"{name}: front matter does not parse ({exc})")
+            continue
+        if back != slug:
+            faults.append(f"{name}: its project: is {back!r}, not {slug!r}")
+    rep.verdict(not faults, f"deep: {len(names) - len(faults)}/{len(names)} pages resolve "
+                "under _deep/ and link back", *faults)
+
+
+def lint_deep(path: Path) -> Report:
+    rep = Report(rel(path) + "  (deep)")
+    try:
+        fm, body = read_front_matter(path)
+    except (ValueError, yaml.YAMLError) as exc:
+        rep.bad("front matter does not parse", *str(exc).splitlines())
+        return rep
+    rep.ok("front matter parses")
+    check_schema(rep, fm, DEEP_REQUIRED, DEEP_OPTIONAL, {}, "the deep-page schema")
+
+    project = str(fm.get("project") or "")
+    parent = SITE_ROOT / "_projects" / f"{project}.md"
+    faults = []
+    if not parent.is_file():
+        faults.append(f"project: _projects/{project}.md not found")
+    elif path.resolve().parent.name != project:
+        faults.append(f"the file lives under _deep/{path.resolve().parent.name}/, "
+                      f"not _deep/{project}/ — the folder is the URL")
+    else:
+        try:
+            listed = list(read_front_matter(parent)[0].get("deep") or [])
+        except Exception:
+            listed = []
+        if path.stem not in listed:
+            faults.append(f"_projects/{project}.md does not list {path.stem!r} under deep: "
+                          "— the link runs both ways")
+    rep.verdict(not faults, f"project: {project} resolves and links back", *faults)
+
+    claimed = list(fm.get("rubric") or [])
+    unknown = [d for d in claimed if d not in load_data("rubric.yml")["dimensions"]]
+    rep.verdict(not unknown,
+                f"rubric: {len(claimed) - len(unknown)}/{len(claimed)} dimensions in "
+                "_data/rubric.yml", *listing(not_a_dimension=unknown))
+
+    updated = fm.get("updated")
+    note = str(fm.get("evidence_note") or "")
+    stamp = updated.isoformat() if hasattr(updated, "isoformat") else str(updated or "")
+    faults = []
+    if not ISO_DATE.match(stamp):
+        faults.append(f"updated: {updated!r} is not a YYYY-MM-DD date")
+    elif stamp not in note:
+        faults.append(f"evidence_note does not name the updated date {stamp} — "
+                      "the note and the date drift apart otherwise")
+    rep.verdict(not faults, f"updated: {stamp}, named in the evidence note", *faults)
+
+    titles = [t for t, _ in h2_sections(body)]
+    faults = order_faults(titles, DEEP_SPINE)
+    hits = len([t for t in DEEP_SPINE if t in titles])
+    rep.verdict(not faults, f"spine: {hits}/5 sections present, in order", *faults,
+                fail_msg=f"spine: {hits}/5 sections match the contract")
+    check_prose(rep, fm)
+    for key, check in (("headline", check_headline), ("outcome", check_outcome),
+                       ("proof_line", check_proof_line)):
+        if key in fm:
+            check(rep, fm)
+    check_sections(rep, fm, body, required=False)
+    check_paragraphs(rep, body)
+    return rep
+
+
 # ------------------------------------------------------------------------ main
 
 
@@ -805,7 +915,9 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("files", nargs="*", type=Path, help="_projects/<slug>.md")
     parser.add_argument("--repo", type=Path, help="sibling repo the proof paths resolve against")
     parser.add_argument("--practice", action="store_true", help="use the practice contract")
-    parser.add_argument("--all", action="store_true", help="every published project and practice")
+    parser.add_argument("--deep", action="store_true", help="use the deep-page contract")
+    parser.add_argument("--all", action="store_true",
+                        help="every published project, practice and deep page")
     parser.add_argument("--no-net", action="store_true", help="skip the live links.demo check")
     parser.add_argument("--quiet", action="store_true", help="only show ✗ and ~ lines")
     args = parser.parse_args(argv)
@@ -814,6 +926,7 @@ def main(argv: list[str] | None = None) -> int:
     if args.all:
         for collection in ("_projects", "_practices"):
             targets += sorted(p for p in (SITE_ROOT / collection).glob("*.md") if is_published(p))
+        targets += sorted(p for p in (SITE_ROOT / "_deep").glob("*/*.md") if is_published(p))
     if not targets:
         parser.error("nothing to lint — pass a file or --all")
 
@@ -825,6 +938,8 @@ def main(argv: list[str] | None = None) -> int:
                 reports[-1].bad("no such file")
             elif args.practice or path.resolve().parent.name == "_practices":
                 reports.append(lint_practice(path))
+            elif args.deep or path.resolve().parent.parent.name == "_deep":
+                reports.append(lint_deep(path))
             elif args.repo is not None and not args.all:
                 repo = args.repo.resolve()
                 reports.append(lint_project(

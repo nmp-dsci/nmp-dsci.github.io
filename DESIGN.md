@@ -146,6 +146,7 @@ Committed as rules so they survive future sessions:
 | Home | Answer "who, what, and can he run it?" in one viewport | hero + matrix → three systems → the nine dimensions → scale ladder → practices → contact |
 | Case study | Reward a 90-second scan and a 12-minute read equally | header + TL;DR → TOC · prose · rail → scorecard → skills → next system |
 | Practice | Same reading template, no scorecard | header → TOC · prose · rail → applies-to → contact |
+| Deep page | One system's setup in full, under its case study, maintained every cycle; reached only from the case study's "go deep" link, never from the matrix | header → TOC · prose · rail → part-of → evidence note |
 | About | Who, what, proof, contact — in one screen | lead → what I work with → links |
 
 The seven-section case-study spine (`1 · Purpose & benefit` … `7 · Production

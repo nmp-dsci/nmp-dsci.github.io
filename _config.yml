@@ -12,6 +12,12 @@ collections:
   practices:
     output: true
     permalink: /practices/:name/
+  # Deep pages: one system's setup in full, maintained every cycle, reached only
+  # from its case study's "go deep" link. The file path is the URL:
+  # _deep/<project-slug>/<name>.md → /projects/<project-slug>/<name>/
+  deep:
+    output: true
+    permalink: /projects/:path/
 
 defaults:
   - scope:
@@ -24,6 +30,11 @@ defaults:
       type: practices
     values:
       layout: practice
+  - scope:
+      path: ""
+      type: deep
+    values:
+      layout: deep
 
 markdown: kramdown
 

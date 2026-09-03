@@ -7,14 +7,15 @@ summary: >-
   per-case regressions, then traces that feed the next version. Three systems
   running the same loop, including the two versions it refused to ship.
 tldr: >-
-  Golden set → graders + judge → gate → ship → traces → diagnose → next version → promote. Three systems, one loop — and the versions it refused: Data Pilot's cycle 002 and ConvFinQA's v3.1.
+  Golden set → graders + judge → gate → ship → traces → diagnose → next version → promote. Three systems, one loop — and the versions it refused: Data Pilot's cycle 002, ConvFinQA's v3_1 and its v4.
 order: 1
 kicker: "practice · evaluation"
 systems: [data-pilot, convfinqa-agent, transcript-rag]
 rubric: [evals, judge, gate, loop]
 evidence_note: >-
-  Every count on this page was re-run against the three repos on 2026-08-30, with
-  the command beside it. Where an older write-up's number no longer reproduces,
+  Every count on this page was re-run with the command beside it: the ConvFinQA
+  rows on 2026-09-03 against the eval-loop release, the Data Pilot and Transcript
+  RAG rows on 2026-08-30. Where an older write-up's number no longer reproduces,
   the number here is the one the repo gives today.
 sections:
   - n: 1
@@ -31,8 +32,8 @@ sections:
       what code can grade and what needs a judge.
   - n: 4
     summary: >-
-      Every count was re-run against the repos on 2026-08-30, with the command
-      beside it, so the numbers are today's.
+      Every count was re-run against the repos with the command beside it, so the
+      numbers are today's, including the loop's newest verdicts.
   - n: 5
     summary: >-
       Six ways an eval loop flatters itself, and what each system does to stop
@@ -67,8 +68,11 @@ automated.
    `skipped` record rather than a fake score when no independent judge exists.
 4. **Fingerprint the build** — provider, model, a content hash per behaviour
    surface — so a base-versus-candidate run has exactly one moving part.
-5. **Gate on per-case flips, not on the average.** Any case going pass → fail
-   blocks, whatever the headline did.
+5. **Gate on per-case flips, not on the average.** On a small, high-stakes pack
+   any case going pass → fail blocks, whatever the headline did. On a larger
+   split a single flip cannot carry a veto, so the gate becomes a paired test —
+   more fixed than broken, with the exact p recorded on the verdict and every
+   flip still listed by name.
 6. **Commit the predictions**, so the gate re-scores offline with no API key and
    therefore runs on every pull request instead of occasionally.
 7. **Trace what ships**, so the next diagnosis reads real failures.
@@ -119,34 +123,41 @@ No judge here, and the write-up says why: answers are numbers and programs, so
 exact and program accuracy are the honest metric. That is the task framing, not a
 missing feature.
 
-The set is **200 conversations / 770 questions** and the prediction CSVs are
-committed, so `REUSE_CACHE=1 uv run convfinqa-eval` reproduces v1 **72.99%** → v2
-**77.14%** with zero API calls. Prompt versions are files — `prompts/v1.py`,
-`v2.py`, `v3_1.py`. GEPA produced v2 over **1,964 metric calls** and 65 full
-validation evaluations on a 108/12 train/val split, lifting the held-out
-80-conversation test split 56.47 → 65.26.
+The first two cycles ran on the **200 conversations / 770 questions** corpus, with
+prediction CSVs committed so `REUSE_CACHE=1 uv run convfinqa-eval` reproduces v1
+**72.99%** → v2 **77.14%** with zero API calls. GEPA produced v2 over **1,964
+metric calls**; the s7 harness then generated **39 rules** into v3_1, which scored
+**76.23%** and was refused: 61 questions fixed, 68 broken, net negative. As a
+headline that is a rounding error; as a flip count it is a decision.
 
-Then the s7 harness — diagnose, propose, verify — read 95 failing cases and
-generated **39 rules** (3 triage, 24 preprocess, 7 retriever, 5 calculator) into
-v3.1. v3.1 scored **76.23%**, and the promotion contract refused it. Running the
-comparator today:
+Since 2026-09-02 the loop runs on a committed manifest instead — train 53 / test
+54 / holdout 56 reports, drawn only from conversations neither optimiser saw — and
+the eight steps look like this:
 
-```
-promotable: False
-reason: shared-question accuracy fell 77.1% → 76.2% (-0.91%)
-regressions (pass→fail): 68 · improvements (fail→pass): 61
-```
+| step | in ConvFinQA |
+|---|---|
+| fix the set | `evaluation/splits/eval_loop_v1.json`: id lists are the truth, the seed is provenance |
+| grade | numeric and program match per turn, a cascade flag, and a gold-derived per-agent panel at zero API calls |
+| judge | none for scoring; a teacher on the pro tier *attributes* each first-wrong turn to one agent, checked by a 30-case κ sheet (unlabelled) |
+| fingerprint | a bundle is a composition of four per-agent prompt hashes, `t3.p4.r3.c3` |
+| gate | net positive on the shared test-split questions, McNemar p recorded, `--promote` refused on train evidence |
+| commit predictions | every run's CSV under `evaluation/predictions/evalloop/` |
+| trace | every LLM call a span in MLflow, run → report → question → stage |
+| promote | an append-only history that keeps the refusals |
 
-Thirty-nine rules of genuine diagnosis, sixty-one questions actually fixed, net
-negative. As a headline that is a rounding error you would argue past; as a flip
-count it is a decision.
+Two verdicts under the new contract. v4 changed only the retriever, improved
+retriever recall on unseen data (.744 → .780) and was **refused** because the
+calculator collapsed behind it. v5 changed only preprocess and was **promoted**:
+77.5% → 79.7% on 187 test questions, 12 fixed against 8 broken, McNemar p 0.503
+— not significant, and recorded as such on the verdict.
 
 The gate runs on every pull request, offline. `python -m convfinqa.tracking.gate`
 re-derives each committed CSV's `correct` column from its own answers against
-gold — catching a CSV edited by hand, the failure mode where every number
-downstream becomes fiction — then checks the champion against its floor. Today:
-three versions, 770 rows each, columns consistent, champion v2 77.14% against a
-76.64% floor, **PASSED**.
+gold — catching a CSV edited by hand — then checks the champion against its
+floor from the CSV its promotion was decided on. Today: v1, v2, v3_1 at 770 rows
+each, consistent; champion v5 79.68% against a 79.18% floor, **PASSED**.
+
+[The loop in full, command by command →](/projects/convfinqa-agent/eval-loop/)
 
 ### Transcript RAG — labelled chunks, then an ablation
 
@@ -196,18 +207,21 @@ that silently invalidates a committed run, and a real drop below a floor.
 
 ## Evidence
 
-Re-run on 2026-08-30, in each system's own repo.
+Re-run in each system's own repo: ConvFinQA on 2026-09-03, the other two on 2026-08-30.
 
 | claim | command | result |
 |---|---|---|
 | Data Pilot pack | `grep -c '^- case_key:' evals/cases/*.yaml` | 11 + 11 + 10 = **32**; 2 `ready`, 30 `draft` |
 | Data Pilot cycles | `ls docs/evals/` | 001 PASS · 002 FAIL, not shipped · 003 PASS |
-| ConvFinQA set | `convfinqa.data.loader` | 200 conversations, **770** questions, **309** never-seen |
-| ConvFinQA registry | `cat evaluation/registry.json` | v1 0.72987 · v2 0.771429 · v3_1 0.762338 · champion `v2` |
-| ConvFinQA gate | `python -m convfinqa.tracking.gate` | 3 × 770 rows consistent; 77.14% vs floor 76.64%; **PASSED** |
-| ConvFinQA refusal | `comparator.compare('v2','v3_1')` | not promotable; 68 pass→fail, 61 fail→pass |
+| ConvFinQA corpus | `convfinqa.data.loader` | 200 conversations, **770** questions, **309** never-seen |
+| ConvFinQA splits | `python -c "import json;print(json.load(open('evaluation/splits/eval_loop_v1.json'))['stats'])"` | train 53 / test 54 / holdout 56 reports · 202 / 201 / 207 questions · holdout opened **0** |
+| ConvFinQA registry | `cat evaluation/registry.json` | v1 0.72987 · v2 0.771429 · v3_1 0.762338 · v5 0.796791 (n=187) · champion `v5` |
+| ConvFinQA gate | `python -m convfinqa.tracking.gate` | v1, v2, v3_1 at 770 rows consistent; champion v5 79.68% vs floor 79.18%; **PASSED** |
+| ConvFinQA refusals | `evaluation/registry.json` history · `predictions/evalloop/*test10*` | v3_1 on 770: 68 pass→fail, 61 fail→pass · v4 on test-10: 79.4% → 67.6%, rolled back |
+| ConvFinQA promotion | `evaluation/registry.json` history, last `promote` | v5 over v3_1 on test-50: 77.5% → 79.7%, 12 fixed / 8 broken, McNemar p 0.503 |
 | GEPA | `evaluation/mlflow_snapshot.json` | 1,964 metric calls, 65 val evals, test 56.47 → 65.26 |
 | s7 rules | `wc -l evaluation/diagnostics/rules_*_v3_1.jsonl` | 3 + 24 + 7 + 5 = **39** |
+| teacher diagnoses | `wc -l evaluation/diagnostics/evalloop/diagnoses_v3_1_20260902_220936.jsonl` | **30** first-wrong turns: preprocess 14 · retriever 10 · calculator 3 · triage 3 · 4 `gold_suspect` |
 | RAG goldens | `src/evals/golden_dataset.json` | 20 entries: 14 local / 4 global / 2 temporal |
 | RAG ablation | `evals/runs/ablation-20260801-051456.json` | 8 configs × 20 entries |
 | RAG snapshots + CI gate | `ls evals/runs/*.json` · `pytest tests/evals/test_committed_runs.py -q` | **16** snapshots · 20 passed in 0.09s |
@@ -231,9 +245,11 @@ Data Pilot's judge refuses the job and records `skipped`; Transcript RAG flags
 produces a number nobody can use.
 
 **A better average hiding per-case flips.** The failure the gate exists for, and
-it fired twice here: cycle 002 improved the exact metric it targeted and would
-have shipped on any headline rule; v3.1 fixed 61 and broke 68 for −0.91%. Both
-are only visible as a list of case ids.
+it fired three times here: cycle 002 improved the exact metric it targeted and
+would have shipped on any headline rule; v3_1 fixed 61 and broke 68 for −0.91%;
+v4 lifted the retriever's own recall on unseen data while the calculator behind
+it fell from .618 to .500. All three are only visible as a list of case ids or
+a per-agent panel, never in the average.
 
 **Goldens without labels.** A golden that says only "this answer was good" cannot
 tell you *why* retrieval failed. Chunk ids are the most expensive part of
