@@ -1,0 +1,33 @@
+<svg class="dia" viewBox="0 0 240 142" role="img"
+     aria-label="Accuracy by turn type for the two runtimes on the same 349 questions: number turns 95.5 percent for both the v8 pipeline and the sdk_v1 session; program turns 75.2 percent for the pipeline against 88.2 for the session.">
+  <title>Where the SDK gain is: number turns unchanged, program turns +13.0 pp</title>
+  <!-- y = 110 - (acc - 70) * 3 -->
+  <g><title>gridlines at 80 and 90 percent</title>
+    <line class="gl" x1="36" y1="80" x2="236" y2="80"/>
+    <line class="gl" x1="36" y1="50" x2="236" y2="50"/>
+    <text class="tx s" x="30" y="83" style="text-anchor:end">80</text>
+    <text class="tx s" x="30" y="53" style="text-anchor:end">90</text></g>
+  <line class="ax" x1="36" y1="110" x2="236" y2="110"/>
+
+  <g><title>number turns · pipeline v8 · 95.5% of 111 · a lookup in the report, answered at the retriever</title>
+    <rect class="bar" x="42" y="33.5" width="30" height="76.5" rx="3"/>
+    <text class="tx k" x="57" y="29">95.5</text></g>
+  <g><title>number turns · sdk_v1 · 95.5% of 111 · +0.0 pp, 3 fixed / 3 broken, p 0.5 — no effect</title>
+    <rect class="bar hi" x="76" y="33.5" width="30" height="76.5" rx="3"/>
+    <text class="tx k" x="91" y="29">95.5</text></g>
+  <text class="tx s" x="74" y="123">number · n 111</text>
+
+  <g><title>program turns · pipeline v8 · 75.2% of 238 · a plan, retrieval and arithmetic across the conversation</title>
+    <rect class="bar" x="142" y="94.4" width="30" height="15.6" rx="3"/>
+    <text class="tx k" x="157" y="89.9">75.2</text></g>
+  <g><title>program turns · sdk_v1 · 88.2% of 238 · +13.0 pp, 35 fixed / 4 broken across 29 conversations, clustered p 0.00005</title>
+    <rect class="bar hi" x="176" y="55.4" width="30" height="54.6" rx="3"/>
+    <text class="tx k" x="191" y="50.9">88.2</text></g>
+  <text class="tx s" x="174" y="123">program · n 238</text>
+
+  <g><title>legend: mid grey is the four-agent pipeline (v8, deepseek-v4-flash); ink is the single session (sdk_v1, claude-sonnet-5)</title>
+    <rect class="bar" x="36" y="132" width="8" height="7" rx="1.5"/>
+    <text class="tx s" x="49" y="138.5" style="text-anchor:start">pipeline v8</text>
+    <rect class="bar hi" x="136" y="132" width="8" height="7" rx="1.5"/>
+    <text class="tx s" x="149" y="138.5" style="text-anchor:start">session sdk_v1</text></g>
+</svg>

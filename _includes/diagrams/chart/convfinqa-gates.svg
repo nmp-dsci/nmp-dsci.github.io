@@ -1,0 +1,42 @@
+<svg class="dia" viewBox="0 0 240 200" role="img"
+     aria-label="Nine gate verdicts on the same 349 unseen questions, each drawn as an accuracy delta in percentage points with its 95 percent confidence interval: v6, v7, v9, v10, v11, v12 and sdk_v2 straddle zero and were rejected; v8 at plus 4.58 and sdk_v1 at plus 8.88 cleared the one-sided cluster-corrected McNemar test and were promoted.">
+  <title>Nine verdicts, two promotions</title>
+  <!-- x = 112 + Δpp * 7.75 ; axis −8 … +16 -->
+  <g><title>reference lines at −8, +8 and +16 percentage points; the solid line is zero</title>
+    <line class="gl" x1="50" y1="8" x2="50" y2="184"/>
+    <line class="gl" x1="174" y1="8" x2="174" y2="184"/>
+    <line class="gl" x1="236" y1="8" x2="236" y2="184"/>
+    <line class="ax" x1="112" y1="8" x2="112" y2="184"/>
+    <text class="tx s" x="50" y="196">−8</text>
+    <text class="tx s" x="112" y="196">0</text>
+    <text class="tx s" x="174" y="196">+8</text>
+    <text class="tx s" x="236" y="196" style="text-anchor:end">+16 pp</text></g>
+
+  <g><title>c01-e01 · v6 vs v2 · preprocess rewrite · +2.29 pp · 31 fixed / 23 broken · 95% CI [−2.87, +7.40] · one-sided clustered p 0.191 · rejected</title>
+    <text class="tx s" x="4" y="21" style="text-anchor:start">v6</text>
+    <line class="ci" x1="89.8" y1="18" x2="169.4" y2="18"/><circle class="pt" cx="129.7" cy="18" r="2.6"/></g>
+  <g><title>c01-e02 · v7 vs v2 · preprocess rewrite · +2.58 pp · 27 fixed / 18 broken · CI [−1.92, +7.16] · p 0.132 · rejected</title>
+    <text class="tx s" x="4" y="41" style="text-anchor:start">v7</text>
+    <line class="ci" x1="97.1" y1="38" x2="167.5" y2="38"/><circle class="pt" cx="132" cy="38" r="2.6"/></g>
+  <g><title>c01-e03 · v8 vs v2 · retriever rewrite · +4.58 pp · 34 fixed / 18 broken across 36 conversations · CI [−0.28, +9.85] · one-sided clustered p 0.040 · promoted, champion</title>
+    <text class="tx s k" x="4" y="61" style="text-anchor:start">v8 ✓</text>
+    <line class="ci pro" x1="109.8" y1="58" x2="188.3" y2="58"/><circle class="pt pro" cx="147.5" cy="58" r="3.4"/></g>
+  <g><title>c02-e01 · v9 vs v8 · retriever rewrite · +0.00 pp · 17 fixed / 17 broken · CI [−3.93, +3.46] · p 0.500 · rejected</title>
+    <text class="tx s" x="4" y="81" style="text-anchor:start">v9</text>
+    <line class="ci" x1="81.5" y1="78" x2="138.8" y2="78"/><circle class="pt" cx="112" cy="78" r="2.6"/></g>
+  <g><title>c02-e02 · v10 vs v8 · preprocess rewrite · +0.57 pp · 20 fixed / 18 broken · CI [−3.44, +4.62] · p 0.393 · rejected</title>
+    <text class="tx s" x="4" y="101" style="text-anchor:start">v10</text>
+    <line class="ci" x1="85.3" y1="98" x2="147.8" y2="98"/><circle class="pt" cx="116.4" cy="98" r="2.6"/></g>
+  <g><title>c03-e01 · v11 vs v8 · preprocess rewrite · +1.43 pp · 19 fixed / 14 broken · CI [−2.87, +5.48] · p 0.254 · rejected — the best rejected candidate at 83.1%</title>
+    <text class="tx s" x="4" y="121" style="text-anchor:start">v11</text>
+    <line class="ci" x1="89.8" y1="118" x2="154.5" y2="118"/><circle class="pt" cx="123.1" cy="118" r="2.6"/></g>
+  <g><title>c03-e02 · v12 vs v8 · preprocess rewrite · −0.29 pp · 19 fixed / 20 broken · CI [−4.66, +4.00] · p 0.551 · rejected</title>
+    <text class="tx s" x="4" y="141" style="text-anchor:start">v12</text>
+    <line class="ci" x1="75.9" y1="138" x2="143" y2="138"/><circle class="pt" cx="109.8" cy="138" r="2.6"/></g>
+  <g><title>s01 baseline · sdk_v1 vs v8 · runtime change: one Claude session, prompt distilled from v8 · +8.88 pp · 38 fixed / 7 broken · CI [+4.20, +13.71] · p 0.0003 · promoted to sdk_champion</title>
+    <text class="tx s k" x="4" y="161" style="text-anchor:start">sdk_v1 ✓</text>
+    <line class="ci pro" x1="144.6" y1="158" x2="218.3" y2="158"/><circle class="pt pro" cx="180.8" cy="158" r="3.4"/></g>
+  <g><title>s01-e02 · sdk_v2 vs sdk_v1 · the SDK teacher's calculator rewrite · −2.87 pp · 6 fixed / 16 broken · CI [−7.32, +0.85] · p 0.917 · rejected</title>
+    <text class="tx s" x="4" y="181" style="text-anchor:start">sdk_v2</text>
+    <line class="ci" x1="55.3" y1="178" x2="118.6" y2="178"/><circle class="pt" cx="89.8" cy="178" r="2.6"/></g>
+</svg>

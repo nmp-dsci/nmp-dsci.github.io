@@ -1,83 +1,101 @@
 ---
 title: The ConvFinQA eval loop, in full
-short: "eval loop · setup"
+short: "eval loop · MLOps"
 kicker: "deep dive · the eval loop"
 project: convfinqa-agent
 rubric: [evals, judge, gate, loop, trace]
 summary: >-
-  The setup behind the case study's §3: the tracking server, the sealed splits, one cycle command
-  by command, the gate and the promotion contract, and the log of every cycle including the ones
-  the loop refused. Maintained every cycle.
+  The MLOps behind the case study's §3: the tracking server, the fixed splits, one experiment
+  command by command, the significance gate and the promotion contract, and the log of every
+  verdict including the seven the loop refused and the three champions it took back.
+  Maintained every cycle.
 tldr: >-
-  Compose up MLflow → make-splits → run train → diagnose → propose → run test → gate → promote →
-  deploy, with the library at each step and the number each step produced.
-updated: 2026-09-03
+  Compose up MLflow → make-splits → cycle (run train → diagnose → rewrite → run gate → gate →
+  decide) → deploy, with the library at each step and the number each step produced.
+updated: 2026-09-06
 evidence_note: >-
-  Every number on this page was re-run on 2026-09-03 in a clone of
-  <code>ConvFinQA-agent</code> at <code>dc3efb2</code>, with the command beside it. The cycle
-  log reads <code>evaluation/registry.json</code>; the split counts read
-  <code>evaluation/splits/eval_loop_v1.json</code>; accuracies are recomputed from the committed
-  CSVs under <code>evaluation/predictions/evalloop/</code> with pandas and no API key. When a
-  cycle is added, append a row to the log and re-date this note.
+  Every number on this page was re-run on 2026-09-06 in a clone of
+  <code>ConvFinQA-agent</code> at <code>5af229e</code>, with the command beside it. The cycle
+  log reads <code>evaluation/diagnostics/evalloop/gates.jsonl</code> and the history in
+  <code>evaluation/registry.json</code>; the split counts read
+  <code>evaluation/splits/eval_loop_v2.json</code>; accuracies are recomputed from the committed
+  CSVs under <code>evaluation/predictions/evalloop/</code> with pandas and no API key. When an
+  experiment is added, append a row to the log and re-date this note.
 sections:
   - n: 1
     summary: >-
       A cycle can only be trusted if the server, the manifest and the choke point exist before it starts.
   - n: 2
     summary: >-
-      Eleven steps, each with the command, the file it writes and the library doing the work.
+      One command runs an experiment end to end; each step names the file it writes and the library doing the work.
   - n: 3
     summary: >-
-      The gate reads the unseen test split only, and records the statistic that says how much to believe it.
+      The gate reads the fixed unseen split only, and promotes only when a cluster-corrected test says the gain is real.
   - n: 4
     summary: >-
-      Refusals are rows too, which is the only reason the promotions mean anything.
+      Refusals and rollbacks are rows too, which is the only reason the promotions mean anything.
   - n: 5
     summary: >-
-      The protocol changed three times in two days, and each change is dated and attributable.
+      The protocol got stricter three times in four days, and each change is dated and attributable.
 ---
 
 ## Setup
 
-Four things exist before a cycle can run. Each is a file or a process the rest of the loop
+Four things exist before an experiment can run. Each is a file or a process the rest of the loop
 reads, so a cycle cannot silently run without them.
 
 | Piece | What it is | Command · path |
 |---|---|---|
 | **Tracking server** | MLflow 3.12 in docker compose, always on, SQLite store and server-side artifacts under `./.mlflow` | `docker compose up -d mlflow` · `docker-compose.yml` |
-| **Split manifest** | Committed `report_id` lists: train 53 / test 54 / holdout 56 reports (202 / 201 / 207 questions), seed 2026, stratified on `has_type2_question`, drawn from the 2,777 train conversations minus the 260 GEPA and s7 saw | `uv run convfinqa-evalloop make-splits` · `evaluation/splits/eval_loop_v1.json` |
-| **The choke point** | Every model built in one module: `deepseek-v4-flash` for the four agents, `deepseek-v4-pro` for the teacher; retry, the 120 s ceiling and the demo gate live there | `src/convfinqa/llm.py` · `backends/pydantic.py::lm_max` |
-| **Per-agent lineage** | Each agent's prompt versions keyed by content hash with a human label (`t1…t3`, `p1…p4`, `r1…r4`, `c1…c3`) | `uv run convfinqa-evalloop backfill-prompts` · `evaluation/registry.json → agent_prompts` |
+| **Split manifest** | Committed `report_id` lists: train 100 reports (368 questions) and a fixed gate split of 100 reports (349 questions), seed 2026, stratified on `has_type2_question`, drawn from the 2,777 train conversations minus the 260 GEPA and s7 saw; the holdout is the untouched remainder, cut only for a confirmatory run | `uv run convfinqa-evalloop make-splits` · `evaluation/splits/eval_loop_v2.json` |
+| **The choke point** | Every model built in one module: `deepseek-v4-flash` for the four agents, `claude-opus-5` through the Agent SDK for the teacher and prompt-writer (with `setting_sources=[]`), `claude-sonnet-5` for the single-session runtime; retry, the 120 s ceiling and the demo gate live there | `src/convfinqa/llm.py` · `evalloop/sdk.py` |
+| **Per-agent lineage** | Each agent's prompt versions keyed by content hash with a human label (`t1…t3`, `p1…p4`, `r1…r5`, `c1…c3`); a bundle is the composition, `t2.p2.r5.c2` for v8 | `uv run convfinqa-evalloop backfill-prompts` · `evaluation/registry.json → agent_prompts` |
 
 The manifest, not the seed, is the truth. The cautionary tale is in the same repo: two 60/40
 splits both seeded 42 agree on only 78 of 120 conversations, because the code around the seed
 changed. So the split holds actual id lists, and the seed is provenance.
 
+The gate split is fixed for a whole campaign, and its size was chosen by a power calculation
+rather than a budget: at 349 paired questions the one-sided test at α 0.05 can detect a gain of
+about 4.7 points, which is the size of change one prompt rewrite has produced. A
+smaller split would have made every verdict a coin toss.
+
 Environment for a cycle:
 
 ```bash
 export MLFLOW_TRACKING_URI=http://127.0.0.1:5000   # the compose service
-export DEEPSEEK_API_KEY=...                        # never set in the demo image
+export DEEPSEEK_API_KEY=...                        # the four agents; never set in the demo image
+claude auth status                                 # the teacher runs on the Claude subscription
 ```
 
 ## One cycle
 
-Cycle 2 (2026-09-02) is the reference: 50 reports, v3_1 as baseline, v5 as the outcome. Each row
-is one step of the ring in the case study's figure.
+Campaign c01, experiment 3 (2026-09-03) is the reference: v2 as baseline, v8 as the outcome.
+One command runs it; each row is one step of the ring in the case study's figure.
+
+```bash
+uv run convfinqa-evalloop cycle --campaign c01 --baseline v2
+```
 
 | # | Step | Command | Writes | Library |
 |---|---|---|---|---|
-| 01 | Manifest | `make-splits` (once) | `evaluation/splits/eval_loop_v1.json` | `evalloop/splits.py` · pandas |
-| 02 | Run train | `run --split train --version v3_1 --n-reports 50` | one MLflow run · `predictions/evalloop/evalloop-train50-v3_1·t3p3r3c3-….csv` · a trace row per turn | pydantic-ai ×4 on flash · `evalloop/runner.py` |
+| 01 | Manifest | `make-splits` (once per campaign) | `evaluation/splits/eval_loop_v2.json` | `evalloop/splits.py` · pandas |
+| 02 | Run train | `run --split train --version v2` | one MLflow run · `predictions/evalloop/evalloop-train100-v2·….csv` · a trace row per turn | pydantic-ai ×4 on flash · `evalloop/runner.py` |
 | 03 | Trace | always on for the loop | spans run → report → question → agent stage → `Agent.run`, linked to the run | `mlflow.pydantic_ai.autolog()` · `tracking/tracing.py` |
 | 04 | Score | inside the run | `correct`, `cascade`, `first_wrong_turn`, and the per-agent columns on every row | `evaluation/metrics.py` · `evalloop/stage_scores.py` |
-| 05 | Diagnose | `diagnose --csv <train.csv> --version v3_1` | `diagnostics/evalloop/diagnoses_v3_1_….jsonl` (30 rows) · a run in `convfinqa-optimization` | pydantic-ai on pro · `evalloop/teacher.py` |
-| 06 | Propose | `propose --diagnoses <jsonl> --base-version v3_1 --new-version v5` | `src/convfinqa/prompts/v5.py` · lineage entry `p4` | `evalloop/teacher.py` · `tracking/prompt_ledger.py` |
-| 07 | Register | on the first run of `v5` | registry spec, composition `t3.p4.r3.c3`, MLflow prompt mirror | `tracking/registry.py` · `tracking/bundle.py` |
-| 08 | Run test | `run --split test --version v3_1 --n-reports 50` and the same for `v5` | the two `test50` CSVs, 187 questions each | as 02 |
-| 09 | Gate | `gate-targeted --target-agent preprocess --baseline-csv … --candidate-csv … --promote` | a `promote` event on the registry history with the full comparison | `tracking/comparator.py` · `evalloop/gate.py` |
+| 05 | Diagnose | `diagnose --csv <train.csv> --version v2` | rows in `diagnostics/evalloop/diagnoses.jsonl` (440 today) · a run in `convfinqa-optimization` | claude-agent-sdk on Opus 5 · `evalloop/teacher.py` |
+| 06 | Propose | `propose --diagnoses … --base-version v2 --new-version v8 --target retriever` | `src/convfinqa/prompts/v8.py` · lineage entry `r5` · a row in `rewrites.jsonl` (13 today) | `evalloop/teacher.py` · `tracking/prompt_ledger.py` |
+| 07 | Register | on the first run of `v8` | registry spec, composition `t2.p2.r5.c2`, MLflow prompt mirror via `mirror-prompts` | `tracking/registry.py` · `tracking/bundle.py` |
+| 08 | Run gate | `run --split test --version v2` and the same for `v8` | the two `test100` CSVs, 349 questions each | as 02 |
+| 09 | Gate | `gate-targeted --target-agent retriever --baseline-csv … --candidate-csv … --promote` | a row in `gates.jsonl` (9 today) · a `promote` event on the registry history with the full comparison | `tracking/comparator.py` · `evalloop/gate.py` |
 | 10 | Deploy | merge to `main` | CI eval gate → OIDC → ECR → App Runner; smoke asserts served bundle == champion | GitHub Actions · Terraform · `scripts/demo_smoke.sh` |
 | 11 | Observe | `MLFLOW_TRACING=1` for serving; `/metrics/production` | one trace row per turn, split by source | `tracking/traces.py` · `serving/routes/metrics.py` |
+
+The campaign wrapper adds two rules on top: at most five experiments against one gate split, and
+a target agent rotates off after two consecutive rejections, so the loop cannot spend a whole
+campaign re-writing the agent it happens to like. `campaign-status` prints where a campaign is;
+`ledger-trace --question-id <report>_q<n>` joins one question's diagnoses, rewrites and verdicts
+by id.
 
 Three details that make the steps honest rather than merely automated.
 
@@ -91,39 +109,52 @@ three of the four stages should have produced:
 | Agent | Metric | How it is derived from gold |
 |---|---|---|
 | triage | `acc_triage_turn_type` | `gold_turn_type` is a column |
-| preprocess | `acc_preprocess_skeleton` | the op skeleton of the planned program vs the gold program's; equivalent-but-different shapes read as misses, and the teacher adjudicates those |
+| preprocess | `acc_preprocess_skeleton` · `acc_preprocess_plan` | the op skeleton of the planned program vs the gold program's; equivalent-but-different shapes read as misses, and the teacher adjudicates those |
 | retriever | `retriever_operand_recall` | the gold program's numeric operands, minus constants and minus earlier gold answers, which come from history not the document |
 | calculator | `acc_calculator_exec` · `calculator_acc_given_full_recall` | the gold answer, conditioned on retrieval having succeeded — what separates "wrong operand" from "wrong computation" |
 
-**The teacher's taxonomy is frozen.** Ten named failure modes across the four agents, plus a
+**The teacher's taxonomy is frozen.** Named failure modes across the four agents, plus a
 `new:<label>` escape so a gap is visible rather than forced into the nearest box. It also sets
 `gold_suspect` when the gold answer itself looks wrong, which is what the Dataset page exists to
-settle. Prior diagnoses are read back from MLflow before each pass, so the teacher extends rather
-than repeats.
+settle.
+
+The attribution prompt was rewritten once, in PR #8, after measuring the old one against the
+new on 554 cases. The SDK arm slices its taxonomy verbatim from the same constant, so the two
+arms cannot drift.
 
 ## Gate & promote
 
-The rule, as the comparator states it: **net positive on the shared question set** — strictly
-more questions fixed than broken — with the exact McNemar p over the discordant pairs recorded
-on every verdict and flagged when the sample cannot support significance at α = 0.05. Flips no
-longer veto on their own (they did until 2026-09-02); each is still listed by report and turn.
+The rule, as `comparator.py::promotable_significant` states it: **net positive on the shared gate
+questions — strictly more fixed than broken — and a one-sided McNemar p below 0.05 over the
+discordant pairs, cluster-corrected by conversation.** One-sided because the gate only ever
+promotes; clustered because the turns of one report share a history, so their flips are not
+independent. Every verdict also carries a cluster-bootstrap 95% CI on the delta and a
+`P(Δ > 0)`.
 
-Two evidence rules sit on top of it:
+Three evidence rules sit on top of it:
 
-- **Train runs optimise, unseen test runs promote.** Both `gate` and `gate-targeted` refuse
+- **Train runs optimise, the gate split promotes.** Both `gate` and `gate-targeted` refuse
   `--promote` when either CSV came from the train split.
 - **A targeted challenger must move its own agent.** `gate-targeted` requires the target agent's
-  panel metric to improve on the shared test reports, and overall paired accuracy not to regress.
+  panel metric to improve on the shared gate reports, and overall paired accuracy not to regress.
+- **The SDK arm promotes to its own alias.** `sdk_champion`, never `champion`; serving reads
+  only the latter.
 
-Three verdicts, from the registry history:
+The verdict that promoted v8, from `gates.jsonl`:
 
 ```text
-v4  2026-09-02 10:05  promote  train-10 (44 q)  63.6% → 72.7%, 5 fixed / 1 broken, p 0.219
-    2026-09-02 11:34  rollback by owner: promotion evidence must come from the unseen test split
-    test-10 (34 q)    retriever recall .744 → .780, accuracy 79.4% → 67.6%  → refused
-v5  2026-09-02 12:18  promote  test-50 (187 q)  77.5% → 79.7%, 12 fixed / 8 broken, p 0.503
-                      preprocess skeleton .415 → .447 on the 123 program turns
+c01-e03  v8 vs v2  target retriever  n_paired 349
+  Δ +4.58pp (77.08% → 81.66%) · 34 fixed / 18 broken across 36 conversations
+  one-sided clustered McNemar p 0.0404 · z 1.75 · 95% CI [−0.28, +9.85] · P(Δ>0) 0.96
+  retriever_operand_recall 0.740 → 0.768                                → PROMOTE
 ```
+
+And the event that un-promoted three champions, from the registry history on 2026-09-03:
+
+> v3_1, v4 and v5 were each promoted under the retired net-positive rule. Re-judged under the
+> campaign rule — net positive AND one-sided cluster-corrected McNemar p < 0.05 — every one is
+> rejected (v5, the strongest, has p=0.207 and a 95% CI of [−3.2pp, +7.6pp] that contains zero).
+> The evidence for them was never wrong, it was never sufficient.
 
 The holdout is the release gate, not the promotion gate. `release --i-know-this-opens-the-holdout`
 opens it once, for the current champion only, and appends the opening to the history so no later
@@ -137,72 +168,88 @@ eval-gate: 3 committed version(s): v1, v2, v3_1
   ✓ v1: 770 rows, correctness column consistent
   ✓ v2: 770 rows, correctness column consistent
   ✓ v3_1: 770 rows, correctness column consistent
-  ✓ champion v5: 79.68% (registered 79.68%, floor 79.18%)
+  ✓ champion v8: 81.66% (registered 0.00%, floor -0.50%)
 eval-gate PASSED
 ```
 
-Champions promoted through the loop are re-scored from their own test-split CSV; legacy
-champions from the 770-row corpus CSV. Before 2026-09-03 the gate would have looked for a
-770-row file that v5 never had.
+That last line is a defect, not a pass. Campaign promotions write their evidence to the gate
+ledger and leave the bundle's `metrics` empty, so the CI floor for v8 is −0.5% and the check
+cannot fail. The re-score is real (81.66% from the committed CSV); the floor is not. It is listed
+under what is still open.
 
 ## Cycle log
 
-Newest first. Accuracies recomputed from the committed CSVs; verdicts from the registry history.
+Newest first. Accuracies recomputed from the committed CSVs; verdicts from `gates.jsonl` and the
+registry history. Every campaign row is paired on the same 349 gate questions.
 
 | Date | Subject | Deliverable | Split · n | Accuracy | Verdict |
 |---|---|---|---|---|---|
-| 2026-09-02 (cycle 2) | v5 · t3.p4.r3.c3 | preprocess (5 merged rules from 14 of 30 diagnoses) | test-50 · 187 | 77.5% → 79.7% · 12 fixed / 8 broken · p 0.503 | **promoted** · champion |
-| 2026-09-02 (cycle 2) | v5 · t3.p4.r3.c3 | as above | train-50 · 193 | 66.8% → 70.5% · first-faults 30 → 27 | optimisation signal only |
-| 2026-09-02 (cycle 2) | teacher pass on v3_1 | — | train-50 · 30 first-wrong | preprocess 14 · retriever 10 · calculator 3 · triage 3 · 4 `gold_suspect` | 4 labels drifted from the frozen spelling; none used `new:` |
-| 2026-09-02 (smoke) | v4 · t3.p3.r4.c3 | retriever (3 of 6 diagnosed faults) | test-10 · 34 | recall .744 → .780 · accuracy 79.4% → 67.6% · calculator .618 → .500 | **refused** |
-| 2026-09-02 (smoke) | v4 · t3.p3.r4.c3 | as above | train-10 · 44 | 63.6% → 72.7% · 5 fixed / 1 broken · p 0.219 | promoted, then **rolled back** 11:34 (protocol change) |
-| 2026-09-02 (cycle 0) | v3_1 over v2 | — | train-10 · 44 | 54.5% → 61.4% · 5 fixed / 2 broken · p 0.453 | promoted under the first net-positive rule, before "test only" |
-| 2026-08-28 | v2 · t2.p2.r2.c2 | GEPA (DSPy), full prompt set | corpus · 770 (never-seen 309) | 73.0% → 77.1% (77.7% never-seen) | champion by backfill |
-| 2026-05 | v3_1 · t3.p3.r3.c3 | s7 harness, 39 verified rules | corpus · 770 | 77.1% → 76.2% · 61 fixed / 68 broken | refused under the flip-veto rule |
+| 2026-09-05 (s01-e02) | sdk_v2 · s2 | SDK teacher, calculator class | gate · 349 | 90.5% → 87.7% · 6 fixed / 16 broken · p 0.917 | **rejected** |
+| 2026-09-05 (s01) | sdk_v1 · s1 | v8's four prompts distilled into one session | gate · 349 | 81.7% → 90.5% · 38 fixed / 7 broken · p 0.0003 · CI [+4.2, +13.7] | **promoted** · `sdk_champion` |
+| 2026-09-04 (c03-e02) | v12 · preprocess | rewrite against v8 | gate · 349 | 81.7% → 81.4% · 19 / 20 · p 0.551 | rejected |
+| 2026-09-04 (c03-e01) | v11 · preprocess | rewrite against v8 | gate · 349 | 81.7% → 83.1% · 19 / 14 · p 0.254 · CI [−2.9, +5.5] | rejected |
+| 2026-09-04 (c02-e02) | v10 · preprocess | rewrite against v8 | gate · 349 | 81.7% → 82.2% · 20 / 18 · p 0.393 | rejected |
+| 2026-09-04 (c02-e01) | v9 · retriever | rewrite against v8 | gate · 349 | 81.7% → 81.7% · 17 / 17 · p 0.500 | rejected |
+| 2026-09-03 (c01-e03) | v8 · t2.p2.r5.c2 | retriever rewrite · `prompts/v8.py` | gate · 349 | 77.1% → 81.7% · 34 / 18 · p 0.040 · CI [−0.3, +9.9] | **promoted** · champion |
+| 2026-09-03 (c01-e02) | v7 · preprocess | rewrite against v2 | gate · 349 | 77.1% → 79.7% · 27 / 18 · p 0.132 | rejected · preprocess rotated off |
+| 2026-09-03 (c01-e01) | v6 · preprocess | rewrite against v2 | gate · 349 | 77.1% → 79.4% · 31 / 23 · p 0.191 | rejected |
+| 2026-09-03 17:18 | v3_1 · v4 · v5 | re-judged under the campaign rule | — | v5: p 0.207 · CI [−3.2, +7.6] | **rolled back** to v2 |
+| 2026-09-02 (cycle 2) | v5 · t3.p4.r3.c3 | preprocess, 5 merged rules from 30 diagnoses | test · 187 | 77.5% → 79.7% · 12 / 8 · p 0.503 | promoted under the retired rule |
+| 2026-09-02 (smoke) | v4 · t3.p3.r4.c3 | retriever, 3 of 6 diagnosed faults | test · 34 | recall .744 → .780 · accuracy 79.4% → 67.6% | refused; its train-10 promotion rolled back 11:34 |
+| 2026-09-02 (cycle 0) | v3_1 over v2 | — | train · 44 | 54.5% → 61.4% · 5 / 2 · p 0.453 | promoted under the first net-positive rule |
+| 2026-08-28 | v2 · t2.p2.r2.c2 | GEPA (DSPy), full prompt set | corpus · 770 | 73.0% → 77.1% | champion by backfill |
+| 2026-05 | v3_1 · t3.p3.r3.c3 | s7 harness, 39 verified rules | corpus · 770 | 77.1% → 76.2% · 61 / 68 | refused under the flip-veto rule |
 
-Two numbers the log keeps beside the promotion so it cannot be read as more than it is:
-p = 0.503 means the 12-versus-8 split is what chance produces about half the time on 20
-discordant pairs, and the per-agent panel moved on the target only (triage .925 → .920, retriever
-recall .752 → .772, calculator .455 → .465, cascade rate .166 → .134).
+Two numbers the log keeps beside the one promotion so it cannot be read as more than it is: the
+CI for v8 still touches zero on the left, and `P(Δ > 0)` is 0.96, not 1. Under the two-sided
+uncorrected test the p would read 0.036; the loop reports the harder number.
 
 What is still open, and why the loop is not yet trusted at scale:
 
+- **The CI floor for campaign champions.** `tracking/gate.py` reads a floor from the bundle's
+  registry metrics, which campaign promotions leave empty; v8 is checked against −0.5%.
 - **Teacher trust.** `kappa --make` produced a 30-case sheet with the teacher's verdict hidden;
   the bar is κ ≥ 0.7 against a human's labels. The sheet is committed and unlabelled.
-- **Holdout.** Sealed, never opened. The first release will be the first measurement.
-- **Production failures joining train.** Designed in the plan, not built: serving traces carry
-  the bundle id but nothing yet routes a failed live turn into the next teacher pass.
-- **The console's accuracy tiles.** They read the 770-question corpus CSVs, so under a v5
-  champion they still show v3_1's 76.2% and 73.5% and a "gate v2 pass" chip. The loop's runs
-  are served at `/eval/loop-runs` (PR #7); the tiles have not been taught to read them.
+- **Holdout.** Reserved, never cut. The first release will be the first measurement.
+- **Production failures joining train.** Designed, not built: serving traces carry the bundle
+  id but nothing yet routes a failed live turn into the next teacher pass.
+- **Diminishing returns.** Three campaigns against v8 produced four rejections; the best, v11,
+  was +1.4 pp. A 100-report train draw yields about 50 first-wrong cases split four ways, so a
+  single draw's ranking of agents is close to noise.
 
 ## What changed since
 
 Newest first. Each entry is a protocol change, not a code change, with what made it.
 
-- **2026-09-03 · CI gate branches on champion source** — evalloop champions are floor-checked
-  from their own test-split CSV, matched by exact version segment so `v5` cannot match `v50`;
-  the gate no longer bails out when no legacy CSV exists. Commit `d149911`.
-- **2026-09-03 · `--n-questions` run budget** — a per-run subsample that walks the manifest in
-  order until the question budget is met; the committed split is never resized. Commit `4c9f741`.
-- **2026-09-02 · promotion evidence must come from the unseen test split** — the owner's rollback
-  of v4 (registry history 11:34); both gates refuse `--promote` on train CSVs since.
-- **2026-09-02 · net-positive rule with McNemar p replaces the flip veto** — flips are listed on
-  the verdict, no longer a veto; the p and a significance flag are recorded. `tracking/comparator.py`.
-- **2026-09-02 · teacher taxonomy frozen** — ten named modes plus `new:`; open-coded from the
-  first battle-test cycles. `evalloop/teacher.py::TEACHER_PROMPT`.
-- **2026-09-02 · the teacher is DeepSeek pro via pydantic-ai, not the Agent SDK** — the s04 plan
-  proposed one Opus session per wrong answer on the Claude Agent SDK; what shipped is
-  `lm_max()` behind the same choke point as everything else. The page follows the code.
+- **2026-09-06 · the loop runs a second runtime** — `--runtime agent_sdk` answers a conversation
+  in one Claude session; same split, same gate, own alias. PR #9, `5af229e`.
+  [The runtime test →](/projects/convfinqa-agent/sdk-vs-llm/)
+- **2026-09-05 · campaigns** — up to five experiments against one fixed gate split, target
+  rotation after two rejections, three append-only ledgers joined by id. PR #8, `4ced811`.
+- **2026-09-05 · attribution rewrite** — the teacher's blame prompt re-written and measured
+  old-against-new on 554 cases before replacing it (PR #8). `evalloop/teacher.py::TEACHER_PROMPT`.
+- **2026-09-03 · the significance rule** — net positive AND one-sided cluster-corrected McNemar
+  p < 0.05 replaces "net positive with p recorded"; v3_1, v4 and v5 re-judged and rolled back
+  to v2 at 17:18; v8 promoted at 19:33. `tracking/comparator.py::promotable_significant`.
+- **2026-09-03 · the campaign split** — `eval_loop_v2` extends v1 to 100 / 100 reports with the
+  holdout reserved, sized by a power calculation. `evaluation/splits/eval_loop_v2.json`.
+- **2026-09-03 · the teacher moves to Opus 5 on the Agent SDK** — from deepseek-v4-pro on
+  pydantic-ai; subscription billing, `setting_sources=[]`, one structured call per case.
+  `llm.py::LM_TEACHER_MODEL`.
+- **2026-09-02 · promotion evidence must come from the unseen split** — the owner's rollback
+  of v4; both gates refuse `--promote` on train CSVs since.
+- **2026-09-02 · net-positive rule with McNemar p replaces the flip veto** — the rule the
+  significance rule then replaced.
 
 Libraries in the loop, for the record:
 
 | Library | Trusted with |
 |---|---|
-| pydantic-ai ≥ 0.2 | the four typed agents, the teacher, the prompt-writer |
-| MLflow ≥ 3.11 (server v3.12.0) | runs, tracing via autolog, prompt registry and aliases, teacher memory |
-| pandas | scoring, the panel, the paired comparison; McNemar exact p is implemented in the comparator |
+| pydantic-ai ≥ 0.2 | the four typed agents on deepseek-v4-flash |
+| claude-agent-sdk ≥ 0.2.152 | the teacher and prompt-writer on Opus 5; the single-session runtime on Sonnet 5 |
+| MLflow ≥ 3.11 (server v3.12.0) | runs, tracing via autolog, hand-opened SDK spans, prompt registry and aliases, teacher memory |
+| pandas | scoring, the panel, the paired comparison; exact and clustered McNemar and the bootstrap CI live in the comparator |
 | Logfire · tenacity | serving spans on a separate provider; retry with jitter in the choke point |
-| FastAPI · React 18 + Vite | the console, seven admin pages read-only in demo |
+| FastAPI · React 18 + Vite | the console, nine admin pages read-only in demo |
 | GitHub Actions · Terraform · App Runner | the offline gate, the OIDC deploy, the smoke test |
 | DSPy / GEPA · the s7 harness | produced v2 and v3_1; no longer the promotion path; iteration logs archived |

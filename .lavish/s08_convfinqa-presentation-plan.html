@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ConvFinQA case study · presentation mode + two deep pages</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Design source: the subject site's own system — tokens copied from
+   nmp-dsci.github.io/assets/css/tokens.css (light :root + dark override). */
+:root{
+  --bg:#F7F6F2; --panel:#FFFFFF; --band:#EFEEE8;
+  --ink:#1A1D1B; --ink-2:#3B403D; --muted:#4A514D; --faint:#5C635E;
+  --line:#DCDAD2; --line-2:#C7C5BC; --line-3:#8A8880;
+  --accent:#0A6552; --accent-ink:#FFFFFF; --accent-soft:#DFEFE8;
+  --amber:#8A5006; --amber-soft:#F6E6CF;
+  --sans:'IBM Plex Sans',system-ui,-apple-system,sans-serif;
+  --serif:'IBM Plex Serif',Georgia,'Times New Roman',serif;
+  --mono:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+  --t-2:0.8rem; --t-1:0.875rem; --t0:1rem; --t1:1.125rem; --t2:1.406rem; --t3:1.758rem; --t4:2.197rem;
+  --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:24px; --s6:32px; --s7:48px; --s8:64px; --s9:96px;
+  --r:10px; --r-sm:6px;
+  --shadow:0 1px 2px rgb(20 25 22 / .05), 0 12px 28px -18px rgb(20 25 22 / .22);
+  --w:1140px; --track-label:.08em;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#121614; --panel:#191E1B; --band:#161A18;
+    --ink:#E8EBE7; --ink-2:#C9CFC9; --muted:#AEB6B0; --faint:#98A09A;
+    --line:#28302B; --line-2:#3A443E; --line-3:#727E77;
+    --accent:#43C29A; --accent-ink:#0E1512; --accent-soft:#17382C;
+    --amber:#D99A4E; --amber-soft:#3A2A14;
+    --shadow:0 1px 2px rgb(0 0 0 / .4), 0 12px 28px -18px rgb(0 0 0 / .65);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#121614; --panel:#191E1B; --band:#161A18;
+  --ink:#E8EBE7; --ink-2:#C9CFC9; --muted:#AEB6B0; --faint:#98A09A;
+  --line:#28302B; --line-2:#3A443E; --line-3:#727E77;
+  --accent:#43C29A; --accent-ink:#0E1512; --accent-soft:#17382C;
+  --amber:#D99A4E; --amber-soft:#3A2A14;
+  --shadow:0 1px 2px rgb(0 0 0 / .4), 0 12px 28px -18px rgb(0 0 0 / .65);
+}
+*,*::before,*::after{box-sizing:border-box}
+:where(.grid,.flex,.cards,.slide)>*{min-width:0}
+:where(p,h1,h2,h3,h4,li,dd,figcaption,td,th,.badge,.label){overflow-wrap:anywhere}
+:where(img,svg,video,iframe){max-width:100%;height:auto}
+html{scroll-behavior:smooth;scroll-padding-top:72px}
+body{margin:0;background:var(--bg);color:var(--ink-2);font-family:var(--sans);font-size:var(--t0);line-height:1.55;-webkit-font-smoothing:antialiased}
+h1,h2,h3,h4{color:var(--ink);margin:0;line-height:1.15;font-weight:600;letter-spacing:-.02em;text-wrap:balance}
+h1{font-size:var(--t4);font-family:var(--serif);font-weight:400} h2{font-size:var(--t3)} h3{font-size:var(--t1)} h4{font-size:var(--t0)}
+p{margin:0 0 var(--s4);text-wrap:pretty}
+a{color:var(--accent);text-decoration:none} a:hover{text-decoration:underline;text-underline-offset:.2em}
+strong,b{color:var(--ink);font-weight:600}
+code{font-family:var(--mono);font-size:max(var(--t-2),.86em);background:var(--band);padding:.08em .32em;border-radius:var(--r-sm);color:var(--ink-2)}
+.wrap{max-width:var(--w);margin-inline:auto;padding-inline:var(--s5)}
+.label{font-family:var(--mono);font-size:var(--t-2);font-weight:500;letter-spacing:var(--track-label);text-transform:uppercase;color:var(--faint);margin:0}
+.lead{font-family:var(--serif);font-size:var(--t1);line-height:1.5;color:var(--ink-2);max-width:72ch}
+.small{font-size:var(--t-1);color:var(--muted)}
+.top{position:sticky;top:0;z-index:60;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.top-in{max-width:var(--w);margin-inline:auto;padding:var(--s3) var(--s5);display:flex;align-items:center;gap:var(--s4);flex-wrap:wrap}
+.top b{font-family:var(--mono);font-size:var(--t-1);color:var(--ink);white-space:nowrap}
+.top nav{display:flex;gap:var(--s4);margin-left:auto;flex-wrap:wrap;font-size:var(--t-1);font-weight:500}
+.top nav a{color:var(--ink-2)} .top nav a:hover{color:var(--accent);text-decoration:none}
+header.hero{padding:var(--s7) 0 var(--s5)}
+.chips{display:flex;gap:var(--s2);flex-wrap:wrap;margin:var(--s4) 0 0}
+.chip{font-family:var(--mono);font-size:var(--t-2);padding:.3em .6em;border:1px solid var(--line-2);border-radius:var(--r-sm);color:var(--ink-2);background:var(--panel)}
+.chip.ok{border-color:var(--accent);color:var(--accent)} .chip.warn{border-color:var(--amber);color:var(--amber)}
+section.blk{padding-top:var(--s8)} section.blk:last-of-type{padding-bottom:var(--s9)}
+.hd{margin-bottom:var(--s5);max-width:80ch} .hd .label{margin-bottom:var(--s2)} .hd h2{margin-bottom:var(--s3)}
+.panel{background:var(--panel);border-radius:var(--r);box-shadow:var(--shadow);padding:var(--s5)}
+.band{background:var(--band);border-radius:var(--r);padding:var(--s4) var(--s5)}
+.grid{display:grid;gap:var(--s4)} .g3{grid-template-columns:repeat(3,minmax(0,1fr))} .g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+@media (max-width:900px){.g3,.g2{grid-template-columns:minmax(0,1fr)}}
+.card h3{margin-bottom:var(--s2)} .card p{margin-bottom:var(--s2);font-size:var(--t-1)} .card p:last-child{margin:0}
+.tw{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:var(--r);box-shadow:var(--shadow);background:var(--panel)}
+table{border-collapse:collapse;width:100%;min-width:680px;font-size:var(--t-1)}
+caption{text-align:left;padding:var(--s4) var(--s5) var(--s2);color:var(--muted);font-size:var(--t-1);caption-side:top}
+th,td{text-align:left;padding:var(--s3) var(--s4);border-bottom:1px solid var(--line);vertical-align:top;line-height:1.45}
+thead th{font-family:var(--mono);font-size:var(--t-2);font-weight:500;color:var(--faint);letter-spacing:var(--track-label);text-transform:uppercase;border-bottom:1px solid var(--line-2);white-space:nowrap}
+tbody tr:last-child td{border-bottom:0}
+td.sub{font-weight:600;color:var(--ink);white-space:nowrap}
+td.num{font-family:var(--mono);font-size:var(--t-2);font-variant-numeric:tabular-nums;white-space:nowrap}
+td .path{display:block;font-family:var(--mono);font-size:var(--t-2);color:var(--faint);margin-top:2px}
+tr.pro td{background:color-mix(in srgb,var(--accent-soft) 55%,transparent)}
+.v-ok{color:var(--accent);font-weight:600} .v-no{color:var(--muted)} .v-warn{color:var(--amber);font-weight:600}
+/* the slide mock — this is the component proposed for the site */
+.slide{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:var(--s5);align-items:start;background:var(--panel);border-radius:var(--r);box-shadow:var(--shadow);padding:var(--s5);margin-bottom:var(--s4)}
+.slide .fr{background:var(--band);border-radius:var(--r);padding:var(--s4)}
+.slide .fr svg{display:block;width:100%;height:auto}
+.slide .tx h3{margin-bottom:var(--s2)} .slide .tx p{font-size:var(--t-1);margin-bottom:var(--s2)}
+.slide .tx .go{font-family:var(--mono);font-size:var(--t-2)}
+.slide .n{font-family:var(--mono);font-size:var(--t-2);color:var(--faint);margin-bottom:var(--s2)}
+@media (max-width:820px){.slide{grid-template-columns:minmax(0,1fr)}}
+.dia .nd{fill:var(--panel);stroke:var(--line-2);stroke-width:1}
+.dia .hi{stroke:var(--accent);stroke-width:1.6;fill:var(--accent-soft)}
+.dia .tt{font:600 12px var(--sans);fill:var(--ink)}
+.dia .tx{font:10.5px var(--sans);fill:var(--ink-2)}
+.dia .lb{font:10px var(--mono);fill:var(--faint)}
+.dia .ed{stroke:var(--line-3);fill:none;stroke-width:1.2;marker-end:url(#arr)}
+.dia .dash{stroke-dasharray:4 3}
+.dia .bar{fill:var(--line-3)} .dia .bar.hi{fill:var(--ink);stroke:none} .dia .bar.pro{fill:var(--accent-soft);stroke:var(--accent);stroke-width:1.2}
+.dia .ax{stroke:var(--line-2);stroke-width:1} .dia .grid{stroke:var(--line);stroke-width:1}
+.dia .ci{stroke:var(--ink-2);stroke-width:1.5} .dia .pt{fill:var(--ink-2)} .dia .pt.pro{fill:var(--accent)} .dia .ci.pro{stroke:var(--accent)}
+.steps{counter-reset:s;list-style:none;padding:0;margin:0;display:grid;gap:var(--s3)}
+.steps li{display:grid;grid-template-columns:2rem minmax(0,1fr);gap:var(--s3);align-items:start;font-size:var(--t-1)}
+.steps li::before{counter-increment:s;content:counter(s,decimal-leading-zero);font-family:var(--mono);color:var(--accent);font-weight:500;padding-top:2px}
+form.q{background:var(--panel);border-radius:var(--r);box-shadow:var(--shadow);padding:var(--s5);display:grid;gap:var(--s3)}
+form.q h3{margin:0} form.q .why{font-size:var(--t-1);color:var(--muted);margin:0}
+form.q label{display:grid;grid-template-columns:1.2rem minmax(0,1fr);gap:var(--s2);align-items:start;font-size:var(--t-1);padding:var(--s2) var(--s3);border:1px solid var(--line);border-radius:var(--r-sm);cursor:pointer}
+form.q label:has(input:checked){border-color:var(--accent);background:var(--accent-soft)}
+form.q input[type=radio]{margin:3px 0 0;accent-color:var(--accent)}
+form.q textarea{width:100%;font:inherit;font-size:var(--t-1);padding:var(--s2) var(--s3);border:1px solid var(--line-2);border-radius:var(--r-sm);background:var(--bg);color:var(--ink-2);min-height:3.2rem;resize:vertical}
+form.q .row{display:flex;gap:var(--s3);align-items:center;flex-wrap:wrap}
+.btn{font:500 var(--t-1) var(--sans);background:var(--accent);color:var(--accent-ink);border:0;border-radius:var(--r-sm);padding:.55em 1em;cursor:pointer}
+.queued{font-family:var(--mono);font-size:var(--t-2);color:var(--accent);min-height:1.2em}
+.rec{font-family:var(--mono);font-size:var(--t-2);color:var(--accent);margin-left:.4em}
+ul.tight{margin:0;padding-left:1.1em;font-size:var(--t-1)} ul.tight li{margin-bottom:var(--s1)}
+.tree{font-family:var(--mono);font-size:var(--t-1);line-height:1.7;white-space:pre;overflow-x:auto;margin:0}
+footer{border-top:1px solid var(--line);padding:var(--s5) 0;font-size:var(--t-2);color:var(--faint);font-family:var(--mono)}
+</style>
+</head>
+<body>
+<div class="top"><div class="top-in"><b>s08 · ConvFinQA presentation mode</b>
+<nav><a href="#verdict">Verdict</a><a href="#story">Story arc</a><a href="#slides">Slides</a><a href="#tree">Page tree</a><a href="#numbers">Numbers</a><a href="#diff">Now vs proposed</a><a href="#decisions">Decisions</a><a href="#steps">Steps</a></nav></div></div>
+
+<header class="hero"><div class="wrap">
+  <p class="label">plan · branch <code>convfinqa-eval</code> · 2026-09-06</p>
+  <h1>Rebuild the ConvFinQA case study as a presentation, with two deep pages under it</h1>
+  <p class="lead">Two things happened in <code>ConvFinQA-agent</code> since the page was last written: optimisation campaigns with a significance gate (PR #8, promoted v8), and an Agent SDK runtime experiment whose distilled single prompt scored 90.5% (PR #9). The page still says champion v5 at 79.7%. This plan turns the seven-section case study into a slide-like scan — figure left, short text right, "go deep" link under each — and puts the full record on two deep pages: <code>/eval-loop/</code> (MLOps) and <code>/sdk-vs-llm/</code> (runtime test).</p>
+  <div class="chips">
+    <span class="chip ok">repo: champion v8 · 81.7% (285/349) · p 0.040 clustered</span>
+    <span class="chip ok">repo: sdk_champion sdk_v1 · 90.5% (316/349) · p 0.0003</span>
+    <span class="chip warn">page: champion v5 · 79.7% (149/187) · rolled back 2026-09-03</span>
+    <span class="chip">327 tests · PRs #8 (2026-09-05) and #9 (2026-09-06) merged</span>
+  </div>
+</div></header>
+
+<section class="blk" id="verdict"><div class="wrap">
+  <div class="hd"><p class="label">00 · verdict</p><h2>Three things the page has to say now</h2></div>
+  <div class="grid g3">
+    <div class="panel card"><h3>The story is now 73% → 90.5%, in four causes</h3>
+      <p>v1 73.0% → v2 77.1% (GEPA) → v8 81.7% (campaign c01, retriever) → sdk_v1 90.5% (v8's four prompts distilled into one Claude session). Each step has a named cause and a gate row. The case study opens on this chart, as asked.</p>
+      <p><b>Kept honest in the same slide:</b> the SDK step changed model and architecture together, and 90.5% is on a split drawn from the public train pool — so "one session beats four agents" is <i>not</i> established; a win at equal optimisation effort is.</p></div>
+    <div class="panel card"><h3>The gate got strictly harder, and it un-promoted three versions</h3>
+      <p>Net-positive with p "recorded" is retired. The campaign rule is net positive <b>and</b> one-sided, cluster-corrected McNemar p &lt; 0.05 (clusters = conversations). Re-judged under it, v3_1, v4 and v5 were all rolled back to v2 on 2026-09-03; v8 is the first promotion that passed.</p>
+      <p>That rollback is the eval-loop deep page's best paragraph: the evidence "was never wrong, it was never sufficient".</p></div>
+    <div class="panel card"><h3>The SDK won, on a prompt the pipeline's loop wrote</h3>
+      <p>sdk_v1 was distilled from v8 — three campaigns and seven experiments of DeepSeek optimisation. The SDK loop's own attempt to improve it (sdk_v2) was rejected at −2.9 pp, and the loop is starving at 90% (≈34 first-wrong cases per 100 reports).</p>
+      <p>It promotes to <code>sdk_champion</code> only, never <code>champion</code>; serving is unchanged. The SDK deep page carries the confound, the contamination note and the Haiku swap.</p></div>
+  </div>
+</div></section>
+
+<section class="blk" id="story"><div class="wrap">
+  <div class="hd"><p class="label">01 · story arc</p><h2>Benefit first, then how the loop earned it, then how the runtime test was run</h2>
+  <p class="small">The seven H2s are a locked contract (lint). The presentation lives <i>inside</i> them: each section becomes one to three slides, and the two deep pages are reached from a "go deep" line under the slide that summarises them.</p></div>
+  <div class="tw"><table>
+    <thead><tr><th>#</th><th>Section (locked H2)</th><th>Slide(s) — figure · text</th><th>Goes deep to</th></tr></thead>
+    <tbody>
+      <tr><td class="num">1</td><td class="sub">Purpose &amp; benefit</td><td><b>S1 · the progression</b> — bar chart 73.0 → 77.1 → 81.7 → 90.5 with the human-expert line at 89.4 dashed and an asterisk; text names the cause of each step and the two caveats.<br><b>S2 · the console</b> — the surface table, condensed to six rows.</td><td>both pages</td></tr>
+      <tr><td class="num">2</td><td class="sub">Agent architecture</td><td><b>S3 · four agents</b> — existing agent SVG; the four-row table.<br><b>S4 · two runtimes</b> — new SVG: four typed agents on deepseek-v4-flash vs one Claude session with the same six calculator tools; text explains "distil, do not copy".</td><td>sdk-vs-llm</td></tr>
+      <tr><td class="num">3</td><td class="sub">Agent loop &amp; evaluation</td><td><b>S5 · the loop</b> — loop SVG revised (teacher on Opus 5 via Agent SDK; campaigns; significance gate).<br><b>S6 · nine gate verdicts</b> — new chart: Δpp with 95% CI per experiment, two promotions filled; text states the rule and the rollback.<br><b>S7 · where the SDK gain is</b> — grouped bars, number vs program turns, pipeline vs SDK; text: +13.0 pp on program turns, 0.0 on number turns; Haiku −3.2 pp, not significant.<br>Then the Subject / Deliverable / Accuracy / Verdict lineage table.</td><td>eval-loop · sdk-vs-llm</td></tr>
+      <tr><td class="num">4</td><td class="sub">Deployed architecture</td><td>Topology SVG as today; prose re-dated. Smoke asserts served bundle == champion (v8).</td><td>—</td></tr>
+      <tr><td class="num">5</td><td class="sub">Guardrails &amp; security</td><td>As today; add: the SDK arm runs on subscription billing through the same choke-point discipline (<code>evalloop/sdk.py</code>), never in the demo image.</td><td>—</td></tr>
+      <tr><td class="num">6</td><td class="sub">Observability &amp; cost</td><td>Add the cost row the runtime test produced: a gate pass costs ~$1–2 on the pipeline and $27.62 on the SDK arm; 6 min vs 13 min wall. SDK spans are opened by hand because the CLI subprocess is not autologged.</td><td>sdk-vs-llm</td></tr>
+      <tr><td class="num">7</td><td class="sub">Scorecard</td><td>Rendered by the layout. Rows re-scored: <i>gate</i> now significance-based, <i>loop</i> now campaigns, <i>judge</i> stays n/a; score stays 6 / 9 unless a proof path changes it.</td><td>—</td></tr>
+    </tbody></table></div>
+</div></section>
+
+<section class="blk" id="slides"><div class="wrap">
+  <div class="hd"><p class="label">02 · the slide component</p><h2>Figure left, one paragraph right, a "go deep" line — falls to one column on a phone</h2>
+  <p class="small">Mocked here in the site's tokens. On the site this is one new CSS block (<code>.slide</code>) in <code>main.css</code> and raw HTML in the markdown, with the SVG inlined by <code>{% include %}</code> so it follows the theme. Accent appears only on the promoted marks (the "shipped" sense) and the link, per DESIGN.md rule 3. Three of the proposed slides are drawn below with the real numbers.</p></div>
+
+  <div class="slide" id="s1">
+    <div class="fr">
+      <svg class="dia" viewBox="0 0 360 190" role="img" aria-label="Accuracy by version: v1 73.0, v2 77.1, v8 81.7, sdk_v1 90.5, with the human expert line at 89.4">
+        <title>S1 · the progression</title>
+        <g class="grid"><line x1="40" y1="150" x2="350" y2="150"/><line x1="40" y1="110" x2="350" y2="110"/><line x1="40" y1="70" x2="350" y2="70"/><line x1="40" y1="30" x2="350" y2="30"/></g>
+        <g class="lb"><text x="34" y="153" text-anchor="end">60</text><text x="34" y="113" text-anchor="end">70</text><text x="34" y="73" text-anchor="end">80</text><text x="34" y="33" text-anchor="end">90</text></g>
+        <!-- y = 150 - (acc-60)*4 -->
+        <g><title>v1 · 73.0% (562/770) · the starting prompt set</title><rect class="bar" x="60" y="98" width="46" height="52" rx="3"/><text class="tt" x="83" y="92" text-anchor="middle">73.0</text><text class="lb" x="83" y="166" text-anchor="middle">v1</text><text class="lb" x="83" y="178" text-anchor="middle">n 770</text></g>
+        <g><title>v2 · 77.1% (594/770) · GEPA over DSPy, full prompt set</title><rect class="bar" x="130" y="81.6" width="46" height="68.4" rx="3"/><text class="tt" x="153" y="76" text-anchor="middle">77.1</text><text class="lb" x="153" y="166" text-anchor="middle">v2 · GEPA</text><text class="lb" x="153" y="178" text-anchor="middle">n 770</text></g>
+        <g><title>v8 · 81.7% (285/349) · campaign c01 experiment 3, retriever prompt only, p 0.040 clustered</title><rect class="bar pro" x="200" y="63.2" width="46" height="86.8" rx="3"/><text class="tt" x="223" y="57" text-anchor="middle">81.7</text><text class="lb" x="223" y="166" text-anchor="middle">v8 · loop</text><text class="lb" x="223" y="178" text-anchor="middle">n 349</text></g>
+        <g><title>sdk_v1 · 90.5% (316/349) · v8's four prompts distilled into one Claude session, p 0.0003</title><rect class="bar hi" x="270" y="28" width="46" height="122" rx="3"/><text class="tt" x="293" y="22" text-anchor="middle">90.5</text><text class="lb" x="293" y="166" text-anchor="middle">sdk_v1</text><text class="lb" x="293" y="178" text-anchor="middle">n 349</text></g>
+        <g><title>human expert 89.4% · Chen et al. 2022 Table 5, on the paper's held-out test set — orientation, not a like-for-like baseline</title><line class="ed dash" x1="40" y1="32.4" x2="350" y2="32.4" style="marker-end:none"/><text class="lb" x="348" y="42" text-anchor="end">human 89.4*</text></g>
+      </svg>
+    </div>
+    <div class="tx"><p class="n">§1 · slide 1</p><h3>From 73% to 90.5%, in four named causes</h3>
+      <p>Each bar is one registry event. v2 came from a GEPA run over DSPy. v8 came from the eval loop: a teacher blamed the retriever, one prompt changed, and a significance gate promoted it on 349 unseen questions. sdk_v1 is those four prompts distilled into one Claude session.</p>
+      <p><b>Same slide, same breath:</b> the SDK step changed model and architecture together, and the 349-question split is drawn from the public train pool, so the human line is orientation. The claim is a win at equal optimisation effort, not human-level reasoning.</p>
+      <p class="go">↳ go deep: the loop · the runtime test</p></div>
+  </div>
+
+  <div class="slide" id="s6">
+    <div class="fr">
+      <svg class="dia" viewBox="0 0 360 236" role="img" aria-label="Nine gate verdicts as accuracy deltas with 95 percent confidence intervals; only v8 and sdk_v1 clear zero">
+        <title>S6 · nine gate verdicts</title>
+        <!-- x = 200 + Δpp*9 ; range -8..+16 -->
+        <g class="grid"><line x1="128" y1="14" x2="128" y2="218"/><line x1="272" y1="14" x2="272" y2="218"/><line x1="344" y1="14" x2="344" y2="218"/></g>
+        <line class="ax" x1="200" y1="10" x2="200" y2="222"/>
+        <g class="lb"><text x="128" y="232" text-anchor="middle">−8</text><text x="200" y="232" text-anchor="middle">0</text><text x="272" y="232" text-anchor="middle">+8</text><text x="344" y="232" text-anchor="middle">+16 pp</text></g>
+        <!-- rows, 22px apart from y=24 -->
+        <g><title>c01-e01 · v6 vs v2 · preprocess · +2.29 pp · CI [−2.87, +7.40] · p 0.191 · REJECT</title><text class="lb" x="8" y="28">c01-e01 v6</text><line class="ci" x1="174.2" y1="24" x2="266.6" y2="24"/><circle class="pt" cx="220.6" cy="24" r="3.5"/></g>
+        <g><title>c01-e02 · v7 vs v2 · preprocess · +2.58 pp · CI [−1.92, +7.16] · p 0.132 · REJECT</title><text class="lb" x="8" y="50">c01-e02 v7</text><line class="ci" x1="182.7" y1="46" x2="264.4" y2="46"/><circle class="pt" cx="223.2" cy="46" r="3.5"/></g>
+        <g><title>c01-e03 · v8 vs v2 · retriever · +4.58 pp · CI [−0.28, +9.85] · one-sided clustered p 0.040 · PROMOTE</title><text class="lb" x="8" y="72">c01-e03 v8</text><line class="ci pro" x1="197.5" y1="68" x2="288.7" y2="68"/><circle class="pt pro" cx="241.2" cy="68" r="4"/><text class="lb" x="296" y="72">promote</text></g>
+        <g><title>c02-e01 · v9 vs v8 · retriever · +0.00 pp · CI [−3.93, +3.46] · p 0.500 · REJECT</title><text class="lb" x="8" y="94">c02-e01 v9</text><line class="ci" x1="164.6" y1="90" x2="231.1" y2="90"/><circle class="pt" cx="200" cy="90" r="3.5"/></g>
+        <g><title>c02-e02 · v10 vs v8 · preprocess · +0.57 pp · CI [−3.44, +4.62] · p 0.393 · REJECT</title><text class="lb" x="8" y="116">c02-e02 v10</text><line class="ci" x1="169" y1="112" x2="241.6" y2="112"/><circle class="pt" cx="205.1" cy="112" r="3.5"/></g>
+        <g><title>c03-e01 · v11 vs v8 · preprocess · +1.43 pp · CI [−2.87, +5.48] · p 0.254 · REJECT</title><text class="lb" x="8" y="138">c03-e01 v11</text><line class="ci" x1="174.2" y1="134" x2="249.3" y2="134"/><circle class="pt" cx="212.9" cy="134" r="3.5"/></g>
+        <g><title>c03-e02 · v12 vs v8 · preprocess · −0.29 pp · CI [−4.66, +4.00] · p 0.551 · REJECT</title><text class="lb" x="8" y="160">c03-e02 v12</text><line class="ci" x1="158.1" y1="156" x2="236" y2="156"/><circle class="pt" cx="197.4" cy="156" r="3.5"/></g>
+        <g><title>s01 baseline · sdk_v1 vs v8 · runtime · +8.88 pp · CI [+4.20, +13.71] · p 0.0003 · PROMOTE to sdk_champion</title><text class="lb" x="8" y="182">s01 sdk_v1</text><line class="ci pro" x1="237.8" y1="178" x2="323.4" y2="178"/><circle class="pt pro" cx="279.9" cy="178" r="4"/><text class="lb" x="330" y="182">promote</text></g>
+        <g><title>s01-e02 · sdk_v2 vs sdk_v1 · calculator · −2.87 pp · CI [−7.32, +0.85] · p 0.917 · REJECT</title><text class="lb" x="8" y="204">s01-e02 sdk_v2</text><line class="ci" x1="134.1" y1="200" x2="207.7" y2="200"/><circle class="pt" cx="174.2" cy="200" r="3.5"/></g>
+      </svg>
+    </div>
+    <div class="tx"><p class="n">§3 · slide 6</p><h3>Nine verdicts, two promotions, all on the same 349 questions</h3>
+      <p>The rule since 2026-09-03: net positive on the shared gate questions <b>and</b> one-sided, cluster-corrected McNemar p &lt; 0.05, clustered by conversation because a wrong turn poisons the turns below it. Seven challengers moved the number and were refused; v8 and sdk_v1 cleared the bar.</p>
+      <p>Re-judged under this rule, v3_1, v4 and v5 were rolled back to v2 the same day. v5's p was 0.207 with a CI of [−3.2, +7.6] that contains zero.</p>
+      <p class="go">↳ go deep: the loop's setup, every command, the cycle log</p></div>
+  </div>
+
+  <div class="slide" id="s7">
+    <div class="fr">
+      <svg class="dia" viewBox="0 0 360 170" role="img" aria-label="Accuracy by turn type: number turns 95.5 versus 95.5, program turns 75.2 versus 88.2, pipeline versus SDK">
+        <title>S7 · where the SDK gain is</title>
+        <g class="grid"><line x1="40" y1="130" x2="350" y2="130"/><line x1="40" y1="90" x2="350" y2="90"/><line x1="40" y1="50" x2="350" y2="50"/></g>
+        <g class="lb"><text x="34" y="133" text-anchor="end">70</text><text x="34" y="93" text-anchor="end">80</text><text x="34" y="53" text-anchor="end">90</text></g>
+        <!-- y = 130 - (acc-70)*4 -->
+        <g><title>number turns · pipeline v8 · 95.5% (n 111)</title><rect class="bar" x="70" y="28" width="40" height="102" rx="3"/><text class="tt" x="90" y="22" text-anchor="middle">95.5</text></g>
+        <g><title>number turns · SDK sdk_v1 · 95.5% (n 111) · +0.0 pp, p 0.5</title><rect class="bar hi" x="114" y="28" width="40" height="102" rx="3"/><text class="tt" x="134" y="22" text-anchor="middle">95.5</text></g>
+        <text class="lb" x="112" y="146" text-anchor="middle">number turns · n 111</text>
+        <g><title>program turns · pipeline v8 · 75.2% (n 238)</title><rect class="bar" x="210" y="109.2" width="40" height="20.8" rx="3"/><text class="tt" x="230" y="103" text-anchor="middle">75.2</text></g>
+        <g><title>program turns · SDK sdk_v1 · 88.2% (n 238) · +13.0 pp, 35 fixed / 4 broken, clustered p 4.7e-05</title><rect class="bar hi" x="254" y="57.2" width="40" height="72.8" rx="3"/><text class="tt" x="274" y="51" text-anchor="middle">88.2</text></g>
+        <text class="lb" x="252" y="146" text-anchor="middle">program turns · n 238</text>
+        <g class="lb"><rect class="bar" x="40" y="158" width="10" height="8" rx="2"/><text x="56" y="165">pipeline v8 · deepseek-v4-flash</text><rect class="bar hi" x="200" y="158" width="10" height="8" rx="2"/><text x="216" y="165">SDK sdk_v1 · claude-sonnet-5</text></g>
+      </svg>
+    </div>
+    <div class="tx"><p class="n">§3 · slide 7</p><h3>The whole gain is on the reasoning turns</h3>
+      <p>Number turns are a lookup and both runtimes already get 95.5%. Program turns need a plan, retrieval and arithmetic across the conversation: the single session lifted them 75.2% → 88.2%, 35 fixed against 4 broken. Program-match stayed at 41%: it reaches the right numbers without reproducing the gold programs.</p>
+      <p>Swapping the model under the same prompt cost 3.2 pp (Haiku 4.5, 87.4%, p 0.051, not significant) and saved $10 a pass.</p>
+      <p class="go">↳ go deep: the runtime test, both arms, every SDK experiment</p></div>
+  </div>
+</div></section>
+
+<section class="blk" id="tree"><div class="wrap">
+  <div class="hd"><p class="label">03 · page tree</p><h2>Two deep pages, both on the locked five-section deep spine</h2>
+  <p class="small">The deep contract is Setup → One cycle → Gate &amp; promote → Cycle log → What changed since. The SDK page fits it without bending: a "cycle" there is one SDK experiment, the gate is the runtime gate, the log has three rows.</p></div>
+  <div class="grid g2">
+    <div class="panel"><pre class="tree">/projects/convfinqa-agent/              the scan (7 sections, ~9 slides)
+├── eval-loop/                          MLOps · rewritten
+│   ├── Setup        MLflow 3.12 · eval_loop_v2 split (100/100)
+│   │                · Opus 5 teacher via Agent SDK · lineage
+│   ├── One cycle    cycle → train → diagnose → rewrite → gate
+│   ├── Gate         net-positive AND clustered McNemar p&lt;.05
+│   ├── Cycle log    7 campaign rows + the 3 rollbacks
+│   └── Changed      significance rule · campaigns · rotation
+└── sdk-vs-llm/                         runtime test · new
+    ├── Setup        claude-agent-sdk · sdk-distil → sdk_v1
+    ├── One cycle    cycle --campaign s01 --runtime agent_sdk
+    ├── Gate         runtime gate · sdk_champion alias only
+    ├── Cycle log    s01 baseline · s01-e02 · Haiku swap
+    └── Changed      what shipped, what did not (loop starving)</pre></div>
+    <div class="panel card"><h3>What each page is for</h3>
+      <p><b>eval-loop</b> answers "how does a prompt get promoted": the split, the teacher, the one-agent rewrite, the statistic, and every verdict including the rollbacks. Libraries named at each step (pydantic-ai, MLflow, claude-agent-sdk, pandas).</p>
+      <p><b>sdk-vs-llm</b> answers "was the runtime or the model the cause": both arms on the same 349 questions, the by-turn-type split, the model swap, the confound stated, and why the SDK loop could not improve its own prompt.</p>
+      <p>The practice page <code>/practices/eval-loop/</code> also quotes v5 numbers in four places; it gets the same refresh so the site does not contradict itself.</p></div>
+  </div>
+</div></section>
+
+<section class="blk" id="numbers"><div class="wrap">
+  <div class="hd"><p class="label">04 · numbers</p><h2>Every version, its deliverable, its number and its verdict</h2>
+  <p class="small">Source: <code>evaluation/registry.json</code>, <code>evaluation/diagnostics/evalloop/gates.jsonl</code>, <code>evaluation/story.json</code> at <code>5af229e</code>. This table is the case study's §3 table.</p></div>
+  <div class="tw"><table>
+    <thead><tr><th>Subject</th><th>Deliverable</th><th>Accuracy</th><th>Verdict</th></tr></thead>
+    <tbody>
+      <tr><td class="sub">v1 · t1.p1.r1.c1</td><td>the starting prompt set</td><td class="num">770 q · 73.0%</td><td class="v-no">champion until v2</td></tr>
+      <tr><td class="sub">v2 · t2.p2.r2.c2</td><td>GEPA run over DSPy<span class="path">optimization/gepa.py</span></td><td class="num">770 q · 77.1% · 349 gate q · 77.1%</td><td class="v-no">champion; baseline of campaign c01 after the rollback</td></tr>
+      <tr><td class="sub">v3_1 · v4 · v5</td><td>s7 harness; teacher retriever; teacher preprocess</td><td class="num">v5: 187 q · 79.7%, p 0.207 clustered</td><td class="v-warn">rolled back to v2 on 2026-09-03 — promoted under the retired rule</td></tr>
+      <tr><td class="sub">v6 · v7</td><td>c01 preprocess rewrites<span class="path">prompts/v6.py · v7.py</span></td><td class="num">349 q · 79.4% · 79.7% · p .19 · .13</td><td class="v-no">rejected</td></tr>
+      <tr class="pro"><td class="sub">v8 · t2.p2.r5.c2</td><td>c01-e03 retriever rewrite<span class="path">prompts/v8.py</span></td><td class="num">349 q · 77.1% → 81.7% · 34 fixed / 18 broken · p 0.040</td><td class="v-ok">promoted · champion</td></tr>
+      <tr><td class="sub">v9 · v10 · v11 · v12</td><td>c02, c03 rewrites against v8</td><td class="num">349 q · 81.7 · 82.2 · 83.1 · 81.4% · p .50 · .39 · .25 · .55</td><td class="v-no">rejected — v11 +1.4 pp was not enough</td></tr>
+      <tr class="pro"><td class="sub">sdk_v1 · s1</td><td>v8's four prompts distilled into one Claude session<span class="path">prompts/sdk_v1.py · evalloop/sdk_teacher.py</span></td><td class="num">349 q · 81.7% → 90.5% · 38 fixed / 7 broken · p 0.0003</td><td class="v-ok">promoted · sdk_champion</td></tr>
+      <tr><td class="sub">sdk_v2 · s2</td><td>SDK teacher's calculator rewrite</td><td class="num">349 q · 90.5% → 87.7% · 6 fixed / 16 broken · p 0.917</td><td class="v-no">rejected</td></tr>
+      <tr><td class="sub">sdk_v1 on Haiku 4.5</td><td>same prompt, cheaper model</td><td class="num">349 q · 87.4% · −3.2 pp · p 0.051 · $17.14 vs $27.62</td><td class="v-no">not significant; still +5.7 over the pipeline</td></tr>
+    </tbody></table></div>
+</div></section>
+
+<section class="blk" id="diff"><div class="wrap">
+  <div class="hd"><p class="label">05 · now vs proposed</p><h2>What the page says today, and what it will say</h2></div>
+  <div class="tw"><table>
+    <thead><tr><th>Field</th><th>Today</th><th>Proposed</th></tr></thead>
+    <tbody>
+      <tr><td class="sub">headline</td><td>One agent per cycle, promoted only on unseen evidence</td><td>Optimised to 90.5%, promoted only on significance</td></tr>
+      <tr><td class="sub">metric</td><td>79.7% · unseen test split (149/187) · v5 over 77.5%</td><td>90.5% · unseen gate split (316/349) · SDK arm over the 81.7% pipeline</td></tr>
+      <tr><td class="sub">proof_line</td><td>v5 promoted at 79.7% … McNemar p 0.50</td><td>sdk_v1 scored 90.5% (316/349) over the v8 pipeline's 81.7% on the same unseen questions, +8.9 pp, one-sided clustered McNemar p 0.0003; v8 itself was the one campaign promotion in seven, p 0.040.</td></tr>
+      <tr><td class="sub">tldr</td><td>four flash agents, teacher, net-positive gate promoted v5</td><td>four agents + a significance-gated optimisation loop that promoted v8; the runtime test that distilled v8 into one Claude session at 90.5%</td></tr>
+      <tr><td class="sub">deep:</td><td>[eval-loop]</td><td>[eval-loop, sdk-vs-llm]</td></tr>
+      <tr><td class="sub">stack</td><td>pydantic-ai ×4 + teacher, MLflow 3, DeepSeek flash/pro …</td><td>+ claude-agent-sdk (teacher on Opus 5; SDK arm on Sonnet 5)</td></tr>
+      <tr><td class="sub">rubric · gate</td><td>net-positive, p recorded</td><td>net-positive AND clustered one-sided p &lt; 0.05; CI gate re-scores v8 from its gate CSV</td></tr>
+      <tr><td class="sub">rubric · loop</td><td>v4 refused, v5 promoted</td><td>campaigns: 7 experiments, 1 promotion, target rotation after 2 rejections; 3 rollbacks under the new rule</td></tr>
+      <tr><td class="sub">loop SVG</td><td>teacher on deepseek-v4-pro</td><td>teacher + prompt-writer on Opus 5 via the Agent SDK; "campaign" ring; the sdk arm as a branch off "register"</td></tr>
+      <tr><td class="sub">layout</td><td>prose + 3 figures + tables</td><td>prose kept short; 7 slides (<code>.slide</code>) with figure + text + go-deep line</td></tr>
+    </tbody></table></div>
+</div></section>
+
+<section class="blk" id="decisions"><div class="wrap">
+  <div class="hd"><p class="label">06 · decisions</p><h2>Four choices that change the text — I am proceeding on the recommended one for each</h2>
+  <p class="small">Pick a different option and press queue; the build will fold the answer in. No answer means the recommendation stands.</p></div>
+  <div class="grid g2">
+    <form class="q" data-lavish-question="headline metric" onsubmit="return qsubmit(event,'Headline metric')">
+      <h3>Which number is the card's metric?</h3>
+      <p class="why">The home-page row and the TL;DR "proof" cell show one number. The SDK number is the bigger story and what you asked to open on; the pipeline number is what the demo serves.</p>
+      <label><input type="radio" name="a" value="90.5% sdk_v1 (316/349) with the 81.7% pipeline beside it" checked> 90.5% sdk_v1, with the 81.7% pipeline named beside it <span class="rec">recommended</span></label>
+      <label><input type="radio" name="a" value="81.7% v8 pipeline champion, SDK result in the body only"> 81.7% v8 — the champion the demo serves; SDK in the body only</label>
+      <textarea name="note" placeholder="note (optional)"></textarea>
+      <div class="row"><button class="btn" type="submit">Queue answer</button><span class="queued"></span></div>
+    </form>
+    <form class="q" data-lavish-question="sdk page slug" onsubmit="return qsubmit(event,'SDK deep page slug')">
+      <h3>URL of the second deep page</h3>
+      <p class="why">Your words were "testing SDK / LLM". The folder name is the URL.</p>
+      <label><input type="radio" name="a" value="sdk-vs-llm" checked> <code>/projects/convfinqa-agent/sdk-vs-llm/</code> <span class="rec">recommended</span></label>
+      <label><input type="radio" name="a" value="sdk-vs-pipeline"> <code>/projects/convfinqa-agent/sdk-vs-pipeline/</code></label>
+      <label><input type="radio" name="a" value="runtime-test"> <code>/projects/convfinqa-agent/runtime-test/</code></label>
+      <textarea name="note" placeholder="note (optional)"></textarea>
+      <div class="row"><button class="btn" type="submit">Queue answer</button><span class="queued"></span></div>
+    </form>
+    <form class="q" data-lavish-question="human line" onsubmit="return qsubmit(event,'Human-expert line on S1')">
+      <h3>Show the 89.4% human-expert line on the progression chart?</h3>
+      <p class="why">It is what makes 90.5% legible, and the repo's own write-up uses it — with the caveat that the split is drawn from the public train pool. The asterisk and the caveat stay either way.</p>
+      <label><input type="radio" name="a" value="show the human line dashed with the asterisk and caveat" checked> Show it, dashed, asterisked, caveat in the slide text <span class="rec">recommended</span></label>
+      <label><input type="radio" name="a" value="omit the human line; mention the paper only in the deep page"> Leave it off the case study; mention the paper only on the deep page</label>
+      <textarea name="note" placeholder="note (optional)"></textarea>
+      <div class="row"><button class="btn" type="submit">Queue answer</button><span class="queued"></span></div>
+    </form>
+    <form class="q" data-lavish-question="practice refresh" onsubmit="return qsubmit(event,'Practice page refresh')">
+      <h3>Refresh <code>/practices/eval-loop/</code> in the same PR?</h3>
+      <p class="why">It quotes v5 at 79.7% and "champion v5" in four rows. Left alone it contradicts the case study.</p>
+      <label><input type="radio" name="a" value="refresh the practice page numbers in the same PR" checked> Yes, numbers and the ConvFinQA rows only <span class="rec">recommended</span></label>
+      <label><input type="radio" name="a" value="leave the practice page for a separate PR"> No, separate PR</label>
+      <textarea name="note" placeholder="note (optional)"></textarea>
+      <div class="row"><button class="btn" type="submit">Queue answer</button><span class="queued"></span></div>
+    </form>
+  </div>
+</div></section>
+
+<section class="blk" id="steps"><div class="wrap">
+  <div class="hd"><p class="label">07 · steps</p><h2>Ten steps on branch <code>convfinqa-eval</code></h2></div>
+  <div class="panel"><ol class="steps">
+    <li>Add the <code>.slide</code> component to <code>assets/css/main.css</code> (grid, band frame, one-column under 820px; no new colours).</li>
+    <li>Draw three chart SVGs under <code>_includes/diagrams/chart/</code>: <code>convfinqa-progression.svg</code>, <code>convfinqa-gates.svg</code>, <code>convfinqa-turn-types.svg</code>, in the <code>.dia</code> style so they follow the theme.</li>
+    <li>Draw <code>_includes/diagrams/runtime/convfinqa-agent.svg</code>: four agents vs one session, same six tools.</li>
+    <li>Revise <code>_includes/diagrams/loop/convfinqa-agent.svg</code>: Opus 5 teacher via the Agent SDK, campaign ring, significance gate, SDK branch.</li>
+    <li>Rewrite <code>_projects/convfinqa-agent.md</code>: card lines, seven sections as slides, lineage table, rubric rows, <code>deep: [eval-loop, sdk-vs-llm]</code>.</li>
+    <li>Rewrite <code>_deep/convfinqa-agent/eval-loop.md</code> on the v2 split, campaigns and the significance rule; cycle log with all nine gate rows and the three rollbacks; re-date.</li>
+    <li>Write <code>_deep/convfinqa-agent/sdk-vs-llm.md</code> on the deep spine.</li>
+    <li>Refresh the ConvFinQA rows of <code>_practices/eval-loop.md</code>.</li>
+    <li>Lint: <code>lint_case_study.py --all --no-net</code> plus <code>--repo ../ConvFinQA-agent</code> on the case study; build in the ghp-jekyll container; screenshot light, dark and 390px.</li>
+    <li>Commit on the branch; then <code>/no-mistakes</code> with the intent "the case study opens on the 73 → 90.5 story and every number resolves to a registry row".</li>
+  </ol></div>
+</div></section>
+
+<footer><div class="wrap">s08 · written 2026-09-06 from ConvFinQA-agent at 5af229e · every number here is quoted from evaluation/registry.json, gates.jsonl or story.json</div></footer>
+
+<script>
+function qsubmit(ev, title){
+  ev.preventDefault();
+  const f = ev.currentTarget, fd = new FormData(f);
+  const a = fd.get('a'); if(!a) return false;
+  const note = (fd.get('note')||'').toString().trim();
+  const q = f.getAttribute('data-lavish-question');
+  const prompt = title + ': ' + a + (note ? ' — note: ' + note : '');
+  const out = f.querySelector('.queued');
+  if (window.lavish && window.lavish.queuePrompt){
+    window.lavish.queuePrompt(prompt, { tag:'decision', text: q + ': ' + a, element: f, queueKey: q, data:{ question:q, answer:a, note } });
+    out.textContent = 'queued · ' + q;
+  } else { out.textContent = 'selected (open in Lavish to queue) · ' + q; }
+  return false;
+}
+</script>
+</body>
+</html>

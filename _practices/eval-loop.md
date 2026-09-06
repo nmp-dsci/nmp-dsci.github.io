@@ -7,7 +7,7 @@ summary: >-
   per-case regressions, then traces that feed the next version. Three systems
   running the same loop, including the two versions it refused to ship.
 tldr: >-
-  Golden set → graders + judge → gate → ship → traces → diagnose → next version → promote. Three systems, one loop — and the versions it refused: Data Pilot's cycle 002, ConvFinQA's v3_1 and its v4.
+  Golden set → graders + judge → gate → ship → traces → diagnose → next version → promote. Three systems, one loop — and the versions it refused: Data Pilot's cycle 002, ConvFinQA's v3_1, its v4 and seven of its nine campaign challengers.
 order: 1
 kicker: "practice · evaluation"
 systems: [data-pilot, convfinqa-agent, transcript-rag]
@@ -130,32 +130,38 @@ metric calls**; the s7 harness then generated **39 rules** into v3_1, which scor
 **76.23%** and was refused: 61 questions fixed, 68 broken, net negative. As a
 headline that is a rounding error; as a flip count it is a decision.
 
-Since 2026-09-02 the loop runs on a committed manifest instead — train 53 / test
-54 / holdout 56 reports, drawn only from conversations neither optimiser saw — and
-the eight steps look like this:
+Since 2026-09-03 the loop runs on a committed manifest instead — train 100 reports
+and a fixed gate split of 100 (368 / 349 questions), drawn only from conversations
+neither optimiser saw, the holdout reserved — and the eight steps look like this:
 
 | step | in ConvFinQA |
 |---|---|
-| fix the set | `evaluation/splits/eval_loop_v1.json`: id lists are the truth, the seed is provenance |
+| fix the set | `evaluation/splits/eval_loop_v2.json`: id lists are the truth, the seed is provenance; the gate split is sized by a power calculation |
 | grade | numeric and program match per turn, a cascade flag, and a gold-derived per-agent panel at zero API calls |
-| judge | none for scoring; a teacher on the pro tier *attributes* each first-wrong turn to one agent, checked by a 30-case κ sheet (unlabelled) |
-| fingerprint | a bundle is a composition of four per-agent prompt hashes, `t3.p4.r3.c3` |
-| gate | net positive on the shared test-split questions, McNemar p recorded, `--promote` refused on train evidence |
+| judge | none for scoring; a teacher on Opus 5 through the Agent SDK *attributes* each first-wrong turn to one agent, checked by a 30-case κ sheet (unlabelled) |
+| fingerprint | a bundle is a composition of four per-agent prompt hashes, `t2.p2.r5.c2` |
+| gate | net positive on the shared gate questions *and* one-sided cluster-corrected McNemar p < 0.05, a bootstrap CI on every verdict, `--promote` refused on train evidence |
 | commit predictions | every run's CSV under `evaluation/predictions/evalloop/` |
 | trace | every LLM call a span in MLflow, run → report → question → stage |
 | promote | an append-only history that keeps the refusals |
 
-Two verdicts under the new contract. v4 changed only the retriever, improved
-retriever recall on unseen data (.744 → .780) and was **refused** because the
-calculator collapsed behind it. v5 changed only preprocess and was **promoted**:
-77.5% → 79.7% on 187 test questions, 12 fixed against 8 broken, McNemar p 0.503
-— not significant, and recorded as such on the verdict.
+Nine verdicts under the current contract, all paired on the same 349 gate
+questions. v8 changed only the retriever and was **promoted**: 77.1% → 81.7%, 34
+fixed against 18 broken, one-sided clustered McNemar p 0.040. Seven challengers
+moved the number and were refused, v11's +1.4 pp among them, and the runtime
+arm's `sdk_v1` was promoted to its own alias at 90.5%, p 0.0003.
+
+When the rule got stricter on 2026-09-03, three earlier promotions (v3_1, v4, v5)
+were rolled back: v5's p under it is 0.207.
 
 The gate runs on every pull request, offline. `python -m convfinqa.tracking.gate`
 re-derives each committed CSV's `correct` column from its own answers against
 gold — catching a CSV edited by hand — then checks the champion against its
-floor from the CSV its promotion was decided on. Today: v1, v2, v3_1 at 770 rows
-each, consistent; champion v5 79.68% against a 79.18% floor, **PASSED**.
+floor from the CSV its promotion was decided on.
+
+Today: v1, v2, v3_1 at 770 rows each, consistent; champion v8 re-scored at
+81.66% — but against a −0.5% floor, because campaign promotions leave the
+bundle's registry metrics empty. The re-score is real; the floor is an open defect.
 
 [The loop in full, command by command →](/projects/convfinqa-agent/eval-loop/)
 
@@ -207,21 +213,21 @@ that silently invalidates a committed run, and a real drop below a floor.
 
 ## Evidence
 
-Re-run in each system's own repo: ConvFinQA on 2026-09-03, the other two on 2026-08-30.
+Re-run in each system's own repo: ConvFinQA on 2026-09-06, the other two on 2026-08-30.
 
 | claim | command | result |
 |---|---|---|
 | Data Pilot pack | `grep -c '^- case_key:' evals/cases/*.yaml` | 11 + 11 + 10 = **32**; 2 `ready`, 30 `draft` |
 | Data Pilot cycles | `ls docs/evals/` | 001 PASS · 002 FAIL, not shipped · 003 PASS |
 | ConvFinQA corpus | `convfinqa.data.loader` | 200 conversations, **770** questions, **309** never-seen |
-| ConvFinQA splits | `python -c "import json;print(json.load(open('evaluation/splits/eval_loop_v1.json'))['stats'])"` | train 53 / test 54 / holdout 56 reports · 202 / 201 / 207 questions · holdout opened **0** |
-| ConvFinQA registry | `cat evaluation/registry.json` | v1 0.72987 · v2 0.771429 · v3_1 0.762338 · v5 0.796791 (n=187) · champion `v5` |
-| ConvFinQA gate | `python -m convfinqa.tracking.gate` | v1, v2, v3_1 at 770 rows consistent; champion v5 79.68% vs floor 79.18%; **PASSED** |
-| ConvFinQA refusals | `evaluation/registry.json` history · `predictions/evalloop/*test10*` | v3_1 on 770: 68 pass→fail, 61 fail→pass · v4 on test-10: 79.4% → 67.6%, rolled back |
-| ConvFinQA promotion | `evaluation/registry.json` history, last `promote` | v5 over v3_1 on test-50: 77.5% → 79.7%, 12 fixed / 8 broken, McNemar p 0.503 |
+| ConvFinQA splits | `python -c "import json;print(json.load(open('evaluation/splits/eval_loop_v2.json'))['stats'])"` | train 100 / gate 100 reports · 368 / 349 questions · holdout reserved, opened **0** |
+| ConvFinQA registry | `cat evaluation/registry.json` | v1 0.72987 · v2 0.771429 · v3_1 0.762338 · v5 0.796791 (n=187) · aliases champion `v8`, sdk_champion `sdk_v1` |
+| ConvFinQA gate | `python -m convfinqa.tracking.gate` | v1, v2, v3_1 at 770 rows consistent; champion v8 81.66% vs floor −0.50% (empty registry metrics); **PASSED**, vacuously |
+| ConvFinQA refusals | `evaluation/diagnostics/evalloop/gates.jsonl` | 7 of 9 campaign verdicts rejected: v6, v7, v9, v10, v11, v12, sdk_v2 · 3 champions rolled back on 2026-09-03 |
+| ConvFinQA promotion | `evaluation/registry.json` history, last `promote` | v8 over v2 on the 349-question gate split: 77.1% → 81.7%, 34 fixed / 18 broken, one-sided clustered McNemar p 0.040 |
 | GEPA | `evaluation/mlflow_snapshot.json` | 1,964 metric calls, 65 val evals, test 56.47 → 65.26 |
 | s7 rules | `wc -l evaluation/diagnostics/rules_*_v3_1.jsonl` | 3 + 24 + 7 + 5 = **39** |
-| teacher diagnoses | `wc -l evaluation/diagnostics/evalloop/diagnoses_v3_1_20260902_220936.jsonl` | **30** first-wrong turns: preprocess 14 · retriever 10 · calculator 3 · triage 3 · 4 `gold_suspect` |
+| teacher diagnoses | `wc -l evaluation/diagnostics/evalloop/diagnoses.jsonl` | **440** first-wrong cases on the ledger; 13 rewrites; 9 gate verdicts |
 | RAG goldens | `src/evals/golden_dataset.json` | 20 entries: 14 local / 4 global / 2 temporal |
 | RAG ablation | `evals/runs/ablation-20260801-051456.json` | 8 configs × 20 entries |
 | RAG snapshots + CI gate | `ls evals/runs/*.json` · `pytest tests/evals/test_committed_runs.py -q` | **16** snapshots · 20 passed in 0.09s |
