@@ -25,11 +25,11 @@
     <text class="tx s" x="56" y="141">pydantic-ai</text></g>
 
   <g><title>runtime "agent_sdk" — src/convfinqa/backends/agent_sdk.py: one ClaudeSDKClient session per conversation; the report arrives in message one, every later question is one more message; the six calculator functions are its only tools, served over MCP</title>
-    <text class="tx k" x="184" y="12">session · sdk_v1</text></g>
+    <text class="tx k" x="184" y="12">sdk_v1</text></g>
   <g><title>one Claude session — a single system prompt of about 16k characters, seven sections, distilled from v8's four by the teacher: keep the knowledge, drop the hand-off plumbing</title>
     <rect class="nd hi" x="134" y="20" width="100" height="70" rx="4"/>
     <text class="tx" x="184" y="46">one session</text>
-    <text class="tx s" x="184" y="59">1 prompt · 8 turns max</text>
+    <text class="tx s" x="184" y="59">8 turns max</text>
     <text class="tx s" x="184" y="71">claude-sonnet-5</text></g>
   <g><title>the same six calculator tools: add, subtract, multiply, divide, exp, greater — arithmetic never happens in free text in either runtime</title>
     <rect class="nd" x="134" y="98" width="100" height="18" rx="4"/><text class="tx" x="184" y="110.5">six tools</text></g>

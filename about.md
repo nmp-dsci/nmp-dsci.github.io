@@ -5,59 +5,37 @@ permalink: /about/
 summary: Data scientist working in gen AI — three gen-AI systems live on AWS, each with evals in CI, guardrails between the model and the data, and a cost ceiling.
 ---
 
-I'm **Nathan Phillips**, a data scientist working in gen AI, in Sydney. I build gen-AI systems end-to-end —
-from the data layer through the agent loop to the eval harness — and then I run them. Three are
-live on AWS right now, and you can open every one of them from the [home page](/).
+I'm **Nathan Phillips**, a data scientist working in gen AI, in Sydney.
 
-Treating the eval as part of the product rather than an afterthought is the through-line. Every
-system here can tell you what it scores, on which fixed set, graded by whom, and what would have
-stopped a worse version from shipping.
+- **End-to-end** — data layer, agent loop, eval harness; then I run them.
+- **Three live on AWS** — all open from the [home page](/).
+- **The eval is part of the product** — each system says what it scores, on which fixed set, graded by whom, and what would have stopped a worse version shipping.
 
-**If you only read one thing:** the [production rubric](/#rubric) and the three honest scorecards
-underneath it — 9/9, 6/9 and 5/9. The gaps are named with their reasons rather than rounded up.
+**If you only read one thing:** the [production rubric](/#rubric) and its three scorecards — 9/9, 6/9 and 5/9, gaps named with reasons.
 
 ## The three systems
 
-- **[Data Pilot](/projects/data-pilot/)** — a conversational data agent over ~3.2M rows of NSW
-  property data. Natural language in, governed SQL out, and Postgres row-level security deciding
-  what each user may see. Nine of nine on the production rubric.
-- **[ConvFinQA Agent](/projects/convfinqa-agent/)** — multi-turn financial Q&A over report text and
-  tables, through four typed agents whose prompts are versioned and promoted like releases. The
-  registry refused the auto-generated challenger; the champion stayed shipped.
-- **[Transcript RAG](/projects/transcript-rag/)** — an evaluation-first retrieval workbench where
-  eight configurations race on one chunk-labelled golden set. Its headline result is a cost
-  result: parity at 6.1× fewer tokens.
+- **[Data Pilot](/projects/data-pilot/)** — a conversational data agent over ~3.2M rows of NSW property data; natural language in, governed SQL out, Postgres row-level security per user; 9/9.
+- **[ConvFinQA Agent](/projects/convfinqa-agent/)** — multi-turn financial Q&A over report text and tables; four typed agents, prompts promoted like releases; the registry refused the auto-generated challenger.
+- **[Transcript RAG](/projects/transcript-rag/)** — an evaluation-first retrieval workbench; eight configurations on one chunk-labelled golden set; parity at 6.1× fewer tokens.
 
-All three run in **demo mode** on their public URL — read-only, keyless, no inference. That is a
-deliberate decision, not a limitation: a no-login app with a live model attached has an unbounded
-abuse bill. Each case study says exactly which surfaces are live and which are replayed.
+All three run in **demo mode** — read-only, keyless, no inference — because a no-login app with a live model has an unbounded abuse bill.
 
 ## How they were built
 
-Three write-ups cover the parts that transfer to any gen-AI system:
-
-- **[The eval loop](/practices/eval-loop/)** — golden set → judge → gate → ship → trace → diagnose
-  → next version, including the versions that got refused.
-- **[Ways of working](/practices/ways-of-working/)** — plan in the browser, build on a branch,
-  validate through a gate, ship on merge.
-- **[Production at 10 / 100 / 1,000 concurrent users](/practices/production-scale/)** — what runs
-  today, what changes at each rung, and the measured arithmetic behind the sizing.
+- **[The eval loop](/practices/eval-loop/)** — golden set → judge → gate → ship → trace → diagnose → next version, refused versions included.
+- **[Ways of working](/practices/ways-of-working/)** — plan in the browser, build on a branch, validate through a gate, ship on merge.
+- **[Production at 10 / 100 / 1,000 concurrent users](/practices/production-scale/)** — what runs today, what changes at each rung, the arithmetic behind the sizing.
 
 ## What I work with
 
 - **Agents** — planning/execution loops, tool use, governed text-to-SQL, typed multi-agent pipelines
-- **Guardrails** — deterministic policy gates between the model and its tools: row-level security,
-  SQL AST guards, WASM sandboxes, abuse limits, red-team suites graded on system state
-- **RAG** — retrieval strategy design and head-to-head benchmarking (HyDE, multi-query, contextual
-  retrieval, rank fusion, GraphRAG) scored on recall@k, MRR and NDCG
-- **Evals** — golden sets, deterministic graders, cross-family LLM judges, CI regression gates
-  on per-case flips rather than averages alone
-- **Production** — Terraform, keyless OIDC deploys, OpenTelemetry tracing, SLOs with error budgets,
-  cost per answer and the caps that bound the worst day
+- **Guardrails** — deterministic policy gates between the model and its tools: row-level security, SQL AST guards, WASM sandboxes, abuse limits, red-team suites graded on system state
+- **RAG** — retrieval strategy design and head-to-head benchmarking (HyDE, multi-query, contextual retrieval, rank fusion, GraphRAG) scored on recall@k, MRR and NDCG
+- **Evals** — golden sets, deterministic graders, cross-family LLM judges, CI regression gates on per-case flips rather than averages alone
+- **Production** — Terraform, keyless OIDC deploys, OpenTelemetry tracing, SLOs with error budgets, cost per answer and the caps that bound the worst day
 - **Data engineering** — the ETL and analytics work that feeds the systems above
 
 ## This site
 
-*It is built the same way as the systems it describes: every case study is one Markdown file against a
-documented contract, generated by a `/case-study` skill, validated by a lint that refuses a claim
-without a repo path, and rebuilt on merge.*
+*Built the same way as the systems it describes: one Markdown file per case study against a documented contract, generated by a `/case-study` skill, validated by a lint that refuses a claim without a repo path, and rebuilt on merge.*

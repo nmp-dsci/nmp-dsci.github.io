@@ -2,10 +2,9 @@
 title: The eval loop
 short: "The eval loop"
 summary: >-
-  How a gen-AI system gets better without getting worse — a versioned golden
-  set, deterministic graders and an independent judge, a gate that blocks
-  per-case regressions, then traces that feed the next version. Three systems
-  running the same loop, including the two versions it refused to ship.
+  A versioned golden set, deterministic graders and an independent judge, a gate
+  that blocks per-case regressions, then traces that feed the next version.
+  Three systems run the same loop, including the versions it refused to ship.
 tldr: >-
   Golden set → graders + judge → gate → ship → traces → diagnose → next version → promote. Three systems, one loop — and the versions it refused: Data Pilot's cycle 002, ConvFinQA's v3_1, its v4 and seven of its nine campaign challengers.
 order: 1
@@ -24,8 +23,8 @@ sections:
       story about the questions you remembered to ask.
   - n: 2
     summary: >-
-      Eight steps turn a guess into an attributable cycle, and the gate that
-      blocks per-case regressions is the one that says no.
+      Eight steps make a cycle attributable, and the gate that blocks per-case
+      regressions is the one that says no.
   - n: 3
     summary: >-
       The same eight steps look different in each repo because the task decides
@@ -42,71 +41,38 @@ sections:
 
 ## Problem
 
-A prompt edit is a guess until something scores it. The feedback you get by hand
-is the three questions you happened to try — and those are the three the edit was
-written against. So the change ships, the demo still works, and a fourth question
-that used to be right is now quietly wrong.
+A prompt edit is a guess until something scores it.
 
-Averages hide this. A version can lose one point overall while fixing sixty-one
-answers and breaking sixty-eight. Without a fixed set, a per-case comparison and
-something that says *no*, "the model got better" is a story about the questions
-you remembered to ask.
+- **Hand feedback** — the three questions you tried, which are the three the edit was written against.
+- **The quiet regression** — the demo still works; a fourth question that used to be right is now wrong.
+- **Averages hide it** — lose one point overall while fixing sixty-one answers and breaking sixty-eight.
+- **No fixed set, no per-case comparison, nothing that says *no*** — "the model got better" is a story about the questions you remembered to ask.
 
 ## Pattern
 
-Eight steps. All three systems run all eight; they differ in how much of each is
-automated.
+Eight steps; all three systems run all eight, differing only in how much is automated.
 
-1. **Fix the set** — goldens in version control beside the code, with a pack
-   version, so a score attaches to a specification rather than to whatever was in
-   the database that day.
-2. **Grade deterministically wherever the answer has a right shape** — values,
-   chunk ids, program accuracy. Code is free, repeatable, and cannot flatter
-   itself.
-3. **Judge only what code cannot score**, independently: a different model family
-   from the one being graded, a frozen rubric hashed into the run, and a
-   `skipped` record rather than a fake score when no independent judge exists.
-4. **Fingerprint the build** — provider, model, a content hash per behaviour
-   surface — so a base-versus-candidate run has exactly one moving part.
-5. **Gate on per-case flips, not on the average.** On a small, high-stakes pack
-   any case going pass → fail blocks, whatever the headline did. On a larger
-   split a single flip cannot carry a veto, so the gate becomes a paired test —
-   more fixed than broken, with the exact p recorded on the verdict and every
-   flip still listed by name.
-6. **Commit the predictions**, so the gate re-scores offline with no API key and
-   therefore runs on every pull request instead of occasionally.
-7. **Trace what ships**, so the next diagnosis reads real failures.
-8. **Promote through a contract**, and write up the cycles that failed as
-   carefully as the ones that worked.
+1. **Fix the set** — goldens in version control beside the code, with a pack version; a score attaches to a specification, not that day's database.
+2. **Grade deterministically** where the answer has a right shape — values, chunk ids, program accuracy. Code is free, repeatable, and cannot flatter itself.
+3. **Judge only what code cannot score** — a different model family, a frozen rubric hashed into the run, a `skipped` record rather than a fake score.
+4. **Fingerprint the build** — provider, model, a content hash per behaviour surface; base-versus-candidate has one moving part.
+5. **Gate on per-case flips, not the average** — small high-stakes pack: any pass → fail blocks. Larger split: a paired test, more fixed than broken, exact p on the verdict, every flip named.
+6. **Commit the predictions** — the gate re-scores offline with no API key, so it runs on every pull request.
+7. **Trace what ships** — the next diagnosis reads real failures.
+8. **Promote through a contract** — and write up the failed cycles as carefully as the successes.
 
 ## In the three systems
 
 ### Data Pilot — goldens authored inside the product
 
-The eval set is a product surface: you ask a question in chat, and the run you
-liked is promoted to a golden — extraction SQL, sandbox objects and finished
-report pages all captured, then exported to `evals/cases/*.yaml`.
-
-The pack holds
-**32 cases** across three NSW property datasets on a T1–T7 question ladder, 2
-marked `ready` and 30 `draft`, so the scored pack is small and correct rather
-than large and noisy.
-
-Graders are layered and deterministic:
-
+- **Goldens from chat** — promote the run you liked; extraction SQL, sandbox objects and report pages captured, exported to `evals/cases/*.yaml`.
+- **Pack** — **32 cases**, three NSW property datasets, a T1–T7 ladder; 2 `ready`, 30 `draft`. Small and correct over large and noisy.
 - **G1** — the values the SQL returned, not the SQL text.
 - **G2** — the sandbox metrics.
-- **G3** — the report shape.
-- **G4** — ops: turns and latency, turns being the cost metric because it drives
-  billed tokens.
-
-Only the *insight* half of G3 needs a judge, and `agent/eval_judge.py` will not
-grade its own family: with DeepSeek answering, Claude judges; with no
-cross-family key configured it records `skipped` with a reason.
-
-`agent/version.py` composes the build fingerprint — provider, model, and content
-hashes over prompt sources, skills and knowledge. That is what makes a cycle
-attributable: one change, one moving hash, one verdict.
+- **G3** — the report shape; only its *insight* half needs a judge.
+- **G4** — ops: turns and latency; turns drive billed tokens, so turns are the cost metric.
+- **Judge** — `agent/eval_judge.py` never grades its own family: DeepSeek answers, Claude judges; no cross-family key means `skipped` with a reason.
+- **Fingerprint** — `agent/version.py`: provider, model, content hashes over prompt sources, skills and knowledge. One change, one moving hash, one verdict.
 
 | cycle | the change | what moved | gate |
 |---|---|---|---|
@@ -114,25 +80,15 @@ attributable: one change, one moving hash, one verdict.
 | 002 | the same guidance moved into the system prompt | turns fell 24 → 20.5, the stated goal — and the rent case broke: pass rate 1.0 → 0.5, one regression | **FAIL**, reverted, not shipped |
 | 003 | the guidance scoped to trend questions over documented marts | no regression | **PASS** |
 
-**One change per cycle is what makes a verdict attributable, and 002 is the one
-that had to be thrown away.** Source: `docs/evals/` in `data-qa-agent`.
+**One change per cycle makes a verdict attributable; 002 is the one thrown away.** Source: `docs/evals/` in `data-qa-agent`.
 
 ### ConvFinQA Agent — prompts as versioned code
 
-No judge here, and the write-up says why: answers are numbers and programs, so
-exact and program accuracy are the honest metric. That is the task framing, not a
-missing feature.
-
-The first two cycles ran on the **200 conversations / 770 questions** corpus, with
-prediction CSVs committed so `REUSE_CACHE=1 uv run convfinqa-eval` reproduces v1
-**72.99%** → v2 **77.14%** with zero API calls. GEPA produced v2 over **1,964
-metric calls**; the s7 harness then generated **39 rules** into v3_1, which scored
-**76.23%** and was refused: 61 questions fixed, 68 broken, net negative. As a
-headline that is a rounding error; as a flip count it is a decision.
-
-Since 2026-09-03 the loop runs on a committed manifest instead — train 100 reports
-and a fixed gate split of 100 (368 / 349 questions), drawn only from conversations
-neither optimiser saw, the holdout reserved — and the eight steps look like this:
+- **No judge** — answers are numbers and programs, so exact and program accuracy are the honest metric. Task framing, not a missing feature.
+- **Cycles one and two** — the **200 conversations / 770 questions** corpus; `REUSE_CACHE=1 uv run convfinqa-eval` reproduces v1 **72.99%** → v2 **77.14%** from committed CSVs, zero API calls.
+- **GEPA** — v2 over **1,964 metric calls**.
+- **s7 harness** — **39 rules** into v3_1, **76.23%**, refused: 61 fixed, 68 broken, net negative. A rounding error as a headline; a decision as a flip count.
+- **Since 2026-09-03** — a committed manifest: train 100 / gate 100 reports (368 / 349 questions), from conversations neither optimiser saw; holdout reserved.
 
 | step | in ConvFinQA |
 |---|---|
@@ -145,40 +101,23 @@ neither optimiser saw, the holdout reserved — and the eight steps look like th
 | trace | every LLM call a span in MLflow, run → report → question → stage |
 | promote | an append-only history that keeps the refusals |
 
-Nine verdicts under the current contract, all paired on the same 349 gate
-questions. v8 changed only the retriever and was **promoted**: 77.1% → 81.7%, 34
-fixed against 18 broken, one-sided clustered McNemar p 0.040. Seven challengers
-moved the number and were refused, v11's +1.4 pp among them, and the runtime
-arm's `sdk_v1` was promoted to its own alias at 90.5%, p 0.0003.
-
-When the rule got stricter on 2026-09-03, three earlier promotions (v3_1, v4, v5)
-were rolled back: v5's p under it is 0.207.
-
-The gate runs on every pull request, offline. `python -m convfinqa.tracking.gate`
-re-derives each committed CSV's `correct` column from its own answers against
-gold — catching a CSV edited by hand — then checks the champion against its
-floor from the CSV its promotion was decided on.
-
-Today: v1, v2, v3_1 at 770 rows each, consistent; champion v8 re-scored at
-81.66% — but against a −0.5% floor, because campaign promotions leave the
-bundle's registry metrics empty. The re-score is real; the floor is an open defect.
+- **Nine verdicts** under the current contract, all paired on the same 349 gate questions.
+- **v8** — retriever only, **promoted**: 77.1% → 81.7%, 34 fixed against 18 broken, one-sided clustered McNemar p 0.040.
+- **Seven refused** — each moved the number, v11's +1.4 pp among them.
+- **`sdk_v1`** — the runtime arm, promoted to its own alias at 90.5%, p 0.0003.
+- **Rolled back 2026-09-03** — v3_1, v4 and v5 under the stricter rule; v5's p under it is 0.207.
+- **The gate on every PR, offline** — `python -m convfinqa.tracking.gate` re-derives each committed CSV's `correct` column against gold (catching a hand-edited CSV), then checks the champion against the floor from its promotion CSV.
+- **Today** — v1, v2, v3_1 at 770 rows, consistent; v8 re-scored 81.66% against a −0.5% floor, because campaign promotions leave registry metrics empty. Real re-score; open defect.
 
 [The loop in full, command by command →](/projects/convfinqa-agent/eval-loop/)
 
 ### Transcript RAG — labelled chunks, then an ablation
 
-The golden set is 20 entries and the expensive part is the labels:
-`expected_chunk_ids` name the exact chunks a good retriever must surface. Over a
-seven-video corpus they break down two ways:
-
-- **by question type** — 14 `local`, 4 `global`, 2 `temporal`.
-- **by domain** — 7 property, 6 ai-coding, 6 career, 1 corpus.
-
-Validation enforces the id shape and cross-references video ids both ways,
-because a wrong label silently corrupts every recall number computed against it.
-
-Those labels buy a measurement with no LLM in it — recall@k, MRR, NDCG@10 — and
-the eight-config ablation is why they were worth the effort:
+- **Golden set** — 20 entries over a seven-video corpus; the expensive part is `expected_chunk_ids`, the exact chunks a good retriever must surface.
+- **By question type** — 14 `local`, 4 `global`, 2 `temporal`.
+- **By domain** — 7 property, 6 ai-coding, 6 career, 1 corpus.
+- **Validation** — id shape enforced, video ids cross-referenced both ways; a wrong label silently corrupts every recall number.
+- **No LLM in the measurement** — recall@k, MRR, NDCG@10; the eight-config ablation is why the labels were worth it.
 
 | config | context recall | MRR | NDCG@10 |
 |---|---|---|---|
@@ -191,25 +130,15 @@ the eight-config ablation is why they were worth the effort:
 | HyDE | 0.591 | 0.669 | 0.525 |
 | contextual | 0.545 | 0.707 | 0.516 |
 
-**Plain hybrid won, and adding a reranker on top of it *lost* recall.** HyDE and
-contextual retrieval both scored below the plain semantic baseline. None of that
-is knowable from a demo. Source: `evals/runs/ablation-20260801-051456.json`.
+**Plain hybrid won; a reranker on top of it *lost* recall.** HyDE and contextual both scored below the plain semantic baseline; none of that is knowable from a demo.
 
-For the open-ended half: RAGAS (faithfulness, answer relevancy, context
-precision) plus a `depth-v2` rubric weighting grounding 40% and depth 60% with a
-hard cap — depth cannot rescue an ungrounded answer.
+Source: `evals/runs/ablation-20260801-051456.json`.
 
-Runs record `judge_model` and set `self_graded` when generator and grader are
-the same model. `rejudge`
-re-scores a committed run under a new rubric while deliberately reusing the
-stored grounding scores, so a ranking change is attributable to the rubric and
-not to judge nondeterminism.
-
-The CI `eval-gate` job runs `tests/evals/test_committed_runs.py` over the **16
-committed snapshots**, recomputing each run's deterministic metrics from its
-stored `retrieved_chunk_ids` against the *current* golden labels. That catches a
-snapshot whose numbers no longer reconcile with its own ids, a golden-set edit
-that silently invalidates a committed run, and a real drop below a floor.
+- **The open-ended half** — RAGAS (faithfulness, answer relevancy, context precision) plus `depth-v2`: grounding 40%, depth 60%, a hard cap so depth cannot rescue an ungrounded answer.
+- **Provenance** — runs record `judge_model` and set `self_graded` when generator and grader match.
+- **`rejudge`** — re-scores a committed run under a new rubric, reusing the stored grounding scores; a ranking change is the rubric's, not judge nondeterminism.
+- **CI `eval-gate`** — `tests/evals/test_committed_runs.py` over the **16 committed snapshots**, recomputing deterministic metrics from stored `retrieved_chunk_ids` against the *current* labels.
+- **What it catches** — a snapshot that no longer reconciles with its own ids, a golden-set edit that invalidates a committed run, a real drop below a floor.
 
 ## Evidence
 
@@ -234,53 +163,14 @@ Re-run in each system's own repo: ConvFinQA on 2026-09-06, the other two on 2026
 
 Two earlier systems, not published as case studies, ran the same discipline.
 
-- [v2v-prod-agent](https://github.com/nmp-dsci/v2v-prod-agent) grades a voice
-  banking agent's red team on **bank state, not words** — nine scripted attacks
-  driven by a model that is already fully compromised, each asserted with
-  `test_the_bank_does_not_move[...]`, 9/9, deterministic, no API key.
-- [CUAD-agent](https://github.com/nmp-dsci/CUAD-agent) scores 41 clause questions
-  across 50 contracts for each of five retrieval context modes — 2,050
-  predictions per mode, **10,250** in the grid — with retrieval measured
-  separately from the answer, so a bad number can be attributed to one of them.
+- **[v2v-prod-agent](https://github.com/nmp-dsci/v2v-prod-agent)** — a voice banking agent's red team graded on **bank state, not words**: nine scripted attacks from an already-compromised model, each asserted with `test_the_bank_does_not_move[...]`, 9/9, deterministic, no API key.
+- **[CUAD-agent](https://github.com/nmp-dsci/CUAD-agent)** — 41 clause questions × 50 contracts × five retrieval context modes: 2,050 predictions per mode, **10,250** in the grid; retrieval scored apart from the answer, so a bad number attributes to one of them.
 
 ## Failure modes
 
-**Self-grading.** A model asked to score its own family rewards its own phrasing.
-Data Pilot's judge refuses the job and records `skipped`; Transcript RAG flags
-`self_graded` on the run. The tempting alternative — grade anyway, footnote it —
-produces a number nobody can use.
-
-**A better average hiding per-case flips.** The failure the gate exists for, and
-it fired three times here: cycle 002 improved the exact metric it targeted and
-would have shipped on any headline rule; v3_1 fixed 61 and broke 68 for −0.91%;
-v4 lifted the retriever's own recall on unseen data while the calculator behind
-it fell from .618 to .500. All three are only visible as a list of case ids or
-a per-agent panel, never in the average.
-
-**Goldens without labels.** A golden that says only "this answer was good" cannot
-tell you *why* retrieval failed. Chunk ids are the most expensive part of
-Transcript RAG's set and the only reason its ablation means anything —
-reference-free metrics cannot measure what retrieval missed.
-
-**A "held-out" split that isn't.** ConvFinQA has two 60/40 splits over the same
-200 conversations, both seeded 42 — one from `pandas.sample`, one from
-`random.shuffle` as the DSPy backend actually performed it. They agree on only
-**78 of 120** conversations. Same seed, same data, different partition.
-
-Only the second supports a held-out claim, which is why `optimizer_split()`
-lives in the data loader with that fact in its docstring instead of being
-rediscovered later.
-
-**A grader that measures the wrong thing.** Cycle 001's first attempt appeared to
-regress: a better answer returned `avg_weekly_rent` while the grader was pinned
-to `total_weekly_rent`, so G1 went to 0.0 on an improvement.
-
-Fixing the grader changed the pack version, and `eval_compare.py` refuses to
-compare across pack versions — the improvement had to be re-baselined and re-earned rather than
-laundered across the boundary. That refusal is the defence against eval-tuning
-theatre, and it costs a full re-run every time it fires.
-
-**A scored gate that is a manual step.** Data Pilot's zero-LLM pack lint blocks
-every merge; the *scored* comparison is a deliberate CD step, because scoring
-needs a live stack and a key. That is an honest trade, not a solved problem — a
-gate you have to remember to run is a gate that eventually is not run.
+- **Self-grading** — a model scoring its own family rewards its own phrasing. Fix: Data Pilot's judge refuses and records `skipped`; Transcript RAG flags `self_graded`. Grade-and-footnote gives a number nobody can use.
+- **A better average hiding per-case flips** — fired three times: 002 improved its target metric and would have shipped on any headline rule; v3_1 fixed 61, broke 68, −0.91%; v4 lifted the retriever's unseen recall while the calculator fell .618 → .500. Fix: a list of case ids or a per-agent panel, never the average.
+- **Goldens without labels** — "this answer was good" cannot say *why* retrieval failed. Fix: chunk ids, Transcript RAG's costliest labels and the only reason its ablation means anything; reference-free metrics cannot measure what retrieval missed.
+- **A "held-out" split that isn't** — two 60/40 splits over the same 200 conversations, both seeded 42, `pandas.sample` versus `random.shuffle` as the DSPy backend performed it; they agree on only **78 of 120**. Fix: only the second supports a held-out claim, so `optimizer_split()` lives in the data loader with that fact in its docstring.
+- **A grader that measures the wrong thing** — cycle 001's first attempt returned `avg_weekly_rent` against a grader pinned to `total_weekly_rent`; G1 hit 0.0 on an improvement. Fix: the grader fix bumped the pack version, and `eval_compare.py` refuses to compare across pack versions — re-baselined and re-earned, a full re-run each time it fires.
+- **A scored gate that is a manual step** — Data Pilot's zero-LLM pack lint blocks every merge; the *scored* comparison is a deliberate CD step, needing a live stack and a key. An honest trade, not a solved problem: a gate you must remember to run is eventually not run.

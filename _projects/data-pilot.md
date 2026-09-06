@@ -2,12 +2,12 @@
 title: Data Pilot
 short: "Pilot"   # the matrix column header on a phone
 summary: >-
-  A conversational data agent over ~3.2M rows of NSW property data — ask in plain
-  English, get governed SQL, a chart and a written report, over only the rows you
-  are allowed to see. It runs on AWS as a walk-in demo: Explore and the SQL editor
-  are live against the real marts, and chat replays recorded agent runs.
+  A conversational data agent over ~3.2M rows of NSW property data: plain English in,
+  governed SQL, a chart and a written report out, over only the rows you may see. A
+  walk-in demo on AWS, with Explore and the SQL editor live against the real marts and
+  chat replaying recorded agent runs.
 tldr: >-
-  Governed NL→SQL in production — Postgres row-level security and an sqlglot AST guard decide what the model may touch, and merging to main deploys the whole stack under GitHub OIDC with no stored keys.
+  Governed NL→SQL in production: Postgres RLS and an sqlglot AST guard decide what the model may touch; merging to main deploys the stack under GitHub OIDC, no stored keys.
 headline: "<em>Governed</em> NL→SQL in production"
 outcome: >-
   Governed natural-language → SQL over ~3.2M rows of NSW property data, with row-level
@@ -16,7 +16,7 @@ proof_line: >-
   Nine of nine rubric dimensions shipped, 32 golden cases across three governed datasets with 2 promoted to `ready`, and rung-100 drain time within 0.5–6% of ⌈N/W⌉×S in all nine grid cells.
 sections:
   - n: 1
-    summary: "The natural language is not the product; the governance around it is what makes an answer checkable rather than believed."
+    summary: "The natural language is not the product; the governance around it makes an answer checkable rather than believed."
   - n: 2
     summary: "Narrow tools and a swappable model interface, so any two runs differ only by what the build fingerprint says changed."
   - n: 3
@@ -34,7 +34,7 @@ metric: "9 / 9"
 metric_label: "rubric dimensions shipped · rung-100 sizing measured"
 featured: true
 order: 1
-stack: [pydantic-ai, FastAPI, Aurora Serverless v2 + pgvector, React 19, dlt + dbt, Pyodide/WASM sandbox, Terraform · App Runner · CloudFront]
+stack: [pydantic-ai, FastAPI, Aurora Serverless v2, pgvector, React 19, dlt, dbt, Pyodide, Terraform, App Runner, CloudFront]
 
 skills: [agentic-ai, governance, mlops, sql, rag, model-evaluation, product-ui]
 skills_detail:
@@ -73,181 +73,144 @@ production:
   live: true
   order: 1
   surface: >-
-    No login and no sign-up. Explore and the SQL editor run live against the real
-    marts; chat replays eight recorded agent runs as paced SSE (plan, then charts,
-    then report, in about 5–10 seconds); the Ops deck, Evaluations and Golden
-    Examples are readable exhibits with every write refused server-side. The first
-    Explore call after an idle hour waits ~30s while Aurora resumes, and the UI
-    narrates it.
+    No login, no sign-up: Explore and the SQL editor run live against the real marts; chat
+    replays eight recorded agent runs as paced SSE (plan, charts, report, ~5–10 s); the Ops
+    deck, Evaluations and Golden Examples are readable exhibits with every write refused
+    server-side. The first Explore call after an idle hour waits ~30 s while Aurora
+    resumes, and the UI narrates it.
   topology: "CloudFront + S3 → App Runner backend ×1 → Aurora Serverless v2 · ECS Fargate one-shot jobs"
   topology_diagram: "diagrams/topology/data-pilot.svg"
   region: "ap-southeast-2"
   cost: "~$8–18/mo · $0 inference"
   rung: 10
-  rung_note: "rung-100 sizing measured — the s42 worker sweep held drain time to within 6% of ⌈N/W⌉×S across all nine grid cells"
+  rung_note: "rung-100 sizing measured · s42 worker sweep · drain time within 6% of ⌈N/W⌉×S · all nine grid cells"
   score: "9 / 9"
 
   rubric:
     - dimension: evals
       status: shipped
       how: >-
-        Goldens are authored inside the product stage by stage — ① SQL extract,
-        ② sandbox objects, ③ report — then exported to a version-controlled pack:
-        32 cases across nsw_sales, nsw_rent and nsw_yield on a T1–T7 question
-        ladder, each carrying golden SQL, a grader spec and an expected report
-        shape. Deterministic graders G1–G3 score extraction, preparation and
-        report structure, and every run records the pack's content hash, so a
-        score can never be silently compared against a different specification.
-        Curation is the honest limit: two cases are promoted to `ready` so far
-        and the rest are agent-drafted first passes the runner skips by default,
-        because scoring against ground truth nobody has reviewed is worse than
-        not scoring at all.
+        Goldens authored in the product stage by stage (① SQL extract, ② sandbox objects,
+        ③ report) and exported to a version-controlled pack: 32 cases across nsw_sales,
+        nsw_rent and nsw_yield on a T1–T7 ladder, each with golden SQL, a grader spec and an
+        expected report shape. Deterministic graders G1–G3 score extraction, preparation and
+        report structure; every run records the pack's content hash. Curation is the limit:
+        2 cases promoted to `ready`, the rest agent-drafted first passes the runner skips by
+        default, because scoring against unreviewed ground truth is worse than not scoring.
       proof: "evals/cases/nsw_sales.yaml · services/data-agent/agent/eval_graders.py · scripts/eval_pack.py · scripts/eval_run.py"
 
     - dimension: judge
       status: shipped
       how: >-
-        The insight half of the presentation grade is scored by an LLM judge
-        against a frozen rubric whose text is hashed onto every run, so it cannot
-        drift without the score changing identity. The judge must be
-        cross-family — with DeepSeek answering, Claude grades — and it refuses to
-        score a model of its own family, recording a skipped verdict rather than
-        a flattering one. Insight is reported but never gates a case on its own,
-        because its agreement with a human rater has not been measured yet.
+        The insight half of the presentation grade is scored by an LLM judge against a
+        frozen rubric whose text is hashed onto every run. The judge must be cross-family
+        (DeepSeek answers, Claude grades) and records a skipped verdict rather than grade
+        its own family. Insight never gates a case on its own, because its agreement with a
+        human rater has not been measured yet.
       proof: "services/data-agent/agent/eval_judge.py · scripts/eval_run.py"
 
     - dimension: gate
       status: shipped
       how: >-
-        The regression gate blocks on any single case flipping pass → fail,
-        whatever the headline average did, and refuses to compare two runs graded
-        under different pack versions or judges rather than quietly reporting a
-        delta. Under it sits a zero-LLM, zero-network pack lint that blocks every
-        merge — unique case keys, dispatchable grader specs, no real user ids or
-        oversized data dumps reaching git — beside a security-guard regression
-        suite. Scoring itself needs a live stack and a provider key, so it is a
-        deliberate command rather than a CI job.
+        Blocks on any single case flipping pass → fail, whatever the average did, and
+        refuses to compare runs graded under different pack versions or judges. A zero-LLM,
+        zero-network pack lint blocks every merge (unique case keys, dispatchable grader
+        specs, no real user ids or oversized dumps in git) beside a security-guard regression
+        suite. Scoring needs a live stack and a provider key, so it is a deliberate command,
+        not a CI job.
       proof: "scripts/eval_compare.py · tests/test_eval_pack.py · .github/workflows/ci.yml"
 
     - dimension: loop
       status: shipped
       how: >-
-        Every answer is stamped with a composed build fingerprint — provider,
-        model, and a content hash each for prompts, skills and knowledge — so a
-        base-versus-candidate run proves exactly one lever moved. The diagnoser
-        reads a scored run's traces and proposes one-lever hypotheses; it is
-        read-only by design and never writes a fix. Three cycles are written up
-        including the one that failed: 001 fixed extraction grain, 002 cut turn
-        cost through the system prompt and lost accuracy doing it, 003 got the
-        same saving by scoping the guidance to a retrieved knowledge page.
+        Every answer carries a composed build fingerprint (provider, model, content hash
+        each for prompts, skills and knowledge), so base-versus-candidate proves one lever
+        moved. The diagnoser reads a scored run's traces and proposes one-lever hypotheses;
+        read-only, never writes a fix. Three cycles written up including the failure: 001
+        fixed extraction grain, 002 cut turn cost via the system prompt and lost accuracy,
+        003 got the same saving by scoping guidance to a retrieved knowledge page.
       proof: "services/data-agent/agent/version.py · scripts/eval_diagnose.py · docs/evals/cycle-002.md · docs/evals/cycle-003.md"
 
     - dimension: guardrails
       status: shipped
       how: >-
-        Google OIDC and role gating sit in front of Postgres row-level security,
-        set per request, and the agent connects as a read-only role — a bug in
-        application code still cannot reach another user's rows. Generated SQL
-        passes a shape check, a keyword denylist and an sqlglot AST walk that
-        rejects DML/DDL hidden in a CTE plus privileged functions like
-        set_config and pg_read_file; analysis code runs in Pyodide/WASM with no
-        network and no filesystem. A deterministic injection suite gates every
-        merge and a four-class promptfoo red team drives real model traffic at
-        the same boundary; writing the deterministic suite found two real
-        defects in the guard.
+        Google OIDC and role gating in front of Postgres RLS set per request, with the agent
+        on a read-only role, so an application bug still cannot reach another user's rows.
+        Generated SQL passes a shape check, a keyword denylist and an sqlglot AST walk that
+        rejects DML/DDL hidden in a CTE plus set_config and pg_read_file; analysis runs in
+        Pyodide/WASM with no network and no filesystem. A deterministic injection suite gates
+        every merge (writing it found two real guard defects) and a four-class promptfoo red
+        team drives real model traffic at the same boundary.
       proof: "SECURITY.md · services/data-agent/agent/sql_guardrails.py · tests/security/test_injection.py · security/promptfoo/redteam.yaml"
 
     - dimension: trace
       status: shipped
       how: >-
-        Both services are instrumented with OpenTelemetry through Logfire, and
-        every ask stamps its trace id onto the query_runs audit row, so a slow
-        row on the deck is one lookup from its span waterfall; locally the spans
-        land in a self-hosted Jaeger with no external account. The Operations tab
-        is the fleet view — latency and time-to-first-page percentiles, error and
-        degraded rates, cost per answer, two SLOs with 28-day error-budget burn,
-        marts freshness, red-team pass rates by attack class, deploy timeline and
-        saturation. It reads one pre-aggregated Postgres row rather than scanning
-        the audit trail, so it stays up when the AWS APIs do not, and the runbook
-        is keyed off its lamps.
+        Both services emit OpenTelemetry through Logfire; every ask stamps its trace id on
+        the query_runs audit row, so a slow row is one lookup from its span waterfall;
+        locally spans land in self-hosted Jaeger. The Operations tab is the fleet view:
+        latency and time-to-first-page percentiles, error and degraded rates, cost per
+        answer, two SLOs with 28-day error-budget burn, marts freshness, red-team pass rates
+        by attack class, deploy timeline, saturation. It reads one pre-aggregated Postgres
+        row, so it stays up when the AWS APIs do not, and the runbook is keyed off its lamps.
       proof: "services/backend-api/app/tracing.py · services/backend-api/app/ops_rollup.py · frontend/src/features/ops/OpsPage.tsx · docs/runbook.md"
 
     - dimension: cost
       status: shipped
       how: >-
-        Cost per answer on the deck is cache-adjusted — most input tokens are
-        prompt-cache hits, so naive token counting overstates spend several-fold —
-        and the panel says how many asks were actually priced instead of implying
-        the total. Spend is capped in three independent places: daily LLM budgets
-        per identity (5 free, 10 paid, 200 for a service key), 22 requests and
-        600k tokens per agent run, and a CloudWatch billing alarm to SNS.
-        Embeddings run on-box with fastembed, and demo mode deletes the agent
-        service outright — a measured 60–70% reduction, roughly $36–66 down to
-        $8–18 a month.
+        Cost per answer is cache-adjusted (most input tokens are prompt-cache hits, so naive
+        counting overstates spend several-fold) and the panel says how many asks were priced.
+        Three independent caps: daily LLM budgets per identity (5 free, 10 paid, 200 for a
+        service key), 22 requests and 600k tokens per agent run, a CloudWatch billing alarm
+        to SNS. Embeddings run on-box with fastembed; demo mode deletes the agent service
+        outright, a measured 60–70% cut, roughly $36–66 down to $8–18 a month.
       proof: "services/backend-api/app/ops_rollup.py · services/backend-api/app/limits.py · infra/terraform/foundations/alarms.tf · .lavish/s38_demo-mode-prod-plan.html"
 
     - dimension: release
       status: shipped
       how: >-
-        Merging to main runs one workflow authenticated by GitHub OIDC with no
-        stored AWS keys: build and push the service images, terraform apply, run
-        the Alembic migration and the dlt/dbt pipeline as ECS one-shot tasks,
-        wait for the App Runner deployments, publish the Vite build to S3 and
-        CloudFront, then smoke-test the live URL. The smoke asserts the backend's
-        auth mode, that a bad token is rejected, that the MCP surface is mounted
-        and gated (401, not 404) and that the SPA and its fallback route both
-        answer 200 — and hands its pass count to the deploy record, so the ops
-        timeline shows how much was checked. Rollback retags App Runner to the
-        previous image digest.
+        Merge to main runs one GitHub OIDC workflow with no stored AWS keys: build and push
+        images, terraform apply, Alembic migration and dlt/dbt pipeline as ECS one-shot tasks,
+        wait for App Runner, publish the Vite build to S3 and CloudFront, smoke-test the live
+        URL. The smoke asserts the auth mode, a bad token rejected, MCP mounted and gated (401,
+        not 404), SPA and fallback route both 200, and hands its pass count to the deploy
+        record. Rollback retags App Runner to the previous image digest.
       proof: ".github/workflows/deploy-aws.yml · scripts/cloud_smoke.sh · scripts/demo_smoke.py · scripts/rollback_apprunner.sh"
 
     - dimension: scale
       status: shipped
       how: >-
-        Today is rung 10 — one App Runner instance at 0.25 vCPU / 512 MB with
-        max_concurrency 100, Aurora at 0–1 ACU, sessions and rate limits in
-        process memory because that is correct at one instance. Rung 100's sizing
-        was measured rather than guessed: a Redis Streams queue in front of the
-        agent was swept across 1/3/5 workers × 10/30/60s service times at 15
-        users per cell, and drain time tracked the closed form ⌈N/W⌉×S to within
-        0.5–6% in every one of the nine grid cells — 3 workers 2.97–2.99×, 5
-        workers 4.87–4.98×, 150 of 150 answers served with nothing shed. The
-        dashboard signal is named too: queue wait p95 rising while service p95
-        stays flat means add slots.
+        Rung 10 today: one App Runner instance at 0.25 vCPU / 512 MB, max_concurrency 100,
+        Aurora at 0–1 ACU, sessions and rate limits in process memory because that is
+        correct at one instance. Rung 100 was measured: a Redis Streams queue in front of
+        the agent swept across 1/3/5 workers × 10/30/60s service times at 15 users per cell,
+        drain time within 0.5–6% of ⌈N/W⌉×S in all nine cells (3 workers 2.97–2.99×, 5
+        workers 4.87–4.98×, 150 of 150 served, nothing shed). The dashboard signal: queue
+        wait p95 rising while service p95 stays flat means add slots.
       proof: "out/wsweep/summary.json · .lavish/s42_worker-scaling-results.html · scripts/wsweep.py · load/k6/chat.js"
 ---
 
 ## 1 · Purpose & benefit
 
-An analyst who needs a number from NSW property data has two bad options: wait
-for someone who writes SQL, or be handed a dashboard that answers last quarter's
-question. Data Pilot is the third — ask in plain English over ~3.2M sales and
-rental-bond rows, and get back a chart, a written report, and the exact query
-that produced them.
+Ask in plain English over ~3.2M NSW sales and rental-bond rows; get a chart, a written report and the exact query behind them.
 
-The benefit is not the natural language, it is the governance around it.
-Row-level security decides what each user can see before the agent runs, the
-agent connects as a read-only role, and every answer carries its SQL, so a
-result can be checked rather than believed.
+- **The old options** — wait for someone who writes SQL, or a dashboard answering last quarter's question.
+- **The benefit** — the governance, not the natural language.
+- **Before** — row-level security decides what each user can see.
+- **During** — the agent connects as a read-only role.
+- **After** — every answer carries its SQL: checked, not believed.
+- **Five front doors** — web app, key-authenticated webhook, Slack slash command, @mention bot, MCP server; one `run_question()` path, one set of caps, one audit trail.
 
-One `run_question()` path serves five front doors — one set of caps, one audit
-trail:
+Demo mode is a decision, not a limitation:
 
-- the web app
-- a key-authenticated webhook
-- a Slack slash command
-- an @mention bot
-- an MCP server
-
-The public deployment runs in demo mode, and that is a decision rather than a
-limitation. A no-login app with a live LLM has an unbounded abuse bill, so the
-LLM surfaces replay eight recorded agent runs while everything deterministic —
-Explore, the SQL editor, the governed executor — stays genuinely live against
-the real marts. Caching is what makes "no login" affordable at all.
+- **Why?** A no-login app with a live LLM has an unbounded abuse bill.
+- **Replayed** — the LLM surfaces play eight recorded agent runs.
+- **Live** — Explore, the SQL editor and the governed executor, against the real marts.
+- **Caching** makes "no login" affordable at all.
 
 <figure class="evidence">
   <img src="/assets/img/data-pilot/demo-landing.png" alt="The Data Pilot demo entry screen: an RLS ACTIVE / AUDIT ON status rail, a portfolio demo panel with WAREHOUSE LIVE, AGENT REPLAYS RECORDED RUNS and NO ACCOUNT NEEDED chips, and four panels describing what the product does" loading="lazy">
-  <figcaption><b>The demo declares its split at the front door, rather than letting a visitor discover it.</b> Warehouse live, chat replayed, no account needed. Source: the entry screen of the live demo, <code>deqfc8b0u8s64.cloudfront.net</code>.</figcaption>
+  <figcaption><b>The demo declares its split at the front door.</b> Source: the entry screen of the live demo, <code>deqfc8b0u8s64.cloudfront.net</code>.</figcaption>
 </figure>
 
 [Open the live demo ↗](https://deqfc8b0u8s64.cloudfront.net) · [Repository ↗](https://github.com/nmp-dsci/data-qa-agent)
@@ -256,72 +219,51 @@ the real marts. Caching is what makes "no login" affordable at all.
 
 {% include fig-agent.html %}
 
-One pydantic-ai loop does the work: it plans an extract, writes a single
-read-only `SELECT`, runs sandboxed pandas over the rows it gets back, and
-assembles a typed report.
+One pydantic-ai loop: plan an extract, write one read-only `SELECT`, run sandboxed pandas over the rows, assemble a typed report.
 
-Its tools are deliberately narrow — four of them:
+- **Four narrow tools** — schema knowledge from the dbt manifest (not a raw catalogue dump), value lookup for named suburbs, per-user memory, a chart builder.
+- **Title agent** — isolated, a background task on the data-agent service; naming a conversation never slows or breaks an answer.
+- **Memory and knowledge** — embedded on-box with fastembed (bge-small, 384-dim) into pgvector; no embedding API, memories RLS-scoped like data.
+- **Prompts** — in code, not templates.
+- **Fingerprint** — content hash per surface (prompts, skills, knowledge) plus provider, model, image tag, so two runs differ by what changed.
 
-- **schema knowledge**, grounded in the dbt manifest rather than a raw catalogue dump
-- **value lookup**, for resolving named suburbs
-- **per-user memory**
-- **a chart builder**
-
-A second, isolated title agent runs on the data-agent service from a background
-task, so naming a conversation never adds latency to an answer and can never
-break one.
-
-The model sits behind an abstraction, with three interchangeable backends:
+Three model backends behind one abstraction:
 
 - **DeepSeek** — the default
-- **Claude** — reachable through the same interface, and used as the eval judge, never as the agent it grades
-- **a deterministic NL→SQL stub** — no key at all, which is why the whole product is testable for free and why CI can boot the stack
-
-Memory and knowledge are embedded on-box with fastembed (bge-small, 384-dim)
-into pgvector, so recall costs no embedding API call and a user's memories are
-RLS-scoped exactly like their data.
-
-Prompts live in code rather than templates, and every run is fingerprinted with
-a content hash per behaviour surface — prompts, skills, knowledge — plus
-provider, model and image tag, so any two runs can be told apart by what
-actually changed.
+- **Claude** — same interface; the eval judge, never the agent it grades
+- **Deterministic NL→SQL stub** — no key, so the product is testable for free and CI can boot the stack
 
 <figure class="evidence">
   <img src="/assets/img/data-pilot/chat-report-light.png" alt="Data Pilot answering a question with results, a chart and a written report" loading="lazy">
-  <figcaption><b>Every answer arrives with the one governed query that produced it.</b> The typed report streams page by page over SSE as it lands. Source: the chat surface of the live demo, replaying one of the eight recorded runs.</figcaption>
+  <figcaption><b>Every answer arrives with the one governed query that produced it.</b> Source: the chat surface of the live demo, replaying one of the eight recorded runs over SSE.</figcaption>
 </figure>
 
 ## 3 · Agent loop & evaluation
 
 One request, end to end:
 
-1. The backend sets `app.current_user_id` on the connection, so RLS scopes everything that follows.
-2. The agent recalls relevant memory, plans, and writes a single read-only `SELECT`.
-3. The guard checks it.
-4. The query runs as a read-only role.
-5. The rows go through the WASM sandbox.
-6. Report pages stream back over SSE as they are built.
-7. The full trace, SQL and pages persist to `query_runs` for audit and replay.
+1. backend sets `app.current_user_id` on the connection; RLS scopes everything after
+2. agent recalls memory, plans, writes one read-only `SELECT`
+3. the guard checks it
+4. the query runs as a read-only role
+5. rows go through the WASM sandbox
+6. report pages stream back over SSE as built
+7. trace, SQL and pages persist to `query_runs` for audit and replay
 
-The eval loop is a product surface, not a script. Goldens are authored in the
-app stage by stage — SQL extract, then sandbox objects, then the report — and
-exported to `evals/cases/*.yaml`: 32 cases across three governed datasets on a
-T1–T7 question ladder, 2 of the 32 curated to `ready` and the other 30 drafts
-the runner skips until someone promotes them.
+The eval loop is a product surface, not a script:
 
-Scoring is split between deterministic graders and a judge:
-
-- **G1–G3, deterministic** — extraction, preparation and report structure.
-- **The judge, cross-family** — the insight half, graded against a hashed rubric. It is scored but never allowed to fail a case on its own until its agreement with a human rater is measured.
-
-The gate blocks on any case flipping pass → fail regardless of the average, and
-a free pack lint blocks every merge on the specification itself. Three
-improvement cycles are written up, including cycle 002, which the gate refused.
-That is [the eval loop →](/practices/eval-loop/) in one system.
+- **Authored in the app** — SQL extract, then sandbox objects, then report.
+- **Exported** — `evals/cases/*.yaml`: 32 cases, three governed datasets, a T1–T7 ladder.
+- **Curated** — 2 of 32 `ready`; the other 30 are drafts the runner skips until promoted.
+- **G1–G3, deterministic** — extraction, preparation, report structure.
+- **Judge, cross-family** — the insight half against a hashed rubric; never fails a case alone until its agreement with a human rater is measured.
+- **Gate** — blocks on any case flipping pass → fail, whatever the average.
+- **Pack lint** — free, blocks every merge on the specification itself.
+- **Cycles** — three written up, including 002, which the gate refused: [the eval loop →](/practices/eval-loop/) in one system.
 
 <figure class="evidence">
   <img src="/assets/img/data-pilot/goldens-light.png" alt="Golden Examples eval authoring inside the product" loading="lazy">
-  <figcaption><b>The eval set is authored inside the product, so the people who know the answers can write the cases.</b> The 32 cases are then exported to a version-controlled pack. Source: the Golden Examples tab of the live demo; <code>evals/cases/*.yaml</code>.</figcaption>
+  <figcaption><b>The people who know the answers write the cases.</b> Source: the Golden Examples tab of the live demo; <code>evals/cases/*.yaml</code>.</figcaption>
 </figure>
 
 ## 4 · Deployed architecture
@@ -335,36 +277,29 @@ One FastAPI service on App Runner carries every front door:
 - the HMAC-signed Slack surfaces
 - the MCP server at `/mcp`
 - the ops and admin routes
-- in demo mode, the replay pack and the governed SQL executor, ported out of the data-agent so live SQL survives that service's deletion
+- in demo mode, the replay pack and governed SQL executor, ported out of the data-agent so live SQL survives its deletion
 
-`/health` and `/openapi.json` are public; everything else is session, bearer or
-`dpk_` key gated.
+- **Public** — `/health`, `/openapi.json`; all else session, bearer or `dpk_` key gated.
+- **State** — Aurora Serverless v2 (Postgres 16, pgvector); schemas `app` / `raw` / `staging` / `marts`.
+- **Migrations** — RLS policies and per-role statement timeouts via Alembic.
+- **Marts** — dlt + dbt as ECS Fargate one-shot tasks streaming the full CSVs from S3.
+- **Frontend** — React build in a private S3 bucket behind CloudFront.
 
-State is Aurora Serverless v2 (Postgres 16, pgvector) with schemas `app` /
-`raw` / `staging` / `marts`. RLS policies and per-role statement timeouts are
-applied by Alembic migrations, and dlt + dbt rebuild the marts as ECS Fargate
-one-shot tasks that stream the full CSVs from S3. The React build sits in a
-private S3 bucket behind CloudFront.
-
-Merging to main is the deploy — one workflow, in order:
+Merging to main is the deploy, one workflow in order:
 
 1. build and push the service images
 2. `terraform apply`
-3. run the Alembic migration and the dlt/dbt pipeline as ECS one-shot tasks
+3. Alembic migration and dlt/dbt pipeline as ECS one-shot tasks
 4. wait for the App Runner deployments
 5. publish the Vite build to S3 and CloudFront
-6. smoke-test the live URL, whose pass count lands in the deploy record
+6. smoke-test the live URL; pass count lands in the deploy record
 
-Region is ap-southeast-2. Demo sizing is one backend instance at 0.25 vCPU /
-512 MB with `max_concurrency` 100 and Aurora at 0–1 ACU, about $8–18 a month
-against the $36–66 the same stack costs with the agent service running. That is
-rung 10.
+- **Region** — ap-southeast-2.
+- **Rung 10** — one instance at 0.25 vCPU / 512 MB, `max_concurrency` 100, Aurora 0–1 ACU; ~$8–18 a month against $36–66 with the agent service running.
+- **Rung 100, measured** — Redis Streams queue before the agent, swept 1/3/5 workers × 10/30/60s service times, 15 users per cell.
+- **Result** — drain time within 0.5–6% of ⌈N/W⌉×S in all nine cells; 3 workers 2.97–2.99×, 5 workers 4.87–4.98×; 150 of 150 served, nothing shed.
 
-Rung 100 is sized from measurement, not guesswork: a Redis Streams queue in
-front of the agent was swept across 1/3/5 workers × 10/30/60s service times at
-15 users per cell, and drain time followed ⌈N/W⌉×S to within 0.5–6% in all nine
-cells — 3 workers 2.97–2.99×, 5 workers 4.87–4.98×, 150 of 150 answers served,
-nothing shed. [See the scale ladder →](/practices/production-scale/)
+[See the scale ladder →](/practices/production-scale/)
 
 ## 5 · Guardrails & security
 
@@ -379,46 +314,34 @@ Enforcement is layered, and no layer is a prompt.
 | The three-layer SQL guard | which queries may run at all |
 | Pyodide/WASM, no network and no filesystem | what analysis code may reach |
 
-The isolation is asserted end to end in CI: a user with no dataset grant asks
-the same question and gets zero rows, through both `/ask` and the SQL editor.
+- **Asserted in CI** — a user with no dataset grant gets zero rows, through both `/ask` and the SQL editor.
+- **Sandbox budgets** — attempt budgets, row caps, per-role statement timeouts.
 
-Generated and hand-typed SQL both pass the same three-layer guard:
+Generated and hand-typed SQL pass the same three-layer guard:
 
 1. a shape check
 2. a keyword denylist that blanks quoted spans first
-3. an sqlglot AST walk that rejects DML/DDL hidden inside a CTE, along with `set_config`, `pg_read_file` and the other read-only-in-form, privileged-in-effect calls
+3. an sqlglot AST walk rejecting DML/DDL hidden in a CTE, plus `set_config`, `pg_read_file` and the other read-only-in-form, privileged-in-effect calls
 
-Analysis code executes in Pyodide/WASM with no network and no filesystem, under
-attempt budgets, row caps and per-role statement timeouts.
+Tested two ways:
 
-It is tested two ways. A deterministic, zero-LLM injection suite runs beside the
-golden-pack gate on every PR; writing it found two real guard defects, one that
-let a query rewrite the RLS context and one that refused a legitimate query
-containing the address `'GRANT ST'`, because over-blocking is a defect too.
-
-Above it, a promptfoo red team drives real model traffic at the same boundary
-and writes per-class pass rates to the ops deck, across four attack classes:
-
-- rls-bypass
-- jailbreak-to-dml
-- prompt-injection
-- pii-exfil
+- **Deterministic, zero-LLM injection suite** — beside the golden-pack gate on every PR.
+- **Two real defects found writing it** — a query could rewrite the RLS context; a legitimate query with the address `'GRANT ST'` was refused. Over-blocking is a defect too.
+- **promptfoo red team** — real model traffic at the same boundary; per-class pass rates on the ops deck.
+- **Four attack classes** — rls-bypass, jailbreak-to-dml, prompt-injection, pii-exfil.
 
 <figure class="evidence">
   <img src="/assets/img/data-pilot/sql-editor-light.png" alt="The governed SQL surface" loading="lazy">
-  <figcaption><b>Hand-typed SQL passes exactly the same guard as SQL the model wrote.</b> Read-only, single-statement, guardrail-checked. Source: the SQL editor of the live demo; <code>services/data-agent/agent/sql_guardrails.py</code>.</figcaption>
+  <figcaption><b>Hand-typed SQL passes exactly the same guard as SQL the model wrote.</b> Source: the SQL editor of the live demo; <code>services/data-agent/agent/sql_guardrails.py</code>.</figcaption>
 </figure>
 
 ## 6 · Observability & cost
 
-Both services emit OpenTelemetry through Logfire; locally the spans go to a
-self-hosted Jaeger instead, so tracing needs no external account. Every ask
-stamps its trace id onto its `query_runs` row, so a slow answer on the dashboard
-is one lookup from its span waterfall — and a request id comes back on every
-response whether tracing is switched on or not.
+- **Spans** — both services emit OpenTelemetry through Logfire; locally a self-hosted Jaeger, no external account.
+- **Trace id** — on every `query_runs` row, so a slow answer is one lookup from its span waterfall.
+- **Request id** — on every response, tracing on or off.
 
-The Operations tab is the one screen that answers "is it healthy, safe, fast and
-affordable":
+The Operations tab answers "is it healthy, safe, fast and affordable":
 
 - latency and time-to-first-page percentiles
 - error and degraded rates
@@ -428,16 +351,10 @@ affordable":
 - red-team pass rates by attack class
 - the deploy timeline and infra saturation
 
-It reads one pre-aggregated Postgres row rather than the audit trail, so it
-survives the AWS APIs being slow or throttled, and panels with no data say
-"no data" instead of rendering a flattering zero. `docs/runbook.md` is written
-against its lamps.
-
-Cost is measured before it is capped. Cost per answer on the deck is
-cache-adjusted, because most input tokens are prompt-cache hits and naive
-counting overstates spend several times over.
-
-The caps then sit at three independent levels:
+- **One pre-aggregated Postgres row** — not the audit trail, so it survives slow or throttled AWS APIs.
+- **No data, no zero** — an empty panel says "no data".
+- **Runbook** — `docs/runbook.md` is written against its lamps.
+- **Cost is measured before it is capped** — cache-adjusted, because most input tokens are prompt-cache hits and naive counting overstates spend several times over.
 
 | Cap | Limit |
 |---|---|
@@ -445,8 +362,7 @@ The caps then sit at three independent levels:
 | Ceiling on any one agent run | 22 requests and 600k tokens |
 | CloudWatch billing alarm to SNS | the backstop |
 
-Embeddings run on-box, so recall costs nothing per query, and demo mode deletes
-the 2 vCPU / 4 GB agent service outright — the biggest idle line on the bill —
-for a measured 60–70% saving, roughly $36–66 down to $8–18 a month.
+- **Embeddings on-box** — recall costs nothing per query.
+- **Demo mode** — deletes the 2 vCPU / 4 GB agent service, the biggest idle line: a measured 60–70% saving, $36–66 down to $8–18 a month.
 
 ## 7 · Production readiness scorecard

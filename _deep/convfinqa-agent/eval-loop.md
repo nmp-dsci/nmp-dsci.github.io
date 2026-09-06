@@ -6,9 +6,8 @@ project: convfinqa-agent
 rubric: [evals, judge, gate, loop, trace]
 summary: >-
   The MLOps behind the case study's §3: the tracking server, the fixed splits, one experiment
-  command by command, the significance gate and the promotion contract, and the log of every
-  verdict including the seven the loop refused and the three champions it took back.
-  Maintained every cycle.
+  command by command, the significance gate and the promotion contract. The log holds every
+  verdict, including the seven refused and the three champions taken back.
 tldr: >-
   Compose up MLflow → make-splits → cycle (run train → diagnose → rewrite → run gate → gate →
   decide) → deploy, with the library at each step and the number each step produced.
@@ -24,25 +23,24 @@ evidence_note: >-
 sections:
   - n: 1
     summary: >-
-      A cycle can only be trusted if the server, the manifest and the choke point exist before it starts.
+      The server, the manifest and the choke point exist before a cycle starts, or it cannot run.
   - n: 2
     summary: >-
-      One command runs an experiment end to end; each step names the file it writes and the library doing the work.
+      One command runs an experiment; each step names the file it writes and the library doing the work.
   - n: 3
     summary: >-
-      The gate reads the fixed unseen split only, and promotes only when a cluster-corrected test says the gain is real.
+      The gate reads the fixed unseen split only, and promotes only on a cluster-corrected significant gain.
   - n: 4
     summary: >-
-      Refusals and rollbacks are rows too, which is the only reason the promotions mean anything.
+      Refusals and rollbacks are rows too, which is what makes the promotions mean anything.
   - n: 5
     summary: >-
-      The protocol got stricter three times in four days, and each change is dated and attributable.
+      The protocol got stricter three times in four days, each change dated and attributable.
 ---
 
 ## Setup
 
-Four things exist before an experiment can run. Each is a file or a process the rest of the loop
-reads, so a cycle cannot silently run without them.
+Four things exist before an experiment can run.
 
 | Piece | What it is | Command · path |
 |---|---|---|
@@ -51,14 +49,9 @@ reads, so a cycle cannot silently run without them.
 | **The choke point** | Every model built in one module: `deepseek-v4-flash` for the four agents, `claude-opus-5` through the Agent SDK for the teacher and prompt-writer (with `setting_sources=[]`), `claude-sonnet-5` for the single-session runtime; retry, the 120 s ceiling and the demo gate live there | `src/convfinqa/llm.py` · `evalloop/sdk.py` |
 | **Per-agent lineage** | Each agent's prompt versions keyed by content hash with a human label (`t1…t3`, `p1…p4`, `r1…r5`, `c1…c3`); a bundle is the composition, `t2.p2.r5.c2` for v8 | `uv run convfinqa-evalloop backfill-prompts` · `evaluation/registry.json → agent_prompts` |
 
-The manifest, not the seed, is the truth. The cautionary tale is in the same repo: two 60/40
-splits both seeded 42 agree on only 78 of 120 conversations, because the code around the seed
-changed. So the split holds actual id lists, and the seed is provenance.
-
-The gate split is fixed for a whole campaign, and its size was chosen by a power calculation
-rather than a budget: at 349 paired questions the one-sided test at α 0.05 can detect a gain of
-about 4.7 points, which is the size of change one prompt rewrite has produced. A
-smaller split would have made every verdict a coin toss.
+- **The manifest, not the seed, is the truth** — two 60/40 splits both seeded 42 agree on only 78 of 120 conversations; the code around the seed changed.
+- **Sized by power, not budget** — 349 paired questions detect about 4.7 points one-sided at α 0.05, the size one rewrite produces.
+- **Fixed for a whole campaign** — a smaller split makes every verdict a coin toss.
 
 Environment for a cycle:
 
@@ -70,8 +63,7 @@ claude auth status                                 # the teacher runs on the Cla
 
 ## One cycle
 
-Campaign c01, experiment 3 (2026-09-03) is the reference: v2 as baseline, v8 as the outcome.
-One command runs it; each row is one step of the ring in the case study's figure.
+Reference: campaign c01, experiment 3 (2026-09-03), v2 → v8, one command.
 
 ```bash
 uv run convfinqa-evalloop cycle --campaign c01 --baseline v2
@@ -91,20 +83,11 @@ uv run convfinqa-evalloop cycle --campaign c01 --baseline v2
 | 10 | Deploy | merge to `main` | CI eval gate → OIDC → ECR → App Runner; smoke asserts served bundle == champion | GitHub Actions · Terraform · `scripts/demo_smoke.sh` |
 | 11 | Observe | `MLFLOW_TRACING=1` for serving; `/metrics/production` | one trace row per turn, split by source | `tracking/traces.py` · `serving/routes/metrics.py` |
 
-The campaign wrapper adds two rules on top: at most five experiments against one gate split, and
-a target agent rotates off after two consecutive rejections, so the loop cannot spend a whole
-campaign re-writing the agent it happens to like. `campaign-status` prints where a campaign is;
-`ledger-trace --question-id <report>_q<n>` joins one question's diagnoses, rewrites and verdicts
-by id.
-
-Three details that make the steps honest rather than merely automated.
-
-**The runner threads the agent's own answers as history.** A wrong turn poisons the turns below
-it exactly as it would in production, and the `cascade` flag marks those rows so the teacher
-reads only each report's first wrong turn — later wrongs are consequence, not signal.
-
-**The per-agent panel needs no judge.** The gold program plus the gold answer determine what
-three of the four stages should have produced:
+- **Campaign rules** — at most five experiments per gate split; a target agent rotates off after two consecutive rejections.
+- **`campaign-status`** — where a campaign is.
+- **`ledger-trace --question-id <report>_q<n>`** — one question's diagnoses, rewrites and verdicts, joined by id.
+- **The runner threads the agent's own answers as history** — a wrong turn poisons the turns below; `cascade` marks those rows, so the teacher reads only each report's first wrong turn.
+- **The per-agent panel needs no judge** — gold program plus gold answer fix what three of the four stages should have produced.
 
 | Agent | Metric | How it is derived from gold |
 |---|---|---|
@@ -113,32 +96,19 @@ three of the four stages should have produced:
 | retriever | `retriever_operand_recall` | the gold program's numeric operands, minus constants and minus earlier gold answers, which come from history not the document |
 | calculator | `acc_calculator_exec` · `calculator_acc_given_full_recall` | the gold answer, conditioned on retrieval having succeeded — what separates "wrong operand" from "wrong computation" |
 
-**The teacher's taxonomy is frozen.** Named failure modes across the four agents, plus a
-`new:<label>` escape so a gap is visible rather than forced into the nearest box. It also sets
-`gold_suspect` when the gold answer itself looks wrong, which is what the Dataset page exists to
-settle.
-
-The attribution prompt was rewritten once, in PR #8, after measuring the old one against the
-new on 554 cases. The SDK arm slices its taxonomy verbatim from the same constant, so the two
-arms cannot drift.
+- **The taxonomy is frozen** — named failure modes per agent, a `new:<label>` escape, and `gold_suspect` for a gold answer that looks wrong (the Dataset page settles those).
+- **Attribution prompt rewritten once** — PR #8, measured old against new on 554 cases; the SDK arm slices its taxonomy verbatim from the same constant.
 
 ## Gate & promote
 
-The rule, as `comparator.py::promotable_significant` states it: **net positive on the shared gate
-questions — strictly more fixed than broken — and a one-sided McNemar p below 0.05 over the
-discordant pairs, cluster-corrected by conversation.** One-sided because the gate only ever
-promotes; clustered because the turns of one report share a history, so their flips are not
-independent. Every verdict also carries a cluster-bootstrap 95% CI on the delta and a
-`P(Δ > 0)`.
+`comparator.py::promotable_significant`: **net positive on the shared gate questions — strictly more fixed than broken — and a one-sided McNemar p below 0.05 over the discordant pairs, cluster-corrected by conversation.**
 
-Three evidence rules sit on top of it:
-
-- **Train runs optimise, the gate split promotes.** Both `gate` and `gate-targeted` refuse
-  `--promote` when either CSV came from the train split.
-- **A targeted challenger must move its own agent.** `gate-targeted` requires the target agent's
-  panel metric to improve on the shared gate reports, and overall paired accuracy not to regress.
-- **The SDK arm promotes to its own alias.** `sdk_champion`, never `champion`; serving reads
-  only the latter.
+- **One-sided** — the gate only ever promotes.
+- **Clustered** — one report's turns share a history, so their flips are not independent.
+- **Every verdict** — a cluster-bootstrap 95% CI on the delta and a `P(Δ > 0)`.
+- **Train runs optimise, the gate split promotes** — `gate` and `gate-targeted` refuse `--promote` on a train CSV.
+- **A targeted challenger must move its own agent** — `gate-targeted` requires the target's panel metric to improve on the shared gate reports and paired accuracy not to regress.
+- **The SDK arm promotes to its own alias** — `sdk_champion`, never `champion`; serving reads only the latter.
 
 The verdict that promoted v8, from `gates.jsonl`:
 
@@ -149,18 +119,17 @@ c01-e03  v8 vs v2  target retriever  n_paired 349
   retriever_operand_recall 0.740 → 0.768                                → PROMOTE
 ```
 
-And the event that un-promoted three champions, from the registry history on 2026-09-03:
+The event that un-promoted three champions, from the registry history on 2026-09-03:
 
 > v3_1, v4 and v5 were each promoted under the retired net-positive rule. Re-judged under the
 > campaign rule — net positive AND one-sided cluster-corrected McNemar p < 0.05 — every one is
 > rejected (v5, the strongest, has p=0.207 and a 95% CI of [−3.2pp, +7.6pp] that contains zero).
 > The evidence for them was never wrong, it was never sufficient.
 
-The holdout is the release gate, not the promotion gate. `release --i-know-this-opens-the-holdout`
-opens it once, for the current champion only, and appends the opening to the history so no later
-version can claim it as unseen. It has been opened 0 times; the mechanism is tested with stubs.
+- **The holdout is the release gate, not the promotion gate** — `release --i-know-this-opens-the-holdout` opens it once, for the current champion only, and records the opening in the history.
+- **Opened 0 times** — tested with stubs.
 
-The offline CI gate then holds the line on every pull request:
+The offline CI gate, on every pull request:
 
 ```text
 $ uv run python -m convfinqa.tracking.gate
@@ -172,15 +141,12 @@ eval-gate: 3 committed version(s): v1, v2, v3_1
 eval-gate PASSED
 ```
 
-That last line is a defect, not a pass. Campaign promotions write their evidence to the gate
-ledger and leave the bundle's `metrics` empty, so the CI floor for v8 is −0.5% and the check
-cannot fail. The re-score is real (81.66% from the committed CSV); the floor is not. It is listed
-under what is still open.
+- **The last line is a defect, not a pass** — campaign promotions leave the bundle's `metrics` empty, so v8's floor is −0.5% and cannot fail.
+- **The re-score is real** — 81.66% from the committed CSV; the floor is not.
 
 ## Cycle log
 
-Newest first. Accuracies recomputed from the committed CSVs; verdicts from `gates.jsonl` and the
-registry history. Every campaign row is paired on the same 349 gate questions.
+Newest first; accuracies from the committed CSVs, verdicts from `gates.jsonl` and the registry history; every campaign row paired on the same 349 gate questions.
 
 | Date | Subject | Deliverable | Split · n | Accuracy | Verdict |
 |---|---|---|---|---|---|
@@ -200,48 +166,34 @@ registry history. Every campaign row is paired on the same 349 gate questions.
 | 2026-08-28 | v2 · t2.p2.r2.c2 | GEPA (DSPy), full prompt set | corpus · 770 | 73.0% → 77.1% | champion by backfill |
 | 2026-05 | v3_1 · t3.p3.r3.c3 | s7 harness, 39 verified rules | corpus · 770 | 77.1% → 76.2% · 61 / 68 | refused under the flip-veto rule |
 
-Two numbers the log keeps beside the one promotion so it cannot be read as more than it is: the
-CI for v8 still touches zero on the left, and `P(Δ > 0)` is 0.96, not 1. Under the two-sided
-uncorrected test the p would read 0.036; the loop reports the harder number.
+Two numbers beside the one promotion, so it reads as no more than it is:
 
-What is still open, and why the loop is not yet trusted at scale:
+- **v8's CI still touches zero on the left** — `P(Δ > 0)` is 0.96, not 1.
+- **Two-sided uncorrected p would read 0.036** — the loop reports the harder number.
 
-- **The CI floor for campaign champions.** `tracking/gate.py` reads a floor from the bundle's
-  registry metrics, which campaign promotions leave empty; v8 is checked against −0.5%.
-- **Teacher trust.** `kappa --make` produced a 30-case sheet with the teacher's verdict hidden;
-  the bar is κ ≥ 0.7 against a human's labels. The sheet is committed and unlabelled.
-- **Holdout.** Reserved, never cut. The first release will be the first measurement.
-- **Production failures joining train.** Designed, not built: serving traces carry the bundle
-  id but nothing yet routes a failed live turn into the next teacher pass.
-- **Diminishing returns.** Three campaigns against v8 produced four rejections; the best, v11,
-  was +1.4 pp. A 100-report train draw yields about 50 first-wrong cases split four ways, so a
-  single draw's ranking of agents is close to noise.
+Still open:
+
+- **CI floor for campaign champions** — `tracking/gate.py` reads the floor from registry metrics campaign promotions leave empty; v8 is checked against −0.5%.
+- **Teacher trust** — `kappa --make` produced a 30-case sheet, teacher's verdict hidden, bar κ ≥ 0.7 against a human; committed, unlabelled.
+- **Holdout** — reserved, never cut; the first release is the first measurement.
+- **Production failures joining train** — designed, not built; serving traces carry the bundle id, nothing routes a failed live turn into the next teacher pass.
+- **Diminishing returns** — three campaigns against v8, four rejections; the best, v11, +1.4 pp.
+- **Noise floor** — a 100-report train draw yields about 50 first-wrong cases split four ways; one draw's ranking of agents is close to noise.
 
 ## What changed since
 
-Newest first. Each entry is a protocol change, not a code change, with what made it.
+Newest first; protocol changes, not code changes.
 
-- **2026-09-06 · the loop runs a second runtime** — `--runtime agent_sdk` answers a conversation
-  in one Claude session; same split, same gate, own alias. PR #9, `5af229e`.
-  [The runtime test →](/projects/convfinqa-agent/sdk-vs-llm/)
-- **2026-09-05 · campaigns** — up to five experiments against one fixed gate split, target
-  rotation after two rejections, three append-only ledgers joined by id. PR #8, `4ced811`.
-- **2026-09-05 · attribution rewrite** — the teacher's blame prompt re-written and measured
-  old-against-new on 554 cases before replacing it (PR #8). `evalloop/teacher.py::TEACHER_PROMPT`.
-- **2026-09-03 · the significance rule** — net positive AND one-sided cluster-corrected McNemar
-  p < 0.05 replaces "net positive with p recorded"; v3_1, v4 and v5 re-judged and rolled back
-  to v2 at 17:18; v8 promoted at 19:33. `tracking/comparator.py::promotable_significant`.
-- **2026-09-03 · the campaign split** — `eval_loop_v2` extends v1 to 100 / 100 reports with the
-  holdout reserved, sized by a power calculation. `evaluation/splits/eval_loop_v2.json`.
-- **2026-09-03 · the teacher moves to Opus 5 on the Agent SDK** — from deepseek-v4-pro on
-  pydantic-ai; subscription billing, `setting_sources=[]`, one structured call per case.
-  `llm.py::LM_TEACHER_MODEL`.
-- **2026-09-02 · promotion evidence must come from the unseen split** — the owner's rollback
-  of v4; both gates refuse `--promote` on train CSVs since.
-- **2026-09-02 · net-positive rule with McNemar p replaces the flip veto** — the rule the
-  significance rule then replaced.
+- **2026-09-06 · a second runtime** — `--runtime agent_sdk` answers a conversation in one Claude session; same split, same gate, own alias. PR #9, `5af229e`. [The runtime test →](/projects/convfinqa-agent/sdk-vs-llm/)
+- **2026-09-05 · campaigns** — up to five experiments per fixed gate split, target rotation after two rejections, three append-only ledgers joined by id. PR #8, `4ced811`.
+- **2026-09-05 · attribution rewrite** — the blame prompt measured old-against-new on 554 cases before replacing it (PR #8). `evalloop/teacher.py::TEACHER_PROMPT`.
+- **2026-09-03 · the significance rule** — net positive AND one-sided cluster-corrected McNemar p < 0.05 replaces "net positive with p recorded"; v3_1, v4, v5 rolled back to v2 at 17:18; v8 promoted at 19:33. `tracking/comparator.py::promotable_significant`.
+- **2026-09-03 · the campaign split** — `eval_loop_v2` extends v1 to 100 / 100 reports, holdout reserved, sized by power calculation. `evaluation/splits/eval_loop_v2.json`.
+- **2026-09-03 · teacher to Opus 5 on the Agent SDK** — from deepseek-v4-pro on pydantic-ai; subscription billing, `setting_sources=[]`, one structured call per case. `llm.py::LM_TEACHER_MODEL`.
+- **2026-09-02 · promotion evidence from the unseen split only** — the owner's rollback of v4; both gates refuse `--promote` on train CSVs since.
+- **2026-09-02 · net-positive rule with McNemar p replaces the flip veto** — itself replaced by the significance rule.
 
-Libraries in the loop, for the record:
+Libraries:
 
 | Library | Trusted with |
 |---|---|

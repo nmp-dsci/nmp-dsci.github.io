@@ -2,10 +2,9 @@
 title: "Production at 10 / 100 / 1,000 concurrent users"
 short: "Production at scale"
 summary: >-
-  What actually runs today at ten concurrent users, what changes at a hundred
-  and at a thousand, and which of those three is deployed, which is measured and
-  which is only drawn. The rung-100 sizing is arithmetic, from a queue
-  experiment whose formula held within 6%.
+  What runs today at ten concurrent users, what changes at a hundred and at a
+  thousand, and which rung is deployed, measured or only drawn. The rung-100
+  sizing is arithmetic, from a queue experiment whose formula held within 6%.
 tldr: >-
   Rung 10 is deployed. Rung 100's sizing is measured — ⌈N ÷ slots⌉ × S held within 6% across 10 cells and 150 answers. Rung 1,000 is designed only. Dollar ranges are order-of-magnitude estimates.
 order: 3
@@ -42,29 +41,17 @@ sections:
 
 ## Problem
 
-Most scale sections on a portfolio are a picture of what someone would build.
-The picture is usually fine and tells you nothing, because it never says which
-box exists.
+Most portfolio scale sections draw what someone would build and never say which box exists.
 
-There is a second problem specific to gen-AI. A web request is measured in
-milliseconds, so "requests per second" is the natural unit and headroom is
-enormous. An agent answer takes **around 90 seconds** and holds a worker slot for
-all of it.
-
-At that service time, capacity is not a throughput number, it is a slot count —
-and a hundred people asking at once is a genuinely different system from ten,
-not the same system with a bigger instance.
-
-So the unit here is **concurrent users**, each rung is labelled with how real it
-is, and the sizing is arithmetic you can check rather than a shape.
+- **Gen-AI breaks the usual unit** — a web request is milliseconds, so "requests per second" fits and headroom is enormous; an agent answer takes **around 90 seconds** and holds a worker slot throughout.
+- **Capacity is a slot count**, not a throughput number — a hundred people at once is a different system from ten, not a bigger instance.
+- **So** — the unit is concurrent users, each rung is labelled with how real it is, and the sizing is arithmetic you can check.
 
 ## Pattern
 
-Three rungs. Rung 10 is running now. Rung 100's sizing was measured on one
-laptop and has not been deployed. Rung 1,000 is a design.
+Three rungs: rung 10 running now; rung 100 sized on one laptop, not deployed; rung 1,000 a design.
 
-Monthly-user figures use a 1–2% concurrency rule of thumb and are
-order-of-magnitude only. Only rung-10 costs are measured.
+Monthly-user figures use a 1–2% concurrency rule of thumb, order-of-magnitude only; only rung-10 costs are measured.
 
 ### Rung 10 · deployed — today's demo
 
@@ -75,25 +62,11 @@ order-of-magnitude only. Only rung-10 costs are measured.
 
 **~$5–18 / month per app · ≈ hundreds of visitors a month**
 
-- **Compute** — one App Runner instance per service, front door and compute
-  bundled. Data Pilot pins `min_size = max_size = 1` with `max_concurrency 100`
-  for its read paths; ConvFinQA and Transcript RAG each run one 0.5 vCPU / 1 GB
-  instance, and ConvFinQA additionally caps live turns at 4 in flight and needs
-  `--workers 1`.
-- **State** — sessions, rate limits and the demo pack live in process memory.
-  That is *correct* at N=1, not a shortcut, and it is the named seam beyond it.
-- **Data** — Data Pilot's Aurora Serverless v2 runs 0–1 ACU and auto-pauses
-  after an hour, so the first visitor after a pause waits about 30 seconds and
-  the UI narrates it. The other two bake their index and CSVs into the image and
-  have no database at all.
-- **Spend** — no inference on the public URL. Chat replays recorded runs, so the
-  worst-case bill under attack is a fixed ceiling rather than an unbounded one.
-  Turning Data Pilot's demo mode on deleted the 2 vCPU / 4 GB agent service —
-  the single biggest idle line at roughly $25–35/month — measured as **~$36–66
-  → ~$8–18/month**, 60–70% cheaper.
-- **Signal to move** — App Runner 5xx alarm or concurrency at cap; Aurora ACU
-  pinned at max; in Data Pilot, the ops deck's wait p95 rising while service p95
-  stays flat.
+- **Compute** — one App Runner instance per service, front door and compute bundled. Data Pilot pins `min_size = max_size = 1`, `max_concurrency 100` on read paths; ConvFinQA and Transcript RAG run 0.5 vCPU / 1 GB each; ConvFinQA caps 4 live turns in flight and needs `--workers 1`.
+- **State** — sessions, rate limits and the demo pack in process memory: *correct* at N=1, not a shortcut, and the named seam beyond it.
+- **Data** — Data Pilot's Aurora Serverless v2 at 0–1 ACU auto-pauses after an hour; the first visitor after a pause waits about 30 seconds and the UI narrates it. The other two bake index and CSVs into the image; no database.
+- **Spend** — no inference on the public URL; chat replays recorded runs, so the worst-case bill under attack is a fixed ceiling. Demo mode deleted Data Pilot's 2 vCPU / 4 GB agent service, the biggest idle line at roughly $25–35/month: **~$36–66 → ~$8–18/month**, 60–70% cheaper.
+- **Signal to move** — App Runner 5xx alarm or concurrency at cap; Aurora ACU pinned at max; Data Pilot's ops-deck wait p95 rising while service p95 stays flat.
 
 ### Rung 100 · sizing measured, not deployed — live LLM back on
 
@@ -104,25 +77,14 @@ order-of-magnitude only. Only rung-10 costs are measured.
 
 **≈ $0.5–1k / month + inference · ≈ 5–10k monthly users — estimates**
 
-Two terms, so the figure reads right. They are the two halves of what App Runner
-bundles at rung 10:
+Two terms, the two halves of what App Runner bundles at rung 10.
 
-- **ALB** (Application Load Balancer) — the front door, the job an API Gateway
-  would otherwise do.
-- **ECS Fargate** — the compute, where the FastAPI containers run, with no
-  servers to manage.
+- **ALB** (Application Load Balancer) — the front door, the job an API Gateway would otherwise do.
+- **ECS Fargate** — the compute, where the FastAPI containers run; no servers to manage.
+- **Why ALB, not API Gateway, for chat?** API Gateway's integration timeout is about 30 seconds: it cannot hold a 90-second answer or an SSE stream. An ALB's idle timeout goes to 4,000 seconds.
+- **Where does API Gateway fit?** *Beside* the ALB on keyed surfaces — Data Pilot's `dpk_` webhook and MCP keys — where per-key usage plans and throttling are the entire point.
 
-**Why ALB, not API Gateway, for the chat path.** API Gateway's integration
-timeout is about 30 seconds. That cannot hold a 90-second agent answer, and it
-cannot hold an SSE stream. An ALB's idle timeout goes to 4,000 seconds.
-
-API Gateway earns a place *beside* the ALB, not instead of it, on keyed
-surfaces — Data Pilot's `dpk_` webhook and MCP keys — where per-key usage plans
-and throttling are the entire point.
-
-**The sizing is arithmetic.** The measured formula is drain time
-`⌈N ÷ slots⌉ × S`, and it held within 6% across every configuration tested.
-Substituting the target:
+**The sizing is arithmetic.** Drain time `⌈N ÷ slots⌉ × S` held within 6% across every configuration tested.
 
 ```
 100 askers · S ≈ 90 s · wait target < 3 min
@@ -130,26 +92,12 @@ Substituting the target:
     50 slots  ≈  8–12 worker tasks × 4–6 concurrency
 ```
 
-Then size the task from measured memory, not from a guess: a warm worker held
-**~300 MB at cruise and up to ~840 MB freshly warmed** (Pyodide plus ONNX), and
-one process running four concurrent slots peaked at **~1.45 GB including four
-in-flight jobs**.
-
-That puts 4–6 slots inside a 1 vCPU / 2 GB task, so ~50 slots is roughly **10
-tasks**. Memory, not CPU, is what bounds worker count.
-
-- **State out of process** — Redis for sessions and limits. This is exactly the
-  seam ConvFinQA's `serving/limits.py` names in its own docstring; Data Pilot's
-  queue already works this way.
-- **Data** — Aurora min ACU above zero kills the cold start; one reader carries
-  Explore and SQL; pgvector stays in the database.
-- **Guardrails scale with it** — per-user daily caps become tenant quotas; WAF
-  and edge rate limits; provider quota alarms. Fifty concurrent LLM calls is
-  where a single provider's rate limit starts to matter.
-- **Signal to move** — queue wait p95 rising while service p95 stays flat means
-  add slots; *both* rising means the agent itself got slower, which is an eval
-  problem and not an infrastructure one. Also reader CPU and connection count on
-  Aurora, and cost-per-answer × volume crossing the budget alarm.
+- **Task size from measured memory** — a warm worker held **~300 MB at cruise, up to ~840 MB freshly warmed** (Pyodide plus ONNX); one process on four slots peaked at **~1.45 GB including four in-flight jobs**.
+- **So** — 4–6 slots per 1 vCPU / 2 GB task; ~50 slots is roughly **10 tasks**. Memory, not CPU, bounds worker count.
+- **State out of process** — Redis for sessions and limits: the seam ConvFinQA's `serving/limits.py` names in its own docstring; Data Pilot's queue already works this way.
+- **Data** — Aurora min ACU above zero kills the cold start; one reader carries Explore and SQL; pgvector stays in the database.
+- **Guardrails scale with it** — per-user daily caps become tenant quotas; WAF and edge rate limits; provider quota alarms. Fifty concurrent LLM calls is where one provider's rate limit starts to matter.
+- **Signal to move** — wait p95 rising, service p95 flat: add slots. *Both* rising: the agent got slower, an eval problem not infrastructure. Also Aurora reader CPU and connection count, and cost-per-answer × volume crossing the budget alarm.
 
 ### Rung 1,000 · designed only — multi-tenant fleet
 
@@ -160,25 +108,13 @@ tasks**. Memory, not CPU, is what bounds worker count.
 
 **≈ $5–15k / month + inference · ≈ 50–100k monthly users — estimates**
 
-- **Compute** — separate autoscaling fleets per role across AZs: API, LLM-wait
-  workers (cheap, high concurrency), CPU-bound sandbox workers, an online judge.
-  About 500 slots for 1,000 askers at the same wait target. Slots are slots: the
-  experiment showed one process × 4 coroutines beating three serial replicas.
-- **Queues per class** — interactive, batch and eval-sample, so a report
-  backfill never queues in front of a live user.
-- **Data** — Aurora writer plus readers; marts partitioned by tenant and
-  dataset; row-level security graduates to schema-per-tenant where a customer
-  demands physical isolation; pgvector moves to a dedicated or partitioned store.
-- **LLM** — 500 concurrent calls exceeds one provider's default quota, so a
-  router across providers with per-tenant quotas, prompt caching and fallbacks.
-  That is the choke-point pattern ConvFinQA already has in one module, applied
-  fleet-wide.
-- **Release** — blue/green on ALB weighted target groups, with the canary judged
-  by the online eval sample before it takes 100%.
+- **Compute** — autoscaling fleets per role across AZs: API, LLM-wait workers (cheap, high concurrency), CPU-bound sandbox workers, an online judge. About 500 slots for 1,000 askers at the same wait target; the experiment showed one process × 4 coroutines beating three serial replicas.
+- **Queues per class** — interactive, batch and eval-sample; a report backfill never queues in front of a live user.
+- **Data** — Aurora writer plus readers; marts partitioned by tenant and dataset; row-level security graduates to schema-per-tenant where a customer demands physical isolation; pgvector to a dedicated or partitioned store.
+- **LLM** — 500 concurrent calls exceeds one provider's default quota: a router across providers, per-tenant quotas, prompt caching, fallbacks. ConvFinQA's one-module choke point, fleet-wide.
+- **Release** — blue/green on ALB weighted target groups; the canary judged by the online eval sample before it takes 100%.
 - **Cost** — per-tenant showback; the budget alarm becomes a per-tenant quota.
-- **Signal to move** — rung-100 autoscaling hitting its max repeatedly; reader
-  lag or connection exhaustion; one tenant's load starving others (the argument
-  for per-class queues and sharding); provider 429s.
+- **Signal to move** — rung-100 autoscaling hitting its max repeatedly; reader lag or connection exhaustion; one tenant starving others (the argument for per-class queues and sharding); provider 429s.
 
 ### What changes at each rung
 
@@ -194,40 +130,21 @@ tasks**. Memory, not CPU, is what bounds worker count.
 | **Release** | Auto-deploy `:latest`, rollback by retag | Blue/green on ALB weighted target groups | Canary judged by the online eval sample |
 | **How you know** | 5xx alarm; ACU pinned; wait p95 ≫ service p95 | Backlog-per-task; reader CPU; cost × volume alarm | Autoscale max hit; reader lag; tenant starvation; provider 429s |
 
-**Every row moves state out of the process and every row costs money, which is
-why the rung you are on is the one worth sizing.** Source: rung 10 from the
-deployed configuration; rungs 100 and 1,000 from
-`.lavish/s42_worker-scaling-results.html` and the design.
+**Every row moves state out of the process and every row costs money, which is why the rung you are on is the one worth sizing.**
+
+Source: rung 10 from the deployed configuration; rungs 100 and 1,000 from `.lavish/s42_worker-scaling-results.html` and the design.
 
 ## In the three systems
 
-All three sit on rung 10 today. What differs is how much of rung 100 is more
-than an intention.
+All three sit on rung 10 today; what differs is how much of rung 100 is more than an intention.
 
-**Data Pilot — rung 10, with rung-100 sizing measured.** k6 load tests are
-recorded to `app.load_tests`, and the Redis Streams queue experiment behind this
-page's arithmetic ran against the live stack. The queue itself exists as an
-opt-in path, so the state-out-of-process half of rung 100 is already built rather
-than designed. Production today is one instance per service and Aurora at 0–1 ACU.
-
-**ConvFinQA Agent — rung 10, seam named.** One instance, `--workers 1`,
-in-memory sessions and limits — and `serving/limits.py` says so in its own
-docstring: in-memory state is *correct* here because App Runner runs the service
-at max-size 1, "if that ever changes, these two classes are the seam". There is
-no load test. Rungs 100 and 1,000 are design only.
-
-**Transcript RAG — rung 10, seam named.** One 0.5 vCPU / 1 GB App Runner
-instance, read-only, with the Chroma index baked into the image; an ingestion
-queue with three workers (`src/api/ingestion_queue.py`) already exists for the
-write path, which is the shape rung 100 needs for the read path. No load test.
-Rungs 100 and 1,000 are design only.
+- **Data Pilot — rung 10, rung-100 sizing measured.** k6 load tests recorded to `app.load_tests`; the Redis Streams queue experiment behind this page's arithmetic ran against the live stack; the queue exists as an opt-in path, so the state-out-of-process half of rung 100 is built. Today: one instance per service, Aurora at 0–1 ACU.
+- **ConvFinQA Agent — rung 10, seam named.** One instance, `--workers 1`, in-memory sessions and limits; `serving/limits.py`'s own docstring says in-memory state is *correct* because App Runner runs at max-size 1, "if that ever changes, these two classes are the seam". No load test; rungs 100 and 1,000 design only.
+- **Transcript RAG — rung 10, seam named.** One 0.5 vCPU / 1 GB App Runner instance, read-only, Chroma index baked in; an ingestion queue with three workers (`src/api/ingestion_queue.py`) already serves the write path, the shape rung 100 needs for reads. No load test; rungs 100 and 1,000 design only.
 
 ## Evidence
 
-The rung-100 arithmetic rests on one experiment, in `data-qa-agent`:
-`.lavish/s42_worker-scaling-results.html` (the write-up),
-`out/wsweep/summary.json` (the raw grid) and `load/k6/chat.js`. Recomputed from
-`summary.json` on 2026-08-30:
+One experiment in `data-qa-agent`: `.lavish/s42_worker-scaling-results.html` (the write-up), `out/wsweep/summary.json` (the raw grid) and `load/k6/chat.js`, recomputed from `summary.json` on 2026-08-30.
 
 | cell | workers × conc | S | predicted ⌈15/W⌉×S | measured | error | speedup |
 |---|---|---|---|---|---|---|
@@ -242,71 +159,31 @@ The rung-100 arithmetic rests on one experiment, in `data-qa-agent`:
 | W5-S60 | 5 × 1 | 60 s | 180 s | 181.6 s | 0.9% | 4.98× |
 | W1-S30-C4 | 1 × 4 | 30 s | 120 s | 121.8 s | 1.5% | 3.73× |
 
-**10 cells · 150 of 150 answers ok · 0 shed · 0 errors · 0 timeouts.** Three
-workers gave 2.97–2.99×, five gave 4.87–4.98×, and the largest error in the grid
-was 6.0% — on the shortest cell, where a fixed ~1.8 s of per-wave overhead is a
-larger share of a 30-second run.
+- **10 cells · 150 of 150 answers ok · 0 shed · 0 errors · 0 timeouts.**
+- **Speedup** — three workers 2.97–2.99×, five 4.87–4.98×.
+- **Largest error 6.0%** — the shortest cell, where a fixed ~1.8 s of per-wave overhead is a larger share of a 30-second run.
+- **The last row changed the design** — one process × four coroutines drained the burst in 121.8 s against 152.3 s for three serial replicas, at 1.45 GB instead of 2.34 GB. Slots are slots, from processes or coroutines.
 
-The last row is the one that changed the design: one process running four
-coroutines drained the burst in 121.8 s against 152.3 s for three serial
-replicas, at 1.45 GB instead of 2.34 GB. Slots are slots, whether they come from
-processes or coroutines.
+**The live-LLM validation (E9).** The grid stubbed service time to isolate queueing, so it was re-run with real answers.
 
-**The live-LLM validation (E9).** The grid used a stubbed service time to isolate
-queueing, so it was re-run with real answers: 10 users at once, through the queue
-on 3 workers, then straight at a single container with the queue off. 20 of 20
-answered, zero errors.
+- **Setup** — 10 users at once, through the queue on 3 workers, then straight at one container with the queue off.
+- **Result** — 20 of 20 answered, zero errors.
 
 | leg | makespan | peak CPU | peak memory | concurrent LLM calls |
 |---|---|---|---|---|
 | queue · 3 workers | **197.0 s** | 331% (≈110%/worker) | 2.0 GB over 3 replicas | ≤ 3, by construction |
 | direct · 1 container | **72.9 s** | 816% | 2.3 GB, one process | 10, unbounded |
 
-The prediction for the queue leg — ⌈10/3⌉ = 4 waves × 50–60 s ≈ 200–240 s —
-landed on a measured 197 s, so the stub arithmetic transfers to real answers.
-
-The direct leg's win was bought with **eight-plus idle cores**, which no App
-Runner instance at 1–2 vCPU has: the same burst there serialises on CPU and stretches
-toward the 240-second timeout. The queue trades about two minutes for the last
-user in exchange for bounded CPU, bounded LLM spend and a clean 429 past depth 32.
-
-Rung-10 costs are the only measured dollars on this page: Data Pilot's demo-mode
-cutover (~$36–66 → ~$8–18/month) and ConvFinQA's container sizing — 225 MiB RSS
-at rest, 315 MiB with every prediction CSV cached, so the 1 GB instance is the
-honest floor at roughly $5–15/month. Everything at rung 100 and rung 1,000 is an
-estimate.
+- **The prediction held** — ⌈10/3⌉ = 4 waves × 50–60 s ≈ 200–240 s, measured 197 s; the stub arithmetic transfers to real answers.
+- **The direct leg's win** cost **eight-plus idle cores**, which no App Runner instance at 1–2 vCPU has; there the burst serialises on CPU toward the 240-second timeout.
+- **The queue's trade** — about two minutes for the last user, for bounded CPU, bounded LLM spend and a clean 429 past depth 32.
+- **The only measured dollars** — Data Pilot's demo-mode cutover (~$36–66 → ~$8–18/month) and ConvFinQA's container: 225 MiB RSS at rest, 315 MiB with every prediction CSV cached, so 1 GB is the honest floor at roughly $5–15/month. Rungs 100 and 1,000 are estimates.
 
 ## Failure modes
 
-**Presenting an estimate as a measurement.** The rung-100 dollar range is a guess
-with a shape, not a bill. The sizing is not — but it was measured on one laptop
-with a stubbed service time, and the write-up says so: live answers vary 60–120 s,
-which smears wave boundaries, so expect the same means with wider spread.
-
-**Confusing throughput with slots.** A queue that "handles 30 requests a minute"
-tells you nothing when one answer occupies a slot for 90 seconds. The only number
-that sizes the fleet is `⌈N ÷ slots⌉ × S`, and the only way to know `S` is to
-measure it under the model you actually ship.
-
-**Reading a single latency number.** Wait p95 and service p95 have to be
-separated or the dashboard cannot tell you what to do. Wait rising while service
-is flat means add slots. Both rising means the agent got slower, and adding
-workers will burn money without fixing anything. The queue sweep produced the
-first pattern on demand, which is what makes it alertable.
-
-**Warm-up lagging scale-out.** A cold replica costs about 30 seconds before its
-first answer (Pyodide and ONNX warm-up), and the sweep saw boot spikes of
-500–750% CPU as three to five replicas warmed concurrently. An autoscaler that
-adds capacity at the moment the backlog appears has already added it too late.
-
-**Scaling the compute and forgetting the provider.** At 50 concurrent calls a
-single provider's rate limit becomes the binding constraint, and at 500 it is a
-certainty. That is a routing and quota problem, not an ECS one, and it is the
-reason the rung-1,000 design puts a router in front of the providers rather than
-more workers behind them.
-
-**Skipping the rung you are on.** All three systems could be given more
-instances tomorrow. None of them would survive it, because sessions and rate
-limits are in process memory — correct at one instance, wrong at two. Naming that
-seam in the code is cheap; the migration is not, and pretending the box is
-already ticked is how a demo becomes an outage.
+- **Presenting an estimate as a measurement** — the rung-100 dollar range is a guess with a shape, not a bill. The sizing was measured, but on one laptop with stubbed service time; live answers vary 60–120 s and smear wave boundaries, so expect the same means with wider spread.
+- **Confusing throughput with slots** — "handles 30 requests a minute" says nothing when one answer holds a slot for 90 seconds. Fix: size by `⌈N ÷ slots⌉ × S`, and measure `S` under the model you actually ship.
+- **Reading a single latency number** — separate wait p95 from service p95 or the dashboard cannot tell you what to do. Wait rising, service flat: add slots. Both rising: the agent got slower, and workers burn money. The sweep produced the first pattern on demand, which makes it alertable.
+- **Warm-up lagging scale-out** — a cold replica costs about 30 seconds before its first answer (Pyodide and ONNX), and three to five replicas warming together spiked 500–750% CPU. An autoscaler that adds capacity when the backlog appears is already late.
+- **Scaling the compute and forgetting the provider** — at 50 concurrent calls one provider's rate limit binds; at 500 it is a certainty. Fix: a routing and quota problem, not an ECS one — the rung-1,000 router in front of the providers, not more workers behind them.
+- **Skipping the rung you are on** — all three could get more instances tomorrow; none would survive it, because sessions and rate limits are in process memory, correct at one instance and wrong at two. Naming the seam in code is cheap, the migration is not; pretending the box is ticked is how a demo becomes an outage.

@@ -6,7 +6,7 @@ project: convfinqa-agent
 rubric: [evals, gate, loop, cost]
 summary: >-
   The runtime experiment behind the case study's slides 2 and 4: the Claude Agent SDK runtime,
-  the distillation of v8's four prompts into one, the same gate on the same 349 questions, the
+  v8's four prompts distilled into one, the same gate on the same 349 questions. Then the
   by-turn-type split, the model swap, and what the result does and does not establish.
 tldr: >-
   sdk-distil v8 → sdk_v1 → run both arms on the gate split → runtime gate → sdk_champion, then
@@ -29,7 +29,7 @@ sections:
       An SDK experiment is the pipeline's cycle with one prompt instead of four and a subprocess instead of a call.
   - n: 3
     summary: >-
-      The runtime gate promoted sdk_v1 to its own alias, and the case for it is stated with both caveats.
+      The runtime gate promoted sdk_v1 to its own alias, and the case for it carries both caveats.
   - n: 4
     summary: >-
       Three rows: the baseline that won, the rewrite that lost, and the model swap that priced the confound.
@@ -40,8 +40,7 @@ sections:
 
 ## Setup
 
-Three things had to exist before one Claude session could be compared with four agents, and each
-was built so the comparison is of runtimes rather than of two scoring paths.
+Three things existed first, so the comparison is of runtimes, not scoring paths.
 
 | Piece | What it is | Path |
 |---|---|---|
@@ -50,11 +49,9 @@ was built so the comparison is of runtimes rather than of two scoring paths.
 | **The distilled prompt** | `sdk-distil` asks the teacher to read v8's four prompts and write one: keep the turn-type criteria, the reference rules, the retrieval conventions and the calculator discipline; drop input-field descriptions and hand-off formats. Seven fixed sections, every tool and output key named, no value from any example. Four lineages of about 22k characters became one of 16.4k | `src/convfinqa/evalloop/sdk_teacher.py::SDK_DISTIL_PROMPT` · `src/convfinqa/prompts/sdk_v1.py` |
 | **Its own lineage and alias** | `sdk_prompts` on the registry (`s1` from distil, `s2` from the SDK teacher), promoted to `sdk_champion` and never to `champion`, so serving is untouched | `evaluation/registry.json → sdk_prompts, aliases` · `src/convfinqa/evalloop/sdk_gate.py` |
 
-The model choice is deliberate and asymmetric. The teacher judges a few dozen cases per cycle and
-runs on `claude-opus-5`; the session runs on every turn of an eval pass, so it runs on
-`claude-sonnet-5` and its cost is recorded per question. Both go through the Agent SDK on
-subscription billing, and the SDK calls are a CLI subprocess the MLflow autologger cannot see, so
-`evalloop/sdk.py` opens their spans by hand and stores prompts by reference.
+- **Teacher on `claude-opus-5`** — a few dozen cases per cycle.
+- **Session on `claude-sonnet-5`** — every turn of an eval pass, cost recorded per question.
+- **Both via the Agent SDK on subscription billing** — a CLI subprocess the MLflow autologger cannot see; `evalloop/sdk.py` opens spans by hand and stores prompts by reference.
 
 ```bash
 uv run convfinqa-evalloop sdk-distil --source-version v8 --new-version sdk_v1
@@ -63,8 +60,7 @@ uv run convfinqa-evalloop run --split test --version sdk_v1 --runtime agent_sdk
 
 ## One cycle
 
-The SDK arm runs the pipeline's cycle with one prompt where there were four. Campaign s01
-(2026-09-05) is the reference; it is capped at two experiments.
+The pipeline's cycle with one prompt where there were four; reference campaign s01 (2026-09-05), capped at two experiments.
 
 ```bash
 uv run convfinqa-evalloop cycle --campaign s01 --runtime agent_sdk
@@ -80,23 +76,14 @@ uv run convfinqa-evalloop cycle --campaign s01 --runtime agent_sdk
 | 06 | Gate | the same rule: net positive AND one-sided clustered McNemar p < 0.05, against `sdk_v1` | `gates.jsonl` row `s01-e02` | `tracking/comparator.py` |
 | 07 | Model swap | `run --sdk-model claude-haiku-4-5-20251001` scores the same prompt on another model — a plain scoring pass, no optimisation, no promotion | `…sdk_v1·s1-haiku-4-5-….csv` · `story.json → sdk_model_comparison` | `evalloop/cli.py` |
 
-Two details that keep the SDK arm honest.
-
-**Skipped stages are failures of that stage.** Across 349 questions `sdk_v1` recorded 3 stage
-skips and 5 inline-arithmetic answers — turns where the session answered without calling a
-tool. They are counted against it, not excused as style.
-
-**A second s01 experiment died at the rewrite step** on a subscription session limit and wrote
-no version. It is on the ledger as a failed step, which is why the campaign shows one rewrite
-rather than two.
+- **Skipped stages are failures of that stage** — over 349 questions `sdk_v1` recorded 3 stage skips and 5 inline-arithmetic answers, counted against it.
+- **A second s01 experiment died at the rewrite step** — subscription session limit, no version written; on the ledger as a failed step, so the campaign shows one rewrite.
 
 ## Gate & promote
 
-The runtime gate is the campaign gate with a different alias at the end. `sdk_gate.py` pairs the
-two arms on the shared gate questions, requires net positive and a one-sided cluster-corrected
-McNemar p below 0.05, and on a pass writes `promote_sdk` with the full comparison.
+The campaign gate with a different alias: `sdk_gate.py` pairs the arms, requires net positive and one-sided cluster-corrected McNemar p < 0.05, and writes `promote_sdk` on a pass.
 
-| | pipeline · v8 | session · sdk_v1 |
+| Metric | pipeline · v8 | session · sdk_v1 |
 |---|---|---|
 | model · library | deepseek-v4-flash · pydantic-ai | claude-sonnet-5 · claude-agent-sdk |
 | accuracy, 349 gate questions | **81.7%** (285) | **90.5%** (316) |
@@ -116,24 +103,16 @@ s01  sdk_v1 vs v8  runtime  n_paired 349
   number turns    +0.00pp ·  3 fixed / 3 broken · p 0.5              → PROMOTE to sdk_champion
 ```
 
-What that establishes, and what it does not — the repo's own write-up says both, and so does
-this page:
+What it establishes, and what it does not:
 
-- **A win at equal optimisation effort.** The session had one distilled prompt and one rejected
-  rewrite; the pipeline had three campaigns and seven experiments. On the same questions the
-  session is 8.9 points better, and the whole gain is on program turns.
-- **Not "one session beats four agents".** Model and architecture moved in the same step. The
-  model swap below prices part of that; isolating the rest needs the four-agent pipeline on a
-  Claude model, which needs an API endpoint this project deliberately does not use.
-- **Not a human-level claim.** 90.5% sits above the paper's 89.4% human-expert figure, but on
-  a 349-question split drawn from the public train pool, and program match is 40.9% against the
-  paper's 86.3%: it reaches the right numbers without reproducing the gold programs.
-- **A prompt the pipeline's loop wrote.** `sdk_v1` is v8 distilled. The campaigns produced the
-  knowledge; the single session was a better vessel for it.
+- **A win at equal optimisation effort** — one distilled prompt and one rejected rewrite against three campaigns and seven experiments; +8.9 points, all of it on program turns.
+- **Not "one session beats four agents"** — model and architecture moved together; isolating the rest needs the pipeline on a Claude model, which needs an API endpoint this project does not use.
+- **Not a human-level claim** — 90.5% is above the paper's 89.4% human-expert figure, but on 349 questions from the public train pool, with program match 40.9% against the paper's 86.3%.
+- **A prompt the pipeline's loop wrote** — `sdk_v1` is v8 distilled; the campaigns produced the knowledge, the session was a better vessel.
 
 ## Cycle log
 
-Newest first. Every row is paired on the same 349 gate questions.
+Newest first; every row is paired on the same 349 gate questions.
 
 | Date | Subject | Deliverable | Accuracy | Verdict |
 |---|---|---|---|---|
@@ -141,34 +120,25 @@ Newest first. Every row is paired on the same 349 gate questions.
 | 2026-09-05 (s01-e02) | sdk_v2 · s2 | the SDK teacher's rewrite for the calculator / wrong-format class · `prompts/sdk_v2.py` | 90.5% → 87.7% · 6 fixed / 16 broken · p 0.917 · CI [−7.3, +0.9] | **rejected** |
 | 2026-09-05 (s01) | sdk_v1 · s1 | v8's four prompts distilled into one · `prompts/sdk_v1.py` | 81.7% → 90.5% · 38 fixed / 7 broken · p 0.0003 · CI [+4.2, +13.7] | **promoted** · `sdk_champion` |
 
-The rejected rewrite is instructive. It targeted the calculator class and the calculator's flips
-were 2 fixed / 4 broken, but preprocess flips were 2 fixed / 9 broken: an edit to one section of a
-single prompt moved a different behaviour. The pipeline's one-agent-per-experiment rule exists
-precisely so that cannot happen, and the single prompt gives it up.
+The rejected rewrite:
 
-What is still open:
+- **Targeted the calculator class** — calculator flips 2 fixed / 4 broken; preprocess flips 2 fixed / 9 broken.
+- **One section moved a different behaviour** — the pipeline's one-agent-per-experiment rule prevents exactly this; the single prompt gives it up.
 
-- **The loop is starving at 90%.** A 100-report train draw yields about 34 first-wrong cases,
-  eight per stage; the top failure class in s01-e02 was 12 of 33 pooled cases, the next two 5
-  and 4. The pool holds 3,098 drawable reports, so a 150-report draw (about 51 cases) would
-  restore parity with what the pipeline's loop had. That is a budget choice, not yet made.
-- **The architecture half of the confound.** Unmeasured, for the reason above.
-- **Cost.** A gate pass on the session is about fourteen times the pipeline's, and 787 seconds
-  against 344. The demo does not serve it, and nothing yet says when it should.
+Still open:
+
+- **The loop is starving at 90%** — a 100-report train draw yields about 34 first-wrong cases, eight per stage; s01-e02's top failure class was 12 of 33 pooled cases, the next two 5 and 4.
+- **A bigger draw is an unmade budget choice** — the pool holds 3,098 drawable reports; a 150-report draw (about 51 cases) restores parity with the pipeline's loop.
+- **The architecture half of the confound** — unmeasured, for the reason above.
+- **Cost** — a session gate pass is about fourteen times the pipeline's, 787 seconds against 344; the demo does not serve it, and nothing says when it should.
 
 ## What changed since
 
 Newest first.
 
-- **2026-09-06 · the runtime experiment ships** — `backends/agent_sdk.py`, `evalloop/sdk.py`,
-  `evalloop/sdk_teacher.py`, `evalloop/sdk_gate.py`, 74 tests across four files, the
-  `Runtimes` admin page and `GET /eval/campaigns`, and `docs/optimization/agent-sdk.html`
-  rebuilt from `story.json` by `convfinqa-evalloop story`. PR #9, `5af229e`.
-- **2026-09-06 · model swap recorded as a scoring pass** — `run --sdk-model <id>` never
-  optimises or promotes; `story.sdk_model_comparison` pairs it against the reference model.
-- **2026-09-05 · `sdk_champion` alias** — the SDK arm promotes to its own alias and serving
-  reads only `champion`; the smoke test still asserts the served bundle is `v8`.
-- **2026-09-05 · one taxonomy for both arms** — the SDK diagnosis prompt slices its failure
-  classes from `teacher.TEACHER_PROMPT` at import time rather than carrying a copy.
+- **2026-09-06 · the runtime experiment ships** — `backends/agent_sdk.py`, `evalloop/sdk.py`, `evalloop/sdk_teacher.py`, `evalloop/sdk_gate.py`, 74 tests across four files, the `Runtimes` admin page, `GET /eval/campaigns`, and `docs/optimization/agent-sdk.html` rebuilt from `story.json` by `convfinqa-evalloop story`. PR #9, `5af229e`.
+- **2026-09-06 · model swap is a scoring pass** — `run --sdk-model <id>` never optimises or promotes; `story.sdk_model_comparison` pairs it against the reference model.
+- **2026-09-05 · `sdk_champion` alias** — the SDK arm promotes to its own alias; serving reads only `champion`; the smoke test still asserts the served bundle is `v8`.
+- **2026-09-05 · one taxonomy for both arms** — the SDK diagnosis prompt slices its failure classes from `teacher.TEACHER_PROMPT` at import time, no copy.
 
 [Back to the loop that wrote the prompt →](/projects/convfinqa-agent/eval-loop/)
