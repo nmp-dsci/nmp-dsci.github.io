@@ -468,6 +468,7 @@ a.chip:hover{text-decoration:none;filter:brightness(.97)}
   transition:color var(--dur) var(--ease),border-color var(--dur) var(--ease)}
 .toc a:hover{color:var(--ink);text-decoration:none;border-left-color:var(--line-3)}
 .toc a[aria-current="true"]{color:var(--ink);font-weight:600;border-left-color:var(--accent)}
+.toc a.sub{font-size:var(--t-2);padding-left:var(--s5);color:var(--faint)}
 .toc .prog{height:3px;background:var(--line);border-radius:2px;margin-top:var(--s4);
   overflow:hidden}
 .toc .prog i{display:block;height:100%;width:0;background:var(--accent)}
@@ -646,10 +647,46 @@ a.chip:hover{text-decoration:none;filter:brightness(.97)}
   line-height:1.5;margin-top:var(--s3)}
 .fig figcaption b{color:var(--ink);font-weight:600}
 
+/* chart marks inside a .dia: bars, confidence intervals, axes. Text wears text
+   tokens; identity is carried by lightness (mid grey vs ink) plus a label, and
+   the accent appears only on a promoted mark — the "shipped" sense of rule 3. */
+.dia .bar{fill:var(--line-3)}
+.dia .bar.hi{fill:currentColor}
+.dia .bar.pro{fill:var(--accent-soft);stroke:var(--accent);stroke-width:1.2;vector-effect:non-scaling-stroke}
+.dia .ax{stroke:var(--line-3);stroke-width:1;vector-effect:non-scaling-stroke}
+.dia .gl{stroke:var(--line-2);stroke-width:1;vector-effect:non-scaling-stroke}
+.dia .ci{stroke:currentColor;stroke-width:1.5;vector-effect:non-scaling-stroke;stroke-linecap:round}
+.dia .ci.pro{stroke:var(--accent)}
+.dia .pt{fill:currentColor}
+.dia .pt.pro{fill:var(--accent-soft);stroke:var(--accent);stroke-width:1.2;vector-effect:non-scaling-stroke}
+.dia .tx.k{fill:var(--ink);font-weight:500}
+
+/* ------------------------------------------------------------- 14b · slides */
+/* A slide is the presentation unit of a case study: a numbered heading with a
+   divider, a compact figure, then one-line bullets and a "go deep" line. The
+   figure is drawn on a 240-unit viewBox and capped in width so its type lands
+   near the reading size. */
+.slide{margin:var(--s7) 0 var(--s6);padding-top:var(--s5);border-top:1px solid var(--line)}
+.slide > h3{font-family:var(--sans);font-size:var(--t2);color:var(--ink);margin:0 0 var(--s4);
+  line-height:var(--lh-snug);display:flex;gap:var(--s3);align-items:baseline}
+.slide > h3 .n{font-family:var(--mono);font-size:var(--t-1);font-weight:500;color:var(--faint);
+  letter-spacing:var(--track-label);flex:none}
+.slide .dia-frame{padding:var(--s4);margin:0 0 var(--s4);max-width:440px}
+.slide .dia{--dia-k:.7}
+.slide ul{font-family:var(--sans);font-size:var(--t0);line-height:1.5;color:var(--ink-2);
+  margin:0 0 var(--s3);padding-left:var(--s5)}
+.slide li{margin-bottom:var(--s2)}
+.slide li b{color:var(--ink)}
+.slide .go{font-family:var(--mono);font-size:var(--t-2);margin:0}
+.slide .go a{text-decoration:none}
+.slide .go a:hover{text-decoration:underline}
+
 @media (max-width:560px){
   /* full-bleed to the gutter so the diagram gets every available pixel */
   .dia-frame{margin-inline:calc(var(--gutter) * -1);border-radius:0;padding:var(--s4) var(--s3)}
   .dia,.fig .dia,.sys-fig .dia{--dia-k:1}
+  .slide .dia-frame{max-width:none}
+  .slide .dia{--dia-k:1}
 }
 
 /* screenshots and other raster evidence */
