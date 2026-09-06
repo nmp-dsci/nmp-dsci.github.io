@@ -25,7 +25,7 @@ deep: [eval-loop, sdk-vs-llm]
 sections:
   - n: 1
     summary: >-
-      Four named causes take the number from 73% to 90.5%, and the two caveats are on the same slide.
+      Four named causes take the number from 73% to 90.5%; the caveats sit on the same slide.
   - n: 2
     summary: >-
       A bundle is a composition of four prompt lineages, which is what makes a one-agent change attributable.
@@ -48,7 +48,7 @@ sections:
     summary: >-
       Six of the nine dimensions shipped; the three that did not are named with their reasons
       rather than quietly rounded up.
-stack: [pydantic-ai ×4 agents, claude-agent-sdk (Opus 5 teacher · Sonnet 5 session), MLflow 3 (runs · traces · prompts), DeepSeek v4 flash / pro, FastAPI + Typer, React 18 + Vite, Terraform + App Runner]
+stack: [pydantic-ai, claude-agent-sdk, MLflow 3, DeepSeek v4, Claude Opus 5 · Sonnet 5, FastAPI, Typer, React 18, Vite, Terraform, AWS App Runner]
 
 # ---- skills -----------------------------------------------------------------
 skills: [prompt-versioning, model-evaluation, agentic-ai, mlops, prompt-engineering, llms, python]
@@ -107,10 +107,7 @@ production:
   region: ap-southeast-1
   cost: "~$5–15/mo · $0 inference"
   rung: 10
-  rung_note: >-
-    Rung 10 only. The seam is named in the code: sessions and the rate limiter are process
-    memory and the backend needs `--workers 1` (src/convfinqa/serving/limits.py, Dockerfile CMD).
-    No load test has been run.
+  rung_note: "`--workers 1` · process-memory sessions · no load test"
   score: "6 / 9"
 
   rubric:
@@ -188,19 +185,20 @@ production:
 
 ## 1 · Purpose & benefit
 
-ConvFinQA asks multi-step numerical questions about a filing, across a conversation where
-"that" and "this change" point back at earlier turns. The benefit is a loop whose every gain
-has a named cause, a registry row and a p-value.
+ConvFinQA: multi-step numerical questions about a filing, where "that" and "this change" point
+back at earlier turns. The benefit is a loop whose every gain has a cause, a registry row and a
+p-value.
 
-<div class="slide" id="slide-progression">
+<div class="slide" id="slide-1a">
+  <h3><span class="n">1a</span>From 73% to 90.5%, in four named causes</h3>
   <div class="dia-frame">{% include diagrams/chart/convfinqa-progression.svg %}</div>
-  <div class="tx">
-    <p class="n">§1 · slide 1</p>
-    <h3>From 73% to 90.5%, in four named causes</h3>
-    <p>v2: a GEPA run. v8: the loop blamed the retriever, changed one prompt, and a significance gate promoted it on 349 unseen questions. sdk_v1: those four prompts distilled into one Claude session.</p>
-    <p><b>The caveats sit here too.</b> The SDK step changed model and architecture together, and the split is drawn from the paper's public train pool. This is a win at equal optimisation effort, not human-level reasoning.</p>
-    <p class="go">↳ <a href="/projects/convfinqa-agent/eval-loop/">how v8 was promoted</a> · <a href="/projects/convfinqa-agent/sdk-vs-llm/">how the runtime was tested</a></p>
-  </div>
+  <ul>
+    <li><b>v2 →</b> a GEPA run over DSPy.</li>
+    <li><b>v8 →</b> the loop blamed the retriever, changed one prompt, cleared a significance gate on 349 unseen questions.</li>
+    <li><b>sdk_v1 →</b> those four prompts distilled into one Claude session.</li>
+    <li><b>Why not "human-level"?</b> Model and architecture moved together, and the split is drawn from the paper's public train pool.</li>
+  </ul>
+  <p class="go">↳ <a href="/projects/convfinqa-agent/eval-loop/">how v8 was promoted</a> · <a href="/projects/convfinqa-agent/sdk-vs-llm/">how the runtime was tested</a></p>
 </div>
 
 The live URL is a read-only operator console over the committed evidence:
@@ -213,8 +211,7 @@ The live URL is a read-only operator console over the committed evidence:
 | **Runtimes** | the pipeline and the SDK session side by side on the gate split |
 | **Traces · Research · System** | every turn stage by stage, the earlier challengers, the debrief |
 
-Every write answers 403 with a reason (`owner_token_unset`). `DEMO_MODE` is baked into the
-image, so no infrastructure change can turn the public URL into a bill.
+Every write answers 403 (`owner_token_unset`); `DEMO_MODE` is baked into the image.
 
 [Open the live demo ↗](https://vrpy25pewm.ap-southeast-1.awsapprunner.com) ·
 [Repository ↗](https://github.com/nmp-dsci/ConvFinQA-agent)
@@ -223,8 +220,6 @@ image, so no infrastructure change can turn the public URL into a bill.
 
 {% include fig-agent.html %}
 
-Four pydantic-ai agents in sequence, each with a typed output rather than parsed prose:
-
 | Agent | Job | Output |
 |---|---|---|
 | **triage** | classify the turn (`number` or `program`) and the conversation (Type I or II) | typed labels |
@@ -232,24 +227,23 @@ Four pydantic-ai agents in sequence, each with a typed output rather than parsed
 | **retriever** | pull the raw values out of the report; answer number turns directly | values, or the answer |
 | **calculator** | execute the program through six tools (`add`, `subtract`, `multiply`, `divide`, `exp`, `greater`) | the number |
 
-Arithmetic never happens in free text. Each agent has its own prompt lineage keyed by content
-hash, and a version is a lockfile of four: `v8` is `t2.p2.r5.c2`, v2 with only the retriever
-changed. `/healthz` names the bundle it serves — `v8`, code `5af229e`.
+Each agent has its own prompt lineage keyed by content hash; a version is a lockfile of four,
+`v8` = `t2.p2.r5.c2`. `/healthz` names the served bundle: `v8`, code `5af229e`.
 
-<div class="slide" id="slide-runtimes">
+<div class="slide" id="slide-2a">
+  <h3><span class="n">2a</span>Four agents, or one session with the same six tools</h3>
   <div class="dia-frame">{% include diagrams/runtime/convfinqa-agent.svg %}</div>
-  <div class="tx">
-    <p class="n">§2 · slide 2</p>
-    <h3>Four agents, or one session with the same six tools</h3>
-    <p>The second runtime answers a whole conversation in one Claude Agent SDK session, with the six calculator functions as its only tools. It writes the same per-turn capture as the pipeline, so the two can be gated on the same questions.</p>
-    <p>Its prompt was distilled from v8's four by the teacher: keep the rules, drop the hand-off plumbing.</p>
-    <p class="go">↳ <a href="/projects/convfinqa-agent/sdk-vs-llm/">the runtime test in full</a></p>
-  </div>
+  <ul>
+    <li><b>What changed?</b> One Claude Agent SDK session answers the whole conversation, with the six calculator functions as its only tools.</li>
+    <li><b>Why is it comparable?</b> It writes the same per-turn capture as the pipeline, so both are gated on the same questions.</li>
+    <li><b>Where did its prompt come from?</b> Distilled from v8's four by the teacher: keep the rules, drop the hand-off plumbing.</li>
+  </ul>
+  <p class="go">↳ <a href="/projects/convfinqa-agent/sdk-vs-llm/">the runtime test in full</a></p>
 </div>
 
 Every model is built in one module, `llm.py`:
 
-- `deepseek-v4-flash` — the four production agents, every turn;
+- `deepseek-v4-flash` — the four production agents;
 - `claude-opus-5` via the Agent SDK — the teacher and prompt-writer;
 - `claude-sonnet-5` — the single session.
 
@@ -260,41 +254,41 @@ Every model is built in one module, `llm.py`:
 One experiment, one command:
 
 1. run the baseline on the train split;
-2. the teacher files each report's first wrong turn under a frozen taxonomy and blames one agent;
+2. the teacher files each first-wrong turn under a frozen taxonomy and blames one agent;
 3. rewrite that agent's prompt, and only that one;
-4. run both versions on the fixed gate split;
+4. run both versions on the fixed test split;
 5. gate — net positive **and** one-sided cluster-corrected McNemar p < 0.05.
 
-A campaign is up to five experiments against one gate split; a target agent rotates off after
-two rejections. Scoring is deterministic (`numeric_match`, `program_match`) and a gold-derived
-per-agent panel says which agent moved.
+A campaign is up to five experiments against one test split; a target rotates off after two
+rejections.
 
-<div class="slide" id="slide-gates">
+<div class="slide" id="slide-3a">
+  <h3><span class="n">3a</span>Nine verdicts, two promotions, same 349 questions</h3>
   <div class="dia-frame">{% include diagrams/chart/convfinqa-gates.svg %}</div>
-  <div class="tx">
-    <p class="n">§3 · slide 3</p>
-    <h3>Nine verdicts, two promotions, same 349 questions</h3>
-    <p>Seven challengers moved the number and were refused. v8 and sdk_v1 cleared the bar.</p>
-    <p>Under this rule v3_1, v4 and v5 were rolled back the same day. v5's p was 0.207 with a CI of [−3.2, +7.6]: the evidence was never wrong, it was never sufficient.</p>
-    <p class="go">↳ <a href="/projects/convfinqa-agent/eval-loop/">setup, every command, the cycle log</a></p>
-  </div>
+  <ul>
+    <li><b>Seven refused</b> — each moved the number, none significantly.</li>
+    <li><b>Two promoted</b> — v8 (+4.6 pp, p 0.040) and sdk_v1 (+8.9 pp, p 0.0003).</li>
+    <li><b>Three rolled back</b> — v3_1, v4, v5 re-judged under the rule; v5's CI [−3.2, +7.6] contains zero.</li>
+  </ul>
+  <p class="go">↳ <a href="/projects/convfinqa-agent/eval-loop/">setup, every command, the cycle log</a></p>
 </div>
 
-<div class="slide" id="slide-turn-types">
+<div class="slide" id="slide-3b">
+  <h3><span class="n">3b</span>The whole SDK gain is on the reasoning turns</h3>
   <div class="dia-frame">{% include diagrams/chart/convfinqa-turn-types.svg %}</div>
-  <div class="tx">
-    <p class="n">§3 · slide 4</p>
-    <h3>The whole SDK gain is on the reasoning turns</h3>
-    <p>Number turns are a lookup; both runtimes get 95.5%. Program turns went 75.2% → 88.2%, 35 fixed against 4 broken.</p>
-    <p>Same prompt on Haiku 4.5: 87.4%, −3.2 pp, not significant, $10 cheaper a pass. The pipeline was never run on a Claude model, so the architecture half of the confound stays open.</p>
-    <p class="go">↳ <a href="/projects/convfinqa-agent/sdk-vs-llm/">both arms, the model swap, every SDK experiment</a></p>
-  </div>
+  <ul>
+    <li><b>Number turns</b> — a lookup; both runtimes 95.5%.</li>
+    <li><b>Program turns</b> — 75.2% → 88.2%, 35 fixed against 4 broken.</li>
+    <li><b>Same prompt on Haiku 4.5</b> — 87.4%, −3.2 pp, not significant, $10 cheaper a pass.</li>
+    <li><b>Still open</b> — the pipeline was never run on a Claude model.</li>
+  </ul>
+  <p class="go">↳ <a href="/projects/convfinqa-agent/sdk-vs-llm/">both arms, the model swap, every SDK experiment</a></p>
 </div>
 
 | Subject | Deliverable | Accuracy | Verdict |
 |---|---|---|---|
 | `v1` · t1.p1.r1.c1 | the starting prompt set | 770 q: 73.0% | champion, until v2 |
-| `v2` · t2.p2.r2.c2 | a GEPA run over DSPy | 770 q: 77.1% · gate 349 q: 77.1% | champion again after the rollback |
+| `v2` · t2.p2.r2.c2 | a GEPA run over DSPy | 770 q: 77.1% · test 349 q: 77.1% | champion again after the rollback |
 | `v3_1` · `v4` · `v5` | s7 harness; teacher, one agent each | v5: 187 q: 79.7%, clustered p 0.207 | **rolled back** 2026-09-03 |
 | `v6` · `v7` | c01 preprocess rewrites | 349 q: 79.4% · 79.7% · p 0.19 · 0.13 | rejected |
 | `v8` · t2.p2.r5.c2 | c01-e03, retriever rewrite | 349 q: 77.1% → 81.7% · 34 / 18 · p 0.040 | **promoted** · champion |
@@ -302,8 +296,7 @@ per-agent panel says which agent moved.
 | `sdk_v1` · s1 | v8 distilled into one session | 349 q: 81.7% → 90.5% · 38 / 7 · p 0.0003 | **promoted** · `sdk_champion` |
 | `sdk_v2` · s2 | the SDK teacher's rewrite | 349 q: 90.5% → 87.7% · 6 / 16 · p 0.917 | rejected |
 
-Refusals keep their bundles, runs and verdicts on the ledger. A loop that deletes its failures
-is marketing.
+Refusals keep their bundles, runs and verdicts on the ledger.
 
 [Go deep: the eval loop →](/projects/convfinqa-agent/eval-loop/)
 · [the runtime test →](/projects/convfinqa-agent/sdk-vs-llm/)
@@ -313,18 +306,14 @@ is marketing.
 
 {% include fig-topology.html %}
 
-One ECR repository, one App Runner service, one CloudWatch alarm. No VPC, no database, no key
-in the container. The dataset, splits, prediction CSVs, ledgers, registry and demo pack are baked
-in at build time.
-
-- **Region** ap-southeast-1, not Sydney: the account's Sydney App Runner quota was full. About
-  100 ms for an Australian visitor.
-- **Sizing** measured: 225 MiB at rest, 315 MiB with every CSV cached; 512 MB OOMs, so 1 GB.
-- **Deploy** merge → CI → OIDC role → push image → App Runner takes `:latest` → Terraform
-  reconciles → `demo_smoke.sh` asserts `mode=demo`, served bundle == champion (`v8`), the
-  committed evidence, a 403 on a promote.
-- **Rollback** retag a previous `:sha`.
-- **Rung 10** only: sessions and rate limits are process memory, `--workers 1`, no load test.
+- **Stack** — one ECR repository, one App Runner service, one CloudWatch alarm; no VPC, no database, no key.
+- **Evidence** — dataset, splits, prediction CSVs, ledgers, registry and demo pack baked in at build.
+- **Region** — ap-southeast-1; Sydney's App Runner quota was full.
+- **Sizing** — 225 MiB at rest, 315 MiB with every CSV cached; 512 MB OOMs, so 1 GB.
+- **Deploy** — merge → CI → OIDC → push image → App Runner takes `:latest` → Terraform reconciles.
+- **Smoke** — `mode=demo`, served bundle == champion (`v8`), the evidence present, 403 on a promote.
+- **Rollback** — retag a previous `:sha`.
+- **Rung 10** — process-memory sessions, `--workers 1`, no load test.
 
 [See the scale ladder →](/practices/production-scale/)
 
@@ -332,46 +321,34 @@ in at build time.
 
 A single-tenant read-only demo has no user data to isolate, so these are abuse controls:
 
-- **One choke point.** Every model — agents, teacher, SDK session — is built in `llm.py`,
-  where the demo gate fires before a provider exists. A test asserts every module imports with
-  no API key.
-- **The teacher inherits nothing.** Its SDK session opens with `setting_sources=[]`; the repo's
-  `CLAUDE.md` and skills never reach its prompt.
-- **Shed load first.** A global in-flight cap of 4 turns rejects instantly; a per-IP window of
-  30 requests / 60 s sits behind it. `X-Forwarded-For` is trusted only behind a declared proxy.
-- **Admin writes** need the owner token *and* a non-demo build: 403 before the handler runs.
-- **Replay declines** below its match threshold rather than serve another filing's number.
-- **Absent**, rated `partial`: per-user auth, row-level policy, a red-team suite.
+- **One choke point** — every model is built in `llm.py`; the demo gate fires before a provider exists.
+- **The teacher inherits nothing** — its SDK session opens with `setting_sources=[]`.
+- **Shed load first** — in-flight cap of 4 turns; per-IP window of 30 / 60 s behind it.
+- **Admin writes** — owner token *and* non-demo build, 403 before the handler runs.
+- **Replay declines** — below its match threshold, rather than serve another filing's number.
+- **Absent**, rated `partial` — per-user auth, row-level policy, a red-team suite.
 
 ## 6 · Observability & cost
 
-Every pipeline LLM call is an MLflow span — run → report → question → agent stage →
-`Agent.run` — stamped with version, split and run name. SDK calls are a subprocess, so their
-spans are opened by hand.
+- **Spans** — every pipeline LLM call: run → report → question → agent stage → `Agent.run`.
+- **SDK calls** — a subprocess, so spans are opened by hand and prompts stored by reference.
+- **Rows** — every served turn at `/admin/traces`: per-stage IO, tool loop, tokens, latency, bundle id.
+- **Sources never blend** — `demo` is paced, `eval` ran at concurrency 8, only `serving` was felt by a person.
+- **No data, no zero** — an unmetered tile renders an em dash and a reason.
 
 <figure class="evidence">
   <img src="/assets/img/convfinqa/mlflow-challenger-trace.jpg" loading="lazy" alt="The MLflow trace view for a challenger eval run: a tree of spans from the run down through a report and a question to the four named agent stages and the Agent.run calls inside them, with tokens and latency per span.">
-  <figcaption><strong>A challenger's run is inspectable down to the individual model call.</strong> Run → report → question → agent stage → <code>Agent.run</code>, with tokens and the full chat on every leaf. Source: <code>src/convfinqa/tracking/tracing.py</code>, <code>docker-compose.yml</code>.</figcaption>
+  <figcaption><strong>A challenger's run is inspectable down to the individual model call.</strong> Source: <code>src/convfinqa/tracking/tracing.py</code>, <code>docker-compose.yml</code>.</figcaption>
 </figure>
 
-Every served turn is also a row at `/admin/traces`: per-stage IO, the tool loop, tokens,
-latency, bundle id, correctness where gold exists. `GET /metrics/production` splits by source
-and never blends them:
+Cost is per turn, prices declared in code so an old run cannot be silently repriced:
 
-- `demo` — a recording paced to four seconds did not take four seconds;
-- `eval` — ran at concurrency 8 on a warm cache;
-- `serving` — the only latency a person experienced.
-
-A tile with no data renders an em dash and a reason. Cost is per turn, with prices declared in
-code so an old run cannot be silently repriced:
-
-| Runtime | Model | Gate pass (349 q) | Wall | Throughput |
+| Runtime | Model | Test pass (349 q) | Wall | Throughput |
 |---|---|---|---|---|
 | pipeline v8 | deepseek-v4-flash, in process | ~$1–2 | 344 s | 61 q/min |
 | session sdk_v1 | claude-sonnet-5, CLI subprocess | $27.62 | 787 s | 27 q/min |
 | session sdk_v1 | claude-haiku-4-5, CLI subprocess | $17.14 | 882 s | 24 q/min |
 
-The public deployment performs no inference: roughly **$5–15/month** for one 0.5 vCPU / 1 GB
-instance and an ECR repository keeping five images.
+Public deployment: no inference, roughly **$5–15/month**.
 
 ## 7 · Production readiness scorecard

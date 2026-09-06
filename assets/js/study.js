@@ -55,12 +55,30 @@
     title.textContent = 'On this page';
     frag.appendChild(title);
 
-    headings.forEach(function (h) {
-      var a = document.createElement('a');
-      a.href = '#' + h.id;
-      a.textContent = (h.textContent || '').trim();
-      frag.appendChild(a);
-      links.push(a);
+    /* document order: an H2 is an entry, a .slide directly under it is a nested
+       entry, so the TOC reads like the deck */
+    Array.prototype.forEach.call(prose.children, function (el) {
+      var a;
+      if (el.tagName === 'H2') {
+        a = document.createElement('a');
+        a.href = '#' + el.id;
+        a.textContent = (el.textContent || '').trim();
+        frag.appendChild(a);
+        links.push(a);
+      } else if (el.classList && el.classList.contains('slide')) {
+        var h = el.querySelector('h3');
+        if (!h) return;
+        if (!el.id) el.id = 'slide-' + (h.textContent || '').toLowerCase().replace(/[^a-z0-9]+/g, '-');
+        a = document.createElement('a');
+        a.className = 'sub';
+        a.href = '#' + el.id;
+        var n = h.querySelector('.n');
+        var label = Array.prototype.map.call(h.childNodes, function (c) {
+          return c === n ? '' : (c.textContent || '');
+        }).join('').replace(/\s+/g, ' ').trim();
+        a.textContent = (n ? n.textContent.trim() + ' · ' : '') + label;
+        frag.appendChild(a);
+      }
     });
 
     /* the scorecard and the skills list are part of the page too */

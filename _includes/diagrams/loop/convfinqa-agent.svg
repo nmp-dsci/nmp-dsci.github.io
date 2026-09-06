@@ -10,7 +10,7 @@
   <g><title>01 · split manifest — evalloop/splits.py writes evaluation/splits/eval_loop_v2.json: train 100 reports (368 questions) and a fixed gate split of 100 reports (349 questions), seed 2026, stratified on Type II, drawn from the 2,777 train conversations minus the 260 that GEPA and s7 saw; the holdout is the untouched remainder of the pool, cut only for a confirmatory run; the committed id lists, not the seed, are the truth</title>
     <rect class="nd" x="6" y="8" width="80" height="34" rx="6"/>
     <text class="tx" x="46" y="22">manifest</text>
-    <text class="tx s" x="46" y="35">100 / 100</text></g>
+    <text class="tx s" x="46" y="35">train/test 100</text></g>
 
   <g><title>02 · run — evalloop/runner.py: one split × one version = one MLflow run; every turn of a report is answered with the agent's own earlier answers as history, so a wrong turn poisons the turns below it exactly as in production; four pydantic-ai agents on deepseek-v4-flash, or one Claude session with --runtime agent_sdk</title>
     <rect class="nd" x="96" y="8" width="80" height="34" rx="6"/>
