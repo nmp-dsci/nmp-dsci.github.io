@@ -8,7 +8,7 @@
  *   M1  nothing renders under 12.8px (DESIGN.md rule 2)
  *   M2  no horizontal document overflow, at any width
  *   M3  anything wider than its parent has an ancestor that scrolls
- *   M4  no SVG label escapes its viewBox
+ *   M4  no SVG label escapes its viewBox, and none overprints its neighbour
  *   M5  6-9 distinct font sizes per page
  *   M7  under prefers-reduced-motion, nothing animates
  *   M8  with animation frozen at its start state, nothing is invisible
@@ -76,6 +76,7 @@ const layoutProbe = ({ minFont, minTarget }) => {
   });
 
   const svgOver = [];
+  const svgClash = [];
   document.querySelectorAll('svg.dia').forEach((svg) => {
     const vb = (svg.getAttribute('viewBox') || '').split(/\s+/).map(Number);
     if (vb.length !== 4) return;
@@ -84,12 +85,33 @@ const layoutProbe = ({ minFont, minTarget }) => {
       if (b.x < vb[0] - 1 || b.x + b.width > vb[0] + vb[2] + 1 || b.y + b.height > vb[1] + vb[3] + 1)
         svgOver.push((t.textContent || '').slice(0, 20));
     });
+
+    /* Fitting the viewBox is not the same as being readable: two tick labels
+       can each sit inside the box and still print on top of each other once
+       --dia-k scales the type up at 390px. Compare every pair that shares a
+       baseline. */
+    const byRow = new Map();
+    svg.querySelectorAll('text').forEach((t) => {
+      let b; try { b = t.getBBox(); } catch { return; }
+      if (!b.width) return;
+      const row = Math.round(b.y + b.height / 2);
+      if (!byRow.has(row)) byRow.set(row, []);
+      byRow.get(row).push({ b, s: (t.textContent || '').trim() });
+    });
+    byRow.forEach((items) => {
+      items.sort((p, q) => p.b.x - q.b.x);
+      for (let i = 1; i < items.length; i += 1) {
+        const prev = items[i - 1], cur = items[i];
+        if (prev.b.x + prev.b.width > cur.b.x + 0.5)
+          svgClash.push(`${prev.s.slice(0, 14)} / ${cur.s.slice(0, 14)}`);
+      }
+    });
   });
 
   return {
     docOverflow: de.scrollWidth > de.clientWidth + 1, scrollW: de.scrollWidth, clientW: de.clientWidth,
     small: [...new Set(small)], unc: [...new Set(unc)], tap: [...new Set(tap)],
-    svgOver, sizes: Object.keys(sizes).length,
+    svgOver, svgClash, sizes: Object.keys(sizes).length,
   };
 };
 
@@ -106,11 +128,13 @@ for (const colorScheme of SCHEMES) {
       await p.waitForTimeout(120);
       const r = await p.evaluate(layoutProbe, { minFont: MIN_FONT, minTarget: MIN_TARGET });
       const bad = r.docOverflow || r.small.length || r.unc.length || r.svgOver.length
+        || r.svgClash.length
         || r.tap.length || r.sizes < 6 || r.sizes > 9;
       note(!bad, `${colorScheme.padEnd(5)} ${String(width).padStart(4)} ${path.padEnd(31)} `
         + `ovf=${r.docOverflow ? `${r.scrollW}>${r.clientW}` : '-'} small=${r.small.length} `
-        + `unc=${r.unc.length} svg=${r.svgOver.length} tap=${r.tap.length} sizes=${r.sizes}`);
-      for (const k of ['small', 'unc', 'tap', 'svgOver'])
+        + `unc=${r.unc.length} svg=${r.svgOver.length} clash=${r.svgClash.length} `
+        + `tap=${r.tap.length} sizes=${r.sizes}`);
+      for (const k of ['small', 'unc', 'tap', 'svgOver', 'svgClash'])
         r[k].slice(0, 4).forEach((v) => console.log(`         · ${k}: ${v}`));
     }
     await ctx.close();

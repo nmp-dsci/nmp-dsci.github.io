@@ -83,6 +83,9 @@ architecture:
   takeaway: >-
     Every turn crosses the same four typed boundaries, and each boundary loads its own prompt lineage, which is what makes a one-agent change attributable.
   diagram: "diagrams/agent/convfinqa-agent.svg"
+  # The home page shows the result rather than the shape: this system's whole
+  # argument is that every jump has a named cause and a p-value behind it.
+  home_diagram: "diagrams/chart/convfinqa-progression.svg"
   caption: "turn → triage → preprocess → retriever → calculator → answer; number turns short-circuit at the retriever; the four prompts compose into one bundle, t2.p2.r5.c2 for the champion"
   loop_diagram: "diagrams/loop/convfinqa-agent.svg"
   loop_takeaway: >-

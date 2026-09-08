@@ -848,6 +848,8 @@ def lint_project(path: Path, repo: Path | None, why: str, no_net: bool) -> Repor
                   "production.topology_diagram")
     if architecture.get("loop_diagram"):
         check_diagram(rep, architecture["loop_diagram"], "loop", "architecture.loop_diagram")
+    if architecture.get("home_diagram"):
+        check_diagram(rep, architecture["home_diagram"], "home", "architecture.home_diagram")
     check_deep_links(rep, fm, path)
     check_spine(rep, body)
     check_assertions(rep, body, SPINE)

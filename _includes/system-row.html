@@ -6,7 +6,13 @@
   button is the case study (the thing we want read); the demo is the quiet link.
 {%- endcomment -%}
 {%- assign p = include.project -%}
-{%- assign c_dgm  = p.architecture.diagram | default: "" | strip -%}
+{%- comment -%}
+  The figure is the agent-structure diagram by default. A system may override it
+  with architecture.home_diagram when its result is better shown than described
+  — the home page is the scan layer, and a chart with a number on it earns the
+  545px more than a box-and-arrow of the same four stages does.
+{%- endcomment -%}
+{%- assign c_dgm  = p.architecture.home_diagram | default: p.architecture.diagram | default: "" | strip -%}
 {%- assign c_out  = p.outcome              | default: p.summary | strip -%}
 {%- assign c_scr  = p.production.score     | default: "" | strip -%}
 {%- assign c_surf = p.production.surface   | default: "" | strip -%}
@@ -57,7 +63,7 @@
 
   {%- if c_dgm != "" %}
   <div class="sys-fig">
-    <div class="dia-frame">{% include {{ p.architecture.diagram }} %}</div>
+    <div class="dia-frame">{% include {{ c_dgm }} %}</div>
   </div>
   {%- endif %}
 </article>

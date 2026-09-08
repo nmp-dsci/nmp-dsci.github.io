@@ -119,6 +119,11 @@ Charts live in `_includes/diagrams/chart/` and follow the `.dia` contract in
 `.tx.k`, `.nd`, `.nd.hi`, `.bar`, `.ci`, `.pt`, `.ax`, `.gl`), a `<title>` in
 every `<g>`, and an `aria-label` that describes the whole figure.
 
+A system may override the figure the home page shows for it with
+`architecture.home_diagram` — the home row is the scan layer, so a chart with a
+number on it usually earns those 545 pixels more than a box-and-arrow of the
+same stages does. The case study's §2 still renders `architecture.diagram`.
+
 **Never draw a number that is not in a repo.** A chart with no committed source
 is worse than no chart, because it looks like evidence.
 
