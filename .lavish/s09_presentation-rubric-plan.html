@@ -285,7 +285,7 @@ pre.md{font-family:var(--mono);font-size:var(--t-2);line-height:1.6;background:v
       <p class="small">Also new: <code>judge_champion judge_j1</code> in the registry — a third lineage alongside <code>agent_prompts</code> and <code>sdk_prompts</code>.</p></div>
   </div>
 
-  <h3 style="margin:var(--s7) 0 var(--s4)">The four slides that would carry the page, mocked at the real numbers</h3>
+  <h3 style="margin:var(--s7) 0 var(--s4)">The four slides that carry the page, at the real numbers</h3>
 
   <div class="slide"><div class="fr"><svg class="dia" viewBox="0 0 240 150" role="img"
      aria-label="Accuracy by version: v1 73.0 percent on 770 questions, v2 77.1 on 770, v8 81.7 on the 349-question gate split, sdk_v1 90.5 on the same 349; a dashed line marks the 89.4 percent human-expert figure from the ConvFinQA paper, on a different split.">
@@ -331,7 +331,7 @@ pre.md{font-family:var(--mono);font-size:var(--t-2);line-height:1.6;background:v
 </div><div class="tx">
     <p class="n">1a</p><h3>From 73% to 90.5%, in four named causes</h3>
     <p><b>The insight line:</b> every jump has a mechanism — a GEPA run, a gated prompt rewrite, a runtime change — and none of them is "we tried a better model".</p>
-    <p class="go">↳ /eval-loop/ · /sdk-vs-llm/</p></div></div>
+    <p class="go">↳ shipped as slide 1a</p></div></div>
 
   <div class="slide"><div class="fr"><svg class="dia" viewBox="0 0 240 142" role="img"
      aria-label="Accuracy by turn type for the two runtimes on the same 349 questions: number turns 95.5 percent for both the v8 pipeline and the sdk_v1 session; program turns 75.2 percent for the pipeline against 88.2 for the session.">
@@ -369,61 +369,74 @@ pre.md{font-family:var(--mono);font-size:var(--t-2);line-height:1.6;background:v
 </div><div class="tx">
     <p class="n">2</p><h3>The SDK win is entirely on program turns</h3>
     <p><b>The insight line:</b> lookups were already at 95.5% and did not move; the +13.0 pp came from multi-step arithmetic, which is where a session beats a hand-off.</p>
-    <p class="go">↳ /sdk-vs-llm/</p></div></div>
+    <p class="go">↳ shipped as slide 3b, and on /sdk-vs-llm/</p></div></div>
 
-  <div class="slide"><div class="fr"><svg class="dia" viewBox="0 0 240 132" role="img" aria-label="The confidence judge on the sealed 349-question gate split: releasing every answer scores 90.54 percent; releasing only the judge's high band scores 91.46 percent with a 95 percent interval from 87.9 to 95.2 that contains the release-everything line, so the gain is not distinguishable from zero.">
-  <title>The high band's interval contains the line it is meant to beat</title>
-  <!-- x = 20 + (acc - 86) * 210/10 -->
-  <g><title>accuracy axis, 86 to 96 percent</title>
-    <line class="ax" x1="20" y1="92" x2="230" y2="92"/>
-    <text class="lb" x="20" y="104" style="text-anchor:middle">86</text>
-    <text class="lb" x="125" y="104" style="text-anchor:middle">91</text>
-    <text class="lb" x="230" y="104" style="text-anchor:middle">96%</text></g>
-  <g><title>release everything: 90.54% — 316 of 349 correct, the sdk_v1 champion's own score</title>
-    <line class="ed dash" style="marker-end:none" x1="115.3" y1="12" x2="115.3" y2="92"/>
-    <text class="lb" x="112" y="10" style="text-anchor:end">release all 90.5</text></g>
-  <g><title>high band only: 91.46% on 316 released answers, 95% CI [87.87, 95.22] — the interval spans the release-everything line, so the judge's gain is not significant</title>
-    <line class="ci" x1="59.3" y1="42" x2="213.7" y2="42"/>
-    <line class="ci" x1="59.3" y1="37" x2="59.3" y2="47"/><line class="ci" x1="213.7" y1="37" x2="213.7" y2="47"/>
-    <circle class="pt" cx="134.7" cy="42" r="3.4"/>
-    <text class="tx" x="59.3" y="31" style="text-anchor:start">high band 91.5 · CI 87.9–95.2</text></g>
-  <g><title>what the band costs: 6 of 33 wrong answers caught, 27 correct answers withheld; AUROC 0.52 on the sealed split is chance</title>
-    <text class="tx" x="20" y="70" style="text-anchor:start">caught 6 of 33 wrong · withheld 27 right</text>
-    <text class="lb" x="20" y="83" style="text-anchor:start">AUROC 0.52 · ECE 0.11 · coverage at 1% target: 0</text></g>
-  <g><title>verdict: not adopted as a gate; ships as an advisory caution</title>
-    <rect class="nd" x="20" y="112" width="210" height="18" rx="4"/>
-    <text class="tt" x="125" y="124" style="text-anchor:middle">not a gate · ships as advisory</text></g>
+  <div class="slide"><div class="fr"><svg class="dia" viewBox="0 0 240 132" role="img"
+     aria-label="The confidence judge on the sealed 349-question gate split: releasing every answer scores 90.5 percent; releasing only the judge's high band scores 91.5 percent with a 95 percent interval from 87.9 to 95.2 that contains the release-everything line, so the gain cannot be told apart from zero.">
+  <title>The high band's interval contains the line it has to beat</title>
+  <!-- x = 24 + (acc - 86) * 20.4 -->
+  <g><title>accuracy axis, 86 to 96 percent, on the 349 sealed gate questions</title>
+    <line class="ax" x1="24" y1="82" x2="228" y2="82"/>
+    <text class="tx s" x="24" y="94" style="text-anchor:middle">86</text>
+    <text class="tx s" x="126" y="94" style="text-anchor:middle">91</text>
+    <text class="tx s" x="228" y="94" style="text-anchor:middle">96%</text></g>
+  <g><title>release everything: 90.5% — 316 of 349 correct, the sdk_v1 champion's own score with no judge at all</title>
+    <line class="ed dash" style="marker-end:none" x1="116.2" y1="14" x2="116.2" y2="82"/>
+    <text class="tx s" x="112" y="12" style="text-anchor:end">all · 90.5</text></g>
+  <g><title>high band only: 91.5% over the 316 answers the judge released, with a 95 percent interval of 87.9 to 95.2 — it spans the release-everything line, so the gain is not significant</title>
+    <line class="ci" x1="62.8" y1="42" x2="212.1" y2="42"/>
+    <line class="ci" x1="62.8" y1="37" x2="62.8" y2="47"/>
+    <line class="ci" x1="212.1" y1="37" x2="212.1" y2="47"/>
+    <circle class="pt" cx="136.6" cy="42" r="3.4"/>
+    <text class="tx k" x="62.8" y="32" style="text-anchor:start">high band · 91.5</text>
+    <text class="tx s" x="62.8" y="58" style="text-anchor:start">95% CI 87.9 – 95.2</text></g>
+  <g><title>the price of the band: 6 of 33 wrong answers caught, and 27 correct answers withheld to do it</title>
+    <text class="tx" x="24" y="74" style="text-anchor:start">6 caught · 27 withheld</text></g>
+  <g><title>the verdict: not adopted as a gate, because AUROC on the sealed split is 0.52 and coverage at the 1 percent error target is zero; the band ships as an advisory caution</title>
+    <rect class="nd" x="24" y="104" width="204" height="22" rx="4"/>
+    <text class="tx k" x="126" y="114" style="text-anchor:middle">not a gate · advisory</text>
+    <text class="tx s" x="126" y="123" style="text-anchor:middle">AUROC 0.52 · coverage at 1%: 0</text></g>
 </svg>
 </div><div class="tx">
     <p class="n">3 · <span style="color:var(--amber)">new</span></p><h3>The judge withholds 27 right answers to catch 6 wrong ones</h3>
     <p><b>The insight line:</b> the high band's 95% interval contains the score for releasing everything, AUROC is 0.52 on the sealed split, and coverage at the 1% error target is zero — so it ships as advisory, not as a gate.</p>
     <p class="small">This is the strongest hiring signal on the page. It is a measured negative that was published rather than dropped, and the second judge version was rejected by the same rule (<code>judge_j2</code>: "high band error 11.82% exceeds the 1% target").</p>
-    <p class="go">↳ new deep page, or a slide on /sdk-vs-llm/ — see decision 2</p></div></div>
+    <p class="go">↳ shipped as slide 3c plus a full section on /sdk-vs-llm/</p></div></div>
 
-  <div class="slide"><div class="fr"><svg class="dia" viewBox="0 0 240 118" role="img" aria-label="The product's own production readiness rubric, scored inside the product: six of nine dimensions shipped — evals, regression gate, learning loop, observability, cost, deploy; two partial — LLM-as-judge and guardrails; one designed only — the scale path.">
-  <title>6 of 9 shipped, scored by the product on itself</title>
-  <g><title>the learning half, R1 to R4: how a version gets better without getting worse</title>
-    <text class="lb" x="8" y="14" style="text-anchor:start">R1–R4 · the learning half</text></g>
-  <g><title>R1 evals and golden set · shipped · committed manifest, train 100 / gate 100 reports</title><rect class="hi" x="8" y="20" width="52" height="20" rx="4"/><text class="tx" x="34" y="33" style="text-anchor:middle">evals ●</text></g>
-  <g><title>R2 LLM-as-judge · partial · a Haiku 4.5 confidence band, scored once, not adopted as a gate</title><rect class="nd" x="66" y="20" width="52" height="20" rx="4"/><text class="tx" x="92" y="33" style="text-anchor:middle">judge ◐</text></g>
-  <g><title>R3 regression gate · shipped · net positive AND one-sided cluster-corrected McNemar p below 0.05</title><rect class="hi" x="124" y="20" width="52" height="20" rx="4"/><text class="tx" x="150" y="33" style="text-anchor:middle">gate ●</text></g>
-  <g><title>R4 learning loop · shipped · campaigns of at most five experiments, one agent rewritten per experiment</title><rect class="hi" x="182" y="20" width="52" height="20" rx="4"/><text class="tx" x="208" y="33" style="text-anchor:middle">loop ●</text></g>
-  <g><title>the operating half, R5 to R9: what happens once it is live, and who finds out first</title>
-    <text class="lb" x="8" y="59" style="text-anchor:start">R5–R9 · the operating half</text></g>
-  <g><title>R5 guardrails and security · partial</title><rect class="nd" x="8" y="65" width="42" height="20" rx="4"/><text class="tx" x="29" y="78" style="text-anchor:middle">guard ◐</text></g>
-  <g><title>R6 observability and tracing · shipped</title><rect class="hi" x="56" y="65" width="42" height="20" rx="4"/><text class="tx" x="77" y="78" style="text-anchor:middle">trace ●</text></g>
-  <g><title>R7 cost tracking and control · shipped</title><rect class="hi" x="104" y="65" width="42" height="20" rx="4"/><text class="tx" x="125" y="78" style="text-anchor:middle">cost ●</text></g>
-  <g><title>R8 deploy and release · shipped</title><rect class="hi" x="152" y="65" width="42" height="20" rx="4"/><text class="tx" x="173" y="78" style="text-anchor:middle">ship ●</text></g>
-  <g><title>R9 scale path · designed only, not built</title><rect class="nd" x="200" y="65" width="34" height="20" rx="4"/><text class="tx" x="217" y="78" style="text-anchor:middle">scale ○</text></g>
-  <g><title>the product publishes this score at /admin, recomputed from evaluation/readiness.json, measured 2026-09-08</title>
-    <text class="lb" x="8" y="103" style="text-anchor:start">6 / 9 shipped · rung 10 · measured 2026-09-08</text>
-    <text class="lb" x="8" y="114" style="text-anchor:start">served at /admin from evaluation/readiness.json</text></g>
+  <div class="slide"><div class="fr"><svg class="dia" viewBox="0 0 240 112" role="img"
+     aria-label="The production readiness rubric the product scores on itself: six of nine dimensions shipped — evals, regression gate, learning loop, tracing, cost and release; two partial — the LLM judge and guardrails; one designed only — the scale path.">
+  <title>Six of nine shipped, scored by the product on itself</title>
+  <g><title>the learning half, R1 to R4 — how a version gets better without getting worse</title>
+    <text class="tx s" x="8" y="12" style="text-anchor:start">R1–R4 · learning</text></g>
+  <g><title>R1 evals and golden set · shipped · a committed manifest, train 100 and gate 100 reports, and prediction CSVs for every run</title>
+    <rect class="nd hi" x="8" y="18" width="52" height="20" rx="4"/><text class="tx" x="34" y="31" style="text-anchor:middle">evals</text></g>
+  <g><title>R2 LLM-as-judge · partial · a Haiku 4.5 confidence band scored once on the sealed split, not adopted as a gate</title>
+    <rect class="nd" x="66" y="18" width="52" height="20" rx="4"/><text class="tx" x="92" y="31" style="text-anchor:middle">judge</text></g>
+  <g><title>R3 regression gate · shipped · net positive and one-sided cluster-corrected McNemar p below 0.05</title>
+    <rect class="nd hi" x="124" y="18" width="52" height="20" rx="4"/><text class="tx" x="150" y="31" style="text-anchor:middle">gate</text></g>
+  <g><title>R4 learning loop · shipped · campaigns of at most five experiments, one agent's prompt rewritten per experiment</title>
+    <rect class="nd hi" x="182" y="18" width="50" height="20" rx="4"/><text class="tx" x="207" y="31" style="text-anchor:middle">loop</text></g>
+  <g><title>the operating half, R5 to R9 — what happens once it is live, and who finds out first</title>
+    <text class="tx s" x="8" y="55" style="text-anchor:start">R5–R9 · operating</text></g>
+  <g><title>R5 guardrails and security · partial · abuse controls only, with no per-user auth and no red-team suite</title>
+    <rect class="nd" x="8" y="61" width="42" height="20" rx="4"/><text class="tx" x="29" y="74" style="text-anchor:middle">guard</text></g>
+  <g><title>R6 observability and tracing · shipped · every LLM call is a span, and every served turn a row</title>
+    <rect class="nd hi" x="56" y="61" width="42" height="20" rx="4"/><text class="tx" x="77" y="74" style="text-anchor:middle">trace</text></g>
+  <g><title>R7 cost tracking and control · shipped · per-turn cost with prices declared in code</title>
+    <rect class="nd hi" x="104" y="61" width="42" height="20" rx="4"/><text class="tx" x="125" y="74" style="text-anchor:middle">cost</text></g>
+  <g><title>R8 deploy and release · shipped · merge to CI to OIDC deploy, with a smoke test that asserts the served bundle</title>
+    <rect class="nd hi" x="152" y="61" width="42" height="20" rx="4"/><text class="tx" x="173" y="74" style="text-anchor:middle">ship</text></g>
+  <g><title>R9 scale path · designed only · rung 10, one instance, sessions in process memory, no load test</title>
+    <rect class="nd ext" x="200" y="61" width="32" height="20" rx="4"/><text class="tx" x="216" y="74" style="text-anchor:middle">scale</text></g>
+  <g><title>the score is computed by the product from evaluation/readiness.json and served at its own admin console, measured 2026-09-08 — the same six of nine this page's scorecard reports</title>
+    <text class="tx k" x="8" y="98" style="text-anchor:start">6 / 9 shipped · rung 10</text>
+    <text class="tx s" x="232" y="98" style="text-anchor:end">measured 2026-09-08</text></g>
 </svg>
 </div><div class="tx">
     <p class="n">4 · <span style="color:var(--amber)">new</span></p><h3>The product grades itself on the same nine dimensions this site does</h3>
     <p><b>The insight line:</b> <code>evaluation/readiness.json</code> scores 6/9 shipped and serves it at <code>/admin</code> — the case study's scorecard and the product's own scorecard are computed from the same file, so they cannot disagree.</p>
-    <p class="small">The site currently scores this project independently. Reading the number from the repo instead is the same move the matrix already makes on the case studies, one level down.</p>
-    <p class="go">↳ /eval-loop/</p></div></div>
+    <p class="small">Shipped as slide 6a. The site scores this project independently and lands on the same 6 / 9 — the slide states that convergence rather than enforcing it, because the other two repos carry no readiness file to check against.</p>
+    <p class="go">↳ shipped as slide 6a</p></div></div>
 </div></section>
 <section class="blk" id="plan"><div class="wrap">
   <div class="hd"><p class="label">05 · what shipped</p>
