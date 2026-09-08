@@ -639,6 +639,12 @@ a.chip:hover{text-decoration:none;filter:brightness(.97)}
 .sys-fig .dia{--dia-k:.75}
 
 .fig{margin:var(--s6) 0}
+/* Every figure is introduced before it is read. The title names what the chart
+   is; the figcaption under it says what it shows. Mono uppercase at --t-2 so it
+   reads as a label rather than competing with the prose it sits in. */
+.fig-title{font-family:var(--mono);font-size:var(--t-2);font-weight:500;
+  letter-spacing:var(--track-label);text-transform:uppercase;color:var(--faint);
+  margin:0 0 var(--s3);text-wrap:balance}
 /* capped so a figure placed in the full-width .wrap (the home-page loop) renders
    at the same size it does inside the 68ch prose column */
 .fig .dia-frame{padding:var(--s5);max-width:680px;margin-inline:auto}
@@ -672,6 +678,7 @@ a.chip:hover{text-decoration:none;filter:brightness(.97)}
 .slide > h3 .n{font-family:var(--mono);font-size:var(--t-1);font-weight:500;color:var(--faint);
   letter-spacing:var(--track-label);flex:none}
 .slide .dia-frame{padding:var(--s4);margin:0 0 var(--s4);max-width:440px}
+.slide .fig-title{margin:0 0 var(--s2)}
 .slide .dia{--dia-k:.7}
 .slide ul{font-family:var(--sans);font-size:var(--t0);line-height:1.5;color:var(--ink-2);
   margin:0 0 var(--s3);padding-left:var(--s5)}

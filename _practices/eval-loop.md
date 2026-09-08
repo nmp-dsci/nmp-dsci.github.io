@@ -140,6 +140,7 @@ Source: `evals/runs/ablation-20260801-051456.json`.
 Re-run in each system's own repo: ConvFinQA on 2026-09-06, the other two on 2026-08-30.
 
 <figure class="fig">
+  <p class="fig-title">Figure · what each of the three loops refused</p>
   <div class="dia-frame">{% include diagrams/chart/practice-refusals.svg %}</div>
   <figcaption><b>Every one of these loops spends most of its life saying no.</b> Two of nine
   ConvFinQA verdicts promoted, one of eight RAG configurations shipped, one of three Data Pilot

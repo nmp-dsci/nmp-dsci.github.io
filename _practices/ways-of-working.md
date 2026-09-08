@@ -50,6 +50,7 @@ An agent writes plausible code very fast.
 ## Pattern — plan in the open, gate before merge
 
 <figure class="fig">
+  <p class="fig-title">Figure · the path every change takes, across four repositories</p>
   <div class="dia-frame">{% include diagrams/chart/practice-pipeline.svg %}</div>
   <figcaption><b>The gate is the only step that can send work backwards, and it is not
   optional.</b> Source: <code>~/.claude/skills/no-mistakes/SKILL.md</code>, each repo's

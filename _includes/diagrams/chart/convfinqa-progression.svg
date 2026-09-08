@@ -1,41 +1,38 @@
-<svg class="dia" viewBox="0 0 240 150" role="img"
-     aria-label="Accuracy by version: v1 73.0 percent on 770 questions, v2 77.1 on 770, v8 81.7 on the 349-question gate split, sdk_v1 90.5 on the same 349; a dashed line marks the 89.4 percent human-expert figure from the ConvFinQA paper, on a different split.">
-  <title>From 73.0% to 90.5%: v1, v2, v8, sdk_v1</title>
-  <!-- y = 120 - (acc - 60) * 100/35 -->
+<svg class="dia" viewBox="0 0 240 134" role="img"
+     aria-label="Accuracy by version. The four-agent LLM pipeline: llm-v1 73.0 percent and llm-v2 77.1 percent, both scored on 770 questions; llm-v8 81.7 percent on the 349-question unseen gate split. The single Claude session, sdk-v1, 90.5 percent on the same 349 questions. A dashed line marks the 89.4 percent human-expert figure from the ConvFinQA paper, measured on a different split.">
+  <title>73.0% to 90.5%, across four gated versions</title>
+  <!-- y = 118 - (acc - 60) * 96/35 -->
   <g><title>gridlines at 70, 80 and 90 percent</title>
-    <line class="gl" x1="36" y1="91.4" x2="236" y2="91.4"/>
-    <line class="gl" x1="36" y1="62.9" x2="236" y2="62.9"/>
-    <line class="gl" x1="36" y1="34.3" x2="236" y2="34.3"/>
-    <text class="tx s" x="30" y="94.5" style="text-anchor:end">70</text>
-    <text class="tx s" x="30" y="66" style="text-anchor:end">80</text>
-    <text class="tx s" x="30" y="37.4" style="text-anchor:end">90</text></g>
-  <line class="ax" x1="36" y1="120" x2="236" y2="120"/>
+    <line class="gl" x1="36" y1="90.6" x2="236" y2="90.6"/>
+    <line class="gl" x1="36" y1="63.1" x2="236" y2="63.1"/>
+    <line class="gl" x1="36" y1="35.7" x2="236" y2="35.7"/>
+    <text class="tx s" x="30" y="93.7" style="text-anchor:end">70</text>
+    <text class="tx s" x="30" y="66.2" style="text-anchor:end">80</text>
+    <text class="tx s" x="30" y="38.8" style="text-anchor:end">90</text></g>
+  <line class="ax" x1="36" y1="118" x2="236" y2="118"/>
 
-  <g><title>v1 · 73.0% (562/770) · the starting prompt set, t1.p1.r1.c1</title>
-    <rect class="bar" x="40" y="82.9" width="34" height="37.1" rx="3"/>
-    <text class="tx k" x="57" y="78.5">73.0</text>
-    <text class="tx s" x="57" y="132">v1</text>
-    <text class="tx s" x="57" y="143">n 770</text></g>
+  <g><title>llm-v1 · 73.0% (562 of 770) · the starting prompt set for the four-agent pipeline, bundle t1.p1.r1.c1</title>
+    <rect class="bar" x="40" y="82.3" width="34" height="35.7" rx="3"/>
+    <text class="tx k" x="57" y="78">73.0</text>
+    <text class="tx s" x="57" y="130">llm-v1</text></g>
 
-  <g><title>v2 · 77.1% (594/770) · a GEPA run over DSPy, all four prompts; champion again after the 2026-09-03 rollback and the baseline of campaign c01</title>
-    <rect class="bar" x="90" y="71.1" width="34" height="48.9" rx="3"/>
+  <g><title>llm-v2 · 77.1% (594 of 770) · a GEPA run over DSPy rewrote all four prompts; champion again after the 2026-09-03 rollback, and the baseline of campaign c01</title>
+    <rect class="bar" x="90" y="71" width="34" height="47" rx="3"/>
     <text class="tx k" x="107" y="66.7">77.1</text>
-    <text class="tx s" x="107" y="132">v2</text>
-    <text class="tx s" x="107" y="143">n 770</text></g>
+    <text class="tx s" x="107" y="130">llm-v2</text></g>
 
-  <g><title>v8 · 81.7% (285/349) on the unseen gate split · campaign c01 experiment 3: the teacher blamed the retriever, one prompt changed, +4.58 pp over v2, one-sided clustered McNemar p 0.040 · the champion the demo serves</title>
-    <rect class="bar pro" x="140" y="58" width="34" height="62" rx="3"/>
-    <text class="tx k" x="157" y="53.6">81.7</text>
-    <text class="tx s" x="157" y="132">v8</text>
-    <text class="tx s" x="157" y="143">n 349</text></g>
+  <g><title>llm-v8 · 81.7% (285 of 349) on the unseen gate split · campaign c01 experiment 3: the teacher blamed the retriever, one prompt changed, +4.58 pp over llm-v2 at one-sided clustered McNemar p 0.040 · the champion the demo serves</title>
+    <rect class="bar pro" x="140" y="58.4" width="34" height="59.6" rx="3"/>
+    <text class="tx k" x="157" y="54.1">81.7</text>
+    <text class="tx s" x="157" y="130">llm-v8</text></g>
 
-  <g><title>sdk_v1 · 90.5% (316/349) on the same 349 questions · v8's four prompts distilled into one Claude session on claude-sonnet-5 with the same six calculator tools · +8.88 pp over v8, p 0.0003 · promoted to sdk_champion, never champion</title>
-    <rect class="bar pro" x="190" y="32.9" width="34" height="87.1" rx="3"/>
-    <text class="tx k" x="207" y="28.5">90.5</text>
-    <text class="tx s" x="207" y="132">sdk_v1</text>
-    <text class="tx s" x="207" y="143">n 349</text></g>
+  <g><title>sdk-v1 · 90.5% (316 of 349) on the same 349 questions · llm-v8's four prompts distilled into one Claude Agent SDK session on claude-sonnet-5 with the same six calculator tools · +8.88 pp over llm-v8 at p 0.0003 · promoted to sdk_champion, never to champion</title>
+    <rect class="bar pro" x="190" y="34.3" width="34" height="83.7" rx="3"/>
+    <text class="tx k" x="207" y="30">90.5</text>
+    <text class="tx s" x="207" y="130">sdk-v1</text></g>
 
-  <g><title>human expert 89.4% · Chen et al. 2022, Table 5, on the paper's held-out test set; the 349-question split here is drawn from the public train pool, so this line is orientation, not a like-for-like baseline</title>
-    <line class="ed dash" x1="36" y1="36" x2="236" y2="36"/>
-    <text class="tx s" x="40" y="31" style="text-anchor:start">human 89.4*</text></g>
+  <g><title>human expert 89.4% · Chen et al. 2022, Table 5, measured on the paper's own held-out test set; the 349-question split used here is drawn from the public train pool, so this line is orientation rather than a like-for-like baseline</title>
+    <line class="ed dash" style="marker-end:none" x1="36" y1="37.3" x2="236" y2="37.3"/>
+    <text class="tx s" x="40" y="32.3" style="text-anchor:start">human 89.4*</text></g>
+
 </svg>

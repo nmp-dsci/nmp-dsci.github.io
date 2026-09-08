@@ -109,6 +109,33 @@ four **question-and-answer** bullets are the format: each bullet asks the thing
 a reader would ask and answers it in a clause. They are not a summary of the
 figure; they are the things the figure cannot say.
 
+### Every figure is introduced before it is read
+
+    <figure class="fig">
+      <p class="fig-title">Figure · what this chart is</p>
+      <div class="dia-frame">{% include diagrams/chart/name.svg %}</div>
+      <figcaption><b>What it shows.</b> The detail, then the source.</figcaption>
+    </figure>
+
+The **title** names the figure — what it plots, on what, in mono uppercase at
+`--t-2`. The **caption** under it states the takeaway first, then the source
+path. They do different jobs: a scanner reads the title to decide whether the
+chart is worth a look, and the caption to find out what they were meant to see.
+`scripts/lint_case_study.py` fails the build on a figure with no title.
+
+Inside a numbered `.slide` the title sits between the `h3` assertion and the
+frame, so the reading order is claim → what the figure is → the figure → the
+question-and-answer bullets.
+
+The layout's `fig-agent.html`, `fig-topology.html` and `fig-loop.html` carry
+their own titles, overridable per system with `architecture.fig_title`,
+`production.fig_title` and `architecture.loop_fig_title`. The home row uses
+`architecture.home_fig_title`.
+
+**A `.slide` and a `.fig` are raw HTML blocks, so kramdown does not run inside
+them.** Write `<code>x</code>`, never `` `x` `` — backticks render literally
+there, and have shipped that way before.
+
 ### What counts as a visual
 
 An inline `{% include diagrams/… %}` the author placed. The agent and topology

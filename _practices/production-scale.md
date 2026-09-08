@@ -56,6 +56,7 @@ Monthly-user figures use a 1–2% concurrency rule of thumb, order-of-magnitude 
 ### Rung 10 · deployed — today's demo
 
 <figure class="fig">
+  <p class="fig-title">Figure · rung 10, what is deployed today</p>
   {% include diagrams/rung-10.svg %}
   <figcaption><strong>The model is never called on the public URL, so the worst-case bill is a fixed ceiling.</strong> App Runner is front door and compute in one, and session and limit state lives in the process. Source: today's deployed configuration of the three demos.</figcaption>
 </figure>
@@ -71,6 +72,7 @@ Monthly-user figures use a 1–2% concurrency rule of thumb, order-of-magnitude 
 ### Rung 100 · sizing measured, not deployed — live LLM back on
 
 <figure class="fig">
+  <p class="fig-title">Figure · rung 100, sized from the measured sweep</p>
   {% include diagrams/rung-100.svg %}
   <figcaption><strong>Rung 100 splits apart what App Runner bundles: ALB in front, Fargate behind, a queue to absorb the burst and Redis to hold session state.</strong> Sizing source: <code>out/wsweep/summary.json</code>. Not deployed.</figcaption>
 </figure>
@@ -98,6 +100,7 @@ Monthly-user figures use a 1–2% concurrency rule of thumb, order-of-magnitude 
 ### Rung 1,000 · designed only — multi-tenant fleet
 
 <figure class="fig">
+  <p class="fig-title">Figure · rung 1,000, designed only</p>
   {% include diagrams/rung-1000.svg %}
   <figcaption><strong>At rung 1,000 the provider, not the compute, is the binding constraint — hence a router in front of it.</strong> Fleets separate by role, one queue per workload class, and an online judge samples production. Source: design only, nothing deployed.</figcaption>
 </figure>

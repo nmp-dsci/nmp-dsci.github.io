@@ -86,6 +86,7 @@ architecture:
   # The home page shows the result rather than the shape: this system's whole
   # argument is that every jump has a named cause and a p-value behind it.
   home_diagram: "diagrams/chart/convfinqa-progression.svg"
+  home_fig_title: "Optimising the ConvFinQA system · llm = four agents, sdk = one session"
   caption: "turn → triage → preprocess → retriever → calculator → answer; number turns short-circuit at the retriever; the four prompts compose into one bundle, t2.p2.r5.c2 for the champion"
   loop_diagram: "diagrams/loop/convfinqa-agent.svg"
   loop_takeaway: >-
@@ -198,12 +199,14 @@ p-value.
 
 <div class="slide" id="slide-1a">
   <h3><span class="n">1a</span>From 73% to 90.5%, in four named causes</h3>
+  <p class="fig-title">Figure · optimising the ConvFinQA system · llm = four agents, sdk = one Claude session</p>
   <div class="dia-frame">{% include diagrams/chart/convfinqa-progression.svg %}</div>
   <ul>
-    <li><b>v2 →</b> a GEPA run over DSPy.</li>
-    <li><b>v8 →</b> the loop blamed the retriever, changed one prompt, cleared a significance gate on 349 unseen questions.</li>
-    <li><b>sdk_v1 →</b> those four prompts distilled into one Claude session.</li>
-    <li><b>Why not "human-level"?</b> Model and architecture moved together, and the split is drawn from the paper's public train pool.</li>
+    <li><b>llm-v2 →</b> a GEPA run over DSPy, rewriting all four agent prompts.</li>
+    <li><b>llm-v8 →</b> the loop blamed the retriever, changed one prompt, cleared a significance gate on 349 unseen questions.</li>
+    <li><b>sdk-v1 →</b> those four prompts distilled into one Claude session.</li>
+    <li><b>Read the bars, not the gaps.</b> <code>llm-v1</code> and <code>llm-v2</code> are scored on all 770 questions; <code>llm-v8</code> and <code>sdk-v1</code> on the 349-question gate split. Only the last two are a paired comparison.</li>
+    <li><b>Why not "human-level"?</b> Model and architecture moved together, and the split is drawn from the paper's public train pool — not the sealed holdout, which has been opened 0 times.</li>
   </ul>
   <p class="go">↳ <a href="/projects/convfinqa-agent/eval-loop/">how v8 was promoted</a> · <a href="/projects/convfinqa-agent/sdk-vs-llm/">how the runtime was tested</a></p>
 </div>
@@ -239,6 +242,7 @@ Each agent has its own prompt lineage keyed by content hash; a version is a lock
 
 <div class="slide" id="slide-2a">
   <h3><span class="n">2a</span>Four agents, or one session with the same six tools</h3>
+  <p class="fig-title">Figure · four typed agents against one Claude session</p>
   <div class="dia-frame">{% include diagrams/runtime/convfinqa-agent.svg %}</div>
   <ul>
     <li><b>What changed?</b> One Claude Agent SDK session answers the whole conversation, with the six calculator functions as its only tools.</li>
@@ -271,6 +275,7 @@ rejections.
 
 <div class="slide" id="slide-3a">
   <h3><span class="n">3a</span>Nine verdicts, two promotions, same 349 questions</h3>
+  <p class="fig-title">Figure · nine gate verdicts, as accuracy deltas with 95% intervals</p>
   <div class="dia-frame">{% include diagrams/chart/convfinqa-gates.svg %}</div>
   <ul>
     <li><b>Seven refused</b> — each moved the number, none significantly.</li>
@@ -282,6 +287,7 @@ rejections.
 
 <div class="slide" id="slide-3b">
   <h3><span class="n">3b</span>The whole SDK gain is on the reasoning turns</h3>
+  <p class="fig-title">Figure · accuracy by turn type, both runtimes on the same 349 questions</p>
   <div class="dia-frame">{% include diagrams/chart/convfinqa-turn-types.svg %}</div>
   <ul>
     <li><b>Number turns</b> — a lookup; both runtimes 95.5%.</li>
@@ -294,12 +300,13 @@ rejections.
 
 <div class="slide" id="slide-3c">
   <h3><span class="n">3c</span>The judge withholds 27 right answers to catch 6 wrong ones</h3>
+  <p class="fig-title">Figure · the confidence judge on the sealed gate split</p>
   <div class="dia-frame">{% include diagrams/chart/convfinqa-judge.svg %}</div>
   <ul>
     <li><b>What was built?</b> A Haiku 4.5 band that never sees gold, reads the finished trace and applies six named checks.</li>
     <li><b>Did it pay?</b> No — the high band's interval [87.9, 95.2] contains the score for releasing everything.</li>
     <li><b>How badly?</b> AUROC 0.52 on the sealed split, and coverage at a 1% error target is zero.</li>
-    <li><b>So what shipped?</b> An advisory caution, not a gate. `judge_j2` was refused by the same rule.</li>
+    <li><b>So what shipped?</b> An advisory caution, not a gate. <code>judge_j2</code> was refused by the same rule.</li>
   </ul>
   <p class="go">↳ <a href="/projects/convfinqa-agent/sdk-vs-llm/">the six checks, both versions, the calibration split</a></p>
 </div>
@@ -372,9 +379,10 @@ Public deployment: no inference, roughly **$5–15/month**.
 
 <div class="slide" id="slide-6a">
   <h3><span class="n">6a</span>The product grades itself on these same nine dimensions</h3>
+  <p class="fig-title">Figure · the readiness score the product computes on itself</p>
   <div class="dia-frame">{% include diagrams/chart/convfinqa-readiness.svg %}</div>
   <ul>
-    <li><b>Where does the score live?</b> `evaluation/readiness.json` in the repo, served at the product's own `/admin`.</li>
+    <li><b>Where does the score live?</b> <code>evaluation/readiness.json</code> in the repo, served at the product's own <code>/admin</code>.</li>
     <li><b>Does it agree with §7?</b> Yes — 6 / 9 shipped, rung 10, measured 2026-09-08, row for row.</li>
     <li><b>Why does that matter?</b> The claim and the thing being claimed about are computed from one file, so they cannot drift.</li>
   </ul>
