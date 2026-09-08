@@ -133,6 +133,8 @@ DEEP_OPTIONAL = ["published", "layout", "permalink", "date", "tags", "featured",
                  "headline", "outcome", "proof_line", "sections", "short"]
 DEEP_SPINE = ["Setup", "One cycle", "Gate & promote", "Cycle log", "What changed since"]
 ISO_DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+# A Liquid tag or output, as Jekyll would try to execute it.
+LIQUID_TAG = re.compile(r"\{%|\{\{")
 
 HEADLINE_WORDS = 9        # the card's first line, read at a glance
 OUTCOME_WORDS = 25        # one sentence under it, on the home-page card
@@ -1025,6 +1027,39 @@ def infer_repo(path: Path) -> tuple[Path | None, str]:
     return (candidate, "") if candidate.is_dir() else (None, f"{rel(candidate)} not checked out")
 
 
+def lint_root_docs() -> Report:
+    """The root .md files, against the one thing that only the deploy can see.
+
+    GitHub Pages runs jekyll-optional-front-matter, which turns a loose .md
+    with no front matter into a rendered page. The local container build runs
+    with JEKYLL_NO_BUNDLER_REQUIRE=true and does not load that plugin, so a
+    literal `{% ... %}` in a brief builds clean here and fails the deploy.
+    Either exclude the file in _config.yml, or do not write Liquid in it.
+    """
+    rep = Report("root *.md  (against _config.yml exclude)")
+    try:
+        config = yaml.safe_load((SITE_ROOT / "_config.yml").read_text(encoding="utf-8")) or {}
+    except (OSError, yaml.YAMLError) as exc:
+        rep.bad("_config.yml does not parse", str(exc))
+        return rep
+    excluded = {str(e) for e in (config.get("exclude") or [])}
+    docs = sorted(p for p in SITE_ROOT.glob("*.md"))
+    faults = []
+    for doc in docs:
+        text = doc.read_text(encoding="utf-8")
+        if text.startswith("---"):          # has front matter: a real page, rendered on purpose
+            continue
+        if doc.name in excluded:
+            continue
+        if LIQUID_TAG.search(text):
+            faults.append(f"{doc.name} carries literal Liquid and is not in _config.yml exclude "
+                          "— jekyll-optional-front-matter will render it and the deploy will fail")
+    rep.verdict(not faults,
+                f"root docs: {len(docs)} checked, none render Liquid by accident", *faults,
+                fail_msg="root docs: a brief would be rendered as a page")
+    return rep
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         description="Lint a case study against the contract in _templates/project.md.",
@@ -1050,6 +1085,8 @@ def main(argv: list[str] | None = None) -> int:
         parser.error("nothing to lint — pass a file or --all")
 
     reports = []
+    if args.all:
+        reports.append(lint_root_docs())
     for path in targets:
         try:
             if not path.is_file():

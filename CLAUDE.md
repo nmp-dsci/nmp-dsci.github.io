@@ -150,6 +150,15 @@ node scripts/audit_pages.mjs http://127.0.0.1:8790
 CI runs the lint and the contrast audit on every pull request
 (`.github/workflows/lint.yml`).
 
+**The local build is not the Pages build.** `JEKYLL_NO_BUNDLER_REQUIRE=true` is
+what makes the container build work without a Gemfile resolve, and it also
+skips the `github-pages` plugin set. One plugin in that set matters here:
+`jekyll-optional-front-matter` turns any loose `.md` with no front matter into
+a rendered page, so a literal `{% ... %}` written as an example in a brief
+builds clean locally and then fails the deploy. This file and `DESIGN.md` are
+in `_config.yml`'s `exclude` for that reason, and the lint's `root docs:` check
+holds the pairing so the deploy is not what finds it next time.
+
 ---
 
 ## Where things live
