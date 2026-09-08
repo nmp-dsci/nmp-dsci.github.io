@@ -1,0 +1,32 @@
+<svg class="dia" viewBox="0 0 240 150" role="img"
+     aria-label="Nine rung-100 load cells — one, three and five workers crossed with ten, thirty and sixty second service times, fifteen users each: measured drain time landed within 0.5 to 6.0 percent of the predicted ceiling N over W times S in every cell, and all 135 jobs were served with nothing shed.">
+  <title>Nine cells, every one within 6% of the predicted drain time</title>
+  <!-- x = 52 + err * 28 ; axis 0 … 6.5% -->
+  <g><title>error against the predicted makespan, the ceiling of N over W times S, from 0 to 6 percent</title>
+    <line class="ax" x1="52" y1="118" x2="52" y2="14"/>
+    <line class="gl" x1="136" y1="14" x2="136" y2="118"/>
+    <line class="gl" x1="220" y1="14" x2="220" y2="118"/>
+    <text class="tx s" x="52" y="130">0</text>
+    <text class="tx s" x="136" y="130">3%</text>
+    <text class="tx s" x="220" y="130">6%</text></g>
+  <g><title>1 worker, 10 s service · predicted 150 s, measured 154.8 s · 3.2% over</title>
+    <text class="tx s" x="48" y="25" style="text-anchor:end">W1·S10</text><circle class="pt" cx="142" cy="21" r="3"/></g>
+  <g><title>1 worker, 30 s · predicted 450 s, measured 454.7 s · 1.0% over</title>
+    <text class="tx s" x="48" y="38" style="text-anchor:end">W1·S30</text><circle class="pt" cx="80" cy="34" r="3"/></g>
+  <g><title>1 worker, 60 s · predicted 900 s, measured 904.7 s · 0.5% over — the longest run is the most accurate</title>
+    <text class="tx s" x="48" y="51" style="text-anchor:end">W1·S60</text><circle class="pt" cx="66" cy="47" r="3"/></g>
+  <g><title>3 workers, 10 s · predicted 50 s, measured 52.1 s · 4.2% over; three workers drained 2.97 to 2.99 times faster than one</title>
+    <text class="tx s" x="48" y="64" style="text-anchor:end">W3·S10</text><circle class="pt" cx="170" cy="60" r="3"/></g>
+  <g><title>3 workers, 30 s · predicted 150 s, measured 152.3 s · 1.5% over</title>
+    <text class="tx s" x="48" y="77" style="text-anchor:end">W3·S30</text><circle class="pt" cx="94" cy="73" r="3"/></g>
+  <g><title>3 workers, 60 s · predicted 300 s, measured 302.4 s · 0.8% over</title>
+    <text class="tx s" x="48" y="90" style="text-anchor:end">W3·S60</text><circle class="pt" cx="74" cy="86" r="3"/></g>
+  <g><title>5 workers, 10 s · predicted 30 s, measured 31.8 s · 6.0% over — the worst cell, and the shortest run; five workers drained 4.87 to 4.98 times faster than one</title>
+    <text class="tx s" x="48" y="103" style="text-anchor:end">W5·S10</text><circle class="pt" cx="220" cy="99" r="3"/></g>
+  <g><title>5 workers, 30 s · predicted 90 s, measured 91.7 s · 1.9% over</title>
+    <text class="tx s" x="48" y="116" style="text-anchor:end">W5·S30</text><circle class="pt" cx="105" cy="112" r="3"/></g>
+  <g><title>5 workers, 60 s · predicted 180 s, measured 181.6 s · 0.9% over</title>
+    <text class="tx s" x="48" y="129" style="text-anchor:end">W5·S60</text><circle class="pt" cx="77" cy="125" r="3"/></g>
+  <g><title>every cell served all fifteen users: 135 of 135 jobs completed, none shed, none timed out</title>
+    <text class="tx k" x="4" y="146" style="text-anchor:start">135/135 served · 0 shed</text></g>
+</svg>

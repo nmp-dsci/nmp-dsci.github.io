@@ -190,7 +190,7 @@ production:
       proof: "out/wsweep/summary.json · .lavish/s42_worker-scaling-results.html · scripts/wsweep.py · load/k6/chat.js"
 ---
 
-## 1 · Purpose & benefit
+## 1 · Purpose & benefit — governance is the product, not a feature
 
 Ask in plain English over ~3.2M NSW sales and rental-bond rows; get a chart, a written report and the exact query behind them.
 
@@ -215,7 +215,7 @@ Demo mode is a decision, not a limitation:
 
 [Open the live demo ↗](https://deqfc8b0u8s64.cloudfront.net) · [Repository ↗](https://github.com/nmp-dsci/data-qa-agent)
 
-## 2 · Agent architecture
+## 2 · Agent architecture — the model never touches the database
 
 {% include fig-agent.html %}
 
@@ -238,7 +238,7 @@ Three model backends behind one abstraction:
   <figcaption><b>Every answer arrives with the one governed query that produced it.</b> Source: the chat surface of the live demo, replaying one of the eight recorded runs over SSE.</figcaption>
 </figure>
 
-## 3 · Agent loop & evaluation
+## 3 · Agent loop & evaluation — goldens are authored inside the product
 
 One request, end to end:
 
@@ -266,7 +266,7 @@ The eval loop is a product surface, not a script:
   <figcaption><b>The people who know the answers write the cases.</b> Source: the Golden Examples tab of the live demo; <code>evals/cases/*.yaml</code>.</figcaption>
 </figure>
 
-## 4 · Deployed architecture
+## 4 · Deployed architecture — one service, and merging to main is the deploy
 
 {% include fig-topology.html %}
 
@@ -299,9 +299,16 @@ Merging to main is the deploy, one workflow in order:
 - **Rung 100, measured** — Redis Streams queue before the agent, swept 1/3/5 workers × 10/30/60s service times, 15 users per cell.
 - **Result** — drain time within 0.5–6% of ⌈N/W⌉×S in all nine cells; 3 workers 2.97–2.99×, 5 workers 4.87–4.98×; 150 of 150 served, nothing shed.
 
+<figure class="fig">
+  <div class="dia-frame">{% include diagrams/chart/data-pilot-sizing.svg %}</div>
+  <figcaption><b>The next rung is sized by measurement, not by guess.</b> Every one of the nine
+  cells drained within 6% of ⌈N/W⌉×S, the worst error is the shortest run, and nothing was shed.
+  Source: <code>scripts/wsweep.py</code>, <code>out/wsweep/summary.json</code>.</figcaption>
+</figure>
+
 [See the scale ladder →](/practices/production-scale/)
 
-## 5 · Guardrails & security
+## 5 · Guardrails & security — six layers, and a bug is still not a leak
 
 Enforcement is layered, and no layer is a prompt.
 
@@ -335,7 +342,7 @@ Tested two ways:
   <figcaption><b>Hand-typed SQL passes exactly the same guard as SQL the model wrote.</b> Source: the SQL editor of the live demo; <code>services/data-agent/agent/sql_guardrails.py</code>.</figcaption>
 </figure>
 
-## 6 · Observability & cost
+## 6 · Observability & cost — every identity has a daily budget in code
 
 - **Spans** — both services emit OpenTelemetry through Logfire; locally a self-hosted Jaeger, no external account.
 - **Trace id** — on every `query_runs` row, so a slow answer is one lookup from its span waterfall.
@@ -365,4 +372,4 @@ The Operations tab answers "is it healthy, safe, fast and affordable":
 - **Embeddings on-box** — recall costs nothing per query.
 - **Demo mode** — deletes the 2 vCPU / 4 GB agent service, the biggest idle line: a measured 60–70% saving, $36–66 down to $8–18 a month.
 
-## 7 · Production readiness scorecard
+## 7 · Production readiness scorecard — nine of nine, each with its path

@@ -1,0 +1,26 @@
+<svg class="dia" viewBox="0 0 240 132" role="img"
+     aria-label="The confidence judge on the sealed 349-question gate split: releasing every answer scores 90.5 percent; releasing only the judge's high band scores 91.5 percent with a 95 percent interval from 87.9 to 95.2 that contains the release-everything line, so the gain cannot be told apart from zero.">
+  <title>The high band's interval contains the line it has to beat</title>
+  <!-- x = 24 + (acc - 86) * 20.4 -->
+  <g><title>accuracy axis, 86 to 96 percent, on the 349 sealed gate questions</title>
+    <line class="ax" x1="24" y1="82" x2="228" y2="82"/>
+    <text class="tx s" x="24" y="94" style="text-anchor:middle">86</text>
+    <text class="tx s" x="126" y="94" style="text-anchor:middle">91</text>
+    <text class="tx s" x="228" y="94" style="text-anchor:middle">96%</text></g>
+  <g><title>release everything: 90.5% — 316 of 349 correct, the sdk_v1 champion's own score with no judge at all</title>
+    <line class="ed dash" style="marker-end:none" x1="116.2" y1="14" x2="116.2" y2="82"/>
+    <text class="tx s" x="112" y="12" style="text-anchor:end">all · 90.5</text></g>
+  <g><title>high band only: 91.5% over the 316 answers the judge released, with a 95 percent interval of 87.9 to 95.2 — it spans the release-everything line, so the gain is not significant</title>
+    <line class="ci" x1="62.8" y1="42" x2="212.1" y2="42"/>
+    <line class="ci" x1="62.8" y1="37" x2="62.8" y2="47"/>
+    <line class="ci" x1="212.1" y1="37" x2="212.1" y2="47"/>
+    <circle class="pt" cx="136.6" cy="42" r="3.4"/>
+    <text class="tx k" x="62.8" y="32" style="text-anchor:start">high band · 91.5</text>
+    <text class="tx s" x="62.8" y="58" style="text-anchor:start">95% CI 87.9 – 95.2</text></g>
+  <g><title>the price of the band: 6 of 33 wrong answers caught, and 27 correct answers withheld to do it</title>
+    <text class="tx" x="24" y="74" style="text-anchor:start">6 caught · 27 withheld</text></g>
+  <g><title>the verdict: not adopted as a gate, because AUROC on the sealed split is 0.52 and coverage at the 1 percent error target is zero; the band ships as an advisory caution</title>
+    <rect class="nd" x="24" y="104" width="204" height="22" rx="4"/>
+    <text class="tx k" x="126" y="114" style="text-anchor:middle">not a gate · advisory</text>
+    <text class="tx s" x="126" y="123" style="text-anchor:middle">AUROC 0.52 · coverage at 1%: 0</text></g>
+</svg>

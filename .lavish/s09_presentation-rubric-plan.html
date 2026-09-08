@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>s09 · The presentation rubric, every page scored, and the plan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+
+/* Design source: the subject site's own system — tokens copied from
+   nmp-dsci.github.io/assets/css/tokens.css (light :root + dark override). */
+:root{
+  --bg:#F7F6F2; --panel:#FFFFFF; --band:#EFEEE8;
+  --ink:#1A1D1B; --ink-2:#3B403D; --muted:#4A514D; --faint:#5C635E;
+  --line:#DCDAD2; --line-2:#C7C5BC; --line-3:#8A8880;
+  --accent:#0A6552; --accent-ink:#FFFFFF; --accent-soft:#DFEFE8;
+  --amber:#8A5006; --amber-soft:#F6E6CF;
+  --sans:'IBM Plex Sans',system-ui,-apple-system,sans-serif;
+  --serif:'IBM Plex Serif',Georgia,'Times New Roman',serif;
+  --mono:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+  --t-2:0.8rem; --t-1:0.875rem; --t0:1rem; --t1:1.125rem; --t2:1.406rem; --t3:1.758rem; --t4:2.197rem;
+  --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:24px; --s6:32px; --s7:48px; --s8:64px; --s9:96px;
+  --r:10px; --r-sm:6px;
+  --shadow:0 1px 2px rgb(20 25 22 / .05), 0 12px 28px -18px rgb(20 25 22 / .22);
+  --w:1140px; --track-label:.08em;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#121614; --panel:#191E1B; --band:#161A18;
+    --ink:#E8EBE7; --ink-2:#C9CFC9; --muted:#AEB6B0; --faint:#98A09A;
+    --line:#28302B; --line-2:#3A443E; --line-3:#727E77;
+    --accent:#43C29A; --accent-ink:#0E1512; --accent-soft:#17382C;
+    --amber:#D99A4E; --amber-soft:#3A2A14;
+    --shadow:0 1px 2px rgb(0 0 0 / .4), 0 12px 28px -18px rgb(0 0 0 / .65);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#121614; --panel:#191E1B; --band:#161A18;
+  --ink:#E8EBE7; --ink-2:#C9CFC9; --muted:#AEB6B0; --faint:#98A09A;
+  --line:#28302B; --line-2:#3A443E; --line-3:#727E77;
+  --accent:#43C29A; --accent-ink:#0E1512; --accent-soft:#17382C;
+  --amber:#D99A4E; --amber-soft:#3A2A14;
+  --shadow:0 1px 2px rgb(0 0 0 / .4), 0 12px 28px -18px rgb(0 0 0 / .65);
+}
+*,*::before,*::after{box-sizing:border-box}
+:where(.grid,.flex,.cards,.slide)>*{min-width:0}
+:where(p,h1,h2,h3,h4,li,dd,figcaption,td,th,.badge,.label){overflow-wrap:anywhere}
+:where(img,svg,video,iframe){max-width:100%;height:auto}
+html{scroll-behavior:smooth;scroll-padding-top:72px}
+body{margin:0;background:var(--bg);color:var(--ink-2);font-family:var(--sans);font-size:var(--t0);line-height:1.55;-webkit-font-smoothing:antialiased}
+h1,h2,h3,h4{color:var(--ink);margin:0;line-height:1.15;font-weight:600;letter-spacing:-.02em;text-wrap:balance}
+h1{font-size:var(--t4);font-family:var(--serif);font-weight:400} h2{font-size:var(--t3)} h3{font-size:var(--t1)} h4{font-size:var(--t0)}
+p{margin:0 0 var(--s4);text-wrap:pretty}
+a{color:var(--accent);text-decoration:none} a:hover{text-decoration:underline;text-underline-offset:.2em}
+strong,b{color:var(--ink);font-weight:600}
+code{font-family:var(--mono);font-size:max(var(--t-2),.86em);background:var(--band);padding:.08em .32em;border-radius:var(--r-sm);color:var(--ink-2)}
+.wrap{max-width:var(--w);margin-inline:auto;padding-inline:var(--s5)}
+.label{font-family:var(--mono);font-size:var(--t-2);font-weight:500;letter-spacing:var(--track-label);text-transform:uppercase;color:var(--faint);margin:0}
+.lead{font-family:var(--serif);font-size:var(--t1);line-height:1.5;color:var(--ink-2);max-width:72ch}
+.small{font-size:var(--t-1);color:var(--muted)}
+.top{position:sticky;top:0;z-index:60;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.top-in{max-width:var(--w);margin-inline:auto;padding:var(--s3) var(--s5);display:flex;align-items:center;gap:var(--s4);flex-wrap:wrap}
+.top b{font-family:var(--mono);font-size:var(--t-1);color:var(--ink);white-space:nowrap}
+.top nav{display:flex;gap:var(--s4);margin-left:auto;flex-wrap:wrap;font-size:var(--t-1);font-weight:500}
+.top nav a{color:var(--ink-2)} .top nav a:hover{color:var(--accent);text-decoration:none}
+header.hero{padding:var(--s7) 0 var(--s5)}
+.chips{display:flex;gap:var(--s2);flex-wrap:wrap;margin:var(--s4) 0 0}
+.chip{font-family:var(--mono);font-size:var(--t-2);padding:.3em .6em;border:1px solid var(--line-2);border-radius:var(--r-sm);color:var(--ink-2);background:var(--panel)}
+.chip.ok{border-color:var(--accent);color:var(--accent)} .chip.warn{border-color:var(--amber);color:var(--amber)}
+section.blk{padding-top:var(--s8)} section.blk:last-of-type{padding-bottom:var(--s9)}
+.hd{margin-bottom:var(--s5);max-width:80ch} .hd .label{margin-bottom:var(--s2)} .hd h2{margin-bottom:var(--s3)}
+.panel{background:var(--panel);border-radius:var(--r);box-shadow:var(--shadow);padding:var(--s5)}
+.band{background:var(--band);border-radius:var(--r);padding:var(--s4) var(--s5)}
+.grid{display:grid;gap:var(--s4)} .g3{grid-template-columns:repeat(3,minmax(0,1fr))} .g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+@media (max-width:900px){.g3,.g2{grid-template-columns:minmax(0,1fr)}}
+.card h3{margin-bottom:var(--s2)} .card p{margin-bottom:var(--s2);font-size:var(--t-1)} .card p:last-child{margin:0}
+.tw{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:var(--r);box-shadow:var(--shadow);background:var(--panel)}
+table{border-collapse:collapse;width:100%;min-width:680px;font-size:var(--t-1)}
+caption{text-align:left;padding:var(--s4) var(--s5) var(--s2);color:var(--muted);font-size:var(--t-1);caption-side:top}
+th,td{text-align:left;padding:var(--s3) var(--s4);border-bottom:1px solid var(--line);vertical-align:top;line-height:1.45}
+thead th{font-family:var(--mono);font-size:var(--t-2);font-weight:500;color:var(--faint);letter-spacing:var(--track-label);text-transform:uppercase;border-bottom:1px solid var(--line-2);white-space:nowrap}
+tbody tr:last-child td{border-bottom:0}
+td.sub{font-weight:600;color:var(--ink);white-space:nowrap}
+td.num{font-family:var(--mono);font-size:var(--t-2);font-variant-numeric:tabular-nums;white-space:nowrap}
+td .path{display:block;font-family:var(--mono);font-size:var(--t-2);color:var(--faint);margin-top:2px}
+tr.pro td{background:color-mix(in srgb,var(--accent-soft) 55%,transparent)}
+.v-ok{color:var(--accent);font-weight:600} .v-no{color:var(--muted)} .v-warn{color:var(--amber);font-weight:600}
+/* the slide mock — this is the component proposed for the site */
+.slide{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:var(--s5);align-items:start;background:var(--panel);border-radius:var(--r);box-shadow:var(--shadow);padding:var(--s5);margin-bottom:var(--s4)}
+.slide .fr{background:var(--band);border-radius:var(--r);padding:var(--s4)}
+.slide .fr svg{display:block;width:100%;height:auto}
+.slide .tx h3{margin-bottom:var(--s2)} .slide .tx p{font-size:var(--t-1);margin-bottom:var(--s2)}
+.slide .tx .go{font-family:var(--mono);font-size:var(--t-2)}
+.slide .n{font-family:var(--mono);font-size:var(--t-2);color:var(--faint);margin-bottom:var(--s2)}
+@media (max-width:820px){.slide{grid-template-columns:minmax(0,1fr)}}
+.dia .nd{fill:var(--panel);stroke:var(--line-2);stroke-width:1}
+.dia .hi{stroke:var(--accent);stroke-width:1.6;fill:var(--accent-soft)}
+.dia .tt{font:600 12px var(--sans);fill:var(--ink)}
+.dia .tx{font:10.5px var(--sans);fill:var(--ink-2)}
+.dia .lb{font:10px var(--mono);fill:var(--faint)}
+.dia .ed{stroke:var(--line-3);fill:none;stroke-width:1.2;marker-end:url(#arr)}
+.dia .dash{stroke-dasharray:4 3}
+.dia .bar{fill:var(--line-3)} .dia .bar.hi{fill:var(--ink);stroke:none} .dia .bar.pro{fill:var(--accent-soft);stroke:var(--accent);stroke-width:1.2}
+.dia .ax{stroke:var(--line-2);stroke-width:1} .dia .grid{stroke:var(--line);stroke-width:1}
+.dia .ci{stroke:var(--ink-2);stroke-width:1.5} .dia .pt{fill:var(--ink-2)} .dia .pt.pro{fill:var(--accent)} .dia .ci.pro{stroke:var(--accent)}
+.steps{counter-reset:s;list-style:none;padding:0;margin:0;display:grid;gap:var(--s3)}
+.steps li{display:grid;grid-template-columns:2rem minmax(0,1fr);gap:var(--s3);align-items:start;font-size:var(--t-1)}
+.steps li::before{counter-increment:s;content:counter(s,decimal-leading-zero);font-family:var(--mono);color:var(--accent);font-weight:500;padding-top:2px}
+form.q{background:var(--panel);border-radius:var(--r);box-shadow:var(--shadow);padding:var(--s5);display:grid;gap:var(--s3)}
+form.q h3{margin:0} form.q .why{font-size:var(--t-1);color:var(--muted);margin:0}
+form.q label{display:grid;grid-template-columns:1.2rem minmax(0,1fr);gap:var(--s2);align-items:start;font-size:var(--t-1);padding:var(--s2) var(--s3);border:1px solid var(--line);border-radius:var(--r-sm);cursor:pointer}
+form.q label:has(input:checked){border-color:var(--accent);background:var(--accent-soft)}
+form.q input[type=radio]{margin:3px 0 0;accent-color:var(--accent)}
+form.q textarea{width:100%;font:inherit;font-size:var(--t-1);padding:var(--s2) var(--s3);border:1px solid var(--line-2);border-radius:var(--r-sm);background:var(--bg);color:var(--ink-2);min-height:3.2rem;resize:vertical}
+form.q .row{display:flex;gap:var(--s3);align-items:center;flex-wrap:wrap}
+.btn{font:500 var(--t-1) var(--sans);background:var(--accent);color:var(--accent-ink);border:0;border-radius:var(--r-sm);padding:.55em 1em;cursor:pointer}
+.queued{font-family:var(--mono);font-size:var(--t-2);color:var(--accent);min-height:1.2em}
+.rec{font-family:var(--mono);font-size:var(--t-2);color:var(--accent);margin-left:.4em}
+ul.tight{margin:0;padding-left:1.1em;font-size:var(--t-1)} ul.tight li{margin-bottom:var(--s1)}
+.tree{font-family:var(--mono);font-size:var(--t-1);line-height:1.7;white-space:pre;overflow-x:auto;margin:0}
+footer{border-top:1px solid var(--line);padding:var(--s5) 0;font-size:var(--t-2);color:var(--faint);font-family:var(--mono)}
+/* --- s09 additions --- */
+.sc{display:inline-grid;grid-auto-flow:column;gap:3px}
+.sc i{width:9px;height:14px;border-radius:2px;background:var(--line);display:block}
+.sc i.p1{background:var(--amber)} .sc i.p2{background:var(--accent)}
+.tot{font-family:var(--mono);font-size:var(--t-1);font-variant-numeric:tabular-nums;font-weight:500}
+.bar-w{display:grid;grid-template-columns:3.2rem minmax(0,1fr);gap:var(--s3);align-items:center}
+.bar-t{height:9px;border-radius:99px;background:var(--band);overflow:hidden}
+.bar-f{height:100%;border-radius:99px;background:var(--accent)}
+.bar-f.lo{background:var(--amber)} .bar-f.mid{background:var(--line-3)}
+.tier{font-family:var(--mono);font-size:var(--t-2);letter-spacing:var(--track-label);text-transform:uppercase;color:var(--faint);padding:var(--s4) var(--s5) var(--s2);display:block}
+.kpi{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:var(--s4)}
+@media(max-width:900px){.kpi{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.kpi .k{background:var(--panel);border-radius:var(--r);box-shadow:var(--shadow);padding:var(--s4)}
+.kpi .k b{display:block;font-family:var(--mono);font-size:var(--t3);color:var(--ink);font-variant-numeric:tabular-nums;line-height:1.1}
+.kpi .k span{display:block;font-size:var(--t-2);color:var(--muted);margin-top:var(--s2);line-height:1.4}
+blockquote{margin:0;padding:var(--s3) var(--s4);border-left:2px solid var(--accent);background:var(--band);border-radius:0 var(--r-sm) var(--r-sm) 0;font-size:var(--t-1)}
+.wave{border-left:2px solid var(--line-2);padding-left:var(--s4);margin-bottom:var(--s5)}
+.wave.now{border-color:var(--accent)}
+.wave h3{margin-bottom:var(--s2)}
+.rule{background:var(--panel);border-radius:var(--r);box-shadow:var(--shadow);padding:var(--s4) var(--s5);margin-bottom:var(--s3)}
+.rule h4{font-family:var(--mono);font-size:var(--t-1);color:var(--accent);margin-bottom:var(--s2);letter-spacing:var(--track-label);text-transform:uppercase}
+pre.md{font-family:var(--mono);font-size:var(--t-2);line-height:1.6;background:var(--band);border-radius:var(--r);padding:var(--s4);overflow-x:auto;margin:0;white-space:pre}
+.legend{display:flex;gap:var(--s4);flex-wrap:wrap;font-size:var(--t-2);color:var(--muted);font-family:var(--mono);margin-top:var(--s3)}
+.legend b{display:inline-block;width:9px;height:12px;border-radius:2px;vertical-align:-1px;margin-right:4px}
+</style>
+</head>
+<body>
+<div class="top"><div class="top-in"><b>s09 · presentation rubric &amp; page plan</b>
+<nav><a href="#rubric">The rubric</a><a href="#scores">Scores</a><a href="#new">New results</a><a href="#plan">The plan</a><a href="#claude">CLAUDE.md</a></nav></div></div>
+<header class="hero"><div class="wrap">
+  <p class="label">plan · branch <code>convfinqa-sdk-presentation</code> · 2026-09-08</p>
+  <h1>One rubric for presentation mode, every page scored against it, and the fix</h1>
+  <p class="lead">Nine published pages. One of them — the ConvFinQA case study — read like a presentation; the other eight were prose with a diagram bolted on, or prose with nothing. This derives a seven-dimension rubric from the reading research, scores every page against it, and records the fix, which is now applied. It also folds in the two results <code>ConvFinQA-agent</code> has produced since the last update: an Agent SDK runtime at 90.5%, and a confidence judge that failed its own gate.</p>
+  <div class="chips">
+    <span class="chip ok">9 published pages: 7.9 → 13.7 of 14</span>
+    <span class="chip ok">pages with nothing drawn: 7 → 0</span>
+    <span class="chip ok">new: a confidence judge that failed its own gate</span>
+    <span class="chip ok">new: the product scores itself 6 / 9 on the same rubric</span>
+  </div>
+</div></header>
+
+<section class="blk" id="rubric"><div class="wrap">
+  <div class="hd"><p class="label">01 · where the rubric comes from</p>
+  <h2>Two findings decide the format, and neither is a matter of taste</h2>
+  <p>The rubric is not invented. It is two well-replicated results turned into checks a lint can run.</p></div>
+
+  <div class="grid g2">
+    <div class="panel card">
+      <h3>People do not read pages, they scan headlines</h3>
+      <p>Nielsen Norman Group eyetracking, replicated for twenty years: readers get through <b>20–28% of the words</b>, the average visit runs <b>under a minute</b>, and the dominant motion is the <b>layer-cake</b> — jump headline to headline, drop into body text only when a headline earns it.</p>
+      <p class="small">Consequence: a topic-label heading like <code>## Architecture</code> spends the one thing the reader reliably looks at, and returns nothing. Every heading has to carry a claim.</p>
+    </div>
+    <div class="panel card">
+      <h3>An assertion over a visual beats a phrase over bullets</h3>
+      <p>Michael Alley's assertion-evidence work at Penn State, tested on 110 engineering students: a <b>sentence assertion headline above explanatory graphics</b> produced better comprehension, <b>fewer misconceptions</b>, <b>lower perceived cognitive load</b>, and stronger recall at delayed post-test than the phrase-headline-plus-bullet-list slide.</p>
+      <p class="small">Consequence: headline states the claim, the visual <em>is</em> the evidence for that claim, and the text under it is one line — not a bullet pile restating the graphic.</p>
+    </div>
+  </div>
+
+  <p class="small" style="margin-top:var(--s4)">Sources: <a href="https://www.nngroup.com/articles/f-shaped-pattern-reading-web-content-discovered/">NN/g — F-shaped pattern (original eyetracking)</a> · <a href="https://guides.libraries.wm.edu/writing-for-web/how-we-read-online">How people read online (20–28% of words)</a> · <a href="https://pure.psu.edu/en/publications/how-the-design-of-presentation-slides-affects-audience-comprehens/">Penn State — How the design of presentation slides affects audience comprehension</a> · <a href="https://cpb-us-e1.wpmucdn.com/sites.psu.edu/dist/7/13153/files/2008/10/Assertion-Evidence-Slides-Instruction_Set.pdf">Alley — assertion-evidence instruction set</a>. <b>Not used:</b> <code>transcript-rag-agent</code>'s corpus — it indexes YouTube transcripts on RAG engineering and holds nothing on presentation design, so searching it would have produced a citation that did not support the claim.</p>
+</div></section>
+
+<section class="blk"><div class="wrap">
+  <div class="hd"><p class="label">02 · the rubric</p>
+  <h2>Seven dimensions, scored 0 / 1 / 2, and the first four outrank the last three</h2>
+  <p>P1–P4 are the <b>order and impact</b> dimensions — what a scanner gets in the first screen, and whether the skill on display is legible. P5–P7 are hygiene. A page can be beautifully concise and still score badly, because concision is P5 and it is worth less than leading with the outcome.</p></div>
+  <div class="tw"><table>
+  <caption>Presentation rubric P1–P7 · max 14 · the executable version lands in <code>scripts/lint_case_study.py</code></caption>
+  <thead><tr><th>Ref</th><th>Dimension</th><th>The question it asks</th><th>2 — holds</th><th>1 — partial</th><th>0 — fails</th></tr></thead>
+  <tbody>
+  <tr><td class="sub">P1</td><td class="sub">Assertion headline</td><td>Does every section heading state a claim, with its number, rather than name a topic?</td><td>every heading is a claim</td><td>some headings are claims</td><td>topic labels — <code>Architecture</code>, <code>Problem</code>, <code>Cost</code></td></tr>
+  <tr><td class="sub">P2</td><td class="sub">Visual evidence</td><td>Does the claim sit above a chart, diagram or table that <em>is</em> its evidence?</td><td>a visual under every claim</td><td>a visual on some sections</td><td>no chart on the page</td></tr>
+  <tr><td class="sub">P3</td><td class="sub">One insight</td><td>Is there exactly one takeaway line per visual, not a bullet pile restating it?</td><td>one line, ≤ 25 words</td><td>two or three lines</td><td>a prose block</td></tr>
+  <tr><td class="sub">P4</td><td class="sub">Impact order</td><td>Outcome and skill first, method second, setup last — or is the reader made to earn the number?</td><td>outcome with its baseline in the first screen</td><td>outcome by mid-page</td><td>setup-first, or no outcome stated</td></tr>
+  <tr><td class="sub">P5</td><td class="sub">Scan cost</td><td>How many words, given that ~25% get read?</td><td>≤ 1,200 words, no paragraph over 60</td><td>≤ 2,000 words</td><td>over 2,000, or a paragraph over 80</td></tr>
+  <tr><td class="sub">P6</td><td class="sub">Skill on display</td><td>Can a scanner name the AI-system capability this page proves — eval, gate, guardrail, scale?</td><td>named and scored</td><td>implied by the prose</td><td>absent</td></tr>
+  <tr><td class="sub">P7</td><td class="sub">Honest number</td><td>Does every number carry its baseline, denominator or caveat <em>adjacent</em> to it?</td><td>adjacent, every time</td><td>somewhere on the page</td><td>bare numbers, or none</td></tr>
+  </tbody></table></div>
+  <blockquote style="margin-top:var(--s4)"><b>The tie-break rule.</b> When P1–P4 and P5–P7 pull against each other, P1–P4 wins. Adding a chart that pushes the page to 1,300 words is a good trade: P2 gains two points, P5 loses one. Cutting a caveat to save words is never a good trade — it costs P7 and it costs the argument.</blockquote>
+</div></section>
+<section class="blk" id="scores"><div class="wrap">
+  <div class="hd"><p class="label">03 · the scoreboard, before and after</p>
+  <h2>Nine published pages went from 8.1 to 13.7 out of 14</h2>
+  <p><b>Two corrections to the first draft of this plan.</b> It scored fifteen pages; six of them
+  carry <code>published: false</code> under decision D4a and do not render, so the wave that would
+  have fixed them was dropped. And its word counts included YAML front matter — the case studies
+  are 1,500–1,700 body words, not 2,700 — so P5 was scored harder than the pages deserved. The
+  table below is the corrected scoring, with what each page now holds beside it.</p></div>
+  <div class="kpi">
+    <div class="k"><b>73 → 123</b><span>total across 9 published pages, out of 126</span></div>
+    <div class="k"><b>58% → 98%</b><span>mean rubric score</span></div>
+    <div class="k"><b>7 → 0</b><span>published pages with nothing drawn</span></div>
+    <div class="k"><b>7</b><span>new charts, every number from a repo</span></div>
+  </div>
+  <div class="legend"><span><b style="background:var(--line)"></b>0 fails</span><span><b style="background:var(--amber)"></b>1 partial</span><span><b style="background:var(--accent)"></b>2 holds</span></div>
+  <div class="tw" style="margin-top:var(--s4)"><table>
+  <caption>P1 assertion headline · P2 visual evidence · P3 one insight · P4 impact order · P5 scan cost · P6 skill on display · P7 honest number</caption>
+  <thead><tr><th>Page</th><th>Before</th><th>After</th><th>Total</th><th>Body words</th><th>What changed</th></tr></thead><tbody>
+<tr><td class="sub">ConvFinQA Agent<span class="path">_projects/convfinqa-agent.md</span></td>
+    <td class="num"><span class="sc"><i class="p1"></i><i class="p2"></i><i class="p1"></i><i class="p2"></i><i class="p2"></i><i class="p2"></i><i class="p2"></i></span></td>
+    <td class="num"><span class="sc"><i class="p2"></i><i class="p2"></i><i class="p2"></i><i class="p2"></i><i class="p2"></i><i class="p2"></i><i class="p2"></i></span></td>
+    <td><div class="bar-w"><span class="tot">12→14</span><div class="bar-t"><div class="bar-f" style="width:100%"></div></div></div></td>
+    <td class="num">1,696 → 1,696</td><td>Seven assertion H2s, plus the judge and readiness slides. 6 charts.</td></tr>
+<tr><td class="sub">Transcript RAG<span class="path">_projects/transcript-rag.md</span></td>
+    <td class="num"><span class="sc"><i></i><i></i><i class="p2"></i><i class="p2"></i><i class="p2"></i><i class="p2"></i><i class="p2"></i></span></td>
+    <td class="num"><span class="sc"><i class="p2"></i><i class="p2"></i><i class="p2"></i><i class="p2"></i><i class="p2"></i><i class="p2"></i><i class="p2"></i></span></td>
+    <td><div class="bar-w"><span class="tot">10→14</span><div class="bar-t"><div class="bar-f" style="width:100%"></div></div></div></td>
+    <td class="num">1,508 → 1,615</td><td>The 6.1× claim is now drawn: four answer paths by prompt tokens.</td></tr>
+<tr><td class="sub">Data Pilot<span class="path">_projects/data-pilot.md</span></td>
+    <td class="num"><span class="sc"><i></i><i></i><i class="p1"></i><i class="p2"></i><i class="p2"></i><i class="p2"></i><i class="p1"></i></span></td>
+    <td class="num"><span class="sc"><i class="p2"></i><i class="p2"></i><i class="p2"></i><i class="p2"></i><i class="p2"></i><i class="p2"></i><i class="p2"></i></span></td>
+    <td><div class="bar-w"><span class="tot">8→14</span><div class="bar-t"><div class="bar-f" style="width:100%"></div></div></div></td>
+    <td class="num">1,516 → 1,619</td><td>The rung-100 sweep is now drawn: nine cells, all within 6%.</td></tr>
+<tr><td class="sub">Practice · Production scale<span class="path">_practices/production-scale.md</span></td>
+    <td class="num"><span class="sc"><i class="p1"></i><i class="p2"></i><i class="p2"></i><i class="p1"></i><i class="p1"></i><i class="p2"></i><i class="p1"></i></span></td>
+    <td class="num"><span class="sc"><i class="p2"></i><i class="p2"></i><i class="p2"></i><i class="p2"></i><i class="p1"></i><i class="p2"></i><i class="p2"></i></span></td>
+    <td><div class="bar-w"><span class="tot">10→13</span><div class="bar-t"><div class="bar-f" style="width:93%"></div></div></div></td>
+    <td class="num">2,474 → 2,429</td><td>Already had three rung diagrams; headings now assert. Over budget on purpose.</td></tr>
+<tr><td class="sub">Practice · Eval loop<span class="path">_practices/eval-loop.md</span></td>
+    <td class="num"><span class="sc"><i></i><i></i><i class="p1"></i><i></i><i class="p1"></i><i class="p2"></i><i class="p1"></i></span></td>
+    <td class="num"><span class="sc"><i class="p2"></i><i class="p2"></i><i class="p2"></i><i class="p2"></i><i class="p2"></i><i class="p2"></i><i class="p2"></i></span></td>
+    <td><div class="bar-w"><span class="tot">5→14</span><div class="bar-t"><div class="bar-f" style="width:100%"></div></div></div></td>
+    <td class="num">2,120 → 2,062</td><td>Was the worst page on the site. Now leads with what each loop refuses.</td></tr>
+<tr><td class="sub">Practice · Ways of working<span class="path">_practices/ways-of-working.md</span></td>
+    <td class="num"><span class="sc"><i></i><i></i><i class="p2"></i><i></i><i class="p2"></i><i class="p1"></i><i></i></span></td>
+    <td class="num"><span class="sc"><i class="p2"></i><i class="p2"></i><i class="p2"></i><i class="p2"></i><i class="p2"></i><i class="p2"></i><i class="p1"></i></span></td>
+    <td><div class="bar-w"><span class="tot">5→13</span><div class="bar-t"><div class="bar-f" style="width:93%"></div></div></div></td>
+    <td class="num">1,644 → 1,673</td><td>Three one-word H3s — Git, Lavish, no-mistakes — now assert. New pipeline chart.</td></tr>
+<tr><td class="sub">Deep · SDK vs LLM<span class="path">_deep/convfinqa-agent/sdk-vs-llm.md</span></td>
+    <td class="num"><span class="sc"><i></i><i></i><i class="p2"></i><i class="p1"></i><i class="p2"></i><i class="p2"></i><i class="p2"></i></span></td>
+    <td class="num"><span class="sc"><i class="p2"></i><i class="p2"></i><i class="p2"></i><i class="p2"></i><i class="p2"></i><i class="p2"></i><i class="p2"></i></span></td>
+    <td><div class="bar-w"><span class="tot">9→14</span><div class="bar-t"><div class="bar-f" style="width:100%"></div></div></div></td>
+    <td class="num">1,368 → 1,878</td><td>Turn-type chart inlined, and the judge that refused itself written up in full.</td></tr>
+<tr><td class="sub">Deep · Eval loop<span class="path">_deep/convfinqa-agent/eval-loop.md</span></td>
+    <td class="num"><span class="sc"><i></i><i></i><i class="p2"></i><i class="p1"></i><i class="p1"></i><i class="p2"></i><i class="p2"></i></span></td>
+    <td class="num"><span class="sc"><i class="p2"></i><i class="p2"></i><i class="p2"></i><i class="p2"></i><i class="p2"></i><i class="p2"></i><i class="p2"></i></span></td>
+    <td><div class="bar-w"><span class="tot">8→14</span><div class="bar-t"><div class="bar-f" style="width:100%"></div></div></div></td>
+    <td class="num">2,365 → 2,452</td><td>The nine gate verdicts were already drawn and unused. Now above the cycle log.</td></tr>
+<tr><td class="sub">About<span class="path">about.md</span></td>
+    <td class="num"><span class="sc"><i></i><i></i><i class="p2"></i><i class="p1"></i><i class="p2"></i><i class="p1"></i><i></i></span></td>
+    <td class="num"><span class="sc"><i class="p2"></i><i class="p2"></i><i class="p2"></i><i class="p2"></i><i class="p2"></i><i class="p2"></i><i class="p1"></i></span></td>
+    <td><div class="bar-w"><span class="tot">6→13</span><div class="bar-t"><div class="bar-f" style="width:93%"></div></div></div></td>
+    <td class="num">430 → 492</td><td>The three scorecards — 9/9, 6/9, 5/9 — are now a figure, not a sentence.</td></tr>
+</tbody></table></div>
+  <div class="grid g3" style="margin-top:var(--s5)">
+  <div class="panel card"><h3>P1 and P2 were the whole gap, as predicted</h3><p>Seven of nine pages scored zero on both. Every heading on the site now carries a claim, and every published page draws at least one piece of its evidence.</p></div>
+  <div class="panel card"><h3>The rule is enforced, not documented</h3><p><code>scripts/lint_case_study.py</code> now fails the build on a heading with no claim, on a claim over ten words, and on an H3 under three words; it warns on a page with nothing drawn and on the body-word budget. CI runs it on every PR.</p></div>
+  <div class="panel card"><h3>One page is over budget on purpose</h3><p><code>production-scale</code> sits at 2,429 words against 2,200. The excess is its three-rung comparison table and its evidence section — cutting either would trade P5 for P6 and P7, which outrank it.</p></div>
+  </div>
+</div></section>
+<section class="blk" id="new"><div class="wrap">
+  <div class="hd"><p class="label">04 · what the repo has produced since the page was written</p>
+  <h2>Two new results, and the better one is the failure</h2>
+  <p>The site's ConvFinQA page currently ends at PR #9 — the SDK runtime win. The repo has merged two more: a confidence judge that did not earn its gate (PR #10, <code>ef10be5</code>), and a design pass that put the nine-dimension readiness rubric inside the product and scored it (PR #11, <code>9d11da7</code>). Both are verified from <code>evaluation/story.json</code> and <code>evaluation/readiness.json</code>, regenerated 2026-09-08.</p></div>
+
+  <div class="grid g2">
+    <div class="panel card"><h3>The result you already asked for is confirmed, unchanged</h3>
+      <p>The SDK arm still stands at <b>90.5%</b> (316/349) against the four-agent pipeline's <b>81.7%</b> (285/349) — <b>+8.88 pp</b>, one-sided clustered McNemar <b>p 0.000286</b>, 95% CI [+4.20, +13.71], 38 fixed / 7 broken across 30 conversations. All of the gain is on program turns (+13.0 pp); number turns moved by exactly zero.</p>
+      <p class="small">Against the paper's 89.4% human-expert figure it reads as on par — but on a 349-question split drawn from the public train pool, not the paper's held-out test set, and with program match at 40.9% against the paper's 86.3%. That caveat stays adjacent to the number, per P7.</p></div>
+    <div class="panel card"><h3>Nothing in the eval record moved, so no number on the site needs re-stating</h3>
+      <p>Nine gate verdicts, two promotions, <code>champion v8</code> and <code>sdk_champion sdk_v1</code> — identical to what the page already says. The update is <em>additive</em>: two more slides, not a correction.</p>
+      <p class="small">Also new: <code>judge_champion judge_j1</code> in the registry — a third lineage alongside <code>agent_prompts</code> and <code>sdk_prompts</code>.</p></div>
+  </div>
+
+  <h3 style="margin:var(--s7) 0 var(--s4)">The four slides that would carry the page, mocked at the real numbers</h3>
+
+  <div class="slide"><div class="fr"><svg class="dia" viewBox="0 0 240 150" role="img"
+     aria-label="Accuracy by version: v1 73.0 percent on 770 questions, v2 77.1 on 770, v8 81.7 on the 349-question gate split, sdk_v1 90.5 on the same 349; a dashed line marks the 89.4 percent human-expert figure from the ConvFinQA paper, on a different split.">
+  <title>From 73.0% to 90.5%: v1, v2, v8, sdk_v1</title>
+  <!-- y = 120 - (acc - 60) * 100/35 -->
+  <g><title>gridlines at 70, 80 and 90 percent</title>
+    <line class="gl" x1="36" y1="91.4" x2="236" y2="91.4"/>
+    <line class="gl" x1="36" y1="62.9" x2="236" y2="62.9"/>
+    <line class="gl" x1="36" y1="34.3" x2="236" y2="34.3"/>
+    <text class="tx s" x="30" y="94.5" style="text-anchor:end">70</text>
+    <text class="tx s" x="30" y="66" style="text-anchor:end">80</text>
+    <text class="tx s" x="30" y="37.4" style="text-anchor:end">90</text></g>
+  <line class="ax" x1="36" y1="120" x2="236" y2="120"/>
+
+  <g><title>v1 · 73.0% (562/770) · the starting prompt set, t1.p1.r1.c1</title>
+    <rect class="bar" x="40" y="82.9" width="34" height="37.1" rx="3"/>
+    <text class="tx k" x="57" y="78.5">73.0</text>
+    <text class="tx s" x="57" y="132">v1</text>
+    <text class="tx s" x="57" y="143">n 770</text></g>
+
+  <g><title>v2 · 77.1% (594/770) · a GEPA run over DSPy, all four prompts; champion again after the 2026-09-03 rollback and the baseline of campaign c01</title>
+    <rect class="bar" x="90" y="71.1" width="34" height="48.9" rx="3"/>
+    <text class="tx k" x="107" y="66.7">77.1</text>
+    <text class="tx s" x="107" y="132">v2 · GEPA</text>
+    <text class="tx s" x="107" y="143">n 770</text></g>
+
+  <g><title>v8 · 81.7% (285/349) on the unseen gate split · campaign c01 experiment 3: the teacher blamed the retriever, one prompt changed, +4.58 pp over v2, one-sided clustered McNemar p 0.040 · the champion the demo serves</title>
+    <rect class="bar pro" x="140" y="58" width="34" height="62" rx="3"/>
+    <text class="tx k" x="157" y="53.6">81.7</text>
+    <text class="tx s" x="157" y="132">v8 · loop</text>
+    <text class="tx s" x="157" y="143">n 349</text></g>
+
+  <g><title>sdk_v1 · 90.5% (316/349) on the same 349 questions · v8's four prompts distilled into one Claude session on claude-sonnet-5 with the same six calculator tools · +8.88 pp over v8, p 0.0003 · promoted to sdk_champion, never champion</title>
+    <rect class="bar pro" x="190" y="32.9" width="34" height="87.1" rx="3"/>
+    <text class="tx k" x="207" y="28.5">90.5</text>
+    <text class="tx s" x="207" y="132">sdk_v1</text>
+    <text class="tx s" x="207" y="143">n 349</text></g>
+
+  <g><title>human expert 89.4% · Chen et al. 2022, Table 5, on the paper's held-out test set; the 349-question split here is drawn from the public train pool, so this line is orientation, not a like-for-like baseline</title>
+    <line class="ed dash" x1="36" y1="36" x2="236" y2="36"/>
+    <text class="tx s" x="40" y="31" style="text-anchor:start">human 89.4*</text></g>
+</svg>
+</div><div class="tx">
+    <p class="n">1a</p><h3>From 73% to 90.5%, in four named causes</h3>
+    <p><b>The insight line:</b> every jump has a mechanism — a GEPA run, a gated prompt rewrite, a runtime change — and none of them is "we tried a better model".</p>
+    <p class="go">↳ /eval-loop/ · /sdk-vs-llm/</p></div></div>
+
+  <div class="slide"><div class="fr"><svg class="dia" viewBox="0 0 240 142" role="img"
+     aria-label="Accuracy by turn type for the two runtimes on the same 349 questions: number turns 95.5 percent for both the v8 pipeline and the sdk_v1 session; program turns 75.2 percent for the pipeline against 88.2 for the session.">
+  <title>Where the SDK gain is: number turns unchanged, program turns +13.0 pp</title>
+  <!-- y = 110 - (acc - 70) * 3 -->
+  <g><title>gridlines at 80 and 90 percent</title>
+    <line class="gl" x1="36" y1="80" x2="236" y2="80"/>
+    <line class="gl" x1="36" y1="50" x2="236" y2="50"/>
+    <text class="tx s" x="30" y="83" style="text-anchor:end">80</text>
+    <text class="tx s" x="30" y="53" style="text-anchor:end">90</text></g>
+  <line class="ax" x1="36" y1="110" x2="236" y2="110"/>
+
+  <g><title>number turns · pipeline v8 · 95.5% of 111 · a lookup in the report, answered at the retriever</title>
+    <rect class="bar" x="42" y="33.5" width="30" height="76.5" rx="3"/>
+    <text class="tx k" x="57" y="29">95.5</text></g>
+  <g><title>number turns · sdk_v1 · 95.5% of 111 · +0.0 pp, 3 fixed / 3 broken, p 0.5 — no effect</title>
+    <rect class="bar hi" x="76" y="33.5" width="30" height="76.5" rx="3"/>
+    <text class="tx k" x="91" y="29">95.5</text></g>
+  <text class="tx s" x="74" y="123">number · n 111</text>
+
+  <g><title>program turns · pipeline v8 · 75.2% of 238 · a plan, retrieval and arithmetic across the conversation</title>
+    <rect class="bar" x="142" y="94.4" width="30" height="15.6" rx="3"/>
+    <text class="tx k" x="157" y="89.9">75.2</text></g>
+  <g><title>program turns · sdk_v1 · 88.2% of 238 · +13.0 pp, 35 fixed / 4 broken across 29 conversations, clustered p 0.00005</title>
+    <rect class="bar hi" x="176" y="55.4" width="30" height="54.6" rx="3"/>
+    <text class="tx k" x="191" y="50.9">88.2</text></g>
+  <text class="tx s" x="174" y="123">program · n 238</text>
+
+  <g><title>legend: mid grey is the four-agent pipeline (v8, deepseek-v4-flash); ink is the single session (sdk_v1, claude-sonnet-5)</title>
+    <rect class="bar" x="36" y="132" width="8" height="7" rx="1.5"/>
+    <text class="tx s" x="49" y="138.5" style="text-anchor:start">pipeline v8</text>
+    <rect class="bar hi" x="136" y="132" width="8" height="7" rx="1.5"/>
+    <text class="tx s" x="149" y="138.5" style="text-anchor:start">session sdk_v1</text></g>
+</svg>
+</div><div class="tx">
+    <p class="n">2</p><h3>The SDK win is entirely on program turns</h3>
+    <p><b>The insight line:</b> lookups were already at 95.5% and did not move; the +13.0 pp came from multi-step arithmetic, which is where a session beats a hand-off.</p>
+    <p class="go">↳ /sdk-vs-llm/</p></div></div>
+
+  <div class="slide"><div class="fr"><svg class="dia" viewBox="0 0 240 132" role="img" aria-label="The confidence judge on the sealed 349-question gate split: releasing every answer scores 90.54 percent; releasing only the judge's high band scores 91.46 percent with a 95 percent interval from 87.9 to 95.2 that contains the release-everything line, so the gain is not distinguishable from zero.">
+  <title>The high band's interval contains the line it is meant to beat</title>
+  <!-- x = 20 + (acc - 86) * 210/10 -->
+  <g><title>accuracy axis, 86 to 96 percent</title>
+    <line class="ax" x1="20" y1="92" x2="230" y2="92"/>
+    <text class="lb" x="20" y="104" style="text-anchor:middle">86</text>
+    <text class="lb" x="125" y="104" style="text-anchor:middle">91</text>
+    <text class="lb" x="230" y="104" style="text-anchor:middle">96%</text></g>
+  <g><title>release everything: 90.54% — 316 of 349 correct, the sdk_v1 champion's own score</title>
+    <line class="ed dash" style="marker-end:none" x1="115.3" y1="12" x2="115.3" y2="92"/>
+    <text class="lb" x="112" y="10" style="text-anchor:end">release all 90.5</text></g>
+  <g><title>high band only: 91.46% on 316 released answers, 95% CI [87.87, 95.22] — the interval spans the release-everything line, so the judge's gain is not significant</title>
+    <line class="ci" x1="59.3" y1="42" x2="213.7" y2="42"/>
+    <line class="ci" x1="59.3" y1="37" x2="59.3" y2="47"/><line class="ci" x1="213.7" y1="37" x2="213.7" y2="47"/>
+    <circle class="pt" cx="134.7" cy="42" r="3.4"/>
+    <text class="tx" x="59.3" y="31" style="text-anchor:start">high band 91.5 · CI 87.9–95.2</text></g>
+  <g><title>what the band costs: 6 of 33 wrong answers caught, 27 correct answers withheld; AUROC 0.52 on the sealed split is chance</title>
+    <text class="tx" x="20" y="70" style="text-anchor:start">caught 6 of 33 wrong · withheld 27 right</text>
+    <text class="lb" x="20" y="83" style="text-anchor:start">AUROC 0.52 · ECE 0.11 · coverage at 1% target: 0</text></g>
+  <g><title>verdict: not adopted as a gate; ships as an advisory caution</title>
+    <rect class="nd" x="20" y="112" width="210" height="18" rx="4"/>
+    <text class="tt" x="125" y="124" style="text-anchor:middle">not a gate · ships as advisory</text></g>
+</svg>
+</div><div class="tx">
+    <p class="n">3 · <span style="color:var(--amber)">new</span></p><h3>The judge withholds 27 right answers to catch 6 wrong ones</h3>
+    <p><b>The insight line:</b> the high band's 95% interval contains the score for releasing everything, AUROC is 0.52 on the sealed split, and coverage at the 1% error target is zero — so it ships as advisory, not as a gate.</p>
+    <p class="small">This is the strongest hiring signal on the page. It is a measured negative that was published rather than dropped, and the second judge version was rejected by the same rule (<code>judge_j2</code>: "high band error 11.82% exceeds the 1% target").</p>
+    <p class="go">↳ new deep page, or a slide on /sdk-vs-llm/ — see decision 2</p></div></div>
+
+  <div class="slide"><div class="fr"><svg class="dia" viewBox="0 0 240 118" role="img" aria-label="The product's own production readiness rubric, scored inside the product: six of nine dimensions shipped — evals, regression gate, learning loop, observability, cost, deploy; two partial — LLM-as-judge and guardrails; one designed only — the scale path.">
+  <title>6 of 9 shipped, scored by the product on itself</title>
+  <g><title>the learning half, R1 to R4: how a version gets better without getting worse</title>
+    <text class="lb" x="8" y="14" style="text-anchor:start">R1–R4 · the learning half</text></g>
+  <g><title>R1 evals and golden set · shipped · committed manifest, train 100 / gate 100 reports</title><rect class="hi" x="8" y="20" width="52" height="20" rx="4"/><text class="tx" x="34" y="33" style="text-anchor:middle">evals ●</text></g>
+  <g><title>R2 LLM-as-judge · partial · a Haiku 4.5 confidence band, scored once, not adopted as a gate</title><rect class="nd" x="66" y="20" width="52" height="20" rx="4"/><text class="tx" x="92" y="33" style="text-anchor:middle">judge ◐</text></g>
+  <g><title>R3 regression gate · shipped · net positive AND one-sided cluster-corrected McNemar p below 0.05</title><rect class="hi" x="124" y="20" width="52" height="20" rx="4"/><text class="tx" x="150" y="33" style="text-anchor:middle">gate ●</text></g>
+  <g><title>R4 learning loop · shipped · campaigns of at most five experiments, one agent rewritten per experiment</title><rect class="hi" x="182" y="20" width="52" height="20" rx="4"/><text class="tx" x="208" y="33" style="text-anchor:middle">loop ●</text></g>
+  <g><title>the operating half, R5 to R9: what happens once it is live, and who finds out first</title>
+    <text class="lb" x="8" y="59" style="text-anchor:start">R5–R9 · the operating half</text></g>
+  <g><title>R5 guardrails and security · partial</title><rect class="nd" x="8" y="65" width="42" height="20" rx="4"/><text class="tx" x="29" y="78" style="text-anchor:middle">guard ◐</text></g>
+  <g><title>R6 observability and tracing · shipped</title><rect class="hi" x="56" y="65" width="42" height="20" rx="4"/><text class="tx" x="77" y="78" style="text-anchor:middle">trace ●</text></g>
+  <g><title>R7 cost tracking and control · shipped</title><rect class="hi" x="104" y="65" width="42" height="20" rx="4"/><text class="tx" x="125" y="78" style="text-anchor:middle">cost ●</text></g>
+  <g><title>R8 deploy and release · shipped</title><rect class="hi" x="152" y="65" width="42" height="20" rx="4"/><text class="tx" x="173" y="78" style="text-anchor:middle">ship ●</text></g>
+  <g><title>R9 scale path · designed only, not built</title><rect class="nd" x="200" y="65" width="34" height="20" rx="4"/><text class="tx" x="217" y="78" style="text-anchor:middle">scale ○</text></g>
+  <g><title>the product publishes this score at /admin, recomputed from evaluation/readiness.json, measured 2026-09-08</title>
+    <text class="lb" x="8" y="103" style="text-anchor:start">6 / 9 shipped · rung 10 · measured 2026-09-08</text>
+    <text class="lb" x="8" y="114" style="text-anchor:start">served at /admin from evaluation/readiness.json</text></g>
+</svg>
+</div><div class="tx">
+    <p class="n">4 · <span style="color:var(--amber)">new</span></p><h3>The product grades itself on the same nine dimensions this site does</h3>
+    <p><b>The insight line:</b> <code>evaluation/readiness.json</code> scores 6/9 shipped and serves it at <code>/admin</code> — the case study's scorecard and the product's own scorecard are computed from the same file, so they cannot disagree.</p>
+    <p class="small">The site currently scores this project independently. Reading the number from the repo instead is the same move the matrix already makes on the case studies, one level down.</p>
+    <p class="go">↳ /eval-loop/</p></div></div>
+</div></section>
+<section class="blk" id="plan"><div class="wrap">
+  <div class="hd"><p class="label">05 · what shipped</p>
+  <h2>Four waves landed; the fifth was dropped, and here is why</h2></div>
+
+  <div class="wave now"><h3>Wave 1 · the ConvFinQA family <span class="chip ok">done</span></h3>
+  <ul class="tight">
+    <li>Seven assertion H2s on the case study; slide <b>3c</b> (the judge) and slide <b>6a</b> (the product's own scorecard) added with two new charts.</li>
+    <li>The <code>judge</code> rubric row corrected from <code>na</code> to <code>partial</code> — the repo built a judge after the row was written. The 6 / 9 score is unchanged, because it never counted judge as shipped.</li>
+    <li><b>Deep · sdk-vs-llm</b> — the turn-type chart inlined, a full write-up of the judge under <em>Gate &amp; promote</em>, two new cycle-log rows, re-dated to 2026-09-08 at <code>9d11da7</code>.</li>
+    <li><b>Deep · eval-loop</b> — the nine-verdict chart was already drawn and unused; it now sits above the cycle log.</li>
+  </ul></div>
+
+  <div class="wave now"><h3>Wave 2 · the two other case studies <span class="chip ok">done</span></h3>
+  <ul class="tight">
+    <li><b>Transcript RAG</b> — <code>transcript-rag-tokens.svg</code>: four answer paths by prompt tokens, single-hop in accent at 3.0k against the 18.3k baseline.</li>
+    <li><b>Data Pilot</b> — <code>data-pilot-sizing.svg</code>: nine load cells, measured drain time against ⌈N/W⌉×S, every one inside 6%, read from <code>out/wsweep/summary.json</code>.</li>
+  </ul></div>
+
+  <div class="wave"><h3>Wave 3 · the compact six <span class="chip warn">dropped — they do not render</span></h3>
+  <p class="small" style="margin:0">All six carry <code>published: false</code> (decision D4a — the site shows only the three production systems). Bringing them to the rubric would be work no visitor can see. If that decision is revisited, this is the wave to run.</p></div>
+
+  <div class="wave now"><h3>Wave 4 · the practices and About <span class="chip ok">done</span></h3>
+  <ul class="tight">
+    <li><b>Eval loop</b> — <code>practice-refusals.svg</code>: what each of the three loops refused. It was the worst-scoring page on the site; it now leads with the point the page is making.</li>
+    <li><b>Ways of working</b> — <code>practice-pipeline.svg</code>: plan → build → gate → merge, with 69 / 49 / 52 on it, and the gate marked as the only step that sends work back. Its three one-word H3s now assert.</li>
+    <li><b>Production scale</b> — assertion headings; the ALB/Fargate definitions cut as teaching rather than evidence.</li>
+    <li><b>About</b> — <code>portfolio-scorecards.svg</code>: 9 / 9, 6 / 9, 5 / 9 as a figure. The sentence beside it said nineteen of twenty-seven shipped; it is twenty.</li>
+  </ul></div>
+
+  <div class="wave now"><h3>Wave 5 · the contract <span class="chip ok">done</span></h3>
+  <ul class="tight">
+    <li><b><code>CLAUDE.md</code></b> — new at the site root. The slide unit, the research behind it, the rubric, the banned heading forms, the scan budget, and what counts as a visual.</li>
+    <li><b><code>scripts/lint_case_study.py</code></b> — <b>fails</b> on a heading with no claim, a claim over ten words, an H3 under three words, and on the spine (now matched by label so a heading can carry an assertion). <b>Warns</b> on a page with nothing drawn and on the body-word budget.</li>
+    <li><b><code>DESIGN.md</code></b> — three rules added to the never-list, at 13, 14 and 15, and the list renumbered.</li>
+  </ul></div>
+
+  <div class="panel" style="margin-top:var(--s5)">
+    <h3>Verification</h3>
+    <ul class="tight" style="margin-top:var(--s3)">
+      <li><b>Lint</b> — 8 files, 8 PASS, 0 FAIL, with one deliberate scan-cost warning.</li>
+      <li><b>Build</b> — clean Jekyll build; 9 pages, 22 inlined <code>.dia</code> figures.</li>
+      <li><b>Layout and axe</b> — 10 pages × 3 widths × 2 themes: <b>0 failing checks</b>. Getting there took a measuring pass: every new chart initially overflowed its viewBox at 390px, and the first placement of the figures broke <code>.prose</code> containment until they were wrapped in the site's own <code>&lt;figure class="fig"&gt;</code> contract.</li>
+      <li><b>Contrast</b> — 50 pairs across both themes, 0 failing.</li>
+    </ul>
+  </div>
+
+  <div class="panel" style="margin-top:var(--s4)">
+    <h3>What I would not claim</h3>
+    <ul class="tight" style="margin-top:var(--s3)">
+      <li><b>P3, P4, P6 and P7 are still human judgement.</b> The lint checks P1, P2 and P5. The other four are in <code>CLAUDE.md</code> and in the review step, and nothing mechanical stops a page from regressing on them.</li>
+      <li><b>The scores in the table are mine.</b> They are a consistent reading of nine pages against seven questions, not a measurement.</li>
+      <li><b>One upstream defect is still open</b>, in <code>ConvFinQA-agent</code> rather than here: the CI eval gate floor-checks v8 against −0.5% because campaign promotions leave the bundle's registry metrics empty, so that floor cannot fail. It is written up on the case study and both deep pages rather than hidden.</li>
+    </ul>
+  </div>
+</div></section>
+<section class="blk" id="claude"><div class="wrap">
+  <div class="hd"><p class="label">06 · the durable contract</p>
+  <h2>What goes into CLAUDE.md, verbatim</h2>
+  <p>Written so the rule is actionable without the research behind it, and so the research is one link away for anyone who wants to argue with it.</p></div>
+  <pre class="md"># Presentation mode — how every page on this site presents information
+
+Every published page is a presentation, not an essay. The unit is a **slide**:
+
+    ASSERTION HEADLINE  — a claim, with its number
+    VISUAL              — the chart, diagram or table that IS the evidence
+    ONE INSIGHT LINE    — what it means, once, in under 25 words
+
+Why: readers get through 20–28% of the words (NN/g eyetracking) and scan
+headline-to-headline in a layer cake. A sentence assertion over a graphic
+beats a phrase headline over bullets on comprehension, misconceptions,
+cognitive load and delayed recall (Alley, Penn State, n=110).
+
+## The rubric — score every page before publishing it
+
+| Ref | Dimension          | Holds (2) when                                          |
+|-----|--------------------|---------------------------------------------------------|
+| P1  | Assertion headline | every heading states a claim, not a topic                |
+| P2  | Visual evidence    | a chart/diagram/table under every claim                  |
+| P3  | One insight        | one takeaway line per visual, <= 25 words                |
+| P4  | Impact order       | outcome + skill in the first screen, setup last          |
+| P5  | Scan cost          | <= 1,200 words, no paragraph over 60                     |
+| P6  | Skill on display   | the AI-system capability is named and scored             |
+| P7  | Honest number      | baseline / denominator / caveat adjacent to the number   |
+
+**P1-P4 outrank P5-P7.** Adding a chart that costs words is a good trade.
+Cutting a caveat to save words never is.
+
+## Banned heading forms
+
+`Architecture` · `Cost` · `What it is` · `Problem` · `The build` · `Overview`
+`Setup` · `Results` — any noun that names a topic instead of asserting one.
+
+Write `The model never touches the database` instead of `Architecture`.
+Write `$0.004 an answer, and the cap is enforced in code` instead of `Cost`.
+
+## Order, always
+
+1. The outcome, with its baseline and its caveat.
+2. The visual that proves it.
+3. The mechanism — how it was made to happen.
+4. The setup — what had to exist first.
+
+Never the reverse. A reader who leaves after the first screen must still
+have the result, and must know which engineering skill produced it.
+
+## One insight, not a bullet pile
+
+A bullet list under a chart that restates the chart is the AI-slop signature.
+One line. If a second line is genuinely needed, the chart is doing too much —
+split it.</pre>
+</div></section>
+<footer><div class="wrap">s09 · nmp-dsci.github.io · branch <code>convfinqa-sdk-presentation</code> · scores measured 2026-09-08 · repo facts from ConvFinQA-agent <code>9d11da7</code></div></footer>
+</body></html>

@@ -183,7 +183,7 @@ production:
       proof: "infra/terraform/demo/main.tf · src/api/ingestion_queue.py · src/config.py"
 ---
 
-## 1 · Purpose & benefit
+## 1 · Purpose & benefit — parity at 6.1× fewer tokens, proved not asserted
 
 transcript·lab answers the question demos skip: *which* retrieval configuration ranks the evidence best, and how would you know?
 
@@ -217,7 +217,7 @@ No composer, no ingestion: every write is a 403.
   <figcaption><strong>Every answer here is a replay of a judged run, not a live call.</strong> Tokens, chunks, LLM calls and latency come from the stored trace; new questions are disabled. Source: <code>src/chat/history.py</code>, <code>src/agents/models.py</code>, <code>src/api/main.py</code>.</figcaption>
 </figure>
 
-## 2 · Agent architecture
+## 2 · Agent architecture — four answer paths over one retrieval stack
 
 {% include fig-agent.html %}
 
@@ -244,7 +244,7 @@ DeepSeek flash is the only remote dependency; embeddings and reranking are local
   <figcaption><strong>Retrieve wide, rerank narrow.</strong> Fan out, fuse two rankings by rank, cut to top-k before any model sees the evidence. Source: <code>src/rag/contextualize.py</code>, <code>src/rag/fusion.py</code>, <code>src/rag/rerank.py</code>.</figcaption>
 </figure>
 
-## 3 · Agent loop & evaluation
+## 3 · Agent loop & evaluation — an ablation decides, and CI re-scores it
 
 - **One request** — embed, search, fuse, rerank to ten chunks, answer with timestamped citations.
 - **Citations** — built from the labels the answer actually cites, not reference JSON the model was trusted to emit.
@@ -273,7 +273,7 @@ DeepSeek flash is the only remote dependency; embeddings and reranking are local
   <figcaption><strong>The Scoreboard argues against its own numbers.</strong> 20 of 20 judged, ranked by composite per 1k tokens, under two warnings it raises itself: self-graded, and scored on 71 videos. Source: <code>frontend/src/scoreboard/</code>, <code>evals/runs/matrix-20260809-071818-depth-v2.json</code>.</figcaption>
 </figure>
 
-## 4 · Deployed architecture
+## 4 · Deployed architecture — the demo answers from committed runs
 
 {% include fig-topology.html %}
 
@@ -288,7 +288,7 @@ DeepSeek flash is the only remote dependency; embeddings and reranking are local
 
 [See the scale ladder →](/practices/production-scale/)
 
-## 5 · Guardrails & security
+## 5 · Guardrails & security — the corpus is public, the spend is not
 
 - **Deny by method** — every non-GET returns `403 {"detail":"demo"}`: ask, judge, index, eval and any POST added later, without touching that file.
 - **Carve-out, allowed** — `POST /api/chunk-graph` builds a layout from stored vectors alone; the query overlay, which would load the embedding stack, is refused.
@@ -298,7 +298,7 @@ DeepSeek flash is the only remote dependency; embeddings and reranking are local
 - **Analytics** — three gates: the server saying `demo`, a key baked in at build, init not already run; no autocapture, no session recording.
 - **Scope, not a control** — no per-user auth, no data isolation; one corpus, public in the repo; the first thing to change.
 
-## 6 · Observability & cost
+## 6 · Observability & cost — cost is the finding, not a footnote
 
 Every answer carries its own trace, built only from what the code measured:
 
@@ -311,6 +311,14 @@ Every answer carries its own trace, built only from what the code measured:
 - **MLflow** — instruments the CLI; the server never opens a run.
 
 Cost is the finding, not a footnote:
+
+<figure class="fig">
+  <div class="dia-frame">{% include diagrams/chart/transcript-rag-tokens.svg %}</div>
+  <figcaption><b>The cheapest path that keeps parity is the one that shipped.</b> Single-hop
+  matches full-transcript prompting at 0.93 similarity for 2,997 tokens against 18,295; the two
+  paths with more agency spend three and eight times that and return nothing on grounding.
+  Source: <code>evals/runs/matrix-20260809-071818-depth-v2.json</code>.</figcaption>
+</figure>
 
 | Answer path | Prompt tokens | What that spend returns |
 |---|---|---|
@@ -328,4 +336,4 @@ Cost is the finding, not a footnote:
   <figcaption><strong>More agency costs more tokens and does not buy grounding.</strong> Single-hop, recursive and agentic on one question, each carrying its own token cost. Source: <code>evals/runs/</code>, <code>dashboard/evaluation.json</code> · <a href="/assets/dash/transcript-rag/comparison.html" target="_blank" rel="noopener">open full-screen ↗</a></figcaption>
 </figure>
 
-## 7 · Production readiness scorecard
+## 7 · Production readiness scorecard — scored the same way as the retrieval

@@ -1,0 +1,29 @@
+<svg class="dia" viewBox="0 0 240 112" role="img"
+     aria-label="The production readiness rubric the product scores on itself: six of nine dimensions shipped — evals, regression gate, learning loop, tracing, cost and release; two partial — the LLM judge and guardrails; one designed only — the scale path.">
+  <title>Six of nine shipped, scored by the product on itself</title>
+  <g><title>the learning half, R1 to R4 — how a version gets better without getting worse</title>
+    <text class="tx s" x="8" y="12" style="text-anchor:start">R1–R4 · learning</text></g>
+  <g><title>R1 evals and golden set · shipped · a committed manifest, train 100 and gate 100 reports, and prediction CSVs for every run</title>
+    <rect class="nd hi" x="8" y="18" width="52" height="20" rx="4"/><text class="tx" x="34" y="31" style="text-anchor:middle">evals</text></g>
+  <g><title>R2 LLM-as-judge · partial · a Haiku 4.5 confidence band scored once on the sealed split, not adopted as a gate</title>
+    <rect class="nd" x="66" y="18" width="52" height="20" rx="4"/><text class="tx" x="92" y="31" style="text-anchor:middle">judge</text></g>
+  <g><title>R3 regression gate · shipped · net positive and one-sided cluster-corrected McNemar p below 0.05</title>
+    <rect class="nd hi" x="124" y="18" width="52" height="20" rx="4"/><text class="tx" x="150" y="31" style="text-anchor:middle">gate</text></g>
+  <g><title>R4 learning loop · shipped · campaigns of at most five experiments, one agent's prompt rewritten per experiment</title>
+    <rect class="nd hi" x="182" y="18" width="50" height="20" rx="4"/><text class="tx" x="207" y="31" style="text-anchor:middle">loop</text></g>
+  <g><title>the operating half, R5 to R9 — what happens once it is live, and who finds out first</title>
+    <text class="tx s" x="8" y="55" style="text-anchor:start">R5–R9 · operating</text></g>
+  <g><title>R5 guardrails and security · partial · abuse controls only, with no per-user auth and no red-team suite</title>
+    <rect class="nd" x="8" y="61" width="42" height="20" rx="4"/><text class="tx" x="29" y="74" style="text-anchor:middle">guard</text></g>
+  <g><title>R6 observability and tracing · shipped · every LLM call is a span, and every served turn a row</title>
+    <rect class="nd hi" x="56" y="61" width="42" height="20" rx="4"/><text class="tx" x="77" y="74" style="text-anchor:middle">trace</text></g>
+  <g><title>R7 cost tracking and control · shipped · per-turn cost with prices declared in code</title>
+    <rect class="nd hi" x="104" y="61" width="42" height="20" rx="4"/><text class="tx" x="125" y="74" style="text-anchor:middle">cost</text></g>
+  <g><title>R8 deploy and release · shipped · merge to CI to OIDC deploy, with a smoke test that asserts the served bundle</title>
+    <rect class="nd hi" x="152" y="61" width="42" height="20" rx="4"/><text class="tx" x="173" y="74" style="text-anchor:middle">ship</text></g>
+  <g><title>R9 scale path · designed only · rung 10, one instance, sessions in process memory, no load test</title>
+    <rect class="nd ext" x="200" y="61" width="32" height="20" rx="4"/><text class="tx" x="216" y="74" style="text-anchor:middle">scale</text></g>
+  <g><title>the score is computed by the product from evaluation/readiness.json and served at its own admin console, measured 2026-09-08 — the same six of nine this page's scorecard reports</title>
+    <text class="tx k" x="8" y="98" style="text-anchor:start">6 / 9 shipped · rung 10</text>
+    <text class="tx s" x="232" y="98" style="text-anchor:end">measured 2026-09-08</text></g>
+</svg>

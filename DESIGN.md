@@ -120,19 +120,31 @@ Committed as rules so they survive future sessions:
     headers collided and "TRANSCRIPT" ran off the panel edge at 390px — which
     is why `scripts/audit_pages.mjs` now measures it.
 12. **No paragraph over 80 words in a case study.** The lint fails the build.
-13. **No second decorated keyword.** One `<em>` per page, in the `h1`. A page
+13. **No section heading that names a topic instead of stating a claim.**
+    Readers scan headline to headline and get through about a quarter of the
+    words, so a heading called `Architecture` spends the one thing they read
+    and returns nothing. A spine heading keeps its label, then carries the
+    claim after an em dash — see `CLAUDE.md`, "Presentation mode". The lint
+    fails the build on a heading with no claim, and on a claim over ten words.
+14. **No published page with nothing drawn.** A page that asserts every number
+    in prose is a page a scanner cannot check. At least one author-placed
+    `{% include diagrams/… %}` per page; the layout's agent and topology
+    diagrams do not count, because they describe rather than evidence.
+15. **No chart drawn from a number that is not in a repo.** A figure with no
+    committed source looks like evidence and is not.
+16. **No second decorated keyword.** One `<em>` per page, in the `h1`. A page
     with two emphasised words has emphasised nothing.
-14. **No navigation surface with a hand-maintained list.** The nav dropdown, the
+17. **No navigation surface with a hand-maintained list.** The nav dropdown, the
     footer page tree and `#work` all read the same
     `where production.live` query, so an unpublished project cannot leak into
     one of them by being forgotten in another.
-15. **No standalone control under 24×24px** (WCAG 2.5.8). Links set inline in a
+18. **No standalone control under 24×24px** (WCAG 2.5.8). Links set inline in a
     sentence are exempt and are left alone — padding them would wreck the line
     rhythm of the prose.
-16. **No link distinguished from its surrounding text by colour alone**
+19. **No link distinguished from its surrounding text by colour alone**
     (WCAG 1.4.1). Inside any block of prose a link is underlined, not just
     tinted.
-17. **No asset URL without its build revision.** GitHub Pages serves CSS and JS
+20. **No asset URL without its build revision.** GitHub Pages serves CSS and JS
     with `max-age=600`, so an unversioned URL gives returning visitors up to ten
     minutes of new HTML against an old stylesheet. It happened on two
     consecutive deploys before the `?v=` was added.
