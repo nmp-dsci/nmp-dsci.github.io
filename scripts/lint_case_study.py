@@ -258,6 +258,17 @@ def h2_sections(body: str) -> list[tuple[str, str]]:
     return [(title, "\n".join(lines)) for title, lines in sections]
 
 
+def h3_headings(body: str) -> list[str]:
+    """Every '### ' heading outside a code fence."""
+    heads, fenced = [], False
+    for line in body.splitlines():
+        if line.lstrip().startswith(("```", "~~~")):
+            fenced = not fenced
+        elif not fenced and line.startswith("### "):
+            heads.append(line[4:].strip())
+    return heads
+
+
 def body_paragraphs(body: str) -> list[str]:
     """The prose blocks of a body, as single strings.
 
@@ -339,13 +350,108 @@ def svg_tag(node) -> str:
     return node.tag.split("}")[-1] if isinstance(node.tag, str) else ""
 
 
+# Presentation mode (CLAUDE.md, "the rubric"): a spine heading is a stable
+# label followed by ` — ` and the section's assertion, so the one thing a
+# scanner reliably reads carries a claim instead of naming a topic. The label
+# keeps the spine checkable and keeps `sections[].n` aligned to the numbering.
+ASSERTION_SEP = " — "
+ASSERTION_WORDS = 10      # P1: long enough to state a claim, short enough to scan
+TOPIC_LABELS = {          # P1: nouns that name a topic instead of asserting one
+    "architecture", "cost", "what it is", "problem", "the build", "overview",
+    "setup", "results", "the result", "background", "introduction", "summary",
+    "how it works", "the problem", "approach", "the approach", "details",
+}
+
+
+def spine_label(title: str) -> str:
+    """The stable part of a heading — everything before the assertion."""
+    return title.split(ASSERTION_SEP, 1)[0].strip()
+
+
+def assertion_of(title: str) -> str:
+    """The claim after the separator, or '' when the heading carries none."""
+    return title.split(ASSERTION_SEP, 1)[1].strip() if ASSERTION_SEP in title else ""
+
+
 def order_faults(titles: list[str], spine: list[str]) -> list[str]:
-    """Which headings are missing, invented, or in the wrong place."""
-    faults = [f"missing (or misspelled): ## {want}" for want in spine if want not in titles]
-    faults += [f"not in the spine: ## {got}" for got in titles if got not in spine]
-    if [t for t in titles if t in spine] != [s for s in spine if s in titles]:
+    """Which headings are missing, invented, or in the wrong place.
+
+    Matched on the label, so `## 3 · Agent loop & evaluation — one promotion in
+    nine tries` satisfies the spine entry `3 · Agent loop & evaluation`.
+    """
+    labels = [spine_label(t) for t in titles]
+    faults = [f"missing (or misspelled): ## {want}" for want in spine if want not in labels]
+    faults += [f"not in the spine: ## {got}" for got, label in zip(titles, labels)
+               if label not in spine]
+    if [t for t in labels if t in spine] != [s for s in spine if s in labels]:
         faults.append("out of order — expected " + " → ".join(spine))
     return faults
+
+
+def check_assertions(rep: Report, body: str, spine: list[str]) -> None:
+    """P1 — every spine heading states a claim, and no heading names a topic."""
+    titles = [h for h, _ in h2_sections(body)]
+    faults = []
+    for title in titles:
+        label, claim = spine_label(title), assertion_of(title)
+        if label.lower() in TOPIC_LABELS and not claim:
+            faults.append(f"## {title} names a topic — say what it proves")
+        elif not claim:
+            faults.append(f"## {title} carries no assertion — add ' — <the claim>'")
+        elif len(claim.split()) > ASSERTION_WORDS:
+            faults.append(f"## {label}: the claim runs {len(claim.split())} words, "
+                          f"and a scanned heading holds {ASSERTION_WORDS}")
+
+    # H3s are scanned the same way. They carry no spine label, so they may
+    # assert outright — but a one-word noun ("Git", "Lavish") names a topic
+    # just as surely as `## Architecture` does.
+    subs = h3_headings(body)
+    for sub in subs:
+        # The whole heading is the claim here, so it is measured whole: a
+        # subheading may name its subject as long as it goes on to say
+        # something about it.
+        if sub.lower().rstrip(".") in TOPIC_LABELS or len(sub.split()) < 3:
+            faults.append(f"### {sub} names a topic — say what it shows")
+    rep.verdict(not faults,
+                f"assertions: {len(titles) + len(subs)} headings state a claim",
+                *faults, fail_msg="assertions: a heading names a topic instead of a claim")
+
+
+# P5 — the scan budget, by page type. A reader gets through about a quarter of
+# the words, so these are the points past which the rest is not being read.
+# The three numbers differ because the page types differ structurally:
+#   project   the 60-90 second scan; mechanism belongs on its deep page
+#   practice  one pattern across three systems, each section a mini-case,
+#             plus an evidence table where every count carries its command
+#   deep      the "in full" level — the page the other two link down to
+WORD_BUDGET = {"project": 1800, "practice": 2200, "deep": 2500, "page": 800}
+
+
+def check_budget(rep: Report, body: str, kind: str) -> None:
+    """P5 — a warning, never a failure: length is a trade, not a rule."""
+    words = len(body.split())
+    cap = WORD_BUDGET[kind]
+    if words <= cap:
+        rep.ok(f"scan cost: {words} body words, inside the {cap}-word {kind} budget")
+    else:
+        rep.warn(f"scan cost: {words} body words against a {cap}-word {kind} budget",
+                 "move mechanism and setup down a level rather than cutting a fact")
+
+
+def check_charts(rep: Report, body: str) -> None:
+    """P2 — a published page draws at least one piece of its evidence.
+
+    A warning, not a failure: the pages are being brought up to the rubric one
+    wave at a time, and a page with nothing to draw yet should still publish.
+    """
+    # Author-placed figures only: the layout injects the agent and topology
+    # diagrams through fig-agent.html / fig-topology.html, so an inline
+    # `include diagrams/...` is always evidence the author chose to draw.
+    charts = re.findall(r"include\s+diagrams/", body)
+    if charts:
+        rep.ok(f"charts: {len(charts)} evidence figure(s) inline")
+    else:
+        rep.warn("charts: no chart, loop or runtime figure — the claims are asserted, not drawn")
 
 
 # --------------------------------------------------------------------- checks
@@ -482,9 +588,10 @@ def check_diagram(rep: Report, include_path: str, kind: str, key: str) -> None:
 
 
 def check_spine(rep: Report, body: str) -> None:
-    sections = dict(h2_sections(body))
-    titles = list(sections)
-    hits = len([t for t in SPINE if t in titles])
+    # Keyed by the stable label, so a heading may carry its assertion after ` — `.
+    sections = {spine_label(t): b for t, b in h2_sections(body)}
+    titles = [t for t, _ in h2_sections(body)]
+    hits = len([s for s in SPINE if s in sections])
     faults = order_faults(titles, SPINE)
     rep.verdict(not faults, f"spine: {hits}/7 sections present, in order", *faults,
                 fail_msg=f"spine: {hits}/7 sections match the contract")
@@ -741,8 +848,13 @@ def lint_project(path: Path, repo: Path | None, why: str, no_net: bool) -> Repor
                   "production.topology_diagram")
     if architecture.get("loop_diagram"):
         check_diagram(rep, architecture["loop_diagram"], "loop", "architecture.loop_diagram")
+    if architecture.get("home_diagram"):
+        check_diagram(rep, architecture["home_diagram"], "home", "architecture.home_diagram")
     check_deep_links(rep, fm, path)
     check_spine(rep, body)
+    check_assertions(rep, body, SPINE)
+    check_charts(rep, body)
+    check_budget(rep, body, "project")
     check_score(rep, production, rows)
     check_prose(rep, fm)
     check_headline(rep, fm)
@@ -780,10 +892,14 @@ def lint_practice(path: Path) -> Report:
                 "_data/rubric.yml", *listing(not_a_dimension=unknown))
 
     titles = [t for t, _ in h2_sections(body)]
+    labels = [spine_label(t) for t in titles]
     faults = order_faults(titles, PRACTICE_SPINE)
-    hits = len([t for t in PRACTICE_SPINE if t in titles])
+    hits = len([s for s in PRACTICE_SPINE if s in labels])
     rep.verdict(not faults, f"spine: {hits}/5 sections present, in order", *faults,
                 fail_msg=f"spine: {hits}/5 sections match the contract")
+    check_assertions(rep, body, PRACTICE_SPINE)
+    check_charts(rep, body)
+    check_budget(rep, body, "practice")
     check_prose(rep, fm)
     for key, check in (("headline", check_headline), ("outcome", check_outcome),
                        ("proof_line", check_proof_line)):
@@ -868,9 +984,12 @@ def lint_deep(path: Path) -> Report:
 
     titles = [t for t, _ in h2_sections(body)]
     faults = order_faults(titles, DEEP_SPINE)
-    hits = len([t for t in DEEP_SPINE if t in titles])
+    hits = len([s for s in DEEP_SPINE if s in [spine_label(t) for t in titles]])
     rep.verdict(not faults, f"spine: {hits}/5 sections present, in order", *faults,
                 fail_msg=f"spine: {hits}/5 sections match the contract")
+    check_assertions(rep, body, DEEP_SPINE)
+    check_charts(rep, body)
+    check_budget(rep, body, "deep")
     check_prose(rep, fm)
     for key, check in (("headline", check_headline), ("outcome", check_outcome),
                        ("proof_line", check_proof_line)):

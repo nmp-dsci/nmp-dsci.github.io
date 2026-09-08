@@ -38,7 +38,7 @@ sections:
       The protocol got stricter three times in four days, each change dated and attributable.
 ---
 
-## Setup
+## Setup — a fixed unseen split, drawn once and committed
 
 Four things exist before an experiment can run.
 
@@ -61,7 +61,7 @@ export DEEPSEEK_API_KEY=...                        # the four agents; never set 
 claude auth status                                 # the teacher runs on the Claude subscription
 ```
 
-## One cycle
+## One cycle — the teacher blames one agent, and only that prompt moves
 
 Reference: campaign c01, experiment 3 (2026-09-03), v2 → v8, one command.
 
@@ -99,7 +99,7 @@ uv run convfinqa-evalloop cycle --campaign c01 --baseline v2
 - **The taxonomy is frozen** — named failure modes per agent, a `new:<label>` escape, and `gold_suspect` for a gold answer that looks wrong (the Dataset page settles those).
 - **Attribution prompt rewritten once** — PR #8, measured old against new on 554 cases; the SDK arm slices its taxonomy verbatim from the same constant.
 
-## Gate & promote
+## Gate & promote — significance, not a better number, decides
 
 `comparator.py::promotable_significant`: **net positive on the shared gate questions — strictly more fixed than broken — and a one-sided McNemar p below 0.05 over the discordant pairs, cluster-corrected by conversation.**
 
@@ -109,6 +109,14 @@ uv run convfinqa-evalloop cycle --campaign c01 --baseline v2
 - **Train runs optimise, the gate split promotes** — `gate` and `gate-targeted` refuse `--promote` on a train CSV.
 - **A targeted challenger must move its own agent** — `gate-targeted` requires the target's panel metric to improve on the shared gate reports and paired accuracy not to regress.
 - **The SDK arm promotes to its own alias** — `sdk_champion`, never `champion`; serving reads only the latter.
+
+<figure class="fig">
+  <div class="dia-frame">{% include diagrams/chart/convfinqa-gates.svg %}</div>
+  <figcaption><b>Seven of nine challengers moved the number and none of them earned it.</b>
+  Every interval that crosses zero is a rejection; the two that clear it are v8 at +4.58 pp and
+  sdk_v1 at +8.88 pp. Source:
+  <code>evaluation/diagnostics/evalloop/gates.jsonl</code>.</figcaption>
+</figure>
 
 The verdict that promoted v8, from `gates.jsonl`:
 
@@ -144,7 +152,7 @@ eval-gate PASSED
 - **The last line is a defect, not a pass** — campaign promotions leave the bundle's `metrics` empty, so v8's floor is −0.5% and cannot fail.
 - **The re-score is real** — 81.66% from the committed CSV; the floor is not.
 
-## Cycle log
+## Cycle log — one promotion in seven campaign experiments
 
 Newest first; accuracies from the committed CSVs, verdicts from `gates.jsonl` and the registry history; every campaign row paired on the same 349 gate questions.
 
@@ -180,7 +188,7 @@ Still open:
 - **Diminishing returns** — three campaigns against v8, four rejections; the best, v11, +1.4 pp.
 - **Noise floor** — a 100-report train draw yields about 50 first-wrong cases split four ways; one draw's ranking of agents is close to noise.
 
-## What changed since
+## What changed since — the rule got stricter, three times
 
 Newest first; protocol changes, not code changes.
 

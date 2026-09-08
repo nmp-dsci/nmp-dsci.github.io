@@ -20,13 +20,13 @@
   <g><title>v2 · 77.1% (594/770) · a GEPA run over DSPy, all four prompts; champion again after the 2026-09-03 rollback and the baseline of campaign c01</title>
     <rect class="bar" x="90" y="71.1" width="34" height="48.9" rx="3"/>
     <text class="tx k" x="107" y="66.7">77.1</text>
-    <text class="tx s" x="107" y="132">v2 · GEPA</text>
+    <text class="tx s" x="107" y="132">v2</text>
     <text class="tx s" x="107" y="143">n 770</text></g>
 
   <g><title>v8 · 81.7% (285/349) on the unseen gate split · campaign c01 experiment 3: the teacher blamed the retriever, one prompt changed, +4.58 pp over v2, one-sided clustered McNemar p 0.040 · the champion the demo serves</title>
     <rect class="bar pro" x="140" y="58" width="34" height="62" rx="3"/>
     <text class="tx k" x="157" y="53.6">81.7</text>
-    <text class="tx s" x="157" y="132">v8 · loop</text>
+    <text class="tx s" x="157" y="132">v8</text>
     <text class="tx s" x="157" y="143">n 349</text></g>
 
   <g><title>sdk_v1 · 90.5% (316/349) on the same 349 questions · v8's four prompts distilled into one Claude session on claude-sonnet-5 with the same six calculator tools · +8.88 pp over v8, p 0.0003 · promoted to sdk_champion, never champion</title>

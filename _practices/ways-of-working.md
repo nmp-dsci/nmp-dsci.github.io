@@ -39,7 +39,7 @@ sections:
       prefixes each hide a different one.
 ---
 
-## Problem
+## Problem — an agent writes fast, and reviews itself badly
 
 An agent writes plausible code very fast.
 
@@ -47,11 +47,18 @@ An agent writes plausible code very fast.
 - **One engineer plus that tool** — a repo that looks healthy and is not.
 - **The failure is not "the AI wrote a bug"** — nothing in the loop is allowed to say *stop*: unreviewed plans become code, unreviewed code becomes main, main deploys.
 
-## Pattern
+## Pattern — plan in the open, gate before merge
+
+<figure class="fig">
+  <div class="dia-frame">{% include diagrams/chart/practice-pipeline.svg %}</div>
+  <figcaption><b>The gate is the only step that can send work backwards, and it is not
+  optional.</b> Source: <code>~/.claude/skills/no-mistakes/SKILL.md</code>, each repo's
+  <code>.lavish/</code> and <code>git log</code>.</figcaption>
+</figure>
 
 Four things, each of which can refuse.
 
-### Git
+### Git — a branch per change, and the message says why
 
 The unit of review is a slice a person can hold in their head, not a week of edits.
 
@@ -61,7 +68,7 @@ The unit of review is a slice a person can hold in their head, not a week of edi
 - **"Never ship a red main"** — only ConvFinQA enforces it mechanically: deploy triggers on `workflow_run` after CI completes and checks the conclusion, with a comment saying why — "their deploy fires on push regardless, which means a red main can ship".
 - **Data Pilot and Transcript RAG** deploy on push to `main`: two of three by discipline, one in YAML.
 
-### Lavish
+### Lavish — the plan is a page, reviewed before any code
 
 - **Every non-trivial change starts as a numbered review artifact** — `.lavish/sNN_*.html`, rendered in the browser, read and annotated *before code exists*: architecture, implementation plans, tickets, experiment results, screenshot sets.
 - **The numbering is the spine** — `s41` is the worker-scaling plan, `s42` its results; a case study cites `s42` the way a paper cites a figure.
@@ -69,7 +76,7 @@ The unit of review is a slice a person can hold in their head, not a week of edi
 - **69 artifacts** across the four repos — this rebuild was planned the same way, from this repo's `.lavish/s04_production-showcase-plan.html`.
 - **Never gitignored**, by workspace rule — an artifact you can `git log` is a decision record; one in a temp directory is a screenshot.
 
-### no-mistakes
+### no-mistakes — an adversarial pass that can refuse the merge
 
 A local gate over committed work on a feature branch: **intent → rebase → review → test → document → lint → push → PR → CI**.
 
@@ -106,7 +113,7 @@ This site closes the loop.
 - and — the load-bearing check — **every path token in a `proof:` field resolving in that system's own repo**.
 - **Why paths?** A model can write "shipped" for free; it cannot invent a path that exists.
 
-## In the three systems
+## In the three systems — one path, four repositories
 
 Same process, three different amounts of it: the repos are different sizes and were built at different times.
 
@@ -127,7 +134,7 @@ Source: `gh pr list`, `git log`, `ls .lavish/*.html` and `git branch -r` in each
 - **ConvFinQA Agent** — the honest outlier: four PRs, all squash-merged, so `main` is fourteen commits with zero `no-mistakes(...)` *subjects*. The gate ran — two squash-commit bodies still contain its fix lines, and the `no-mistakes` remote holds its branch — but squashing erased the per-fix history. Squash-merge and a countable gate trail are mutually exclusive; this repo picked squash.
 - **Transcript RAG** — in between: 13 PRs, 20 artifacts, 16 gate commits (9 review · 5 document · 2 lint), and the largest single log entry is `no-mistakes(review): Address all 14 approved review findings across RAG pipeline` — one branch, fourteen findings.
 
-## Evidence
+## Evidence — 52 merged PRs, 69 artifacts, 49 gate commits
 
 Re-run on 2026-08-30 in each repo.
 
@@ -152,7 +159,7 @@ git branch -r | grep -c 'no-mistakes/'
 - **Two counts moved since the plan** — Transcript RAG is at 13 merged PRs, not 12; the gate total is 49 by commit *subject*, where an earlier 33 for Data Pilot included six squash-merge commits whose bodies quote the gate lines.
 - **Why subjects?** That is what a `git log` reader sees.
 
-## Failure modes
+## Failure modes — how a gate turns into a rubber stamp
 
 - **A gate you skip under time pressure** — local and optional is why it exists at all, and why the numbers above are uneven: ConvFinQA was built fastest and shows the least trail. Nothing in the repo forced it, and nothing would have.
 - **Squash-merge erasing the evidence** — ConvFinQA's four PRs collapsed to four commits; the work happened, the gate ran, the record is gone from the subject line. Fix: if you intend to count the gate trail later, the merge strategy is part of the design, not a preference.

@@ -1,0 +1,29 @@
+<svg class="dia" viewBox="0 0 240 104" role="img"
+     aria-label="The path every change takes across four repositories: a Lavish review artifact is written before the code, the branch is built and linted, the no-mistakes gate reviews it, then it merges and deploys. Sixty-nine review artifacts, fifty-two merged pull requests and forty-nine gate commits stand behind those four repositories.">
+  <title>Plan in the open, gate before merge: 69 artifacts, 52 PRs, 49 gate commits</title>
+  <defs><marker id="wow-ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 1 L9 5 L0 9 z" fill="currentColor"/></marker></defs>
+  <g><title>step 1 · plan — a Lavish HTML artifact states the change and its open decisions before any code exists; 69 of them across the four repositories</title>
+    <rect class="nd" x="4" y="24" width="48" height="26" rx="4"/>
+    <text class="tx" x="28" y="36" style="text-anchor:middle">plan</text>
+    <text class="tx s" x="28" y="46" style="text-anchor:middle">69</text></g>
+  <line class="ed" style="marker-end:url(#wow-ar)" x1="54" y1="37" x2="66" y2="37"/>
+  <g><title>step 2 · build on a branch — conventional commits, and a lint that encodes the page contract rather than describing it</title>
+    <rect class="nd" x="68" y="24" width="48" height="26" rx="4"/>
+    <text class="tx" x="92" y="36" style="text-anchor:middle">build</text>
+    <text class="tx s" x="92" y="46" style="text-anchor:middle">lint</text></g>
+  <line class="ed" style="marker-end:url(#wow-ar)" x1="118" y1="37" x2="130" y2="37"/>
+  <g><title>step 3 · the no-mistakes gate — an adversarial review that pushes its own branch and lands as a no-mistakes(...) commit; 49 of them so far</title>
+    <rect class="nd hi" x="132" y="24" width="48" height="26" rx="4"/>
+    <text class="tx" x="156" y="36" style="text-anchor:middle">gate</text>
+    <text class="tx s" x="156" y="46" style="text-anchor:middle">49</text></g>
+  <line class="ed" style="marker-end:url(#wow-ar)" x1="182" y1="37" x2="194" y2="37"/>
+  <g><title>step 4 · merge and deploy — 52 merged pull requests; in every one of these systems, merging to main is the deploy</title>
+    <rect class="nd" x="196" y="24" width="40" height="26" rx="4"/>
+    <text class="tx" x="216" y="36" style="text-anchor:middle">merge</text>
+    <text class="tx s" x="216" y="46" style="text-anchor:middle">52</text></g>
+  <g><title>the gate is the only step that can send work backwards, and it is the step that is not optional</title>
+    <path class="ed dash" style="marker-end:url(#wow-ar)" d="M156 52 L156 66 L92 66 L92 52"/>
+    <text class="tx s" x="124" y="78" style="text-anchor:middle">the only step that sends work back</text></g>
+  <g><title>counted on 2026-08-30 across ConvFinQA-agent, data-qa-agent, transcript-rag-agent and this site</title>
+    <text class="tx s" x="4" y="98" style="text-anchor:start">four repos · counted 2026-08-30</text></g>
+</svg>

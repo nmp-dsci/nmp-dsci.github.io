@@ -1,0 +1,19 @@
+<svg class="dia" viewBox="0 0 240 132" role="img"
+     aria-label="What each system's loop refused: ConvFinQA rejected seven of nine gate verdicts and rolled back three earlier champions; Transcript RAG shipped one of eight ablation configurations; Data Pilot shipped two of three eval cycles and holds thirty of thirty-two golden cases in draft.">
+  <title>A loop earns its keep by refusing, not by promoting</title>
+  <g><title>ConvFinQA Agent · nine gate verdicts on the same 349 unseen questions · two promoted, seven rejected, and three earlier champions un-promoted on 2026-09-03 when the rule got stricter</title>
+    <text class="tx k" x="4" y="18" style="text-anchor:start">ConvFinQA</text>
+    <rect class="bar pro" x="4" y="24" width="50" height="14" rx="3"/>
+    <rect class="bar" x="56" y="24" width="180" height="14" rx="3"/>
+    <text class="tx s" x="4" y="48" style="text-anchor:start">2 promoted of 9 · 3 rolled back</text></g>
+  <g><title>Transcript RAG · an eight-configuration ablation over the same twenty golden entries · one configuration ships, and every committed run is re-scored by CI</title>
+    <text class="tx k" x="4" y="66" style="text-anchor:start">Transcript RAG</text>
+    <rect class="bar pro" x="4" y="72" width="29" height="14" rx="3"/>
+    <rect class="bar" x="35" y="72" width="201" height="14" rx="3"/>
+    <text class="tx s" x="4" y="96" style="text-anchor:start">1 config of 8 · 16 runs in CI</text></g>
+  <g><title>Data Pilot · three eval cycles, of which 002 failed and was not shipped · and 30 of the 32 golden cases are still draft rather than promoted to ready</title>
+    <text class="tx k" x="4" y="114" style="text-anchor:start">Data Pilot</text>
+    <rect class="bar pro" x="4" y="120" width="155" height="10" rx="3"/>
+    <rect class="bar" x="161" y="120" width="75" height="10" rx="3"/>
+    <text class="tx s" x="236" y="114" style="text-anchor:end">2 cycles of 3 · 30 goldens draft</text></g>
+</svg>

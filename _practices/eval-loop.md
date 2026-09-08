@@ -39,7 +39,7 @@ sections:
       it.
 ---
 
-## Problem
+## Problem — a number with no gate behind it is a claim
 
 A prompt edit is a guess until something scores it.
 
@@ -48,7 +48,7 @@ A prompt edit is a guess until something scores it.
 - **Averages hide it** — lose one point overall while fixing sixty-one answers and breaking sixty-eight.
 - **No fixed set, no per-case comparison, nothing that says *no*** — "the model got better" is a story about the questions you remembered to ask.
 
-## Pattern
+## Pattern — the loop's job is to refuse, not to promote
 
 Eight steps; all three systems run all eight, differing only in how much is automated.
 
@@ -61,7 +61,7 @@ Eight steps; all three systems run all eight, differing only in how much is auto
 7. **Trace what ships** — the next diagnosis reads real failures.
 8. **Promote through a contract** — and write up the failed cycles as carefully as the successes.
 
-## In the three systems
+## In the three systems — same discipline, three different graders
 
 ### Data Pilot — goldens authored inside the product
 
@@ -84,10 +84,9 @@ Eight steps; all three systems run all eight, differing only in how much is auto
 
 ### ConvFinQA Agent — prompts as versioned code
 
-- **No judge** — answers are numbers and programs, so exact and program accuracy are the honest metric. Task framing, not a missing feature.
-- **Cycles one and two** — the **200 conversations / 770 questions** corpus; `REUSE_CACHE=1 uv run convfinqa-eval` reproduces v1 **72.99%** → v2 **77.14%** from committed CSVs, zero API calls.
-- **GEPA** — v2 over **1,964 metric calls**.
-- **s7 harness** — **39 rules** into v3_1, **76.23%**, refused: 61 fixed, 68 broken, net negative. A rounding error as a headline; a decision as a flip count.
+- **No judge for scoring** — answers are numbers and programs, so exact and program match are the honest metric. Task framing, not a missing feature. The confidence judge that *was* built failed its own gate and ships as advisory.
+- **Reproducible offline** — `REUSE_CACHE=1 uv run convfinqa-eval` re-derives v1 **72.99%** → v2 **77.14%** from committed CSVs, zero API calls.
+- **s7 harness** — **39 rules** into v3_1, **76.23%**, refused: 61 fixed, 68 broken. A rounding error as a headline; a decision as a flip count.
 - **Since 2026-09-03** — a committed manifest: train 100 / gate 100 reports (368 / 349 questions), from conversations neither optimiser saw; holdout reserved.
 
 | step | in ConvFinQA |
@@ -101,13 +100,9 @@ Eight steps; all three systems run all eight, differing only in how much is auto
 | trace | every LLM call a span in MLflow, run → report → question → stage |
 | promote | an append-only history that keeps the refusals |
 
-- **Nine verdicts** under the current contract, all paired on the same 349 gate questions.
-- **v8** — retriever only, **promoted**: 77.1% → 81.7%, 34 fixed against 18 broken, one-sided clustered McNemar p 0.040.
-- **Seven refused** — each moved the number, v11's +1.4 pp among them.
-- **`sdk_v1`** — the runtime arm, promoted to its own alias at 90.5%, p 0.0003.
-- **Rolled back 2026-09-03** — v3_1, v4 and v5 under the stricter rule; v5's p under it is 0.207.
-- **The gate on every PR, offline** — `python -m convfinqa.tracking.gate` re-derives each committed CSV's `correct` column against gold (catching a hand-edited CSV), then checks the champion against the floor from its promotion CSV.
-- **Today** — v1, v2, v3_1 at 770 rows, consistent; v8 re-scored 81.66% against a −0.5% floor, because campaign promotions leave registry metrics empty. Real re-score; open defect.
+- **Nine verdicts, two promotions** — v8 at +4.6 pp (p 0.040) and `sdk_v1` at +8.9 pp (p 0.0003); seven refused, and v3_1, v4 and v5 rolled back on 2026-09-03 under the stricter rule.
+- **The gate on every PR, offline** — `python -m convfinqa.tracking.gate` re-derives each committed CSV's `correct` column against gold, then checks the champion against its promotion floor.
+- **Open defect** — v8 re-scores at 81.66% against a −0.5% floor, because campaign promotions leave registry metrics empty. The floor is real; it cannot currently fail.
 
 [The loop in full, command by command →](/projects/convfinqa-agent/eval-loop/)
 
@@ -140,9 +135,17 @@ Source: `evals/runs/ablation-20260801-051456.json`.
 - **CI `eval-gate`** — `tests/evals/test_committed_runs.py` over the **16 committed snapshots**, recomputing deterministic metrics from stored `retrieved_chunk_ids` against the *current* labels.
 - **What it catches** — a snapshot that no longer reconciles with its own ids, a golden-set edit that invalidates a committed run, a real drop below a floor.
 
-## Evidence
+## Evidence — every count here has the command that reproduces it
 
 Re-run in each system's own repo: ConvFinQA on 2026-09-06, the other two on 2026-08-30.
+
+<figure class="fig">
+  <div class="dia-frame">{% include diagrams/chart/practice-refusals.svg %}</div>
+  <figcaption><b>Every one of these loops spends most of its life saying no.</b> Two of nine
+  ConvFinQA verdicts promoted, one of eight RAG configurations shipped, one of three Data Pilot
+  cycles refused — and 30 of 32 goldens are still draft. Source: the three repos' own ledgers,
+  each with the command that reproduces it in the table below.</figcaption>
+</figure>
 
 | claim | command | result |
 |---|---|---|
@@ -166,7 +169,7 @@ Two earlier systems, not published as case studies, ran the same discipline.
 - **[v2v-prod-agent](https://github.com/nmp-dsci/v2v-prod-agent)** — a voice banking agent's red team graded on **bank state, not words**: nine scripted attacks from an already-compromised model, each asserted with `test_the_bank_does_not_move[...]`, 9/9, deterministic, no API key.
 - **[CUAD-agent](https://github.com/nmp-dsci/CUAD-agent)** — 41 clause questions × 50 contracts × five retrieval context modes: 2,050 predictions per mode, **10,250** in the grid; retrieval scored apart from the answer, so a bad number attributes to one of them.
 
-## Failure modes
+## Failure modes — the ways a gate quietly stops gating
 
 - **Self-grading** — a model scoring its own family rewards its own phrasing. Fix: Data Pilot's judge refuses and records `skipped`; Transcript RAG flags `self_graded`. Grade-and-footnote gives a number nobody can use.
 - **A better average hiding per-case flips** — fired three times: 002 improved its target metric and would have shipped on any headline rule; v3_1 fixed 61, broke 68, −0.91%; v4 lifted the retriever's unseen recall while the calculator fell .618 → .500. Fix: a list of case ids or a per-agent panel, never the average.

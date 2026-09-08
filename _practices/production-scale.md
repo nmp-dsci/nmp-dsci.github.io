@@ -39,7 +39,7 @@ sections:
       a measurement.
 ---
 
-## Problem
+## Problem — "it scales" is a claim nobody has measured
 
 Most portfolio scale sections draw what someone would build and never say which box exists.
 
@@ -47,7 +47,7 @@ Most portfolio scale sections draw what someone would build and never say which 
 - **Capacity is a slot count**, not a throughput number — a hundred people at once is a different system from ten, not a bigger instance.
 - **So** — the unit is concurrent users, each rung is labelled with how real it is, and the sizing is arithmetic you can check.
 
-## Pattern
+## Pattern — name your rung, and size the next one
 
 Three rungs: rung 10 running now; rung 100 sized on one laptop, not deployed; rung 1,000 a design.
 
@@ -77,12 +77,8 @@ Monthly-user figures use a 1–2% concurrency rule of thumb, order-of-magnitude 
 
 **≈ $0.5–1k / month + inference · ≈ 5–10k monthly users — estimates**
 
-Two terms, the two halves of what App Runner bundles at rung 10.
-
-- **ALB** (Application Load Balancer) — the front door, the job an API Gateway would otherwise do.
-- **ECS Fargate** — the compute, where the FastAPI containers run; no servers to manage.
-- **Why ALB, not API Gateway, for chat?** API Gateway's integration timeout is about 30 seconds: it cannot hold a 90-second answer or an SSE stream. An ALB's idle timeout goes to 4,000 seconds.
-- **Where does API Gateway fit?** *Beside* the ALB on keyed surfaces — Data Pilot's `dpk_` webhook and MCP keys — where per-key usage plans and throttling are the entire point.
+- **ALB in front, ECS Fargate behind** — the two halves of what App Runner bundles at rung 10.
+- **Why not API Gateway for chat?** Its integration timeout is ~30 s and cannot hold a 90-second answer or an SSE stream; an ALB's idle timeout goes to 4,000 s. API Gateway sits *beside* it on the keyed surfaces, where per-key throttling is the point.
 
 **The sizing is arithmetic.** Drain time `⌈N ÷ slots⌉ × S` held within 6% across every configuration tested.
 
@@ -134,7 +130,7 @@ Two terms, the two halves of what App Runner bundles at rung 10.
 
 Source: rung 10 from the deployed configuration; rungs 100 and 1,000 from `.lavish/s42_worker-scaling-results.html` and the design.
 
-## In the three systems
+## In the three systems — all three sit on rung 10, and say so
 
 All three sit on rung 10 today; what differs is how much of rung 100 is more than an intention.
 
@@ -142,7 +138,7 @@ All three sit on rung 10 today; what differs is how much of rung 100 is more tha
 - **ConvFinQA Agent — rung 10, seam named.** One instance, `--workers 1`, in-memory sessions and limits; `serving/limits.py`'s own docstring says in-memory state is *correct* because App Runner runs at max-size 1, "if that ever changes, these two classes are the seam". No load test; rungs 100 and 1,000 design only.
 - **Transcript RAG — rung 10, seam named.** One 0.5 vCPU / 1 GB App Runner instance, read-only, Chroma index baked in; an ingestion queue with three workers (`src/api/ingestion_queue.py`) already serves the write path, the shape rung 100 needs for reads. No load test; rungs 100 and 1,000 design only.
 
-## Evidence
+## Evidence — rung 100 is measured, rung 1,000 is only drawn
 
 One experiment in `data-qa-agent`: `.lavish/s42_worker-scaling-results.html` (the write-up), `out/wsweep/summary.json` (the raw grid) and `load/k6/chat.js`, recomputed from `summary.json` on 2026-08-30.
 
@@ -179,7 +175,7 @@ One experiment in `data-qa-agent`: `.lavish/s42_worker-scaling-results.html` (th
 - **The queue's trade** — about two minutes for the last user, for bounded CPU, bounded LLM spend and a clean 429 past depth 32.
 - **The only measured dollars** — Data Pilot's demo-mode cutover (~$36–66 → ~$8–18/month) and ConvFinQA's container: 225 MiB RSS at rest, 315 MiB with every prediction CSV cached, so 1 GB is the honest floor at roughly $5–15/month. Rungs 100 and 1,000 are estimates.
 
-## Failure modes
+## Failure modes — where a rung-10 shape breaks first
 
 - **Presenting an estimate as a measurement** — the rung-100 dollar range is a guess with a shape, not a bill. The sizing was measured, but on one laptop with stubbed service time; live answers vary 60–120 s and smear wave boundaries, so expect the same means with wider spread.
 - **Confusing throughput with slots** — "handles 30 requests a minute" says nothing when one answer holds a slot for 90 seconds. Fix: size by `⌈N ÷ slots⌉ × S`, and measure `S` under the model you actually ship.

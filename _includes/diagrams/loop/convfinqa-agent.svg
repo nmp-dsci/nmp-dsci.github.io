@@ -47,7 +47,7 @@
   <g><title>08 · gate — tracking/comparator.py::promotable_significant and evalloop/gate.py, on the fixed unseen gate split only: net positive on the shared questions AND one-sided McNemar p below 0.05, cluster-corrected by conversation because a wrong turn poisons the turns below it; a cluster-bootstrap 95% CI and the exact p are written on every verdict; --promote is refused on train-split evidence; 9 verdicts on the ledger, 2 promotions</title>
     <rect class="nd hi" x="186" y="158" width="80" height="34" rx="6"/>
     <text class="tx" x="226" y="172">gate</text>
-    <text class="tx s" x="226" y="185">p &lt; .05 · clustered</text></g>
+    <text class="tx s" x="226" y="185">p &lt; .05</text></g>
 
   <g><title>09 · release — evalloop/release.py: the holdout opens once, for the current champion only, behind an explicit acknowledgement flag; every opening is appended to the registry history so no later version can claim it as unseen; opened 0 times so far, mechanism tested with stubs</title>
     <rect class="nd" x="96" y="158" width="80" height="34" rx="6"/>

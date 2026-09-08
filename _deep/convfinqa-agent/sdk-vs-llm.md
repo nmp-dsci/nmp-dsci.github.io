@@ -7,18 +7,21 @@ rubric: [evals, gate, loop, cost]
 summary: >-
   The runtime experiment behind the case study's slides 2 and 4: the Claude Agent SDK runtime,
   v8's four prompts distilled into one, the same gate on the same 349 questions. Then the
-  by-turn-type split, the model swap, and what the result does and does not establish.
+  by-turn-type split, the model swap, the confidence judge that refused itself, and what the
+  result does and does not establish.
 tldr: >-
   sdk-distil v8 → sdk_v1 → run both arms on the gate split → runtime gate → sdk_champion, then
-  the SDK loop's own experiment (rejected) and a model swap (Haiku 4.5, −3.2 pp, not significant).
-updated: 2026-09-06
+  the SDK loop's own experiment (rejected), a model swap (Haiku 4.5, −3.2 pp, not significant),
+  and a confidence judge that scored AUROC 0.52 and ships as advisory rather than as a gate.
+updated: 2026-09-08
 evidence_note: >-
-  Every number on this page was re-run on 2026-09-06 in a clone of
-  <code>ConvFinQA-agent</code> at <code>5af229e</code>. The two arms' accuracies are recomputed
+  Every number on this page was re-read on 2026-09-08 from
+  <code>ConvFinQA-agent</code> at <code>9d11da7</code>. The two arms' accuracies are recomputed
   with pandas from the committed CSVs under <code>evaluation/predictions/evalloop/</code>
   (<code>evalloop-test100-v8·…</code>, <code>sdk-evalloop-test100-sdk_v1·…</code> and the
   <code>…haiku-4-5…</code> run); the verdicts read <code>evaluation/diagnostics/evalloop/gates.jsonl</code>
-  and <code>evaluation/story.json → runtime_comparison</code>; cost and wall time are the
+  and <code>evaluation/story.json → runtime_comparison</code>; the judge figures read
+  <code>evaluation/story.json → judge</code> and <code>evaluation/judge/judge_gates.jsonl</code>; cost and wall time are the
   values logged on each MLflow run. When an SDK experiment is added, append a row and re-date.
 sections:
   - n: 1
@@ -29,7 +32,7 @@ sections:
       An SDK experiment is the pipeline's cycle with one prompt instead of four and a subprocess instead of a call.
   - n: 3
     summary: >-
-      The runtime gate promoted sdk_v1 to its own alias, and the case for it carries both caveats.
+      The runtime gate promoted sdk_v1; a second gate, the confidence judge, refused itself.
   - n: 4
     summary: >-
       Three rows: the baseline that won, the rewrite that lost, and the model swap that priced the confound.
@@ -38,7 +41,7 @@ sections:
       What shipped is a measurement and a second runtime, not a change to what the demo serves.
 ---
 
-## Setup
+## Setup — one capture shape, so only the runtime differs
 
 Three things existed first, so the comparison is of runtimes, not scoring paths.
 
@@ -58,7 +61,7 @@ uv run convfinqa-evalloop sdk-distil --source-version v8 --new-version sdk_v1
 uv run convfinqa-evalloop run --split test --version sdk_v1 --runtime agent_sdk
 ```
 
-## One cycle
+## One cycle — the pipeline's loop with one prompt instead of four
 
 The pipeline's cycle with one prompt where there were four; reference campaign s01 (2026-09-05), capped at two experiments.
 
@@ -79,9 +82,17 @@ uv run convfinqa-evalloop cycle --campaign s01 --runtime agent_sdk
 - **Skipped stages are failures of that stage** — over 349 questions `sdk_v1` recorded 3 stage skips and 5 inline-arithmetic answers, counted against it.
 - **A second s01 experiment died at the rewrite step** — subscription session limit, no version written; on the ledger as a failed step, so the campaign shows one rewrite.
 
-## Gate & promote
+## Gate & promote — one session beat four agents by 8.9 points
 
 The campaign gate with a different alias: `sdk_gate.py` pairs the arms, requires net positive and one-sided cluster-corrected McNemar p < 0.05, and writes `promote_sdk` on a pass.
+
+<figure class="fig">
+  <div class="dia-frame">{% include diagrams/chart/convfinqa-turn-types.svg %}</div>
+  <figcaption><b>The gain is entirely on program turns.</b> Lookups sat at 95.5% for both
+  runtimes and moved by exactly zero; the +13.0 pp came from the multi-step turns, where a
+  session keeps the plan and the arithmetic in one context instead of handing them across four
+  boundaries. Source: <code>evaluation/story.json → runtime_comparison</code>.</figcaption>
+</figure>
 
 | Metric | pipeline · v8 | session · sdk_v1 |
 |---|---|---|
@@ -110,12 +121,45 @@ What it establishes, and what it does not:
 - **Not a human-level claim** — 90.5% is above the paper's 89.4% human-expert figure, but on 349 questions from the public train pool, with program match 40.9% against the paper's 86.3%.
 - **A prompt the pipeline's loop wrote** — `sdk_v1` is v8 distilled; the campaigns produced the knowledge, the session was a better vessel.
 
-## Cycle log
+### The judge that did not earn its gate
+
+A second gate was built for the same runtime and refused itself. `judge_j1` is a
+`claude-haiku-4-5` pass that never sees gold: it reads a finished turn's trace and returns a
+confidence band from six named checks, so a low band could withhold an answer instead of
+serving a wrong number.
+
+<figure class="fig">
+  <div class="dia-frame">{% include diagrams/chart/convfinqa-judge.svg %}</div>
+  <figcaption><b>The band's interval contains the line it has to beat.</b> Withholding
+  everything below the high band scores 91.5% on the 316 answers it releases, against 90.5% for
+  releasing all 349 — and the 95% interval on that 91.5% runs 87.9 to 95.2. Source:
+  <code>evaluation/story.json → judge</code>,
+  <code>evaluation/judge/scores/</code>.</figcaption>
+</figure>
+
+| Metric | calibrate · n 304 | test · n 349 |
+|---|---|---|
+| release everything | 90.1% | 90.5% |
+| high band only | 91.4% (267 released) | 91.5% (316 released) |
+| 95% CI on the high band | [87.6, 94.3] | [87.9, 95.2] |
+| failures caught / total | 7 / 30 | 6 / 33 |
+| correct answers withheld | 30 | 27 |
+| AUROC · ECE | 0.62 · 0.13 | 0.52 · 0.11 |
+| coverage at the 1% error target | 0.7% | 0% |
+
+- **Near chance on the split that counts** — AUROC 0.62 on calibrate did not survive to 0.52 on test.
+- **The target is unreachable, not merely missed** — holding high-band error to 1% needs a threshold of 0.997 and releases almost nothing.
+- **The second version was refused by its own rule** — `judge_j2`: *"candidate high band error 11.82% exceeds the 1% target"* (`evaluation/judge/judge_gates.jsonl`).
+- **What shipped** — `JUDGE_MODE=advisory`: the band is shown as a caution beside the answer, and gates nothing.
+
+## Cycle log — the baseline won, the rewrite lost, the swap priced it
 
 Newest first; every row is paired on the same 349 gate questions.
 
 | Date | Subject | Deliverable | Accuracy | Verdict |
 |---|---|---|---|---|
+| 2026-09-07 (judge gate) | judge_j2 · j2 | the SDK teacher's rewrite of the confidence prompt | high band error 11.82% against a 1% target | **rejected**, by its own rule |
+| 2026-09-07 (judge s12/s13) | judge_j1 · j1 | a Haiku 4.5 confidence band over six named checks · `evalloop/judge.py` | high band 91.5% vs 90.5% releasing all · CI [87.9, 95.2] · AUROC 0.52 | **not adopted as a gate** · ships advisory |
 | 2026-09-06 (model swap) | sdk_v1 on claude-haiku-4-5 | same prompt, cheaper model · $17.14 · 882 s | 90.5% → 87.4% · 7 fixed / 18 broken · p 0.051 · CI [−6.9, +0.3] | not significant; still +5.7 pp over the pipeline |
 | 2026-09-05 (s01-e02) | sdk_v2 · s2 | the SDK teacher's rewrite for the calculator / wrong-format class · `prompts/sdk_v2.py` | 90.5% → 87.7% · 6 fixed / 16 broken · p 0.917 · CI [−7.3, +0.9] | **rejected** |
 | 2026-09-05 (s01) | sdk_v1 · s1 | v8's four prompts distilled into one · `prompts/sdk_v1.py` | 81.7% → 90.5% · 38 fixed / 7 broken · p 0.0003 · CI [+4.2, +13.7] | **promoted** · `sdk_champion` |
@@ -132,10 +176,11 @@ Still open:
 - **The architecture half of the confound** — unmeasured, for the reason above.
 - **Cost** — a session gate pass is about fourteen times the pipeline's, 787 seconds against 344; the demo does not serve it, and nothing says when it should.
 
-## What changed since
+## What changed since — a second runtime, not a change to serving
 
 Newest first.
 
+- **2026-09-08 · the judge ships as advisory, not as a gate** — `evalloop/judge.py`, `evaluation/judge/`, the band rendered beside a served answer in `serving/sdk_turn.py`, and `JUDGE_MODE=advisory` as the default. PR #10, `ef10be5`.
 - **2026-09-06 · the runtime experiment ships** — `backends/agent_sdk.py`, `evalloop/sdk.py`, `evalloop/sdk_teacher.py`, `evalloop/sdk_gate.py`, 74 tests across four files, the `Runtimes` admin page, `GET /eval/campaigns`, and `docs/optimization/agent-sdk.html` rebuilt from `story.json` by `convfinqa-evalloop story`. PR #9, `5af229e`.
 - **2026-09-06 · model swap is a scoring pass** — `run --sdk-model <id>` never optimises or promotes; `story.sdk_model_comparison` pairs it against the reference model.
 - **2026-09-05 · `sdk_champion` alias** — the SDK arm promotes to its own alias; serving reads only `champion`; the smoke test still asserts the served bundle is `v8`.

@@ -83,6 +83,9 @@ architecture:
   takeaway: >-
     Every turn crosses the same four typed boundaries, and each boundary loads its own prompt lineage, which is what makes a one-agent change attributable.
   diagram: "diagrams/agent/convfinqa-agent.svg"
+  # The home page shows the result rather than the shape: this system's whole
+  # argument is that every jump has a named cause and a p-value behind it.
+  home_diagram: "diagrams/chart/convfinqa-progression.svg"
   caption: "turn → triage → preprocess → retriever → calculator → answer; number turns short-circuit at the retriever; the four prompts compose into one bundle, t2.p2.r5.c2 for the champion"
   loop_diagram: "diagrams/loop/convfinqa-agent.svg"
   loop_takeaway: >-
@@ -120,12 +123,16 @@ production:
         and a gold-derived per-agent panel.
       proof: "evaluation/splits/eval_loop_v2.json · src/convfinqa/evalloop/splits.py · src/convfinqa/evalloop/stage_scores.py · evaluation/predictions/evalloop/"
     - dimension: judge
-      status: na
+      status: partial
       how: >-
-        No judge, by task framing: every answer is a number or a program, so matching is
-        deterministic. The teacher attributes a miss to an agent and never scores it; its trust
-        check is a 30-case κ sheet (bar 0.7), committed and not yet labelled.
-      proof: "src/convfinqa/evaluation/metrics.py · src/convfinqa/evalloop/kappa.py · evaluation/diagnostics/evalloop/labelling_sheet_30cases.csv"
+        Scoring needs no judge — every answer is a number or a program, so matching is
+        deterministic. The judge that was built answers a different question: a Haiku 4.5
+        confidence band that never sees gold, reads a finished turn's trace and returns one of
+        six named checks. Scored once on the sealed split: the high band is 91.5% against 90.5%
+        for releasing everything, a 95% interval of 87.9–95.2% that contains that baseline,
+        AUROC 0.52, 6 of 33 failures caught for 27 correct answers withheld. Not adopted as a
+        gate; `JUDGE_MODE=advisory`. `judge_j2` was refused by the same rule.
+      proof: "src/convfinqa/evalloop/judge.py · evaluation/judge/judge_gates.jsonl · evaluation/judge/scores · src/convfinqa/serving/sdk_turn.py · src/convfinqa/evalloop/kappa.py"
     - dimension: gate
       status: shipped
       how: >-
@@ -183,7 +190,7 @@ production:
       proof: "src/convfinqa/serving/limits.py · CLAUDE.md · infra/terraform/demo/main.tf"
 ---
 
-## 1 · Purpose & benefit
+## 1 · Purpose & benefit — every gain has a cause and a p-value
 
 ConvFinQA: multi-step numerical questions about a filing, where "that" and "this change" point
 back at earlier turns. The benefit is a loop whose every gain has a cause, a registry row and a
@@ -216,7 +223,7 @@ Every write answers 403 (`owner_token_unset`); `DEMO_MODE` is baked into the ima
 [Open the live demo ↗](https://vrpy25pewm.ap-southeast-1.awsapprunner.com) ·
 [Repository ↗](https://github.com/nmp-dsci/ConvFinQA-agent)
 
-## 2 · Agent architecture
+## 2 · Agent architecture — four typed boundaries, or one session
 
 {% include fig-agent.html %}
 
@@ -247,7 +254,7 @@ Every model is built in one module, `llm.py`:
 - `claude-opus-5` via the Agent SDK — the teacher and prompt-writer;
 - `claude-sonnet-5` — the single session.
 
-## 3 · Agent loop & evaluation
+## 3 · Agent loop & evaluation — two promotions in nine tries
 
 {% include fig-loop.html %}
 
@@ -285,6 +292,18 @@ rejections.
   <p class="go">↳ <a href="/projects/convfinqa-agent/sdk-vs-llm/">both arms, the model swap, every SDK experiment</a></p>
 </div>
 
+<div class="slide" id="slide-3c">
+  <h3><span class="n">3c</span>The judge withholds 27 right answers to catch 6 wrong ones</h3>
+  <div class="dia-frame">{% include diagrams/chart/convfinqa-judge.svg %}</div>
+  <ul>
+    <li><b>What was built?</b> A Haiku 4.5 band that never sees gold, reads the finished trace and applies six named checks.</li>
+    <li><b>Did it pay?</b> No — the high band's interval [87.9, 95.2] contains the score for releasing everything.</li>
+    <li><b>How badly?</b> AUROC 0.52 on the sealed split, and coverage at a 1% error target is zero.</li>
+    <li><b>So what shipped?</b> An advisory caution, not a gate. `judge_j2` was refused by the same rule.</li>
+  </ul>
+  <p class="go">↳ <a href="/projects/convfinqa-agent/sdk-vs-llm/">the six checks, both versions, the calibration split</a></p>
+</div>
+
 | Subject | Deliverable | Accuracy | Verdict |
 |---|---|---|---|
 | `v1` · t1.p1.r1.c1 | the starting prompt set | 770 q: 73.0% | champion, until v2 |
@@ -302,7 +321,7 @@ Refusals keep their bundles, runs and verdicts on the ledger.
 · [the runtime test →](/projects/convfinqa-agent/sdk-vs-llm/)
 · [the eval loop as a practice →](/practices/eval-loop/)
 
-## 4 · Deployed architecture
+## 4 · Deployed architecture — the evidence ships inside the image
 
 {% include fig-topology.html %}
 
@@ -317,7 +336,7 @@ Refusals keep their bundles, runs and verdicts on the ledger.
 
 [See the scale ladder →](/practices/production-scale/)
 
-## 5 · Guardrails & security
+## 5 · Guardrails & security — one choke point owns every model call
 
 A single-tenant read-only demo has no user data to isolate, so these are abuse controls:
 
@@ -328,7 +347,7 @@ A single-tenant read-only demo has no user data to isolate, so these are abuse c
 - **Replay declines** — below its match threshold, rather than serve another filing's number.
 - **Absent**, rated `partial` — per-user auth, row-level policy, a red-team suite.
 
-## 6 · Observability & cost
+## 6 · Observability & cost — a gate pass has a price, per turn
 
 - **Spans** — every pipeline LLM call: run → report → question → agent stage → `Agent.run`.
 - **SDK calls** — a subprocess, so spans are opened by hand and prompts stored by reference.
@@ -351,4 +370,15 @@ Cost is per turn, prices declared in code so an old run cannot be silently repri
 
 Public deployment: no inference, roughly **$5–15/month**.
 
-## 7 · Production readiness scorecard
+<div class="slide" id="slide-6a">
+  <h3><span class="n">6a</span>The product grades itself on these same nine dimensions</h3>
+  <div class="dia-frame">{% include diagrams/chart/convfinqa-readiness.svg %}</div>
+  <ul>
+    <li><b>Where does the score live?</b> `evaluation/readiness.json` in the repo, served at the product's own `/admin`.</li>
+    <li><b>Does it agree with §7?</b> Yes — 6 / 9 shipped, rung 10, measured 2026-09-08, row for row.</li>
+    <li><b>Why does that matter?</b> The claim and the thing being claimed about are computed from one file, so they cannot drift.</li>
+  </ul>
+  <p class="go">↳ <a href="/projects/convfinqa-agent/eval-loop/">the loop that fills those rows</a></p>
+</div>
+
+## 7 · Production readiness scorecard — six of nine, named not rounded

@@ -1,0 +1,19 @@
+<svg class="dia" viewBox="0 0 240 116" role="img"
+     aria-label="The production readiness rubric scored across the three live systems: Data Pilot nine of nine shipped; ConvFinQA Agent six of nine, with the judge and guardrails partial and the scale path designed only; Transcript RAG five of nine. Every dimension that is not shipped is named with its reason on the system's own scorecard.">
+  <title>9 / 9, 6 / 9, 5 / 9 — and the gaps are named, not rounded up</title>
+  <g><title>the nine dimensions run in order: evals, judge, gate, loop, guardrails, tracing, cost, release, scale. Accent is shipped, a plain outline is partial, a dashed outline is designed only.</title>
+    <text class="tx s" x="4" y="12" style="text-anchor:start">evals → scale</text>
+    <text class="tx s" x="236" y="12" style="text-anchor:end">accent = shipped</text></g>
+  <g><title>Data Pilot · 9 of 9 dimensions shipped · governed natural-language to SQL with row-level security, and rung 100 sized by measurement</title>
+    <text class="tx k" x="4" y="28" style="text-anchor:start">Data Pilot</text>
+    <text class="tx k" x="236" y="28" style="text-anchor:end">9 / 9</text>
+    <rect class="nd hi" x="4" y="32" width="23" height="11" rx="3"/><rect class="nd hi" x="30" y="32" width="23" height="11" rx="3"/><rect class="nd hi" x="56" y="32" width="23" height="11" rx="3"/><rect class="nd hi" x="82" y="32" width="23" height="11" rx="3"/><rect class="nd hi" x="108" y="32" width="23" height="11" rx="3"/><rect class="nd hi" x="134" y="32" width="23" height="11" rx="3"/><rect class="nd hi" x="160" y="32" width="23" height="11" rx="3"/><rect class="nd hi" x="186" y="32" width="23" height="11" rx="3"/><rect class="nd hi" x="212" y="32" width="23" height="11" rx="3"/></g>
+  <g><title>ConvFinQA Agent · 6 of 9 shipped · the LLM judge and the guardrails are partial, and the scale path is designed only</title>
+    <text class="tx k" x="4" y="60" style="text-anchor:start">ConvFinQA</text>
+    <text class="tx k" x="236" y="60" style="text-anchor:end">6 / 9</text>
+    <rect class="nd hi" x="4" y="64" width="23" height="11" rx="3"/><rect class="nd" x="30" y="64" width="23" height="11" rx="3"/><rect class="nd hi" x="56" y="64" width="23" height="11" rx="3"/><rect class="nd hi" x="82" y="64" width="23" height="11" rx="3"/><rect class="nd" x="108" y="64" width="23" height="11" rx="3"/><rect class="nd hi" x="134" y="64" width="23" height="11" rx="3"/><rect class="nd hi" x="160" y="64" width="23" height="11" rx="3"/><rect class="nd hi" x="186" y="64" width="23" height="11" rx="3"/><rect class="nd ext" x="212" y="64" width="23" height="11" rx="3"/></g>
+  <g><title>Transcript RAG · 5 of 9 shipped · an evaluation-first retrieval workbench whose operating half is the thinner one</title>
+    <text class="tx k" x="4" y="92" style="text-anchor:start">Transcript RAG</text>
+    <text class="tx k" x="236" y="92" style="text-anchor:end">5 / 9</text>
+    <rect class="nd hi" x="4" y="96" width="23" height="11" rx="3"/><rect class="nd hi" x="30" y="96" width="23" height="11" rx="3"/><rect class="nd hi" x="56" y="96" width="23" height="11" rx="3"/><rect class="nd hi" x="82" y="96" width="23" height="11" rx="3"/><rect class="nd" x="108" y="96" width="23" height="11" rx="3"/><rect class="nd hi" x="134" y="96" width="23" height="11" rx="3"/><rect class="nd" x="160" y="96" width="23" height="11" rx="3"/><rect class="nd" x="186" y="96" width="23" height="11" rx="3"/><rect class="nd ext" x="212" y="96" width="23" height="11" rx="3"/></g>
+</svg>
