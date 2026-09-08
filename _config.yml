@@ -49,6 +49,14 @@ exclude:
   - Gemfile
   - Gemfile.lock
   - readme.md
+  # The two briefs. They live in git for whoever is working on the site, not on
+  # the site itself — and GitHub Pages runs jekyll-optional-front-matter, which
+  # turns a loose .md into a rendered page and then chokes on the literal
+  # `{% include %}` examples both files carry. The local container build skips
+  # that plugin set, so only the Pages build sees it; scripts/lint_case_study.py
+  # now checks the pairing instead of relying on the deploy to find it.
+  - CLAUDE.md
+  - DESIGN.md
   # legacy D3 / notebook pages from the previous portfolio (kept in git, not built)
   - profile_nswrent.html
   - profile_nswsold.html
