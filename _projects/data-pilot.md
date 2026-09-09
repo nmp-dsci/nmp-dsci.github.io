@@ -300,6 +300,7 @@ Merging to main is the deploy, one workflow in order:
 - **Result** — drain time within 0.5–6% of ⌈N/W⌉×S in all nine cells; 3 workers 2.97–2.99×, 5 workers 4.87–4.98×; 150 of 150 served, nothing shed.
 
 <figure class="fig">
+  <p class="fig-title">Figure · rung-100 load sweep, nine worker × service-time cells</p>
   <div class="dia-frame">{% include diagrams/chart/data-pilot-sizing.svg %}</div>
   <figcaption><b>The next rung is sized by measurement, not by guess.</b> Every one of the nine
   cells drained within 6% of ⌈N/W⌉×S, the worst error is the shortest run, and nothing was shed.

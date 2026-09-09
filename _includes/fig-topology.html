@@ -7,6 +7,7 @@
 {%- assign cost = page.production.cost | default: "" | strip -%}
 {%- if dgm != "" %}
 <figure class="fig">
+  <p class="fig-title">{{ page.production.fig_title | default: "Figure · what is deployed, and where" }}</p>
   <div class="dia-frame">{% include {{ page.production.topology_diagram }} %}</div>
   <figcaption><b>What is actually deployed.</b>
     {%- if topo != "" %} {{ topo }}.{% endif %}

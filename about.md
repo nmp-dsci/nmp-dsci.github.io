@@ -14,6 +14,7 @@ I'm **Nathan Phillips**, a data scientist working in gen AI, in Sydney.
 **If you only read one thing:** the [production rubric](/#rubric) and its three scorecards — 9/9, 6/9 and 5/9, gaps named with reasons.
 
 <figure class="fig">
+  <p class="fig-title">Figure · the production rubric, scored across the three live systems</p>
   <div class="dia-frame">{% include diagrams/chart/portfolio-scorecards.svg %}</div>
   <figcaption><b>Twenty of twenty-seven dimensions shipped, and the other seven say why not.</b>
   Source: each case study's <code>production.rubric</code>, recomputed by

@@ -63,6 +63,7 @@
 
   {%- if c_dgm != "" %}
   <div class="sys-fig">
+    <p class="fig-title">{{ p.architecture.home_fig_title | default: "How a request is answered" }}</p>
     <div class="dia-frame">{% include {{ c_dgm }} %}</div>
   </div>
   {%- endif %}

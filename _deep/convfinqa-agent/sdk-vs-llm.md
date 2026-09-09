@@ -87,6 +87,7 @@ uv run convfinqa-evalloop cycle --campaign s01 --runtime agent_sdk
 The campaign gate with a different alias: `sdk_gate.py` pairs the arms, requires net positive and one-sided cluster-corrected McNemar p < 0.05, and writes `promote_sdk` on a pass.
 
 <figure class="fig">
+  <p class="fig-title">Figure · accuracy by turn type, both runtimes on the same 349 questions</p>
   <div class="dia-frame">{% include diagrams/chart/convfinqa-turn-types.svg %}</div>
   <figcaption><b>The gain is entirely on program turns.</b> Lookups sat at 95.5% for both
   runtimes and moved by exactly zero; the +13.0 pp came from the multi-step turns, where a
@@ -129,6 +130,7 @@ confidence band from six named checks, so a low band could withhold an answer in
 serving a wrong number.
 
 <figure class="fig">
+  <p class="fig-title">Figure · the confidence judge on the sealed gate split</p>
   <div class="dia-frame">{% include diagrams/chart/convfinqa-judge.svg %}</div>
   <figcaption><b>The band's interval contains the line it has to beat.</b> Withholding
   everything below the high band scores 91.5% on the 316 answers it releases, against 90.5% for

@@ -111,6 +111,7 @@ uv run convfinqa-evalloop cycle --campaign c01 --baseline v2
 - **The SDK arm promotes to its own alias** — `sdk_champion`, never `champion`; serving reads only the latter.
 
 <figure class="fig">
+  <p class="fig-title">Figure · nine gate verdicts, as accuracy deltas with 95% intervals</p>
   <div class="dia-frame">{% include diagrams/chart/convfinqa-gates.svg %}</div>
   <figcaption><b>Seven of nine challengers moved the number and none of them earned it.</b>
   Every interval that crosses zero is a rejection; the two that clear it are v8 at +4.58 pp and

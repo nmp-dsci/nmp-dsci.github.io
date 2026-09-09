@@ -313,6 +313,7 @@ Every answer carries its own trace, built only from what the code measured:
 Cost is the finding, not a footnote:
 
 <figure class="fig">
+  <p class="fig-title">Figure · prompt tokens per answer, four answer paths</p>
   <div class="dia-frame">{% include diagrams/chart/transcript-rag-tokens.svg %}</div>
   <figcaption><b>The cheapest path that keeps parity is the one that shipped.</b> Single-hop
   matches full-transcript prompting at 0.93 similarity for 2,997 tokens against 18,295; the two

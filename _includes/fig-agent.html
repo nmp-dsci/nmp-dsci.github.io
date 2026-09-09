@@ -1,12 +1,15 @@
 {%- comment -%}
-  The agent-structure figure inside a case study (§2). The caption states the
-  takeaway first; page.architecture.caption carries it.
+  The agent-structure figure inside a case study (§2). A .fig-title names the
+  figure before it is read; the caption under it states the takeaway first,
+  from page.architecture.takeaway, then the detail from .caption. The title can
+  be overridden per system with architecture.fig_title.
 {%- endcomment -%}
 {%- assign dgm  = page.architecture.diagram  | default: "" | strip -%}
 {%- assign cap  = page.architecture.caption  | default: "" | strip -%}
 {%- assign take = page.architecture.takeaway | default: "" | strip -%}
 {%- if dgm != "" %}
 <figure class="fig">
+  <p class="fig-title">{{ page.architecture.fig_title | default: "Figure · how a request is answered" }}</p>
   <div class="dia-frame">{% include {{ page.architecture.diagram }} %}</div>
   <figcaption>
     <b>{% if take != "" %}{{ take }}{% else %}Agent structure.{% endif %}</b>

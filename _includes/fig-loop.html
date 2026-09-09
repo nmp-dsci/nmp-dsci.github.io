@@ -9,6 +9,7 @@
 {%- assign take = page.architecture.loop_takeaway | default: "" | strip -%}
 {%- if dgm != "" %}
 <figure class="fig">
+  <p class="fig-title">{{ page.architecture.loop_fig_title | default: "Figure · one turn of the optimisation loop" }}</p>
   <div class="dia-frame">{% include {{ page.architecture.loop_diagram }} %}</div>
   <figcaption>
     <b>{% if take != "" %}{{ take }}{% else %}The eval loop.{% endif %}</b>

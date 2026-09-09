@@ -440,6 +440,24 @@ def check_budget(rep: Report, body: str, kind: str) -> None:
                  "move mechanism and setup down a level rather than cutting a fact")
 
 
+def check_fig_titles(rep: Report, body: str) -> None:
+    """Every figure is introduced before it is read (CLAUDE.md, "presentation mode").
+
+    A `.fig-title` above the frame names what the chart is; the caption under it
+    says what it shows. Checked on author-placed figures only — the layout's
+    fig-*.html includes carry their own.
+    """
+    frames = re.findall(r"(?:<p class=\"fig-title\">.*?</p>\s*)?"
+                        r"(?:<div class=\"dia-frame\">)?\s*\{%\s*include\s+diagrams/[^%]+%\}",
+                        body, re.S)
+    untitled = [f for f in frames if 'class="fig-title"' not in f]
+    rep.verdict(not untitled,
+                f"figure titles: {len(frames) - len(untitled)}/{len(frames)} figures introduced",
+                *[f"a figure carries no <p class=\"fig-title\"> above its frame: "
+                  f"{re.search(r'diagrams/[^ %]+', f).group(0)}" for f in untitled],
+                fail_msg="figure titles: a chart is dropped in without being named")
+
+
 def check_charts(rep: Report, body: str) -> None:
     """P2 — a published page draws at least one piece of its evidence.
 
@@ -855,6 +873,7 @@ def lint_project(path: Path, repo: Path | None, why: str, no_net: bool) -> Repor
     check_deep_links(rep, fm, path)
     check_spine(rep, body)
     check_assertions(rep, body, SPINE)
+    check_fig_titles(rep, body)
     check_charts(rep, body)
     check_budget(rep, body, "project")
     check_score(rep, production, rows)
@@ -900,6 +919,7 @@ def lint_practice(path: Path) -> Report:
     rep.verdict(not faults, f"spine: {hits}/5 sections present, in order", *faults,
                 fail_msg=f"spine: {hits}/5 sections match the contract")
     check_assertions(rep, body, PRACTICE_SPINE)
+    check_fig_titles(rep, body)
     check_charts(rep, body)
     check_budget(rep, body, "practice")
     check_prose(rep, fm)
@@ -990,6 +1010,7 @@ def lint_deep(path: Path) -> Report:
     rep.verdict(not faults, f"spine: {hits}/5 sections present, in order", *faults,
                 fail_msg=f"spine: {hits}/5 sections match the contract")
     check_assertions(rep, body, DEEP_SPINE)
+    check_fig_titles(rep, body)
     check_charts(rep, body)
     check_budget(rep, body, "deep")
     check_prose(rep, fm)
