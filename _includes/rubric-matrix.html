@@ -4,8 +4,9 @@
   tooltip — a tooltip is invisible on touch, and the word is the fact. Each cell
   links to the section of that case study which proves it.
 
-  On a phone the dimension column keeps its label and the three status columns
-  abbreviate; the grid never scrolls sideways.
+  On a phone the dimension column keeps its label and the status columns
+  abbreviate; the grid never scrolls sideways. The column count is passed to
+  the CSS as --nsys so the grid follows the same query as everything else.
 {%- endcomment -%}
 {%- assign live = site.projects | where_exp: "p", "p.production.live == true" | sort: "production.order" -%}
 {%- assign dims = site.data.rubric.dimensions -%}
@@ -17,7 +18,7 @@
     <span>every cell links to the section that proves it</span>
   </div>
 
-  <div class="matrix" role="table" aria-label="Production rubric across the live systems">
+  <div class="matrix" role="table" aria-label="Production rubric across the live systems" style="--nsys:{{ live.size }}">
     {%- comment -%}
       role="row" wrappers are `display:contents`, so they carry the ARIA
       structure a table requires without becoming grid items. Without them the

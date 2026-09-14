@@ -16,7 +16,7 @@
 # --no-net is deliberate. The live-demo check needs the public URL and the
 # runner's egress is not the thing under test, so the URL check stays a local
 # and pre-merge concern. The proof-path check also self-skips here: the sibling
-# repos (../data-qa-agent, ../ConvFinQA-agent, ../transcript-rag-agent) are not
+# repos (../data-qa-agent, ../ConvFinQA-agent, ../transcript-rag-agent, ../DABStep-loop) are not
 # checked out on the runner, so it prints "~ proof paths: not checked" rather
 # than failing. Run the lint locally with --repo to exercise it:
 #

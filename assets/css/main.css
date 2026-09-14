@@ -245,19 +245,30 @@ a.chip:hover{text-decoration:none;filter:brightness(.97)}
 }
 
 /* ------------------------------------------- 6 · the star: the rubric matrix */
-.star{background:var(--panel);border-radius:var(--r);padding:var(--s5);box-shadow:var(--shadow)}
+.star{background:var(--panel);border-radius:var(--r);padding:var(--s5);box-shadow:var(--shadow);
+  container:star / inline-size}
 .star-head{display:flex;justify-content:space-between;align-items:baseline;gap:var(--s3);
   margin-bottom:var(--s4);flex-wrap:wrap}
 .star-head b{font-size:var(--t-1);color:var(--ink)}
 .star-head span{font-family:var(--mono);font-size:var(--t-2);color:var(--faint)}
 
-.matrix{display:grid;grid-template-columns:minmax(0,1.5fr) repeat(3,minmax(0,1fr));
+/* --nsys is set by rubric-matrix.html from the `where production.live` query, so
+   a fourth system adds a column here without a CSS edit (DESIGN.md rule 17). */
+.matrix{display:grid;grid-template-columns:minmax(0,1.5fr) repeat(var(--nsys,3),minmax(0,1fr));
   gap:var(--s1) var(--s2);align-items:stretch}
 .matrix .mh{font-family:var(--mono);font-size:var(--t-2);letter-spacing:var(--track-label);
   text-transform:uppercase;color:var(--faint);padding-bottom:var(--s2);text-align:center;
   align-self:end;line-height:1.25}
 .matrix .mh:first-child{text-align:left}
 .matrix .mh-abbr{display:none}
+/* Beside the hero text the panel is ~470px wide; with four systems the full
+   titles ("TRANSCRIPT", "CONVFINQA") no longer fit a 72px column even without
+   tracking, so the panel — not the viewport — decides when headers abbreviate. */
+@container star (max-width:600px){
+  .matrix .mh{letter-spacing:0}
+  .matrix .mh-full{display:none}
+  .matrix .mh-abbr{display:inline}
+}
 .matrix .md{display:flex;align-items:center;gap:var(--s2);font-size:var(--t-1);
   color:var(--ink-2);line-height:1.3;padding-block:var(--s1)}
 .matrix .md i{font-family:var(--mono);font-size:var(--t-2);font-style:normal;
@@ -284,12 +295,17 @@ a.chip:hover{text-decoration:none;filter:brightness(.97)}
 .cell-na{background:transparent;color:var(--faint)}
 
 /* DESIGN.md rule 11: the matrix never side-scrolls on a phone — it abbreviates.
-   Under 560px the three system columns take the short label from each project's
+   Under 560px the system columns take the short label from each project's
    front matter, the tracking comes off (it was costing ~9px a header), and the
    columns equalise. Without this the headers collided and "TRANSCRIPT" spilled
    past the panel edge at 390px. */
 @media (max-width:560px){
-  .matrix{grid-template-columns:repeat(4,minmax(0,1fr))}
+  /* With four systems, five columns in ~300px leave 55px a cell and the word
+     "designed" no longer fits. So the dimension moves above its row of cells,
+     spanning the grid, and the cells share the full width. */
+  .matrix{grid-template-columns:repeat(var(--nsys,3),minmax(0,1fr))}
+  .matrix .mh:first-child{display:none}
+  .matrix .md{grid-column:1 / -1;padding-top:var(--s2)}
   .matrix .mh{letter-spacing:0}
   .matrix .mh-full{display:none}
   .matrix .mh-abbr{display:inline}

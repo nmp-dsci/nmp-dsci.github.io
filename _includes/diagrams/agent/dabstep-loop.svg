@@ -1,0 +1,46 @@
+<svg class="dia" viewBox="0 0 320 100" role="img"
+     aria-label="A DABstep task enters one Claude Agent SDK session on Haiku 4.5 with a single execute_python tool; the tool runs pandas in a persistent namespace with the version's helper module loaded per task; the session returns a one-line JSON answer that the benchmark's vendored scorer grades against gold.">
+  <defs>
+    <marker id="ar-dabstep-loop" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="currentColor"/>
+    </marker>
+  </defs>
+
+  <g><title>task — one of the ten dev tasks with gold, or one of the 450 without; question text plus the guidelines for the answer format</title>
+    <rect class="nd" x="4" y="38" width="48" height="24" rx="6"/>
+    <text class="tx" x="28" y="53">task</text></g>
+
+  <g><title>the agent — one Claude Agent SDK session per task on claude-haiku-4-5, system prompt from agents/vN/system.md, agent.yaml frozen at 20 turns and 270 s; the only tool is execute_python</title>
+    <rect class="nd hi" x="66" y="30" width="80" height="40" rx="6"/>
+    <text class="tx" x="106" y="46">Haiku 4.5</text>
+    <text class="tx s" x="106" y="58">20 turns</text></g>
+
+  <g><title>helper.py — the version's helper module, loaded from file per task so champion and challenger never share one; 57 lines in v0, 325 in v1, 440 in v2</title>
+    <rect class="nd ext" x="154" y="6" width="78" height="28" rx="6"/>
+    <text class="tx" x="193" y="18">helper.py</text>
+    <text class="tx s" x="193" y="29">vN</text></g>
+
+  <g><title>execute_python — an in-process MCP server: persistent namespace, pandas preloaded, 120 s per call, output over 12k chars truncated, the same code three times returns STOP</title>
+    <rect class="nd hi" x="154" y="44" width="78" height="30" rx="6"/>
+    <text class="tx" x="193" y="57">execute_python</text>
+    <text class="tx s" x="193" y="68">pandas</text></g>
+
+  <g><title>the scorer — question_scorer vendored verbatim from the DABstep space and excluded from lint; exact match on numbers, strings and lists</title>
+    <rect class="nd" x="244" y="6" width="70" height="28" rx="6"/>
+    <text class="tx" x="279" y="18">scorer</text>
+    <text class="tx s" x="279" y="29">vendored</text></g>
+
+  <g><title>the answer — one line of JSON, agent_answer formatted to the task's guidelines, written to results.jsonl with its cost, turns and duration</title>
+    <rect class="nd hi" x="244" y="44" width="70" height="30" rx="6"/>
+    <text class="tx" x="279" y="57">answer</text>
+    <text class="tx s" x="279" y="68">one line</text></g>
+
+  <path class="ed" d="M52,50 L64,50" marker-end="url(#ar-dabstep-loop)"/>
+  <path class="ed" d="M146,62 L152,64" marker-end="url(#ar-dabstep-loop)"/>
+  <path class="ed dash" d="M152,52 L148,50" marker-end="url(#ar-dabstep-loop)"/>
+  <path class="ed" d="M193,34 L193,42" marker-end="url(#ar-dabstep-loop)"/>
+  <path class="ed" d="M232,59 L242,59" marker-end="url(#ar-dabstep-loop)"/>
+  <path class="ed" d="M279,44 L279,36" marker-end="url(#ar-dabstep-loop)"/>
+
+  <text class="cap" x="4" y="92">scored by the benchmark's own scorer</text>
+</svg>

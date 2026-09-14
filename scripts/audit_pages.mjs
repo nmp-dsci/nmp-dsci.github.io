@@ -33,7 +33,8 @@ import { createRequire } from 'node:module';
 const BASE = (process.argv[2] || 'http://127.0.0.1:8801').replace(/\/$/, '');
 const PAGES = ['/', '/about/', '/projects/data-pilot/', '/projects/convfinqa-agent/',
   '/projects/convfinqa-agent/eval-loop/', '/projects/convfinqa-agent/sdk-vs-llm/',
-  '/projects/transcript-rag/', '/practices/eval-loop/', '/practices/ways-of-working/',
+  '/projects/transcript-rag/', '/projects/dabstep-loop/', '/projects/dabstep-loop/eval-loop/',
+  '/practices/eval-loop/', '/practices/ways-of-working/',
   '/practices/production-scale/'];
 const WIDTHS = [390, 768, 1280];
 const SCHEMES = ['light', 'dark'];
