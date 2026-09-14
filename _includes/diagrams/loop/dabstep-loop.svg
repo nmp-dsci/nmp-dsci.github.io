@@ -1,15 +1,15 @@
 <svg class="dia" viewBox="0 0 360 236" role="img"
-     aria-label="The DABstep loop as a ring: the ten-task dev split feeds a run of the champion, every task is traced to a JSON file with its cost and turns, the vendored scorer grades each answer, one Sonnet 5 optimiser session reads every failure and both champion surfaces, writes only the next version's prompt and helper and files a diagnosis, the challenger runs on the same ten, a one-sided exact McNemar test on the paired flips promotes at p below 0.05 or holds, the registry records the verdict either way, CI re-scores the champion and a smoke test checks the deployed image, and a read-only reflection pass records what the next optimiser should know. Off the ring sit the single model choke point and the write guard with its checksum.">
+     aria-label="The DABstep loop as one ring that runs in two modes. Supervised: the ten-task dev split feeds a run of the champion, every task is traced, the vendored scorer grades each answer, one Sonnet 5 optimiser session reads every failure and writes only the next version's prompt and helper, the challenger runs on the same ten, and a one-sided exact McNemar test on the paired flips promotes or holds. Unsupervised: a seeded probe of 47 of the 450 runs unscored in two passes, gold-free signals and twelve family cards replace the failures in the optimiser's prompt, and gate A promotes only if no dev task broke and the paired signals improved. Either way the registry records the verdict, CI re-scores the champion, and a reflection pass writes what the next optimiser should know. Off the ring sit the single model choke point and the write guard with its checksum.">
   <defs>
     <marker id="lp-dabstep-loop" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto">
       <path d="M0,0 L8,4 L0,8 z" fill="currentColor"/>
     </marker>
   </defs>
 
-  <g><title>01 · the split — data/tasks/dev.jsonl holds the ten tasks with gold; data/tasks/all.jsonl holds the 450 without, locked behind a confirmation and never scored in this build; test_dev_split_has_ten_gold_and_all_has_none pins both counts</title>
+  <g><title>01 · the input — supervised: data/tasks/dev.jsonl, ten tasks with gold. Unsupervised: loop/sampler.py draws a seeded, stratified probe of the 450 by family, boundary tasks first, never a dev id, plus the siblings each invariant needs; 47 tasks at k = 3, seed 0. The 450 are never scored</title>
     <rect class="nd" x="6" y="8" width="80" height="34" rx="6"/>
-    <text class="tx" x="46" y="22">dev split</text>
-    <text class="tx s" x="46" y="35">ten gold</text></g>
+    <text class="tx" x="46" y="22">dev · probe</text>
+    <text class="tx s" x="46" y="35">10 gold · 47</text></g>
 
   <g><title>02 · run — eval/runner.py: one agent version on one split at three workers behind an asyncio semaphore; writes runs/&lt;id&gt;/run.json, results.jsonl, traces/ and the submission file; run folders are immutable once scored</title>
     <rect class="nd" x="96" y="8" width="80" height="34" rx="6"/>
@@ -21,12 +21,12 @@
     <text class="tx" x="226" y="22">trace</text>
     <text class="tx s" x="226" y="35">per task</text></g>
 
-  <g><title>04 · score — eval/scorer.py vendored verbatim from the benchmark space and excluded from ruff and mypy; exact match per task, then easy and hard counts</title>
+  <g><title>04 · score or signal — supervised: eval/scorer.py vendored verbatim from the benchmark space, exact match per task. Unsupervised: loop/signals.py computes S1 method consistency, S2 two-pass agreement, S3 metamorphic invariants between sibling answers and S5 format compliance from the run folder alone; nothing reads a gold answer</title>
     <rect class="nd" x="276" y="8" width="80" height="34" rx="6"/>
     <text class="tx" x="316" y="22">score</text>
-    <text class="tx s" x="316" y="35">vendored</text></g>
+    <text class="tx s" x="316" y="35">or signals</text></g>
 
-  <g><title>05 · optimise — loop/optimiser.py: one ClaudeSDKClient session on claude-sonnet-5 at high effort, up to 120 turns, shown both champion surfaces, every failed task with its gold and a condensed trace, the ledger history and any held challenger as a starting point; cycle 1 took 40 turns and 3.85 M input tokens, cycle 2 took 27 and 2.05 M</title>
+  <g><title>05 · optimise — loop/optimiser.py: one ClaudeSDKClient session on claude-sonnet-5 at high effort, shown both champion surfaces, the ledger history and any held challenger. Supervised: every failed task with its gold and a condensed trace. Unsupervised: the twelve family cards, worst status first, and both traces of every failed invariant; it may verify against an invariant, never against a leaderboard answer</title>
     <rect class="nd hi" x="276" y="58" width="80" height="34" rx="6"/>
     <text class="tx" x="316" y="72">optimise</text>
     <text class="tx s" x="316" y="85">one session</text></g>
@@ -41,20 +41,20 @@
     <text class="tx" x="316" y="172">register</text>
     <text class="tx s" x="316" y="185">or hold</text></g>
 
-  <g><title>08 · gate — eval/compare.py: the challenger runs on the same ten, then a one-sided exact McNemar test on the paired flips, alpha 0.05; five fixes and no break is the smallest result that clears it; the verdict carries fixed, broken and p and lands on loop/ledger.jsonl whether it promotes or holds</title>
+  <g><title>08 · gate — eval/compare.py. Supervised: a one-sided exact McNemar test on the paired dev flips, alpha 0.05. Unsupervised, gate A: the challenger re-runs dev-10 scored and the same probe unscored; promote only if no dev task broke and the paired gold-free composite improved. The verdict lands on loop/ledger.jsonl whether it promotes or holds</title>
     <rect class="nd hi" x="186" y="158" width="80" height="34" rx="6"/>
     <text class="tx" x="226" y="172">gate</text>
-    <text class="tx s" x="226" y="185">p &lt; .05</text></g>
+    <text class="tx s" x="226" y="185">McNemar · A</text></g>
 
   <g><title>09 · deploy — tracking/gate.py re-scores the champion's committed results in CI and checks its fingerprint against the registry; a green main deploys by OIDC to ECR and App Runner, and demo_smoke.sh asserts demo mode, a registered champion, 450 tasks and a declined question</title>
     <rect class="nd" x="96" y="158" width="80" height="34" rx="6"/>
     <text class="tx" x="136" y="172">deploy</text>
     <text class="tx s" x="136" y="185">smoke test</text></g>
 
-  <g><title>10 · reflect — loop/reflect.py: a read-only Sonnet pass over the champion's traces, up to 40 turns, that records a summary, consistency notes, open gaps and sibling-template groups on the ledger; cycle 2's pass found why v1 broke task 1871 before the next optimiser ran</title>
+  <g><title>10 · reflect — read-only Sonnet passes that write for the next optimiser. loop/reflect.py over the champion's dev traces found why v1 broke 1871. loop/ureflect.py over a probe writes one card per family to loop/families/Fnn.json: canonical method, entry point, prompt rule, status verified, provisional or open</title>
     <rect class="nd" x="6" y="158" width="80" height="34" rx="6"/>
     <text class="tx" x="46" y="172">reflect</text>
-    <text class="tx s" x="46" y="185">read-only</text></g>
+    <text class="tx s" x="46" y="185">→ 12 cards</text></g>
 
   <g><title>11 · next cycle — the promoted challenger is the champion; a held challenger stays on the ledger and is offered to the next optimiser as a starting point, not a rejected one</title>
     <rect class="nd" x="6" y="108" width="80" height="34" rx="6"/>
@@ -84,5 +84,5 @@
   <path class="ed" d="M46,108 V44" marker-end="url(#lp-dabstep-loop)"/>
 
   <text class="cap" x="6" y="212">agent-sdk · MLflow · GH Actions · Terraform</text>
-  <text class="cap" x="6" y="226">champion v2 · 9 / 10 · 1 of 2 cycles promoted</text>
+  <text class="cap" x="6" y="226">champion v2 · 5 cycles · 1 promoted · 2 held</text>
 </svg>

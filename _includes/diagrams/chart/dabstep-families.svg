@@ -1,0 +1,69 @@
+<svg class="dia" viewBox="0 0 320 190" role="img"
+     aria-label="The 450 DABstep tasks in twelve operation families, one horizontal bar per family showing its member count. Six families carry at least one of the ten gold dev tasks and are drawn filled: F01 45 tasks, F02 20, F04 40, F07 60, F10 25, F12 72. Six carry no gold at all and are drawn hollow: F03 45, F05 20, F06 27, F08 46, F09 30, F11 20, together 188 of the 378 hard tasks. Only the unsupervised loop can learn anything about those six.">
+  <title>Six of twelve families, 188 hard tasks, have no gold task at all</title>
+  <text class="tx s" x="6" y="12" style="text-anchor:start">family</text>
+  <text class="tx s" x="314" y="12" style="text-anchor:end">filled = has gold</text>
+  <g><title>F01 · fee-ids-for-merchant-period · 45 of the 450 · with gold dev tasks 1681, 1753 · loop/families/families.json, loop/families/F01.json</title>
+    <text class="tx s" x="6" y="29" style="text-anchor:start">F01 fee ids · period</text>
+    <rect class="bar hi" x="118" y="21" width="112.5" height="9" rx="2"/>
+    <text class="tx s" x="234.5" y="29" style="text-anchor:start">45</text>
+  </g>
+  <g><title>F02 · fee-ids-by-attributes · 20 of the 450 · with gold dev tasks 1464 · loop/families/families.json, loop/families/F02.json</title>
+    <text class="tx s" x="6" y="42" style="text-anchor:start">F02 fee ids · attrs</text>
+    <rect class="bar hi" x="118" y="34" width="50.0" height="9" rx="2"/>
+    <text class="tx s" x="172.0" y="42" style="text-anchor:start">20</text>
+  </g>
+  <g><title>F03 · total-fees-paid · 45 of the 450 · no gold task; learnable only from the probe, its invariants and the family card · loop/families/families.json, loop/families/F03.json</title>
+    <text class="tx s" x="6" y="55" style="text-anchor:start">F03 total fees</text>
+    <rect class="nd ext" x="118" y="47" width="112.5" height="9" rx="2"/>
+    <text class="tx s" x="234.5" y="55" style="text-anchor:start">45</text>
+  </g>
+  <g><title>F04 · delta-fee-rate-change · 40 of the 450 · with gold dev tasks 1871 · loop/families/families.json, loop/families/F04.json</title>
+    <text class="tx s" x="6" y="68" style="text-anchor:start">F04 Δ fee rate</text>
+    <rect class="bar hi" x="118" y="60" width="100.0" height="9" rx="2"/>
+    <text class="tx s" x="222.0" y="68" style="text-anchor:start">40</text>
+  </g>
+  <g><title>F05 · delta-mcc-change · 20 of the 450 · no gold task; learnable only from the probe, its invariants and the family card · loop/families/families.json, loop/families/F05.json</title>
+    <text class="tx s" x="6" y="81" style="text-anchor:start">F05 Δ MCC</text>
+    <rect class="nd ext" x="118" y="73" width="50.0" height="9" rx="2"/>
+    <text class="tx s" x="172.0" y="81" style="text-anchor:start">20</text>
+  </g>
+  <g><title>F06 · merchants-affected-by-fee · 27 of the 450 · no gold task; learnable only from the probe, its invariants and the family card · loop/families/families.json, loop/families/F06.json</title>
+    <text class="tx s" x="6" y="94" style="text-anchor:start">F06 affected merch.</text>
+    <rect class="nd ext" x="118" y="86" width="67.5" height="9" rx="2"/>
+    <text class="tx s" x="189.5" y="94" style="text-anchor:start">27</text>
+  </g>
+  <g><title>F07 · average-fee-for-scheme · 60 of the 450 · with gold dev tasks 1273, 1305 · loop/families/families.json, loop/families/F07.json</title>
+    <text class="tx s" x="6" y="107" style="text-anchor:start">F07 avg fee · scheme</text>
+    <rect class="bar hi" x="118" y="99" width="150.0" height="9" rx="2"/>
+    <text class="tx s" x="272.0" y="107" style="text-anchor:start">60</text>
+  </g>
+  <g><title>F08 · cheapest-or-priciest-choice · 46 of the 450 · no gold task; learnable only from the probe, its invariants and the family card · loop/families/families.json, loop/families/F08.json</title>
+    <text class="tx s" x="6" y="120" style="text-anchor:start">F08 cheapest choice</text>
+    <rect class="nd ext" x="118" y="112" width="115.0" height="9" rx="2"/>
+    <text class="tx s" x="237.0" y="120" style="text-anchor:start">46</text>
+  </g>
+  <g><title>F09 · steer-traffic-scheme · 30 of the 450 · no gold task; learnable only from the probe, its invariants and the family card · loop/families/families.json, loop/families/F09.json</title>
+    <text class="tx s" x="6" y="133" style="text-anchor:start">F09 steer traffic</text>
+    <rect class="nd ext" x="118" y="125" width="75.0" height="9" rx="2"/>
+    <text class="tx s" x="197.0" y="133" style="text-anchor:start">30</text>
+  </g>
+  <g><title>F10 · move-fraud-to-aci · 25 of the 450 · with gold dev tasks 2697 · loop/families/families.json, loop/families/F10.json</title>
+    <text class="tx s" x="6" y="146" style="text-anchor:start">F10 move fraud ACI</text>
+    <rect class="bar hi" x="118" y="138" width="62.5" height="9" rx="2"/>
+    <text class="tx s" x="184.5" y="146" style="text-anchor:start">25</text>
+  </g>
+  <g><title>F11 · avg-value-grouped-by · 20 of the 450 · no gold task; learnable only from the probe, its invariants and the family card · loop/families/families.json, loop/families/F11.json</title>
+    <text class="tx s" x="6" y="159" style="text-anchor:start">F11 avg by group</text>
+    <rect class="nd ext" x="118" y="151" width="50.0" height="9" rx="2"/>
+    <text class="tx s" x="172.0" y="159" style="text-anchor:start">20</text>
+  </g>
+  <g><title>F12 · easy-descriptive · 72 of the 450 · with gold dev tasks 5, 49, 70 · loop/families/families.json, loop/families/F12.json</title>
+    <text class="tx s" x="6" y="172" style="text-anchor:start">F12 easy descriptive</text>
+    <rect class="bar hi" x="118" y="164" width="180.0" height="9" rx="2"/>
+    <text class="tx s" x="302.0" y="172" style="text-anchor:start">72</text>
+  </g>
+  <text class="cap" x="6" y="184">106 templates → 12 families</text>
+  <g><title>lens 1 is an ordered regex table over the 106 question templates; lens 2 (MiniLM k-means, k = 12) and lens 3 (one Sonnet membership pass) agree with it at ARI 0.58 and 0.66, and only say how far to trust lens 1 per task · loop/families/lenses.json</title>
+    <text class="cap" x="314" y="184" style="text-anchor:end">ARI .58 / .66</text></g>
+</svg>

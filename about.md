@@ -26,7 +26,7 @@ I'm **Nathan Phillips**, a data scientist working in gen AI, in Sydney.
 - **[Data Pilot](/projects/data-pilot/)** — a conversational data agent over ~3.2M rows of NSW property data; natural language in, governed SQL out, Postgres row-level security per user; 9/9.
 - **[ConvFinQA Agent](/projects/convfinqa-agent/)** — multi-turn financial Q&A over report text and tables; four typed agents, prompts promoted like releases; seven of nine challengers refused, and one Claude session at 90.5%.
 - **[Transcript RAG](/projects/transcript-rag/)** — an evaluation-first retrieval workbench; eight configurations on one chunk-labelled golden set; parity at 6.1× fewer tokens.
-- **[DABstep Loop](/projects/dabstep-loop/)** — a Haiku agent on a tabular-QA benchmark, and the loop that rewrites its prompt and helper from its own failures; 4/10 to 9/10 in two cycles, the first held at p 0.109, the second promoted at p 0.031.
+- **[DABstep Loop](/projects/dabstep-loop/)** — a Haiku agent on a tabular-QA benchmark, optimised by two loops: supervised on the ten gold tasks (v2 promoted at p 0.031) and unsupervised on the 440 without answers (v3 held when every gold-free signal improved but two gold tasks broke).
 
 All four run in **demo mode** — read-only, keyless, no inference — because a no-login app with a live model has an unbounded abuse bill.
 

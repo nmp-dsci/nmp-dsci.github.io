@@ -1,0 +1,51 @@
+<svg class="dia" viewBox="0 0 320 150" role="img"
+     aria-label="Five paired bars, before and after the unsupervised cycle that wrote v3 from v2. Four gold-free signals computed on the same 47-task probe of the 450 all improved: method consistency 0.43 to 0.69, pass agreement 0.66 to 0.89, invariants passed 17 of 21 to 21 of 21, format compliance 0.97 to 1.00, and errors fell from 3 to 0. The fifth pair is the gold anchor: the ten dev tasks fell from 9 to 7 passed, tasks 49 and 1681 broke, and gate A held v3. Gold-free signals agreed the agent was better; the gold said two tasks were now wrong.">
+  <title>Every gold-free signal improved, and the ten gold tasks still held v3</title>
+  <!-- y = 112 - v * 88 -->
+  <g><title>gridlines at 0.5 and 1.0; the axis is 0</title>
+    <line class="gl" x1="30" y1="68" x2="316" y2="68"/>
+    <line class="gl" x1="30" y1="24" x2="316" y2="24"/>
+    <text class="tx s" x="26" y="71" style="text-anchor:end">.5</text>
+    <text class="tx s" x="26" y="27" style="text-anchor:end">1</text></g>
+  <line class="ax" x1="30" y1="112" x2="316" y2="112"/>
+  <path class="ed dash" d="M264,14 V112"/>
+  <text class="tx s" x="147" y="12">gold-free · 47 of the 450, unscored</text>
+  <text class="tx s" x="290" y="12">ten gold</text>
+  <g><title>S1 · method consistency: the share of a family's probe traces on its modal helper method, mean over twelve families · v2 0.433 → v3 0.686 · loop/signals.py</title>
+    <rect class="bar" x="44" y="73.9" width="20" height="38.1" rx="2"/>
+    <text class="tx s" x="54" y="70.9">.43</text>
+    <rect class="bar pro" x="67" y="51.6" width="20" height="60.4" rx="2"/>
+    <text class="tx k" x="77" y="48.6">.69</text>
+    <text class="tx s" x="66" y="124">S1 method</text>
+  </g>
+  <g><title>S2 · pass agreement: the share of probed tasks whose two passes gave the same answer, mean over families · v2 0.658 → v3 0.889</title>
+    <rect class="bar" x="100" y="54.1" width="20" height="57.9" rx="2"/>
+    <text class="tx s" x="110" y="51.1">.66</text>
+    <rect class="bar pro" x="123" y="33.8" width="20" height="78.2" rx="2"/>
+    <text class="tx k" x="133" y="30.8">.89</text>
+    <text class="tx s" x="122" y="124">S2 agree</text>
+  </g>
+  <g><title>S3 · metamorphic invariants between sibling answers, 21 checks: v2 passed 17, failed 3, skipped 1 → v3 passed 21, failed 0 · loop/invariants.py</title>
+    <rect class="bar" x="156" y="40.8" width="20" height="71.2" rx="2"/>
+    <text class="tx s" x="166" y="37.8">17/21</text>
+    <rect class="bar pro" x="179" y="24.0" width="20" height="88.0" rx="2"/>
+    <text class="tx k" x="189" y="21.0">21/21</text>
+    <text class="tx s" x="178" y="124">S3 invs</text>
+  </g>
+  <g><title>S5 · guideline format compliance, mean over families · v2 0.972 → v3 1.000</title>
+    <rect class="bar" x="212" y="26.5" width="20" height="85.5" rx="2"/>
+    <text class="tx s" x="222" y="23.5">.97</text>
+    <rect class="bar pro" x="235" y="24.0" width="20" height="88.0" rx="2"/>
+    <text class="tx k" x="245" y="21.0">1</text>
+    <text class="tx s" x="234" y="124">S5 fmt</text>
+  </g>
+  <g><title>the gold anchor · the same ten dev tasks, scored: v2 9 of 10 → v3 7 of 10 · 49 and 1681 broke · gate A: hold</title>
+    <rect class="bar" x="268" y="32.8" width="20" height="79.2" rx="2"/>
+    <text class="tx s" x="278" y="29.8">9/10</text>
+    <rect class="bar" x="291" y="50.4" width="20" height="61.6" rx="2"/>
+    <rect class="nd ext" x="291" y="50.4" width="20" height="61.6" rx="2"/>
+    <text class="tx k" x="301" y="47.4">7/10</text>
+    <text class="tx s" x="290" y="124">dev gold</text>
+  </g>
+  <text class="cap" x="30" y="142">v2 grey → v3 · same 47 tasks · hold: broke 2</text>
+</svg>
