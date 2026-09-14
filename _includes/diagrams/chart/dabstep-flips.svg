@@ -1,0 +1,57 @@
+<svg class="dia" viewBox="0 0 320 100" role="img"
+     aria-label="Pass or fail per task for three agent versions on the ten DABstep gold tasks 5, 49, 70, 1273, 1305, 1464, 1681, 1753, 1871 and 2697. v0 passes four. v1 passes eight: it fixes five and breaks 1871, the one cell that held it. v2 passes nine: the same five fixed and 1871 restored. 2697 fails in every version.">
+  <title>Ten tasks, three versions: one broken cell held v1, and 2697 never passed</title>
+  <g><title>the ten dev task ids, in file order; accent fill is a pass, an outline is a fail, a dashed cell with a cross is a pass the version broke</title>
+    <text class="tx s" x="57.0" y="14">5</text>
+    <text class="tx s" x="84.0" y="14">49</text>
+    <text class="tx s" x="111.0" y="14">70</text>
+    <text class="tx s" x="138.0" y="14">1273</text>
+    <text class="tx s" x="165.0" y="14">1305</text>
+    <text class="tx s" x="192.0" y="14">1464</text>
+    <text class="tx s" x="219.0" y="14">1681</text>
+    <text class="tx s" x="246.0" y="14">1753</text>
+    <text class="tx s" x="273.0" y="14">1871</text>
+    <text class="tx s" x="300.0" y="14">2697</text>
+  </g>
+  <g><title>v0 · 4 of 10 · passes 5, 1305, 1464, 1871 · 1681 hit the 20-turn cap · the champion both cycles were gated against</title>
+    <text class="tx k" x="4" y="32" style="text-anchor:start">v0 · 4</text>
+    <rect class="nd hi" x="46" y="22" width="22" height="14" rx="3"/>
+    <rect class="nd" x="73" y="22" width="22" height="14" rx="3"/>
+    <rect class="nd" x="100" y="22" width="22" height="14" rx="3"/>
+    <rect class="nd" x="127" y="22" width="22" height="14" rx="3"/>
+    <rect class="nd hi" x="154" y="22" width="22" height="14" rx="3"/>
+    <rect class="nd hi" x="181" y="22" width="22" height="14" rx="3"/>
+    <rect class="nd" x="208" y="22" width="22" height="14" rx="3"/>
+    <rect class="nd" x="235" y="22" width="22" height="14" rx="3"/>
+    <rect class="nd hi" x="262" y="22" width="22" height="14" rx="3"/>
+    <rect class="nd" x="289" y="22" width="22" height="14" rx="3"/>
+  </g>
+  <g><title>v1 · 8 of 10 · fixed 49, 70, 1273, 1681, 1753 · broke 1871 by letting one most-specific fee rule win where the gold sums every matching rule · 2697 hit the 20-turn cap · held, p 0.109</title>
+    <text class="tx k" x="4" y="56" style="text-anchor:start">v1 · 8</text>
+    <rect class="nd hi" x="46" y="46" width="22" height="14" rx="3"/>
+    <rect class="nd hi" x="73" y="46" width="22" height="14" rx="3"/>
+    <rect class="nd hi" x="100" y="46" width="22" height="14" rx="3"/>
+    <rect class="nd hi" x="127" y="46" width="22" height="14" rx="3"/>
+    <rect class="nd hi" x="154" y="46" width="22" height="14" rx="3"/>
+    <rect class="nd hi" x="181" y="46" width="22" height="14" rx="3"/>
+    <rect class="nd hi" x="208" y="46" width="22" height="14" rx="3"/>
+    <rect class="nd hi" x="235" y="46" width="22" height="14" rx="3"/>
+    <rect class="nd ext" x="262" y="46" width="22" height="14" rx="3"/>
+    <text class="tx k" x="273.0" y="57">×</text>
+    <rect class="nd" x="289" y="46" width="22" height="14" rx="3"/>
+  </g>
+  <g><title>v2 · 9 of 10 · the same five fixed, 1871 restored by fee_total_for_rule, nothing broken · 2697 still wrong, diagnosis says not found · promoted, p 0.031</title>
+    <text class="tx k" x="4" y="80" style="text-anchor:start">v2 · 9</text>
+    <rect class="nd hi" x="46" y="70" width="22" height="14" rx="3"/>
+    <rect class="nd hi" x="73" y="70" width="22" height="14" rx="3"/>
+    <rect class="nd hi" x="100" y="70" width="22" height="14" rx="3"/>
+    <rect class="nd hi" x="127" y="70" width="22" height="14" rx="3"/>
+    <rect class="nd hi" x="154" y="70" width="22" height="14" rx="3"/>
+    <rect class="nd hi" x="181" y="70" width="22" height="14" rx="3"/>
+    <rect class="nd hi" x="208" y="70" width="22" height="14" rx="3"/>
+    <rect class="nd hi" x="235" y="70" width="22" height="14" rx="3"/>
+    <rect class="nd hi" x="262" y="70" width="22" height="14" rx="3"/>
+    <rect class="nd" x="289" y="70" width="22" height="14" rx="3"/>
+  </g>
+  <text class="cap" x="4" y="96">filled pass · outline fail · × broke a pass</text>
+</svg>

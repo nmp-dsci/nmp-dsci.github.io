@@ -1,0 +1,30 @@
+<svg class="dia" viewBox="0 0 240 142" role="img"
+     aria-label="Pass count on the ten DABstep gold tasks by agent version. v0, NVIDIA's prompt on Haiku 4.5, passed 4 of 10. v1, cycle one's rewrite, passed 8 of 10 but broke task 1871; five fixed against one broken is p 0.109 on a one-sided exact McNemar test, so it was held. v2, cycle two's rewrite, passed 9 of 10 with five fixed and none broken, p 0.031, and was promoted to champion. Every version is compared against v0, the champion throughout.">
+  <title>4 of 10 to 9 of 10 in two cycles; the first was held, the second promoted</title>
+  <!-- y = 118 - n * 9.6 -->
+  <g><title>gridlines at 5 and 10 passes; the axis is 0</title>
+    <line class="gl" x1="36" y1="70" x2="236" y2="70"/>
+    <line class="gl" x1="36" y1="22" x2="236" y2="22"/>
+    <text class="tx s" x="30" y="73" style="text-anchor:end">5</text>
+    <text class="tx s" x="30" y="25" style="text-anchor:end">10</text></g>
+  <line class="ax" x1="36" y1="118" x2="236" y2="118"/>
+
+  <g><title>v0 · 4 of 10 · NVIDIA's nine-line inference prompt on claude-haiku-4-5 with a 57-line helper · 1 of 3 easy, 3 of 7 hard · $0.754, 90 turns · the champion both cycles were measured against</title>
+    <rect class="bar" x="52" y="79.6" width="40" height="38.4" rx="3"/>
+    <text class="tx k" x="72" y="75">4 / 10</text>
+    <text class="tx s" x="72" y="130">v0</text>
+    <text class="tx s" x="72" y="139">baseline</text></g>
+
+  <g><title>v1 · 8 of 10 · cycle 1: one Sonnet session, 40 turns, 3.85 M input tokens, added four prompt rules and thirteen helper functions · fixed 49, 70, 1273, 1681, 1753 · broke 1871 · one-sided exact McNemar p 0.109 · held as challenger, never champion</title>
+    <rect class="bar" x="112" y="41.2" width="40" height="76.8" rx="3"/>
+    <rect class="nd ext" x="112" y="41.2" width="40" height="76.8" rx="3"/>
+    <text class="tx k" x="132" y="36.6">8 / 10</text>
+    <text class="tx s" x="132" y="130">v1 ✗</text>
+    <text class="tx s" x="132" y="139">p .109</text></g>
+
+  <g><title>v2 · 9 of 10 · cycle 2: 27 turns, 2.05 M input tokens, kept v1's helper, removed best_matching_fee, added fee_total_for_rule and total_fees_paid · the same five fixed, nothing broken · p 0.031 · promoted, champion · 2697 still fails</title>
+    <rect class="bar pro" x="172" y="31.6" width="40" height="86.4" rx="3"/>
+    <text class="tx k" x="192" y="27">9 / 10</text>
+    <text class="tx s" x="192" y="130">v2 ✓</text>
+    <text class="tx s" x="192" y="139">p .031</text></g>
+</svg>

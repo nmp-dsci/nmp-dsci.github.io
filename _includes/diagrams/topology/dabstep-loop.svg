@@ -1,0 +1,45 @@
+<svg class="dia" viewBox="0 0 320 100" role="img"
+     aria-label="A visitor reaches one App Runner instance in ap-southeast-1 serving the FastAPI and React viewer from an image that has the runs, the ledger and the agent versions baked in; GitHub Actions deploys by OIDC to ECR after CI is green; a CloudWatch alarm watches 5xx responses; there is no database and no model call.">
+  <defs>
+    <marker id="tp-dabstep-loop" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="currentColor"/>
+    </marker>
+  </defs>
+
+  <g><title>visitor — no login; the viewer is public and read-only</title>
+    <rect class="nd" x="6" y="36" width="52" height="26" rx="6"/>
+    <text class="tx" x="32" y="52">visitor</text></g>
+
+  <g><title>GitHub Actions — deploy-aws.yml runs only after ci.yml succeeds on main, assumes an OIDC role with no stored keys, builds the image and applies Terraform</title>
+    <rect class="nd" x="80" y="8" width="72" height="24" rx="6"/>
+    <text class="tx" x="116" y="18">GitHub</text>
+    <text class="tx s" x="116" y="28">OIDC deploy</text></g>
+
+  <g><title>App Runner — service dabstep-demo, one instance at 0.5 vCPU and 1 GB, port 8080, health check on /healthz, one uvicorn worker; auto-deploys when ECR :latest changes</title>
+    <rect class="nd hi" x="80" y="44" width="72" height="30" rx="6"/>
+    <text class="tx" x="116" y="56">App Runner</text>
+    <text class="tx s" x="116" y="67">1 instance</text></g>
+
+  <g><title>the evidence, inside the image — agents/, runs/, loop/, data/tasks/ and the data sample copied in at build; DEMO_MODE=1 and BILLING=none set in the Dockerfile so the container cannot make a model call</title>
+    <rect class="nd hi" x="176" y="44" width="70" height="30" rx="6"/>
+    <text class="tx" x="211" y="56">image</text>
+    <text class="tx s" x="211" y="67">baked in</text></g>
+
+  <g><title>ECR — repository dabstep-demo, scan on push, lifecycle keeps the five most recent images; rollback is retagging a previous :sha as :latest</title>
+    <rect class="nd" x="176" y="8" width="70" height="24" rx="6"/>
+    <text class="tx" x="211" y="18">ECR</text>
+    <text class="tx s" x="211" y="28">keep 5</text></g>
+
+  <g><title>CloudWatch — alarm dabstep-demo-5xx: ten 5xx responses across two five-minute periods</title>
+    <rect class="nd ext" x="266" y="8" width="48" height="24" rx="6"/>
+    <text class="tx" x="290" y="18">alarm</text>
+    <text class="tx s" x="290" y="28">5xx</text></g>
+
+  <path class="ed" d="M58,49 L78,49" marker-end="url(#tp-dabstep-loop)"/>
+  <path class="ed" d="M152,20 L174,20" marker-end="url(#tp-dabstep-loop)"/>
+  <path class="ed" d="M211,32 L211,42" marker-end="url(#tp-dabstep-loop)"/>
+  <path class="ed" d="M152,59 L174,59" marker-end="url(#tp-dabstep-loop)"/>
+  <path class="ed dash" d="M152,50 C200,38 240,36 264,24" marker-end="url(#tp-dabstep-loop)"/>
+
+  <text class="cap" x="6" y="92">ap-southeast-1 · Terraform · demo mode</text>
+</svg>

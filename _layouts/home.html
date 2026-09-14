@@ -28,7 +28,7 @@ layout: default
 <section class="section-band" id="work" aria-labelledby="work-h">
   <div class="wrap">
     <div class="sec-head">
-      <h2 id="work-h">{% if nsys == 3 %}Three{% else %}{{ nsys }}{% endif %} systems, live on AWS</h2>
+      <h2 id="work-h">{% if nsys == 3 %}Three{% elsif nsys == 4 %}Four{% else %}{{ nsys }}{% endif %} systems, live on AWS</h2>
       <span class="aside">demo mode on every public URL — read-only, no keys, no inference</span>
     </div>
     <div class="systems">
@@ -71,7 +71,7 @@ layout: default
   <div class="wrap">
     <div class="sec-head"><h2 id="practices-h">How they were built</h2></div>
     <p class="sec-lead">The parts that transfer to any gen-AI system, written up once instead of
-      three times.</p>
+      once per system.</p>
     {% include practice-list.html %}
   </div>
 </section>

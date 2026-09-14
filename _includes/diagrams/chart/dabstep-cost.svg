@@ -1,0 +1,41 @@
+<svg class="dia" viewBox="0 0 240 134" role="img"
+     aria-label="Two bar groups by agent version on the same ten tasks. Cost per run in US dollars: v0 0.754, v1 0.634, v2 0.632. Agent turns per run: v0 90, v1 79, v2 75. The promoted champion is cheaper and shorter than the baseline it replaced.">
+  <title>The champion answers ten tasks for 16% less and 15 fewer turns than the baseline</title>
+  <!-- left panel: USD, y = 118 - usd * 120 · right panel: turns, y = 118 - t * 0.96 -->
+  <g><title>left panel: cost per ten-task run in US dollars, from summary.cost_usd in each run.json, which is the sum of cost_usd over the ten traces</title>
+    <text class="tx s" x="70" y="12">USD per run</text>
+    <line class="gl" x1="30" y1="70" x2="112" y2="70"/>
+    <line class="ax" x1="30" y1="118" x2="112" y2="118"/>
+    <text class="tx s" x="26" y="73" style="text-anchor:end">.40</text></g>
+  <g><title>right panel: agent turns per ten-task run, summed over the ten traces' n_turns</title>
+    <text class="tx s" x="186" y="12">agent turns</text>
+    <line class="gl" x1="146" y1="70" x2="236" y2="70"/>
+    <line class="ax" x1="146" y1="118" x2="236" y2="118"/>
+    <text class="tx s" x="142" y="73" style="text-anchor:end">50</text></g>
+
+  <g><title>v0 · $0.754 for the ten tasks · 90 turns, max 21 · 453.6 s wall · 3.12 M input tokens · task 1681 alone cost $0.17 and hit the turn cap</title>
+    <rect class="bar" x="36" y="27.5" width="20" height="90.5" rx="3"/>
+    <text class="tx k" x="46" y="23">.75</text>
+    <text class="tx s" x="46" y="130">v0</text>
+    <rect class="bar" x="152" y="31.6" width="20" height="86.4" rx="3"/>
+    <text class="tx k" x="162" y="27">90</text>
+    <text class="tx s" x="162" y="130">v0</text></g>
+
+  <g><title>v1 · $0.634 · 79 turns, max 21 · 404.0 s · 2.67 M input tokens · held by the gate, so never served</title>
+    <rect class="bar" x="62" y="41.9" width="20" height="76.1" rx="3"/>
+    <rect class="nd ext" x="62" y="41.9" width="20" height="76.1" rx="3"/>
+    <text class="tx k" x="72" y="37.5">.63</text>
+    <text class="tx s" x="72" y="130">v1</text>
+    <rect class="bar" x="178" y="42.2" width="20" height="75.8" rx="3"/>
+    <rect class="nd ext" x="178" y="42.2" width="20" height="75.8" rx="3"/>
+    <text class="tx k" x="188" y="37.8">79</text>
+    <text class="tx s" x="188" y="130">v1</text></g>
+
+  <g><title>v2 · $0.632 · 75 turns, max 19 · 369.8 s · 2.62 M input tokens · the champion; task 1681 now passes at $0.10 · the optimiser session that produced it read 2.05 M input tokens, about $1.27</title>
+    <rect class="bar pro" x="88" y="42.2" width="20" height="75.8" rx="3"/>
+    <text class="tx k" x="98" y="37.8">.63</text>
+    <text class="tx s" x="98" y="130">v2 ✓</text>
+    <rect class="bar pro" x="204" y="46" width="20" height="72" rx="3"/>
+    <text class="tx k" x="214" y="41.6">75</text>
+    <text class="tx s" x="214" y="130">v2 ✓</text></g>
+</svg>

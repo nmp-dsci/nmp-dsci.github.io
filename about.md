@@ -2,32 +2,33 @@
 layout: page
 title: About
 permalink: /about/
-summary: Data scientist working in gen AI — three gen-AI systems live on AWS, each with evals in CI, guardrails between the model and the data, and a cost ceiling.
+summary: Data scientist working in gen AI — four gen-AI systems live on AWS, each with evals in CI, guardrails between the model and the data, and a cost ceiling.
 ---
 
 I'm **Nathan Phillips**, a data scientist working in gen AI, in Sydney.
 
 - **End-to-end** — data layer, agent loop, eval harness; then I run them.
-- **Three live on AWS** — all open from the [home page](/).
+- **Four live on AWS** — all open from the [home page](/).
 - **The eval is part of the product** — each system says what it scores, on which fixed set, graded by whom, and what would have stopped a worse version shipping.
 
-**If you only read one thing:** the [production rubric](/#rubric) and its three scorecards — 9/9, 6/9 and 5/9, gaps named with reasons.
+**If you only read one thing:** the [production rubric](/#rubric) and its four scorecards — 9/9, 6/9, 5/9 and 6/9, gaps named with reasons.
 
 <figure class="fig">
-  <p class="fig-title">Figure · the production rubric, scored across the three live systems</p>
+  <p class="fig-title">Figure · the production rubric, scored across the four live systems</p>
   <div class="dia-frame">{% include diagrams/chart/portfolio-scorecards.svg %}</div>
-  <figcaption><b>Twenty of twenty-seven dimensions shipped, and the other seven say why not.</b>
+  <figcaption><b>Twenty-six of thirty-six dimensions shipped, and the other ten say why not.</b>
   Source: each case study's <code>production.rubric</code>, recomputed by
   <code>scripts/lint_case_study.py</code>.</figcaption>
 </figure>
 
-## The three systems — all three live on AWS, in demo mode
+## The four systems — all four live on AWS, in demo mode
 
 - **[Data Pilot](/projects/data-pilot/)** — a conversational data agent over ~3.2M rows of NSW property data; natural language in, governed SQL out, Postgres row-level security per user; 9/9.
 - **[ConvFinQA Agent](/projects/convfinqa-agent/)** — multi-turn financial Q&A over report text and tables; four typed agents, prompts promoted like releases; seven of nine challengers refused, and one Claude session at 90.5%.
 - **[Transcript RAG](/projects/transcript-rag/)** — an evaluation-first retrieval workbench; eight configurations on one chunk-labelled golden set; parity at 6.1× fewer tokens.
+- **[DABstep Loop](/projects/dabstep-loop/)** — a Haiku agent on a tabular-QA benchmark, and the loop that rewrites its prompt and helper from its own failures; 4/10 to 9/10 in two cycles, the first held at p 0.109, the second promoted at p 0.031.
 
-All three run in **demo mode** — read-only, keyless, no inference — because a no-login app with a live model has an unbounded abuse bill.
+All four run in **demo mode** — read-only, keyless, no inference — because a no-login app with a live model has an unbounded abuse bill.
 
 ## How they were built — three practices, one path
 
