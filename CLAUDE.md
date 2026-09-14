@@ -170,7 +170,7 @@ uv run --with pyyaml --no-project python scripts/lint_case_study.py \
 docker run --rm -e JEKYLL_NO_BUNDLER_REQUIRE=true -v "$PWD":/site -w /site \
     ghp-jekyll:local jekyll build -d /site/_probeout -q
 
-# layout + axe across 10 pages × 3 widths × 2 themes
+# layout + axe across 12 pages × 3 widths × 2 themes
 node scripts/audit_pages.mjs http://127.0.0.1:8790
 ```
 
