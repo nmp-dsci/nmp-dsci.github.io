@@ -1,8 +1,8 @@
 {%- comment -%}
   The footer carries the page tree — the site's only index of itself. It is
   generated from the same collections as the nav dropdown and #work, so the
-  three live systems, their rubric scores and the three practices stay correct
-  without anyone maintaining a list. Glyphs are decorative and aria-hidden; the
+  live systems, their rubric scores and the practices stay correct without
+  anyone maintaining a list. Glyphs are decorative and aria-hidden; the
   structure a screen reader hears is the nested list, not the box-drawing.
 {%- endcomment -%}
 {%- assign live = site.projects | where_exp: "p", "p.production.live == true" | sort: "production.order" -%}
