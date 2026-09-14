@@ -1,5 +1,5 @@
 <svg class="dia" viewBox="0 0 320 190" role="img"
-     aria-label="The 450 DABstep tasks in twelve operation families, one horizontal bar per family showing its member count. Six families carry at least one of the ten gold dev tasks and are drawn filled: F01 45 tasks, F02 20, F04 40, F07 60, F10 25, F12 72. Six carry no gold at all and are drawn hollow: F03 45, F05 20, F06 27, F08 46, F09 30, F11 20, together 188 of the 378 hard tasks. Only the unsupervised loop can learn anything about those six.">
+     aria-label="The 450 DABstep tasks in twelve operation families, one horizontal bar per family showing its member count. Six families carry at least one of the ten gold dev tasks and are drawn filled: F01 45 tasks, F02 20, F04 40, F07 60, F10 25, F12 72. Six carry no gold at all and are drawn hollow: F03 45, F05 20, F06 27, F08 46, F09 30, F11 20, together 188 of the 378 hard tasks (the other 72 of the 450 are the easy family F12). Only the unsupervised loop can learn anything about those six.">
   <title>Six of twelve families, 188 hard tasks, have no gold task at all</title>
   <text class="tx s" x="6" y="12" style="text-anchor:start">family</text>
   <text class="tx s" x="314" y="12" style="text-anchor:end">filled = has gold</text>
