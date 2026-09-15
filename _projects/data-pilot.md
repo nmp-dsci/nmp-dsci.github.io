@@ -363,7 +363,7 @@ The Operations tab answers "is it healthy, safe, fast and affordable":
 - **No data, no zero** — an empty panel says "no data".
 - **Runbook** — `docs/runbook.md` is written against its lamps.
 - **Cost is measured before it is capped** — cache-adjusted, because most input tokens are prompt-cache hits and naive counting overstates spend several times over.
-- **What a question costs** — a heavy two-dataset question observed in traffic: 252k nominal input tokens, 220k of them cache reads, 6k output, $0.021 on `deepseek-chat`; priced without the cache split it reads as six times that. Pinned in `tests/test_pricing.py`.
+- **What a question costs** — a heavy two-dataset question observed in traffic: 252k nominal input tokens, 220k of them cache reads, 6k output, $0.021 on `deepseek-chat`; priced without the cache split it reads as three and a half times that. Pinned in `tests/test_pricing.py`.
 
 | Cap | Limit |
 |---|---|
