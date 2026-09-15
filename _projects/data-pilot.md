@@ -81,7 +81,7 @@ production:
   topology: "CloudFront + S3 → App Runner backend ×1 → Aurora Serverless v2 · ECS Fargate one-shot jobs"
   topology_diagram: "diagrams/topology/data-pilot.svg"
   region: "ap-southeast-2"
-  cost: "~$8–18/mo · $0 inference"
+  cost: "~$8–18/mo · $0.02 a question (252k in, 87% cached · 6k out)"
   rung: 10
   rung_note: "rung-100 sizing measured · s42 worker sweep · drain time within 6% of ⌈N/W⌉×S · all nine grid cells"
   score: "9 / 9"
@@ -363,6 +363,7 @@ The Operations tab answers "is it healthy, safe, fast and affordable":
 - **No data, no zero** — an empty panel says "no data".
 - **Runbook** — `docs/runbook.md` is written against its lamps.
 - **Cost is measured before it is capped** — cache-adjusted, because most input tokens are prompt-cache hits and naive counting overstates spend several times over.
+- **What a question costs** — a heavy two-dataset question observed in traffic: 252k nominal input tokens, 220k of them cache reads, 6k output, $0.021 on `deepseek-chat`; priced without the cache split it reads as three and a half times that. Pinned in `tests/test_pricing.py`.
 
 | Cap | Limit |
 |---|---|

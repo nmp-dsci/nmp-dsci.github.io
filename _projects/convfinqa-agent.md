@@ -109,7 +109,7 @@ production:
   topology: "ECR → App Runner (1 instance, 0.5 vCPU / 1 GB) · CloudWatch 5xx alarm · no VPC, no database"
   topology_diagram: "diagrams/topology/convfinqa-agent.svg"
   region: ap-southeast-1
-  cost: "~$5–15/mo · $0 inference"
+  cost: "~$5–15/mo · $0.003 a turn (10.9k in · 0.8k out)"
   rung: 10
   rung_note: "`--workers 1` · process-memory sessions · no load test"
   score: "6 / 9"
@@ -375,7 +375,7 @@ Cost is per turn, prices declared in code so an old run cannot be silently repri
 | session sdk_v1 | claude-sonnet-5, CLI subprocess | $27.62 | 787 s | 27 q/min |
 | session sdk_v1 | claude-haiku-4-5, CLI subprocess | $17.14 | 882 s | 24 q/min |
 
-Public deployment: no inference, roughly **$5–15/month**.
+Per turn on the champion: **$0.0034**, 10,939 input and 798 output tokens on `deepseek-v4-flash`, the mean over 1,576 v8 eval turns in `evaluation/traces_snapshot.jsonl.gz`. Public deployment: no inference, roughly **$5–15/month**.
 
 <div class="slide" id="slide-6a">
   <h3><span class="n">6a</span>The product grades itself on these same nine dimensions</h3>
