@@ -80,7 +80,7 @@ production:
   topology: "S3 demo data → ECR → App Runner ×1 · no VPC, no database"
   topology_diagram: "diagrams/topology/transcript-rag.svg"
   region: "ap-southeast-2"
-  cost: "~$8–12/mo · $0 inference"
+  cost: "~$8–12/mo · 3.0k prompt tokens a question · DeepSeek V4 Flash"
   rung: 10
   rung_note: "Chroma corpus and graph snapshot baked into the image · a second instance is a second copy of the corpus, not a second reader · rung 100 starts by moving both behind a shared store"
   score: "5 / 9"
@@ -330,6 +330,7 @@ Cost is the finding, not a footnote:
 
 - **Why ship single-hop?** Agency costs more, and what it buys depends on the rubric; single-metric leaderboards hide that.
 - **Free to repeat** — embeddings and reranking are local.
+- **In dollars?** Not committed: the matrix records prompt tokens per answer and the model, `deepseek-v4-flash`, not a priced figure, so the page gives tokens.
 - **Worst case** — no inference on the demo; a fixed ~$8–12/month App Runner bill.
 
 <figure class="evidence">
