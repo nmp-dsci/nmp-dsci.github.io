@@ -216,7 +216,7 @@ pre.md{font-family:var(--mono);font-size:var(--t-2);line-height:1.6;background:v
   <p class="label">Plan · branch <code>review-loop</code> · 2026-09-17</p>
   <h1>Comment on the live page, press send, keep reading — the page refreshes when the fix lands</h1>
   <p class="lead">Today a design note on a case study goes through the terminal: you describe the element, I find it, I rebuild, you reload. The ask is the Lavish loop — sidebar comments, one send, the agent works while you read — pointed at the real Jekyll pages instead of a plan artifact. This is what exists, what I verified in twenty minutes, and the smallest build that gets there.</p>
-  <div class="chips"><span class="chip ok">spike passed: built page renders inside Lavish</span><span class="chip">4 tools surveyed</span><span class="chip">3 options, 1 recommended</span><span class="chip warn">1 open question: which page first</span></div>
+  <div class="chips"><span class="chip ok">spike passed: built page renders inside Lavish</span><span class="chip">4 tools surveyed</span><span class="chip">3 options, 1 recommended</span><span class="chip ok">decided: option A · first page: home</span></div>
 </div></header>
 
 <section class="blk" id="goal"><div class="wrap">
@@ -332,23 +332,22 @@ npx -y lavish-axi .lavish/review/dabstep-loop.html</pre>
 </div></section>
 
 <section class="blk" id="build"><div class="wrap">
-  <div class="hd"><p class="label">05 · the build for option A</p><h2>Three files on <code>review-loop</code>, and the first review is the DABstep page</h2></div>
+  <div class="hd"><p class="label">05 · the build for option A</p><h2>Three files on <code>review-loop</code>, built; the first review is the home page</h2></div>
   <div class="grid g2">
     <div class="panel">
       <p class="label">files</p>
-      <pre class="tree">scripts/review_page.py     build · rewrite · copy assets · print the path
-Makefile                   review: PAGE=projects/dabstep-loop
-.claude/skills/review/     /review &lt;page&gt; — the loop as a skill
-.lavish/review/            generated; gitignored except .gitkeep
-CLAUDE.md                  one paragraph: how a review session runs</pre>
-      <p class="small" style="margin-top:var(--s3)"><code>review_page.py</code>: run the Docker build if <code>_probeout</code> is stale; rewrite <code>/assets/</code> to relative; point every other root link at <code>127.0.0.1:8790</code>; drop gtag; copy <code>assets/{css,fonts,img/favicon}</code> only; write <code>.lavish/review/&lt;slug&gt;.html</code>.</p>
+      <pre class="tree">scripts/review_page.py     build · rewrite · copy assets · print the path   ✓
+.claude/skills/review/     /review &lt;page&gt; — the loop as a skill              ✓
+_review/                   generated, gitignored (.lavish/ may never be ignored)
+CLAUDE.md                  one paragraph: how a review session runs          ✓</pre>
+      <p class="small" style="margin-top:var(--s3)"><code>review_page.py</code>: Docker build (or <code>--no-build</code>); rewrite <code>/assets/</code> to relative; point every other root link at <code>127.0.0.1:8790</code>; drop gtag; copy css, js, fonts, favicon and images under 400 KB (2.3 MB, not 22); write <code>_review/&lt;slug&gt;.html</code>. Home page verified headless: five diagrams, nine matrix cells, zero failed requests.</p>
     </div>
     <div class="panel">
       <p class="label">the skill, in order</p>
       <ol class="steps">
-        <li><span><code>make review PAGE=…</code>, then <code>lavish-axi</code> on the output; start the local server if :8790 is down</span></li>
+        <li><span><code>scripts/review_page.py &lt;page&gt;</code>, then <code>lavish-axi</code> on the output; start the local server if :8790 is down</span></li>
         <li><span>foreground poll. A note arrives with its selector — map it to source: a <code>.slide</code> id → the Markdown block, an <code>svg.dia</code> → the include, a class → <code>main.css</code></span></li>
-        <li><span>edit, lint the page with <code>--repo</code>, rebuild, re-export, <code>--agent-reply</code> one line per note</span></li>
+        <li><span>edit, lint the page with <code>--repo</code>, <code>review_page.py</code> again (rebuild + re-export), <code>--agent-reply</code> one line per note</span></li>
         <li><span>on Send &amp; End: full lint, Docker build, <code>audit_pages</code>, contrast; commit with the notes as the body; <code>/no-mistakes</code></span></li>
       </ol>
     </div>
@@ -366,28 +365,8 @@ CLAUDE.md                  one paragraph: how a review session runs</pre>
 </div></section>
 
 <section class="blk" id="decide"><div class="wrap">
-  <div class="hd"><p class="label">07 · decide</p><h2>Two answers and the build starts</h2></div>
-  <div class="grid g2">
-    <form class="q" data-lavish-question="route" onsubmit="event.preventDefault();const f=new FormData(event.currentTarget);const r=f.get('route');const s=f.get('spikeB');if(!r)return;const t='Build the review loop: option '+r+(s?'; also spike option B (artifact with comments) after A works':'; do not spike B yet');window.lavish.queuePrompt(t,{tag:'choice',text:'Route: '+r+(s?' + spike B':''),element:event.currentTarget,data:{question:'route',answer:r,spikeB:!!s}});event.currentTarget.querySelector('.queued').textContent='queued: '+t;">
-      <h3>Which route?</h3>
-      <p class="why">A is verified and needs no install. B is the better loop on paper.</p>
-      <label><input type="radio" name="route" value="A" checked><span><b>A · Lavish over the built page</b><span class="rec">recommended</span></span></label>
-      <label><input type="radio" name="route" value="B"><span><b>B · Claude artifact with comments</b> — spike it first, fall back to A</span></label>
-      <label><input type="radio" name="route" value="C"><span><b>C · Vibe Annotations</b> — install the extension and MCP server</span></label>
-      <label><input type="checkbox" name="spikeB" value="1"><span>after A works, spend 30 minutes proving B end to end</span></label>
-      <div class="row"><button class="btn" type="submit">Queue this answer</button><span class="queued"></span></div>
-    </form>
-    <form class="q" data-lavish-question="first-page" onsubmit="event.preventDefault();const f=new FormData(event.currentTarget);const p=f.get('page');const n=(f.get('notes')||'').trim();if(!p)return;const t='First review session: '+p+(n?'. Focus: '+n:'');window.lavish.queuePrompt(t,{tag:'choice',text:'First page: '+p,element:event.currentTarget,data:{question:'first-page',answer:p,notes:n}});event.currentTarget.querySelector('.queued').textContent='queued: '+t;">
-      <h3>First page to review?</h3>
-      <p class="why">The message that started this was about the DABstep page's design and commentary.</p>
-      <label><input type="radio" name="page" value="projects/dabstep-loop" checked><span><b>/projects/dabstep-loop/</b> — the case study</span></label>
-      <label><input type="radio" name="page" value="projects/dabstep-loop/eval-loop"><span><b>/projects/dabstep-loop/eval-loop/</b> — the deep page</span></label>
-      <label><input type="radio" name="page" value="index"><span><b>/</b> — home, the four-column matrix</span></label>
-      <textarea name="notes" placeholder="Anything you already know you want changed on it (optional)"></textarea>
-      <div class="row"><button class="btn" type="submit">Queue this answer</button><span class="queued"></span></div>
-    </form>
-  </div>
-  <p class="small" style="margin-top:var(--s4)">Both answers queue in the sidebar; press <b>Send to Agent</b> once. Anything else — pin it on the page.</p>
+  <div class="hd"><p class="label">07 · decided</p><h2>Option A, no spike of B yet; the first session is the home page</h2>
+  <p>Queued from this page on 2026-09-17 and built the same hour. A second Lavish window is open on the home page now — pin the first note there.</p></div>
 </div></section>
 
 <footer><div class="wrap">s11 · design source: the site's own tokens (<code>assets/css/tokens.css</code>), as in s05–s10 · research 2026-09-17 · spike verified headless on the rewritten build</div></footer>
