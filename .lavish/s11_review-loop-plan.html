@@ -1,0 +1,395 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>s11 · Review loop — comment on the live page, Claude fixes it</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+
+/* Design source: the subject site's own system — tokens copied from
+   nmp-dsci.github.io/assets/css/tokens.css (light :root + dark override). */
+:root{
+  --bg:#F7F6F2; --panel:#FFFFFF; --band:#EFEEE8;
+  --ink:#1A1D1B; --ink-2:#3B403D; --muted:#4A514D; --faint:#5C635E;
+  --line:#DCDAD2; --line-2:#C7C5BC; --line-3:#8A8880;
+  --accent:#0A6552; --accent-ink:#FFFFFF; --accent-soft:#DFEFE8;
+  --amber:#8A5006; --amber-soft:#F6E6CF;
+  --sans:'IBM Plex Sans',system-ui,-apple-system,sans-serif;
+  --serif:'IBM Plex Serif',Georgia,'Times New Roman',serif;
+  --mono:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+  --t-2:0.8rem; --t-1:0.875rem; --t0:1rem; --t1:1.125rem; --t2:1.406rem; --t3:1.758rem; --t4:2.197rem;
+  --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:24px; --s6:32px; --s7:48px; --s8:64px; --s9:96px;
+  --r:10px; --r-sm:6px;
+  --shadow:0 1px 2px rgb(20 25 22 / .05), 0 12px 28px -18px rgb(20 25 22 / .22);
+  --w:1140px; --track-label:.08em;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#121614; --panel:#191E1B; --band:#161A18;
+    --ink:#E8EBE7; --ink-2:#C9CFC9; --muted:#AEB6B0; --faint:#98A09A;
+    --line:#28302B; --line-2:#3A443E; --line-3:#727E77;
+    --accent:#43C29A; --accent-ink:#0E1512; --accent-soft:#17382C;
+    --amber:#D99A4E; --amber-soft:#3A2A14;
+    --shadow:0 1px 2px rgb(0 0 0 / .4), 0 12px 28px -18px rgb(0 0 0 / .65);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#121614; --panel:#191E1B; --band:#161A18;
+  --ink:#E8EBE7; --ink-2:#C9CFC9; --muted:#AEB6B0; --faint:#98A09A;
+  --line:#28302B; --line-2:#3A443E; --line-3:#727E77;
+  --accent:#43C29A; --accent-ink:#0E1512; --accent-soft:#17382C;
+  --amber:#D99A4E; --amber-soft:#3A2A14;
+  --shadow:0 1px 2px rgb(0 0 0 / .4), 0 12px 28px -18px rgb(0 0 0 / .65);
+}
+*,*::before,*::after{box-sizing:border-box}
+:where(.grid,.flex,.cards,.slide)>*{min-width:0}
+:where(p,h1,h2,h3,h4,li,dd,figcaption,td,th,.badge,.label){overflow-wrap:anywhere}
+:where(img,svg,video,iframe){max-width:100%;height:auto}
+html{scroll-behavior:smooth;scroll-padding-top:72px}
+body{margin:0;background:var(--bg);color:var(--ink-2);font-family:var(--sans);font-size:var(--t0);line-height:1.55;-webkit-font-smoothing:antialiased}
+h1,h2,h3,h4{color:var(--ink);margin:0;line-height:1.15;font-weight:600;letter-spacing:-.02em;text-wrap:balance}
+h1{font-size:var(--t4);font-family:var(--serif);font-weight:400} h2{font-size:var(--t3)} h3{font-size:var(--t1)} h4{font-size:var(--t0)}
+p{margin:0 0 var(--s4);text-wrap:pretty}
+a{color:var(--accent);text-decoration:none} a:hover{text-decoration:underline;text-underline-offset:.2em}
+strong,b{color:var(--ink);font-weight:600}
+code{font-family:var(--mono);font-size:max(var(--t-2),.86em);background:var(--band);padding:.08em .32em;border-radius:var(--r-sm);color:var(--ink-2)}
+.wrap{max-width:var(--w);margin-inline:auto;padding-inline:var(--s5)}
+.label{font-family:var(--mono);font-size:var(--t-2);font-weight:500;letter-spacing:var(--track-label);text-transform:uppercase;color:var(--faint);margin:0}
+.lead{font-family:var(--serif);font-size:var(--t1);line-height:1.5;color:var(--ink-2);max-width:72ch}
+.small{font-size:var(--t-1);color:var(--muted)}
+.top{position:sticky;top:0;z-index:60;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.top-in{max-width:var(--w);margin-inline:auto;padding:var(--s3) var(--s5);display:flex;align-items:center;gap:var(--s4);flex-wrap:wrap}
+.top b{font-family:var(--mono);font-size:var(--t-1);color:var(--ink);white-space:nowrap}
+.top nav{display:flex;gap:var(--s4);margin-left:auto;flex-wrap:wrap;font-size:var(--t-1);font-weight:500}
+.top nav a{color:var(--ink-2)} .top nav a:hover{color:var(--accent);text-decoration:none}
+header.hero{padding:var(--s7) 0 var(--s5)}
+.chips{display:flex;gap:var(--s2);flex-wrap:wrap;margin:var(--s4) 0 0}
+.chip{font-family:var(--mono);font-size:var(--t-2);padding:.3em .6em;border:1px solid var(--line-2);border-radius:var(--r-sm);color:var(--ink-2);background:var(--panel)}
+.chip.ok{border-color:var(--accent);color:var(--accent)} .chip.warn{border-color:var(--amber);color:var(--amber)}
+section.blk{padding-top:var(--s8)} section.blk:last-of-type{padding-bottom:var(--s9)}
+.hd{margin-bottom:var(--s5);max-width:80ch} .hd .label{margin-bottom:var(--s2)} .hd h2{margin-bottom:var(--s3)}
+.panel{background:var(--panel);border-radius:var(--r);box-shadow:var(--shadow);padding:var(--s5)}
+.band{background:var(--band);border-radius:var(--r);padding:var(--s4) var(--s5)}
+.grid{display:grid;gap:var(--s4)} .g3{grid-template-columns:repeat(3,minmax(0,1fr))} .g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+@media (max-width:900px){.g3,.g2{grid-template-columns:minmax(0,1fr)}}
+.card h3{margin-bottom:var(--s2)} .card p{margin-bottom:var(--s2);font-size:var(--t-1)} .card p:last-child{margin:0}
+.tw{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:var(--r);box-shadow:var(--shadow);background:var(--panel)}
+table{border-collapse:collapse;width:100%;min-width:680px;font-size:var(--t-1)}
+caption{text-align:left;padding:var(--s4) var(--s5) var(--s2);color:var(--muted);font-size:var(--t-1);caption-side:top}
+th,td{text-align:left;padding:var(--s3) var(--s4);border-bottom:1px solid var(--line);vertical-align:top;line-height:1.45}
+thead th{font-family:var(--mono);font-size:var(--t-2);font-weight:500;color:var(--faint);letter-spacing:var(--track-label);text-transform:uppercase;border-bottom:1px solid var(--line-2);white-space:nowrap}
+tbody tr:last-child td{border-bottom:0}
+td.sub{font-weight:600;color:var(--ink);white-space:nowrap}
+td.num{font-family:var(--mono);font-size:var(--t-2);font-variant-numeric:tabular-nums;white-space:nowrap}
+td .path{display:block;font-family:var(--mono);font-size:var(--t-2);color:var(--faint);margin-top:2px}
+tr.pro td{background:color-mix(in srgb,var(--accent-soft) 55%,transparent)}
+.v-ok{color:var(--accent);font-weight:600} .v-no{color:var(--muted)} .v-warn{color:var(--amber);font-weight:600}
+/* the slide mock — this is the component proposed for the site */
+.slide{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:var(--s5);align-items:start;background:var(--panel);border-radius:var(--r);box-shadow:var(--shadow);padding:var(--s5);margin-bottom:var(--s4)}
+.slide .fr{background:var(--band);border-radius:var(--r);padding:var(--s4)}
+.slide .fr svg{display:block;width:100%;height:auto}
+.slide .tx h3{margin-bottom:var(--s2)} .slide .tx p{font-size:var(--t-1);margin-bottom:var(--s2)}
+.slide .tx .go{font-family:var(--mono);font-size:var(--t-2)}
+.slide .n{font-family:var(--mono);font-size:var(--t-2);color:var(--faint);margin-bottom:var(--s2)}
+@media (max-width:820px){.slide{grid-template-columns:minmax(0,1fr)}}
+.dia .nd{fill:var(--panel);stroke:var(--line-2);stroke-width:1}
+.dia .hi{stroke:var(--accent);stroke-width:1.6;fill:var(--accent-soft)}
+.dia .tt{font:600 12px var(--sans);fill:var(--ink)}
+.dia .tx{font:10.5px var(--sans);fill:var(--ink-2)}
+.dia .lb{font:10px var(--mono);fill:var(--faint)}
+.dia .ed{stroke:var(--line-3);fill:none;stroke-width:1.2;marker-end:url(#arr)}
+.dia .dash{stroke-dasharray:4 3}
+.dia .bar{fill:var(--line-3)} .dia .bar.hi{fill:var(--ink);stroke:none} .dia .bar.pro{fill:var(--accent-soft);stroke:var(--accent);stroke-width:1.2}
+.dia .ax{stroke:var(--line-2);stroke-width:1} .dia .grid{stroke:var(--line);stroke-width:1}
+.dia .ci{stroke:var(--ink-2);stroke-width:1.5} .dia .pt{fill:var(--ink-2)} .dia .pt.pro{fill:var(--accent)} .dia .ci.pro{stroke:var(--accent)}
+.steps{counter-reset:s;list-style:none;padding:0;margin:0;display:grid;gap:var(--s3)}
+.steps li{display:grid;grid-template-columns:2rem minmax(0,1fr);gap:var(--s3);align-items:start;font-size:var(--t-1)}
+.steps li::before{counter-increment:s;content:counter(s,decimal-leading-zero);font-family:var(--mono);color:var(--accent);font-weight:500;padding-top:2px}
+form.q{background:var(--panel);border-radius:var(--r);box-shadow:var(--shadow);padding:var(--s5);display:grid;gap:var(--s3)}
+form.q h3{margin:0} form.q .why{font-size:var(--t-1);color:var(--muted);margin:0}
+form.q label{display:grid;grid-template-columns:1.2rem minmax(0,1fr);gap:var(--s2);align-items:start;font-size:var(--t-1);padding:var(--s2) var(--s3);border:1px solid var(--line);border-radius:var(--r-sm);cursor:pointer}
+form.q label:has(input:checked){border-color:var(--accent);background:var(--accent-soft)}
+form.q input[type=radio]{margin:3px 0 0;accent-color:var(--accent)}
+form.q textarea{width:100%;font:inherit;font-size:var(--t-1);padding:var(--s2) var(--s3);border:1px solid var(--line-2);border-radius:var(--r-sm);background:var(--bg);color:var(--ink-2);min-height:3.2rem;resize:vertical}
+form.q .row{display:flex;gap:var(--s3);align-items:center;flex-wrap:wrap}
+.btn{font:500 var(--t-1) var(--sans);background:var(--accent);color:var(--accent-ink);border:0;border-radius:var(--r-sm);padding:.55em 1em;cursor:pointer}
+.queued{font-family:var(--mono);font-size:var(--t-2);color:var(--accent);min-height:1.2em}
+.rec{font-family:var(--mono);font-size:var(--t-2);color:var(--accent);margin-left:.4em}
+ul.tight{margin:0;padding-left:1.1em;font-size:var(--t-1)} ul.tight li{margin-bottom:var(--s1)}
+.tree{font-family:var(--mono);font-size:var(--t-1);line-height:1.7;white-space:pre;overflow-x:auto;margin:0}
+footer{border-top:1px solid var(--line);padding:var(--s5) 0;font-size:var(--t-2);color:var(--faint);font-family:var(--mono)}
+/* --- s09 additions --- */
+.sc{display:inline-grid;grid-auto-flow:column;gap:3px}
+.sc i{width:9px;height:14px;border-radius:2px;background:var(--line);display:block}
+.sc i.p1{background:var(--amber)} .sc i.p2{background:var(--accent)}
+.tot{font-family:var(--mono);font-size:var(--t-1);font-variant-numeric:tabular-nums;font-weight:500}
+.bar-w{display:grid;grid-template-columns:3.2rem minmax(0,1fr);gap:var(--s3);align-items:center}
+.bar-t{height:9px;border-radius:99px;background:var(--band);overflow:hidden}
+.bar-f{height:100%;border-radius:99px;background:var(--accent)}
+.bar-f.lo{background:var(--amber)} .bar-f.mid{background:var(--line-3)}
+.tier{font-family:var(--mono);font-size:var(--t-2);letter-spacing:var(--track-label);text-transform:uppercase;color:var(--faint);padding:var(--s4) var(--s5) var(--s2);display:block}
+.kpi{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:var(--s4)}
+@media(max-width:900px){.kpi{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.kpi .k{background:var(--panel);border-radius:var(--r);box-shadow:var(--shadow);padding:var(--s4)}
+.kpi .k b{display:block;font-family:var(--mono);font-size:var(--t3);color:var(--ink);font-variant-numeric:tabular-nums;line-height:1.1}
+.kpi .k span{display:block;font-size:var(--t-2);color:var(--muted);margin-top:var(--s2);line-height:1.4}
+blockquote{margin:0;padding:var(--s3) var(--s4);border-left:2px solid var(--accent);background:var(--band);border-radius:0 var(--r-sm) var(--r-sm) 0;font-size:var(--t-1)}
+.wave{border-left:2px solid var(--line-2);padding-left:var(--s4);margin-bottom:var(--s5)}
+.wave.now{border-color:var(--accent)}
+.wave h3{margin-bottom:var(--s2)}
+.rule{background:var(--panel);border-radius:var(--r);box-shadow:var(--shadow);padding:var(--s4) var(--s5);margin-bottom:var(--s3)}
+.rule h4{font-family:var(--mono);font-size:var(--t-1);color:var(--accent);margin-bottom:var(--s2);letter-spacing:var(--track-label);text-transform:uppercase}
+pre.md{font-family:var(--mono);font-size:var(--t-2);line-height:1.6;background:var(--band);border-radius:var(--r);padding:var(--s4);overflow-x:auto;margin:0;white-space:pre}
+.legend{display:flex;gap:var(--s4);flex-wrap:wrap;font-size:var(--t-2);color:var(--muted);font-family:var(--mono);margin-top:var(--s3)}
+.legend b{display:inline-block;width:9px;height:12px;border-radius:2px;vertical-align:-1px;margin-right:4px}
+/* --- s10 additions --- */
+.mat{display:grid;grid-template-columns:auto repeat(9,minmax(0,1fr));gap:4px;align-items:center;font-family:var(--mono);font-size:var(--t-2)}
+.mat .rn{color:var(--ink);font-weight:500;padding-right:var(--s3);white-space:nowrap}
+.mat .c{height:22px;border-radius:4px;border:1px solid var(--line-2);background:var(--panel);display:grid;place-items:center;color:var(--faint)}
+.mat .c.s{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+.mat .c.p{border-color:var(--line-3);color:var(--ink-2)}
+.mat .c.d{border-style:dashed;border-color:var(--line-3)}
+.mat .c.n{background:var(--band);color:var(--faint)}
+.mat .hdr{font-size:10px;color:var(--faint);text-align:center;letter-spacing:0}
+.mat .new{outline:2px solid var(--amber);outline-offset:2px;border-radius:4px}
+.flip{display:grid;grid-template-columns:auto repeat(10,minmax(0,1fr));gap:4px;font-family:var(--mono);font-size:var(--t-2);align-items:center}
+.flip .h{text-align:center;color:var(--faint);font-size:10px}
+.flip .rn{color:var(--ink);font-weight:500;padding-right:var(--s3)}
+.flip .x{height:24px;border-radius:4px;display:grid;place-items:center;border:1px solid var(--line-2)}
+.flip .x.ok{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+.flip .x.no{background:var(--panel);color:var(--muted)}
+.flip .x.brk{background:var(--amber-soft);border-color:var(--amber);color:var(--amber);font-weight:600}
+.spine{display:grid;gap:var(--s3)}
+.spine .s{background:var(--panel);border-radius:var(--r);box-shadow:var(--shadow);padding:var(--s4) var(--s5);display:grid;grid-template-columns:2.4rem minmax(0,1fr);gap:var(--s3);align-items:start}
+.spine .s .n{font-family:var(--mono);color:var(--accent);font-weight:500;padding-top:3px}
+.spine .s h4{margin-bottom:var(--s2)} .spine .s h4 small{font-family:var(--mono);font-weight:500;color:var(--faint);font-size:var(--t-2);display:block;margin-bottom:2px;letter-spacing:var(--track-label);text-transform:uppercase}
+.spine .s p{font-size:var(--t-1);margin-bottom:var(--s2)} .spine .s p:last-child{margin:0}
+.spine .s .fig{font-family:var(--mono);font-size:var(--t-2);color:var(--muted);background:var(--band);border-radius:var(--r-sm);padding:var(--s2) var(--s3);margin-bottom:var(--s2)}
+.tp{display:grid;gap:var(--s2)}
+.tp .row{display:grid;grid-template-columns:7.5rem minmax(0,1fr) auto;gap:var(--s3);align-items:start;padding:var(--s2) var(--s3);background:var(--panel);border-radius:var(--r-sm);box-shadow:var(--shadow);font-size:var(--t-1)}
+.tp .row code{white-space:nowrap}
+.tp .row .k{font-family:var(--mono);font-size:var(--t-2);color:var(--faint);letter-spacing:var(--track-label);text-transform:uppercase;padding-top:3px}
+.tag{font-family:var(--mono);font-size:var(--t-2);padding:.15em .5em;border-radius:var(--r-sm);border:1px solid var(--line-2);color:var(--muted);white-space:nowrap}
+.tag.auto{border-color:var(--accent);color:var(--accent)} .tag.edit{border-color:var(--amber);color:var(--amber)} .tag.new{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.cav{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--s3)} @media(max-width:900px){.cav{grid-template-columns:minmax(0,1fr)}}
+.cav .c{background:var(--panel);border-radius:var(--r);box-shadow:var(--shadow);padding:var(--s4);font-size:var(--t-1);border-top:3px solid var(--amber)}
+.cav .c b{display:block;margin-bottom:var(--s1)}
+.bars{display:grid;gap:var(--s2);font-family:var(--mono);font-size:var(--t-2)}
+.bars .b{display:grid;grid-template-columns:3rem minmax(0,1fr) 9rem;gap:var(--s3);align-items:center}
+.bars .t{height:14px;background:var(--band);border-radius:4px;overflow:hidden} .bars .f{height:100%;background:var(--line-3)} .bars .f.pro{background:var(--accent)} .bars .f.hold{background:var(--amber)}
+/* --- s11 additions --- */
+.opt{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--s4)}
+@media(max-width:980px){.opt{grid-template-columns:minmax(0,1fr)}}
+.opt .o{background:var(--panel);border-radius:var(--r);box-shadow:var(--shadow);padding:var(--s5);display:grid;gap:var(--s3);align-content:start;border-top:3px solid var(--line-2)}
+.opt .o.rec{border-top-color:var(--accent)}
+.opt .o h3{display:flex;gap:var(--s2);align-items:baseline;flex-wrap:wrap}
+.opt .o .k{font-family:var(--mono);font-size:var(--t-2);color:var(--faint)}
+.opt .o .cost{font-size:var(--t-1);color:var(--amber);margin:0}
+.opt .o .cost b{color:var(--amber)}
+.flow{list-style:none;margin:0;padding:0;display:grid;gap:var(--s2);font-size:var(--t-1)}
+.flow li{display:grid;grid-template-columns:1.5rem minmax(0,1fr);gap:var(--s2)}
+.flow li i{font-style:normal;font-family:var(--mono);font-size:var(--t-2);color:var(--accent);padding-top:2px}
+.flow li.you i{color:var(--amber)}
+.verified{display:inline-block;font-family:var(--mono);font-size:var(--t-2);color:var(--accent);border:1px solid var(--accent);border-radius:var(--r-sm);padding:.15em .5em}
+.todo{display:inline-block;font-family:var(--mono);font-size:var(--t-2);color:var(--amber);border:1px solid var(--amber);border-radius:var(--r-sm);padding:.15em .5em}
+.mock{background:var(--band);border-radius:var(--r);padding:var(--s3);display:grid;grid-template-columns:minmax(0,2.2fr) minmax(0,1fr);gap:var(--s3);min-height:220px}
+.mock .pg{background:var(--panel);border-radius:var(--r-sm);padding:var(--s3);font-size:var(--t-2);display:grid;gap:6px;align-content:start}
+.mock .pg .h{height:14px;border-radius:3px;background:var(--ink);width:70%;opacity:.85}
+.mock .pg .l{height:7px;border-radius:3px;background:var(--line-2)} .mock .pg .l.s{width:60%}
+.mock .pg .fig{height:56px;border-radius:4px;background:var(--accent-soft);border:1px solid var(--accent);position:relative}
+.mock .pin{position:absolute;top:-8px;right:-8px;width:18px;height:18px;border-radius:50%;background:var(--amber);color:#fff;font:600 10px var(--mono);display:grid;place-items:center}
+.mock .sb{background:var(--panel);border-radius:var(--r-sm);padding:var(--s3);font-size:var(--t-2);display:grid;gap:6px;align-content:start;color:var(--muted)}
+.mock .sb .msg{background:var(--band);border-radius:4px;padding:6px;color:var(--ink-2)}
+.mock .sb .msg.me{border-left:2px solid var(--amber)} .mock .sb .msg.ag{border-left:2px solid var(--accent)}
+.mock .sb .send{margin-top:auto;background:var(--accent);color:var(--accent-ink);border-radius:4px;padding:5px;text-align:center;font-weight:500}
+@media(max-width:700px){.mock{grid-template-columns:minmax(0,1fr)}}
+</style>
+</head>
+<body>
+<div class="top"><div class="top-in"><b>s11 · review loop</b>
+<nav><a href="#goal">Goal</a><a href="#research">What exists</a><a href="#spike">Spike</a><a href="#options">Options</a><a href="#build">The build</a><a href="#risks">Risks</a><a href="#decide">Decide</a></nav></div></div>
+
+<header class="hero"><div class="wrap">
+  <p class="label">Plan · branch <code>review-loop</code> · 2026-09-17</p>
+  <h1>Comment on the live page, press send, keep reading — the page refreshes when the fix lands</h1>
+  <p class="lead">Today a design note on a case study goes through the terminal: you describe the element, I find it, I rebuild, you reload. The ask is the Lavish loop — sidebar comments, one send, the agent works while you read — pointed at the real Jekyll pages instead of a plan artifact. This is what exists, what I verified in twenty minutes, and the smallest build that gets there.</p>
+  <div class="chips"><span class="chip ok">spike passed: built page renders inside Lavish</span><span class="chip">4 tools surveyed</span><span class="chip">3 options, 1 recommended</span><span class="chip warn">1 open question: which page first</span></div>
+</div></header>
+
+<section class="blk" id="goal"><div class="wrap">
+  <div class="hd"><p class="label">01 · the loop you asked for</p><h2>You annotate the page; I edit the Markdown; the page you are reading updates</h2>
+  <p>The unit of work is one comment pinned to one element. Nothing on this page is a new idea — it is the Lavish loop from s00–s10, with the artifact swapped for the site.</p></div>
+  <div class="grid g2">
+    <div class="panel">
+      <p class="label">what the reviewer sees</p>
+      <div class="mock" aria-label="mock of the review surface: the case study on the left with a numbered pin on a figure, a conversation sidebar on the right">
+        <div class="pg"><div class="h"></div><div class="l"></div><div class="l s"></div><div class="fig"><span class="pin">1</span></div><div class="l"></div><div class="l"></div><div class="l s"></div></div>
+        <div class="sb"><span>Conversation</span><div class="msg me">#1 on figure 3b · "the dev-gold pair needs a label saying held"</div><div class="msg ag">Done — caption and aria-label updated, rebuilt, page reloaded.</div><div class="send">Send to agent</div></div>
+      </div>
+      <p class="small" style="margin-top:var(--s3)">The case study itself, full width, in its own CSS, with pins and a sidebar. That is the whole target.</p>
+    </div>
+    <div class="panel">
+      <p class="label">the turn, step by step</p>
+      <ol class="flow">
+        <li class="you"><i>you</i><span>click an element on the page, type the note, press <b>Send</b>; keep scrolling</span></li>
+        <li><i>me</i><span>the poll returns the note with the element's selector and text</span></li>
+        <li><i>me</i><span>edit <code>_projects/…md</code>, an SVG, or CSS — the real source, on the branch</span></li>
+        <li><i>me</i><span>rebuild the page, re-export it to the review copy, reply in the sidebar</span></li>
+        <li class="you"><i>you</i><span>the review window reloads on the new revision; your scroll position and other pins stay</span></li>
+        <li><i>me</i><span>when you press <b>Send &amp; End</b>: lint, audit, commit, <code>/no-mistakes</code>, PR</span></li>
+      </ol>
+    </div>
+  </div>
+</div></section>
+
+<section class="blk" id="research"><div class="wrap">
+  <div class="hd"><p class="label">02 · what exists</p><h2>Four tools do this; two of them are already on this machine</h2>
+  <p>Searched 2026-09-17. The column that matters for a static Jekyll site is the third: most of these tools assume a React dev server and a component tree to point at.</p></div>
+  <div class="tw"><table>
+    <thead><tr><th>Tool</th><th>What it is</th><th>Works on this site?</th><th>How a note reaches Claude</th><th>Page refresh after the fix</th><th>Cost</th></tr></thead>
+    <tbody>
+      <tr class="pro"><td class="sub">Lavish Editor<span class="path">npx lavish-axi · in use since s00</span></td><td>Serves one HTML file with a pin-and-sidebar review surface; the agent long-polls for notes and replies in the sidebar</td><td class="v-ok">Yes — verified below on the built DABstep page</td><td>the poll returns selector + text + the reviewer's note; images attachable</td><td class="v-ok">reloads the artifact on a new file revision</td><td class="num">$0 · installed</td></tr>
+      <tr><td class="sub">Claude artifacts<span class="path">the Artifact tool in this session</span></td><td>Publishes a page privately on claude.ai; viewers leave comment threads; a thread sent to Claude wakes this session</td><td class="v-ok">Yes, single-page — the page must be inlined (no root-relative assets) and the DOCTYPE/head stripped</td><td>comment → "Send to Claude" → this session wakes with the thread</td><td class="v-ok">a republish reaches open views live, carrying state</td><td class="num">$0 · built in</td></tr>
+      <tr><td class="sub">Vibe Annotations<span class="path">Chrome extension + local MCP server</span></td><td>Annotate anything on localhost, across pages; the agent pulls the queue over MCP and fixes in one batch</td><td class="v-ok">Yes — "React, Vue, Rails or plain HTML"</td><td>MCP: Claude Code reads the queue; notes carry selector, viewport, a zoned screenshot</td><td class="v-no">none described; you reload</td><td class="num">free, source-available · new install</td></tr>
+      <tr><td class="sub">Agentation<span class="path">npm install agentation · React component</span></td><td>In-app toolbar: click an element, note it, get structured Markdown; MCP lets the agent list and resolve notes</td><td class="v-warn">Not directly — a React component; there is a Vue port and a Chrome extension</td><td>copy-paste Markdown, or MCP</td><td class="v-no">agent can mark a note resolved; no reload</td><td class="num">free for internal use</td></tr>
+      <tr><td class="sub">Stagewise<span class="path">stagewise.io</span></td><td>Was a toolbar that sent element context to your editor; in 2026 it became its own agentic IDE and browser</td><td class="v-warn">Only inside its IDE</td><td>its own agent</td><td class="v-no">—</td><td class="num">product, not a component</td></tr>
+      <tr><td class="sub">Marker.io · BugHerd · Vercel toolbar<span class="path">SaaS</span></td><td>Client-feedback overlays for deployed sites; notes go to an issue tracker</td><td class="v-warn">On the deployed site only</td><td>via Jira/GitHub issue, then a human</td><td class="v-no">—</td><td class="num">subscription</td></tr>
+    </tbody></table></div>
+  <p class="small" style="margin-top:var(--s3)">Sources: <a href="https://www.vibe-annotations.com/">vibe-annotations.com</a> · <a href="https://www.agentation.com/">agentation.com</a> · <a href="https://vibecodinghub.org/tools/stagewise">stagewise review 2026</a> · <a href="https://github.com/inosaint/agent-annotate">agent-annotate</a> · <a href="https://avibebuilder.com/blog/web-annotation-tools-claude-code-compatible">annotation tools compatible with Claude Code</a>.</p>
+</div></section>
+
+<section class="blk" id="spike"><div class="wrap">
+  <div class="hd"><p class="label">03 · the spike</p><h2>The built DABstep page renders inside Lavish with its own fonts, CSS and all seven diagrams</h2>
+  <p>Lavish serves one file and its sibling assets; it cannot follow the site's root-relative <code>/assets/…</code> paths. So the question was whether a rewritten copy of a built page is still the page. It is.</p></div>
+  <div class="grid g2">
+    <div class="panel">
+      <p class="label">what was done <span class="verified">verified 2026-09-17</span></p>
+      <pre class="md">cp -R _probeout/assets .lavish/review/assets
+sed -e 's#"/assets/#"assets/#g' \
+    -e 's#href="/\([^"]*\)"#href="http://127.0.0.1:8790/\1"#g' \
+    _probeout/projects/dabstep-loop/index.html \
+    &gt; .lavish/review/dabstep-loop.html
+npx -y lavish-axi .lavish/review/dabstep-loop.html</pre>
+      <p class="small" style="margin-top:var(--s3)">Then a headless check of the served copy: <code>h1</code> "Two loops improve one agent…", <code>svg.dia</code> × 7, IBM Plex Serif loaded, body background <code>#F7F6F2</code>, zero failed requests.</p>
+    </div>
+    <div class="panel">
+      <p class="label">what it tells us</p>
+      <ul class="tight">
+        <li><b>No new tooling.</b> The loop you already use for plans works on the site's pages as they are built.</li>
+        <li><b>One page per session.</b> Lavish reviews a file, not a site. Internal links point at the local server on :8790, so a click opens the real neighbour page outside the review surface — fine for reading, no pins there.</li>
+        <li><b>Assets are 22 MB.</b> The copy step needs to skip <code>video/</code>, <code>dash/</code> and the ConvFinQA screenshots, or symlink instead of copy.</li>
+        <li><b>Analytics stripped.</b> The gtag script is removed from the review copy so a review session is not a page view.</li>
+        <li><b>Two windows conflict.</b> Lavish keeps one live view per session; if I open the session URL myself, yours is invalidated. I verify with headless Playwright instead (already the rule in memory).</li>
+      </ul>
+    </div>
+  </div>
+</div></section>
+
+<section class="blk" id="options"><div class="wrap">
+  <div class="hd"><p class="label">04 · options</p><h2>Ship Lavish now; spike the artifact route second, because it is the only one that refreshes a tab I did not open</h2></div>
+  <div class="opt">
+    <div class="o rec">
+      <h3><span class="k">A</span>Lavish over the built page <span class="rec">recommended</span></h3>
+      <p class="small">A <code>make review PAGE=projects/dabstep-loop</code> target that builds, rewrites, copies assets and opens Lavish; a <code>/review</code> skill that runs it, polls, edits source, rebuilds and replies.</p>
+      <ol class="flow">
+        <li><i>1</i><span>build → export the page to <code>.lavish/review/&lt;slug&gt;.html</code></span></li>
+        <li><i>2</i><span><code>lavish-axi</code> opens it; I poll</span></li>
+        <li class="you"><i>3</i><span>you pin, note, send</span></li>
+        <li><i>4</i><span>I edit source, rebuild, re-export, reply — Lavish reloads the revision</span></li>
+        <li><i>5</i><span>Send &amp; End → lint, audit, commit, <code>/no-mistakes</code></span></li>
+      </ol>
+      <p class="cost"><b>Cost:</b> ~60 lines of script + one skill file; one page at a time; the review copy is a rewritten build, not the deploy.</p>
+      <p class="small"><span class="verified">rendering verified</span> <span class="todo">reload-on-revision to confirm in first use</span></p>
+    </div>
+    <div class="o">
+      <h3><span class="k">B</span>Claude artifact with comments</h3>
+      <p class="small">Publish the page privately on claude.ai as a single inlined file. You comment in the artifact's own sidebar; a thread sent to Claude wakes this session; a republish updates every open view in place.</p>
+      <ol class="flow">
+        <li><i>1</i><span>build → inline CSS, fonts and SVGs into one file; strip the head skeleton</span></li>
+        <li><i>2</i><span><code>Artifact</code> publish → private URL, session watches it</span></li>
+        <li class="you"><i>3</i><span>you comment, "Send to Claude"</span></li>
+        <li><i>4</i><span>session wakes, I edit source, rebuild, republish; open tabs refresh</span></li>
+      </ol>
+      <p class="cost"><b>Cost:</b> a second export path (inline everything, ~16 MB cap, fonts as data URIs); the page lives on claude.ai, not localhost; works from your phone. Unverified end to end.</p>
+      <p class="small"><span class="todo">30-minute spike</span></p>
+    </div>
+    <div class="o">
+      <h3><span class="k">C</span>Vibe Annotations on :8790</h3>
+      <p class="small">Install the Chrome extension and its MCP server; annotate the real local site across pages; I read the queue over MCP and fix in a batch.</p>
+      <ol class="flow">
+        <li><i>1</i><span>install extension + <code>npx vibe-annotations-server init</code>; register the MCP with Claude Code</span></li>
+        <li class="you"><i>2</i><span>you annotate any page on 127.0.0.1:8790</span></li>
+        <li><i>3</i><span>I pull the queue, edit, rebuild</span></li>
+        <li class="you"><i>4</i><span>you reload</span></li>
+      </ol>
+      <p class="cost"><b>Cost:</b> a new extension and MCP server; no reply channel in the page and no reload; the site's real multi-page navigation is the one thing it does better than A.</p>
+      <p class="small"><span class="todo">unverified</span></p>
+    </div>
+  </div>
+</div></section>
+
+<section class="blk" id="build"><div class="wrap">
+  <div class="hd"><p class="label">05 · the build for option A</p><h2>Three files on <code>review-loop</code>, and the first review is the DABstep page</h2></div>
+  <div class="grid g2">
+    <div class="panel">
+      <p class="label">files</p>
+      <pre class="tree">scripts/review_page.py     build · rewrite · copy assets · print the path
+Makefile                   review: PAGE=projects/dabstep-loop
+.claude/skills/review/     /review &lt;page&gt; — the loop as a skill
+.lavish/review/            generated; gitignored except .gitkeep
+CLAUDE.md                  one paragraph: how a review session runs</pre>
+      <p class="small" style="margin-top:var(--s3)"><code>review_page.py</code>: run the Docker build if <code>_probeout</code> is stale; rewrite <code>/assets/</code> to relative; point every other root link at <code>127.0.0.1:8790</code>; drop gtag; copy <code>assets/{css,fonts,img/favicon}</code> only; write <code>.lavish/review/&lt;slug&gt;.html</code>.</p>
+    </div>
+    <div class="panel">
+      <p class="label">the skill, in order</p>
+      <ol class="steps">
+        <li><span><code>make review PAGE=…</code>, then <code>lavish-axi</code> on the output; start the local server if :8790 is down</span></li>
+        <li><span>foreground poll. A note arrives with its selector — map it to source: a <code>.slide</code> id → the Markdown block, an <code>svg.dia</code> → the include, a class → <code>main.css</code></span></li>
+        <li><span>edit, lint the page with <code>--repo</code>, rebuild, re-export, <code>--agent-reply</code> one line per note</span></li>
+        <li><span>on Send &amp; End: full lint, Docker build, <code>audit_pages</code>, contrast; commit with the notes as the body; <code>/no-mistakes</code></span></li>
+      </ol>
+    </div>
+  </div>
+</div></section>
+
+<section class="blk" id="risks"><div class="wrap">
+  <div class="hd"><p class="label">06 · risks and what is not solved</p><h2>Four things to know before the first session</h2></div>
+  <div class="grid g2">
+    <div class="rule"><h4>Reload behaviour</h4><p class="small">Lavish reloads on a new revision of the file — that is how the s10 fixes appeared for you — but a rebuilt page is a bigger diff than a plan edit, and whether pins survive a reload is not yet verified. First session answers it.</p></div>
+    <div class="rule"><h4>Home page and matrix</h4><p class="small">The export handles any built page, home included, but the home row's container query and the dropdown JS come along as-is; <code>study.js</code> is copied with the assets so the nav and theme toggle work.</p></div>
+    <div class="rule"><h4>The lint still decides</h4><p class="small">A comment that asks for an eleventh word in an H2 claim, or a number without a source, gets a reply saying why not, not a silent edit. The review loop sits inside the contract, not beside it.</p></div>
+    <div class="rule"><h4>Option B is the better loop if it works</h4><p class="small">It refreshes a tab I did not open, wakes the session without a poll, and works away from the desk. It is second only because it is unverified and the page would live on claude.ai. If A's reload disappoints, B is next.</p></div>
+  </div>
+</div></section>
+
+<section class="blk" id="decide"><div class="wrap">
+  <div class="hd"><p class="label">07 · decide</p><h2>Two answers and the build starts</h2></div>
+  <div class="grid g2">
+    <form class="q" data-lavish-question="route" onsubmit="event.preventDefault();const f=new FormData(event.currentTarget);const r=f.get('route');const s=f.get('spikeB');if(!r)return;const t='Build the review loop: option '+r+(s?'; also spike option B (artifact with comments) after A works':'; do not spike B yet');window.lavish.queuePrompt(t,{tag:'choice',text:'Route: '+r+(s?' + spike B':''),element:event.currentTarget,data:{question:'route',answer:r,spikeB:!!s}});event.currentTarget.querySelector('.queued').textContent='queued: '+t;">
+      <h3>Which route?</h3>
+      <p class="why">A is verified and needs no install. B is the better loop on paper.</p>
+      <label><input type="radio" name="route" value="A" checked><span><b>A · Lavish over the built page</b><span class="rec">recommended</span></span></label>
+      <label><input type="radio" name="route" value="B"><span><b>B · Claude artifact with comments</b> — spike it first, fall back to A</span></label>
+      <label><input type="radio" name="route" value="C"><span><b>C · Vibe Annotations</b> — install the extension and MCP server</span></label>
+      <label><input type="checkbox" name="spikeB" value="1"><span>after A works, spend 30 minutes proving B end to end</span></label>
+      <div class="row"><button class="btn" type="submit">Queue this answer</button><span class="queued"></span></div>
+    </form>
+    <form class="q" data-lavish-question="first-page" onsubmit="event.preventDefault();const f=new FormData(event.currentTarget);const p=f.get('page');const n=(f.get('notes')||'').trim();if(!p)return;const t='First review session: '+p+(n?'. Focus: '+n:'');window.lavish.queuePrompt(t,{tag:'choice',text:'First page: '+p,element:event.currentTarget,data:{question:'first-page',answer:p,notes:n}});event.currentTarget.querySelector('.queued').textContent='queued: '+t;">
+      <h3>First page to review?</h3>
+      <p class="why">The message that started this was about the DABstep page's design and commentary.</p>
+      <label><input type="radio" name="page" value="projects/dabstep-loop" checked><span><b>/projects/dabstep-loop/</b> — the case study</span></label>
+      <label><input type="radio" name="page" value="projects/dabstep-loop/eval-loop"><span><b>/projects/dabstep-loop/eval-loop/</b> — the deep page</span></label>
+      <label><input type="radio" name="page" value="index"><span><b>/</b> — home, the four-column matrix</span></label>
+      <textarea name="notes" placeholder="Anything you already know you want changed on it (optional)"></textarea>
+      <div class="row"><button class="btn" type="submit">Queue this answer</button><span class="queued"></span></div>
+    </form>
+  </div>
+  <p class="small" style="margin-top:var(--s4)">Both answers queue in the sidebar; press <b>Send to Agent</b> once. Anything else — pin it on the page.</p>
+</div></section>
+
+<footer><div class="wrap">s11 · design source: the site's own tokens (<code>assets/css/tokens.css</code>), as in s05–s10 · research 2026-09-17 · spike verified headless on the rewritten build</div></footer>
+</body>
+</html>
