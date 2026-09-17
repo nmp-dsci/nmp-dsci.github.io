@@ -140,7 +140,7 @@ production:
         reject any host with a private answer; analytics needs three gates open. What it is not: a
         single-tenant workbench with no per-user auth, no tenancy and no data isolation — deliberate
         for a read-only corpus that is public in the repo anyway, but scope, not a control.
-      proof: "src/api/main.py · src/api/stt.py · frontend/src/chat/useSpeechToText.ts · src/documents/fetch.py · frontend/src/analytics.ts"
+      proof: "src/api/main.py · src/api/stt.py · frontend/src/speech/useSpeechToText.ts · src/documents/fetch.py · frontend/src/analytics.ts"
     - dimension: trace
       status: shipped
       how: >-

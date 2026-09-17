@@ -10,8 +10,8 @@ tldr: >-
   Four typed agents, a teacher that rewrites one prompt per experiment, a significance gate on
   349 unseen questions that promoted v8, and a runtime test that scored 90.5% in one session.
 outcome: >-
-  A loop that optimises one agent's prompt at a time, promotes only on significant unseen
-  evidence, and measured a runtime change the same way.
+  A multi-turn agent over financial reports, its accuracy maximised through experimentation and
+  optimisation: one prompt changed per cycle, promoted only on significant unseen evidence.
 proof_line: >-
   sdk_v1 scored 90.5% (316/349) over the v8 pipeline's 81.7% on the same unseen gate questions,
   +8.9 pp with one-sided clustered McNemar p 0.0003; v8 itself was the one campaign promotion
@@ -20,7 +20,7 @@ tags: [Agents]
 metric: "90.5%"
 metric_label: "unseen gate split (316/349) · one session over the 81.7% pipeline"
 featured: true
-order: 2
+order: 1
 deep: [eval-loop, sdk-vs-llm]
 sections:
   - n: 1
@@ -96,7 +96,7 @@ architecture:
 # ---- how and where it runs --------------------------------------------------
 production:
   live: true
-  order: 2
+  order: 1
   surface: >-
     Read-only operator console: chat replays 8 recorded conversations; Evaluations, Dataset,
     Experiments, Campaigns, Runtimes and Traces read the committed evidence. Every write
