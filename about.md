@@ -11,7 +11,7 @@ I'm **Nathan Phillips**, a data scientist working in gen AI, in Sydney.
 - **Four live on AWS** — all open from the [home page](/).
 - **The eval is part of the product** — each system says what it scores, on which fixed set, graded by whom, and what would have stopped a worse version shipping.
 
-**If you only read one thing:** the [production rubric](/#rubric) and its four scorecards — 9/9, 6/9, 5/9 and 6/9, gaps named with reasons.
+**If you only read one thing:** the [production rubric](/#rubric) and its four scorecards — 6/9, 9/9, 5/9 and 6/9, gaps named with reasons.
 
 <figure class="fig">
   <p class="fig-title">Figure · the production rubric, scored across the four live systems</p>
@@ -23,8 +23,8 @@ I'm **Nathan Phillips**, a data scientist working in gen AI, in Sydney.
 
 ## The four systems — all four live on AWS, in demo mode
 
-- **[Data Pilot](/projects/data-pilot/)** — a conversational data agent over ~3.2M rows of NSW property data; natural language in, governed SQL out, Postgres row-level security per user; 9/9.
 - **[ConvFinQA Agent](/projects/convfinqa-agent/)** — multi-turn financial Q&A over report text and tables; four typed agents, prompts promoted like releases; seven of nine challengers refused, and one Claude session at 90.5%.
+- **[Data Pilot](/projects/data-pilot/)** — a conversational data agent over ~3.2M rows of NSW property data; natural language in, governed SQL out, Postgres row-level security per user; 9/9.
 - **[Transcript RAG](/projects/transcript-rag/)** — an evaluation-first retrieval workbench; eight configurations on one chunk-labelled golden set; parity at 6.1× fewer tokens.
 - **[DABstep Loop](/projects/dabstep-loop/)** — a Haiku agent on a tabular-QA benchmark, optimised by two loops: supervised on the ten gold tasks (v2 promoted at p 0.031) and unsupervised on the 440 without answers (v3 held when every gold-free signal improved but two gold tasks broke).
 

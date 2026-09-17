@@ -188,6 +188,14 @@ holds the pairing so the deploy is not what finds it next time.
 
 ---
 
+## Reviewing a page in the browser
+
+`/review <page>` exports one built page to `_review/` with relative assets and
+opens it in Lavish, so comments are pinned on the real page and the agent edits
+the Markdown, SVG or CSS behind them, rebuilds, and the review window reloads.
+The loop, the selector-to-source table and the close-out checks are in
+`.claude/skills/review/SKILL.md`; the export is `scripts/review_page.py`.
+
 ## Where things live
 
 | Path | What it is |
