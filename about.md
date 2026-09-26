@@ -24,7 +24,7 @@ I'm **Nathan Phillips**, a data scientist working in gen AI, in Sydney.
 ## The four systems — three live on AWS, one loop on a public benchmark
 
 - **[ConvFinQA Agent](/projects/convfinqa-agent/)** — multi-turn financial Q&A over report text and tables; four typed agents, prompts promoted like releases; seven of nine challengers refused, and one Claude session at 90.5%.
-- **[DataAgentBench Loop](/projects/dataagentbench/)** — an SQL-writing agent on a public data benchmark; 49 hand-made golden statements score the SQL, an optimiser writes one prompt per dataset under four leak guards; 0.440 → 0.904 Pass@1 in five days, one trial, no public URL.
+- **[DataAgentBench Loop](/projects/dataagentbench/)** — an SQL-writing agent on a public data benchmark; 49 hand-made golden statements score the SQL, an optimiser writes one prompt per dataset under four leak guards; 44.0% → 90.4% Pass@1 in five days, one trial, no public URL.
 - **[Data Pilot](/projects/data-pilot/)** — a conversational data agent over ~3.2M rows of NSW property data; natural language in, governed SQL out, Postgres row-level security per user; 9/9.
 - **[Transcript RAG](/projects/transcript-rag/)** — an evaluation-first retrieval workbench; eight configurations on one chunk-labelled golden set; parity at 6.1× fewer tokens.
 

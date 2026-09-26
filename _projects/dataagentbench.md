@@ -1,31 +1,31 @@
 ---
 title: DataAgentBench Loop
 short: "DAB"   # the matrix column header on a phone
-headline: "Optimised from 0.440 to 0.904 Pass@1, scoring the SQL"
+headline: "Optimised from 44.0% to 90.4% Pass@1, scoring the SQL"
 summary: >-
-  Pass@1 optimised from 0.440 to 0.904 in five days on DataAgentBench's 54 public questions. A
+  Pass@1 optimised from 44.0% to 90.4% in five days on DataAgentBench's 54 public questions. A
   Claude Agent SDK analyst, and a loop that optimises the SQL it writes, not the answer it gives.
 tldr: >-
   One Opus session writes one SQL statement per question; 49 hand-made goldens score the statement;
   an optimiser reads where it breaks and writes one prompt per dataset under four leak guards; five
   rounds, four promotions.
 outcome: >-
-  Pass@1 optimised from 0.440 to 0.904 in five rounds by scoring its SQL against goldens; third on
+  Pass@1 optimised from 44.0% to 90.4% in five rounds by scoring its SQL against goldens; third on
   the public board, one trial against five.
 proof_line: >-
-  v8 scores Pass@1 0.904 (48/54, one trial), from v0's 0.440; the public board's top two are 0.947
-  and 0.906 over five trials, so this sits third by 0.002.
+  v8 scores Pass@1 90.4%, the board's mean over its 12 datasets (48 of 54 answers, one trial), from
+  v0's 44.0%; the board's top two are 94.7% and 90.6% over five trials, so this sits third by 0.2 pp.
 tags: [Agents, Data]
 # the card and the page header lead with the optimisation result; cost and rubric follow
 lead: metric
-metric: "0.904"
-metric_label: "Pass@1 on the 54, one trial · v0 0.440 · board #2 0.906 over five"
+metric: "90.4%"
+metric_label: "Pass@1, mean over 12 datasets · one trial · from 44.0% · board #2 90.6% over five"
 featured: true
 order: 2
 sections:
   - n: 1
     summary: >-
-      0.904 on the board's own number, with the trial count stated beside it.
+      90.4% on the board's own number, with the trial count stated beside it.
   - n: 2
     summary: >-
       Three tools and one statement per question, so every failure has an SQL to diff.
@@ -176,7 +176,7 @@ production:
       proof: "src/dab_bench/eval/runner.py · Makefile · AGENTS.md"
 ---
 
-## 1 · Purpose & benefit — 0.904 on the board's number, trial count stated
+## 1 · Purpose & benefit — 90.4% on the board's number, trial count stated
 
 [DataAgentBench](https://github.com/ucbepic/DataAgentBench) asks 54 natural-language questions over
 12 datasets in four engines, each with a gold answer and its own validator, and a public
@@ -184,13 +184,13 @@ leaderboard scores them. This build re-hosts the data in Postgres, puts one Clau
 analyst on the 54, and optimises what it writes: the SQL statement, not the answer.
 
 <div class="slide" id="slide-1a">
-  <h3><span class="n">1a</span>Five promotions in five days: 0.440 → 0.904, on the board's second line</h3>
+  <h3><span class="n">1a</span>Five promotions in five days: 44.0% → 90.4%, on the board's second line</h3>
   <p class="fig-title">Figure · Pass@1 by version in build order; the champion line; the public board's top two</p>
   <div class="dia-frame">{% include diagrams/chart/dataagentbench-progression.svg %}</div>
   <ul>
-    <li><b>What moved it?</b> Sonnet +0.166, Opus +0.104; rounds +0.134, +0.049, +0.013. The model switches bought more than the rounds; the rounds made every miss a diff.</li>
+    <li><b>What moved it?</b> Sonnet +16.6 pp, Opus +10.4 pp; rounds +13.4, +4.9, +1.3 pp. The model switches bought more than the rounds; the rounds made every miss a diff.</li>
     <li><b>The misses?</b> v1 rebuilt to SQL and scored under v0; v3 and v5 were beaten by the next step; v7 tied v6 and lost on SQL, 30 to 33.</li>
-    <li><b>Where does it sit?</b> Third on the public board (0.947 · 0.906 · 0.879), 0.002 under second, on one trial where the board runs five. Every top entry is tuned on the 54; so is this.</li>
+    <li><b>Where does it sit?</b> Third on the public board (94.7% · 90.6% · 87.9%), 0.2 pp under second, on one trial where the board runs five. Pass@1 is the board's mean over 12 datasets, so it is not answers ÷ 54. Every top entry is tuned on the 54; so is this.</li>
     <li><b>The skill?</b> Choosing the target, what the optimiser may see, what it may write, and the rule that decides.</li>
   </ul>
 </div>

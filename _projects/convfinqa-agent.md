@@ -1,6 +1,6 @@
 ---
 title: ConvFinQA Agent
-short: "Conv\u00ADFinQA"   # the matrix column header on a phone; the soft hyphen lets it break at five columns
+short: "Conv\u00ADFinQA"   # the matrix column header on a phone; the soft hyphen lets it break when a column is narrow
 headline: "Optimised from 73.0% to 90.5%, promoted only on significance"
 summary: >-
   Multi-turn financial Q&A over filings, optimised from 73.0% to 90.5% across four gated
