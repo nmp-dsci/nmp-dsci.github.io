@@ -211,8 +211,9 @@ The loop, the selector-to-source table and the close-out checks are in
 | `.lavish/sNN_*.html` | the review artifact written before each change |
 
 Six `_projects/` pages carry `published: false` (decision D4a — the site shows
-only the three production systems). They do not render and the lint skips them;
-do not spend rubric work on them without changing that decision first.
+only the five systems that are live on AWS or a public benchmark). They do not
+render and the lint skips them; do not spend rubric work on them without
+changing that decision first.
 
 ---
 
