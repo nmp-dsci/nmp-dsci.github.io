@@ -31,10 +31,18 @@ layout: default
     <h1>{{ p_head }}</h1>
     <p class="dek">{{ page.summary }}</p>
 
+    {%- comment -%}
+      `lead: metric` puts the optimisation result first, then cost, then the
+      rubric — the same order the home-page row uses for that system.
+    {%- endcomment -%}
+    {%- assign lead_m = false -%}
+    {%- if page.lead == "metric" and p_metric != "" -%}{%- assign lead_m = true -%}{%- endif %}
     <p class="meta">
+      {%- if lead_m %}<span><b>{{ p_metric }}</b> {{ p_mlabel }}</span>{% endif -%}
+      {%- if lead_m and p_cost != "" %}<span><b>{{ p_cost }}</b></span>{% endif -%}
       {%- if p_score != "" %}<span><b>{{ p_score }}</b> rubric dimensions shipped</span>{% endif -%}
       {%- if page.production.live %}<span><b>live</b>{% if p_region != "" %} · {{ p_region }}{% endif %}</span>{% endif -%}
-      {%- if p_cost != "" %}<span><b>{{ p_cost }}</b></span>{% endif -%}
+      {%- if lead_m == false and p_cost != "" %}<span><b>{{ p_cost }}</b></span>{% endif -%}
       <span><b data-reading-time>—</b> read · 7 sections</span>
     </p>
 

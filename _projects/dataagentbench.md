@@ -1,21 +1,23 @@
 ---
 title: DataAgentBench Loop
 short: "DAB"   # the matrix column header on a phone
-headline: "Trained on the statement, not the answer: 0.904"
+headline: "Optimised from 0.440 to 0.904 Pass@1, scoring the SQL"
 summary: >-
-  A Claude Agent SDK analyst on DataAgentBench's 54 public questions, and the loop that took it
-  from 0.440 to 0.904 Pass@1 in five days by optimising the SQL it writes, not the answer it gives.
+  Pass@1 optimised from 0.440 to 0.904 in five days on DataAgentBench's 54 public questions. A
+  Claude Agent SDK analyst, and a loop that optimises the SQL it writes, not the answer it gives.
 tldr: >-
   One Opus session writes one SQL statement per question; 49 hand-made goldens score the statement;
   an optimiser reads where it breaks and writes one prompt per dataset under four leak guards; five
   rounds, four promotions.
 outcome: >-
-  An SQL-writing agent on a public benchmark, improved v0 → v8 by a loop that scores the statement
-  against a golden and refuses leaked answers.
+  Pass@1 optimised from 0.440 to 0.904 in five rounds by scoring its SQL against goldens; third on
+  the public board, one trial against five.
 proof_line: >-
   v8 scores Pass@1 0.904 (48/54, one trial), from v0's 0.440; the public board's top two are 0.947
   and 0.906 over five trials, so this sits third by 0.002.
 tags: [Agents, Data]
+# the card and the page header lead with the optimisation result; cost and rubric follow
+lead: metric
 metric: "0.904"
 metric_label: "Pass@1 on the 54, one trial · v0 0.440 · board #2 0.906 over five"
 featured: true

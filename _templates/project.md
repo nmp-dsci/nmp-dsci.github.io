@@ -53,6 +53,8 @@ sections:
 tags: []                     # Category kicker above the case-study title, e.g. [Agents, Data]
 metric: ""                   # The headline number, e.g. "77.1%" or "6.1×"
 metric_label: ""             # What the number means, e.g. "accuracy · up from 73.0% (594/770)"
+# lead: metric               # Optional. The story is an optimisation result: the home row and the
+                             # page header open on metric, then cost, then rubric. Omit for rubric-first.
 stack: []                    # Technologies, most distinctive first. Source: README, pyproject/package.json, infra/
 
 # ---- skills -----------------------------------------------------------------

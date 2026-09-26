@@ -86,6 +86,8 @@ REQUIRED = [
 OPTIONAL = ["published", "media", "evidence", "layout", "permalink", "date",
             # the abbreviated column header the rubric matrix uses under 560px
             "short",
+            # `metric`: the card and header lead with the metric, then cost, then rubric
+            "lead",
             # names of the deep pages under _deep/<slug>/ this case study links to
             "deep"]
 REQUIRED_NESTED = {
@@ -865,6 +867,14 @@ def lint_project(path: Path, repo: Path | None, why: str, no_net: bool) -> Repor
     check_schema(rep, fm, REQUIRED, OPTIONAL, nested)
     if "demo" not in nested["links"]:
         rep.ok("links.demo: none — production.live is false, so no URL is claimed")
+    if "lead" in fm:
+        # The only value is `metric`, and it needs a metric to lead with, or the
+        # card silently falls back to the rubric-first order.
+        rep.verdict(fm["lead"] == "metric" and not is_empty(fm.get("metric")),
+                    "lead: metric — the card and header open on the optimisation result",
+                    f"lead is {fm['lead']!r} with metric {fm.get('metric')!r}; the only value "
+                    "is 'metric', and it needs a metric to lead with",
+                    fail_msg="lead: not usable")
     check_skills(rep, fm, load_data("skills.yml"))
     check_rubric(rep, rows, rubric)
     if rows:  # the two row-level checks have nothing to say without a rubric
