@@ -109,20 +109,28 @@ dimensions:
     why: "Load tests, a queue-scaling experiment with a formula that held, and an honest \"designed, not built\" for the next rungs."
     section: 4
 
+# `wrap` is the label with a U+00AD soft hyphen at the one place it may break:
+# with five systems a phone-width matrix cell is about 55px, narrower than
+# "designed" set in mono at 12.8px, and the matrix never side-scrolls (DESIGN.md
+# rule 11). Invisible unless the word actually has to wrap; `label` stays the
+# plain word for titles and screen readers.
 statuses:
   shipped:
     glyph: "●"
     label: "shipped"
+    wrap: "ship\u00ADped"
     blurb: "built, measured, in the repo"
     needs_reason: false
   partial:
     glyph: "◐"
     label: "partial"
+    wrap: "par\u00ADtial"
     blurb: "present but narrower than the rubric asks"
     needs_reason: true
   designed:
     glyph: "○"
     label: "designed"
+    wrap: "de\u00ADsigned"
     blurb: "written up, not built"
     needs_reason: true
   na:

@@ -7,7 +7,9 @@
   an unpublished project. Under 820px the whole bar collapses to a sheet and the
   panel renders inline and indented instead of floating.
 {%- endcomment -%}
-{%- assign live = site.projects | where_exp: "p", "p.production.live == true" | sort: "production.order" -%}
+{%- assign onaws = site.projects | where_exp: "p", "p.production.live == true" -%}
+{%- assign bench = site.projects | where_exp: "p", "p.production.bench == true" -%}
+{%- assign live = onaws | concat: bench | sort: "production.order" -%}
 <header class="nav" id="nav">
   <div class="nav-inner">
     <a class="brand" href="{{ '/' | relative_url }}">

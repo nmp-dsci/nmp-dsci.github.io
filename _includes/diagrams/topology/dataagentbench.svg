@@ -1,0 +1,44 @@
+<svg class="dia" viewBox="0 0 320 100" role="img"
+     aria-label="Nothing is deployed. The author runs the explorer locally: a FastAPI server on port 8091 with a React front end, reading the committed index and the run folders, and connecting as two Postgres roles to the shared platform's central database dab, where the twelve datasets live in one schema and the gold and goldens in another the agent role cannot read; the central MLflow indexes every run and trace. A Docker sandbox with no network ran the v0 trials. GitHub Actions runs lint, types, tests and the front-end build on every pull request, and deploys nothing.">
+  <defs>
+    <marker id="tp-dataagentbench" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0,0 L8,4 L0,8 z" fill="currentColor"/>
+    </marker>
+  </defs>
+
+  <g><title>the author, locally — no public URL, no login, nothing served to anyone else; the explorer is a workbench, not a demo</title>
+    <rect class="nd" x="6" y="36" width="52" height="26" rx="6"/>
+    <text class="tx" x="32" y="52">author</text></g>
+
+  <g><title>GitHub Actions — ci.yml on every push to main and every pull request: ruff, ruff format, mypy, pytest against the committed index; npm typecheck, the design lint, vitest, the build. No deploy job</title>
+    <rect class="nd" x="80" y="8" width="72" height="24" rx="6"/>
+    <text class="tx" x="116" y="18">CI</text>
+    <text class="tx s" x="116" y="28">no deploy</text></g>
+
+  <g><title>the explorer — FastAPI on :8091 serving the built React app and the API over data/index/, data/answers/, data/context/, agents/ and runs/; two routes execute SQL, both as the read-only role · make dev</title>
+    <rect class="nd hi" x="80" y="44" width="72" height="30" rx="6"/>
+    <text class="tx" x="116" y="56">explorer</text>
+    <text class="tx s" x="116" y="67">FastAPI :8091</text></g>
+
+  <g><title>the central Postgres — the shared platform's database dab on :5432: schema dataagentbench holds the 12 datasets as 2,811 tables (8.4 GB), SELECT for dab_agent; schema dataagentbench_meta holds the question set, gold and goldens, refused to dab_agent · infra/roles.sql</title>
+    <rect class="nd hi" x="176" y="44" width="70" height="30" rx="6"/>
+    <text class="tx" x="211" y="56">Postgres</text>
+    <text class="tx s" x="211" y="67">dab · 2 roles</text></g>
+
+  <g><title>the central MLflow — experiment dataagentbench/evals: one run per eval, one trace per trial and per optimiser session, the prompt registry with the champion alias; linked, read back only for the history · never a local MLflow</title>
+    <rect class="nd ext" x="176" y="8" width="70" height="24" rx="6"/>
+    <text class="tx" x="211" y="18">MLflow</text>
+    <text class="tx s" x="211" y="28">central</text></g>
+
+  <g><title>the sandbox — one Docker container per v0 trial, --network none, only that trial's /work mounted, no database credential inside; the SQL versions have no Python and no sandbox · infra/sandbox.Dockerfile</title>
+    <rect class="nd ext" x="266" y="44" width="48" height="30" rx="6"/>
+    <text class="tx" x="290" y="56">sandbox</text>
+    <text class="tx s" x="290" y="67">v0 only</text></g>
+
+  <path class="ed" d="M58,49 L78,49" marker-end="url(#tp-dataagentbench)"/>
+  <path class="ed" d="M152,59 L174,59" marker-end="url(#tp-dataagentbench)"/>
+  <path class="ed dash" d="M152,50 L174,26" marker-end="url(#tp-dataagentbench)"/>
+  <path class="ed dash" d="M246,59 L264,59" marker-end="url(#tp-dataagentbench)"/>
+
+  <text class="cap" x="6" y="92">no public URL · shared platform · CI per PR</text>
+</svg>

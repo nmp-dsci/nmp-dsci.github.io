@@ -20,7 +20,7 @@ tags: [Agents]
 metric: "5 cycles"
 metric_label: "3 supervised on ten gold · 2 unsupervised on the 450 · one promoted, two held"
 featured: true
-order: 4
+order: 5
 deep: [eval-loop]
 sections:
   - n: 1
@@ -93,7 +93,7 @@ architecture:
 # ---- how and where it runs --------------------------------------------------
 production:
   live: true
-  order: 4
+  order: 5
   surface: >-
     Read-only viewer over the committed evidence. Overview, Architecture and Data describe the
     benchmark and the agent; Tasks lists all 450; Runs, Trace and Compare open every run,

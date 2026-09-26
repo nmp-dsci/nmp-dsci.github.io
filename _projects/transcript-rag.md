@@ -34,7 +34,7 @@ tags: [RAG]
 metric: "6.1×"
 metric_label: "fewer tokens at 0.93 answer parity"
 featured: true
-order: 3
+order: 4
 stack: [LangChain, LangGraph, ChromaDB, BM25, MiniLM, ms-marco cross-encoder, Neo4j GraphRAG, RAGAS, DeepSeek, FastAPI, React 19, Terraform, AWS App Runner]
 
 skills: [rag, model-evaluation, embeddings, vector-databases, agentic-ai, llms]
@@ -70,7 +70,7 @@ architecture:
 
 production:
   live: true
-  order: 3
+  order: 4
   surface: >-
     Read-only workbench: the corpus tree, the Retrieval Lab (semantic vs BM25 vs graph side by
     side), the chunk-similarity graph, a 2,000-entity knowledge-graph snapshot, 30 Themes,

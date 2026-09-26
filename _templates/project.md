@@ -65,7 +65,8 @@ skills_detail:
 # ---- links ------------------------------------------------------------------
 links:
   repo: ""                   # https://github.com/<org>/<repo>
-  demo: ""                   # The live URL. MUST answer 200 (demo builds answer mode: demo).
+  demo: ""                   # The live URL. MUST answer 200 (demo builds answer mode: demo);
+                             # "" only when production.live is false (a bench, not a demo).
 
 # ---- media (optional) -------------------------------------------------------
 # A path or nothing. DESIGN.md rule 5: no placeholder for media that does not

@@ -1,0 +1,49 @@
+<svg class="dia" viewBox="0 0 360 160" role="img" aria-label="One optimisation round as the explorer's Optimise tab draws it, seven stages with round five's own counts. One, the source run: the champion v6 on all 54 questions, one trial each, SQL 33 of 49. Two, diagnose: the scorecard scores every question three ways and the reader ledgers each of the 16 failed statements in seven steps. Three, split: every error of the 54 is read, none held out. Four, sessions: 13 Opus sessions, one per break step and one per dataset, read the golden diffs and each question's history from MLflow. Five, guard: of 28 writes the literal guard and guards G1 to G4 refused 19 and kept 9. Six, the new version v8: three playbook sections and six dataset notes, then 54 trials. Seven, outcome: 48 of 54, Pass at 1 0.904, promoted under D46, the leak gate then Pass at 1. The next round starts only from the champion's run. Off the ring sit the reader and the reviewer, both Opus and never inside a trial, and the history read from MLflow.">
+  <title>Round 5, v6 → v8: 20 misses read, 28 writes, 9 kept, one prompt shipped, promoted on Pass@1</title>
+  <defs><marker id="lp-dataagentbench" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="currentColor"/></marker></defs>
+
+  <g><title>1 · source run — the champion's newest full run, v6_sql on all 54 once: answers 46 of 54, SQL 33 of 49, decision 49 of 49, $5.12; from s13 a round starts only here (dab optimise refuses another version's run) · dab eval · runs/20260925T015204Z_v6_sql_all_opus_hints/</title>
+    <rect class="nd" x="6" y="8" width="80" height="34" rx="6"/>
+    <text class="tx" x="46" y="22">1 · run</text><text class="tx s" x="46" y="35">v6 · 54 × 1</text></g>
+  <g><title>2 · diagnose — the scorecard scores every question three ways (answer, SQL, decision); the reader writes both statements as seven steps and names where each failed one breaks: sources 5, parse 5, shape 4, rank 1, filter 1 · 16 SQL fails of 49 goldened · dab diagnose --ledger · eval/scorecard.py, eval/ledger.py</title>
+    <rect class="nd" x="96" y="8" width="80" height="34" rx="6"/>
+    <text class="tx" x="136" y="22">2 · diagnose</text><text class="tx s" x="136" y="35">16 SQL fails</text></g>
+  <g><title>3 · split — from round 4 (D38) every error of the 54 is read, wrong answers without a golden included: 20 questions went to the sessions; none held out, so the score on the 54 is in-sample, as every leaderboard entry's is · data/splits/, dab optimise --train all</title>
+    <rect class="nd" x="186" y="8" width="80" height="34" rx="6"/>
+    <text class="tx" x="226" y="22">3 · split</text><text class="tx s" x="226" y="35">all 54 read</text></g>
+  <g><title>4 · sessions — 13 isolated Opus 5.5 sessions, $4.83 with the reviewer: one per step at which statements break (3: sources, parse, shape) writes that step's playbook section; one per dataset with failures (10) writes its notes; each reads the golden SQL and result diff of the questions it may touch, the ledger's lines, and from round 5 each question's history · agents/optimiser/, src/dab_bench/agent/optimise.py</title>
+    <rect class="nd hi" x="276" y="8" width="80" height="34" rx="6"/>
+    <text class="tx" x="316" y="22">4 · write</text><text class="tx s" x="316" y="35">13 · Opus</text></g>
+  <g><title>5 · guard — every write checked: no run of 8 question words, no gold value, no run of 6 golden tokens, under the cap (600 a section, 2,000 a note); G1 an Opus reviewer refuses a decisive value or interpretation, G2 audits every gold value in the finished text, G3 two errors behind a section, G4 no question named · 28 writes, 19 refused (15 leaks, 6 too long), 9 accepted, 4 dropped · eval/guards.py, eval/review.py</title>
+    <rect class="nd hi" x="276" y="60" width="80" height="34" rx="6"/>
+    <text class="tx" x="316" y="74">5 · guard</text><text class="tx s" x="316" y="87">28 → 9 kept</text></g>
+  <g><title>6 · new version — agents/v8_sql/: v6's files plus 3 rewritten playbook sections in system.md (7,560 characters) and 6 dataset notes; agent.yaml unchanged; then dab eval on all 54 once, $5.36 · agents/v8_sql/optimise.json</title>
+    <rect class="nd" x="276" y="112" width="80" height="34" rx="6"/>
+    <text class="tx" x="316" y="126">6 · v8</text><text class="tx s" x="316" y="139">3 § + 6 notes</text></g>
+  <g><title>7 · outcome — v8: answers 48 of 54, SQL 31 of 49, Pass@1 0.904 against v6's 0.891; dab promote (D46): a challenger passes the leak gate (its round ran G1–G4, G2 finds no gold value in its prompt), then the highest Pass@1 wins; promoted 2026-09-25 · agents/promotions.jsonl, eval/promote.py</title>
+    <rect class="nd hi" x="186" y="112" width="80" height="34" rx="6"/>
+    <text class="tx" x="226" y="126">7 · outcome</text><text class="tx s" x="226" y="139">0.904 · won</text></g>
+  <g><title>next round — starts only from the champion's newest full run; a held challenger stays on the record and its round is read by the next one as history · eval/history.py, eval/outcome.py</title>
+    <rect class="nd ext" x="6" y="112" width="80" height="34" rx="6"/>
+    <text class="tx" x="46" y="126">next round</text><text class="tx s" x="46" y="139">champion lock</text></g>
+
+  <g><title>the reader and the reviewer — Opus, never inside a trial: the reader describes goldens and failed statements in seven steps (any gold value it writes is redacted); the reviewer (G1) reads each write beside the questions it could affect and their gold, and refuses text that decides one; its verdicts go to optimise.json, never a prompt · agents/reader/, agents/reviewer/</title>
+    <rect class="nd ext" x="96" y="60" width="170" height="34" rx="6"/>
+    <text class="tx" x="181" y="74">reader · reviewer G1</text><text class="tx s" x="181" y="87">Opus · never in a trial</text></g>
+  <g><title>the history — built from MLflow (D42 A) and parity-checked against the folders: each failed question's answer and SQL under every version, what each round changed, the statement that last passed a regressed question, and every lost round from the champion; read by the sessions only · dab history, eval/history.py, runs/&lt;run&gt;/history.json</title>
+    <rect class="nd ext" x="6" y="60" width="80" height="34" rx="6"/>
+    <text class="tx" x="46" y="74">history</text><text class="tx s" x="46" y="87">from MLflow</text></g>
+
+  <path class="ed" d="M86,25 H94" marker-end="url(#lp-dataagentbench)"/>
+  <path class="ed" d="M176,25 H184" marker-end="url(#lp-dataagentbench)"/>
+  <path class="ed" d="M266,25 H274" marker-end="url(#lp-dataagentbench)"/>
+  <path class="ed" d="M316,42 V58" marker-end="url(#lp-dataagentbench)"/>
+  <path class="ed" d="M316,94 V110" marker-end="url(#lp-dataagentbench)"/>
+  <path class="ed" d="M276,129 H268" marker-end="url(#lp-dataagentbench)"/>
+  <path class="ed" d="M186,129 H88" marker-end="url(#lp-dataagentbench)"/>
+  <path class="ed" d="M46,112 V96" marker-end="url(#lp-dataagentbench)"/>
+  <path class="ed" d="M46,60 V44" marker-end="url(#lp-dataagentbench)"/>
+  <path class="ed dash" d="M266,77 H274" marker-end="url(#lp-dataagentbench)"/>
+  <path class="ed dash" d="M86,77 H94" marker-end="url(#lp-dataagentbench)"/>
+  <text class="cap" x="6" y="157">round 5 · $4.83 · 19 refused · promoted under D46</text>
+</svg>

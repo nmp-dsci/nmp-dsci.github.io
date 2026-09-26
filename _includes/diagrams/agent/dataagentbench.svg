@@ -1,0 +1,54 @@
+<svg class="dia" viewBox="0 0 320 152" role="img" aria-label="The v8 agent system as the explorer's Agent tab draws it. The benchmark question, alone, enters one Claude Agent SDK session on Opus 5.5 at medium effort, at most 30 turns and 900 seconds, whose system prompt is system.md plus the code-built tables map, the version's notes for this dataset, and the upstream description and hints. The session reaches one in-process MCP server, dab, with three tools: query_db and describe_table run as the read-only dab_agent role on Postgres, and submit_answer takes the final SQL, a mode and the seven-step plan, re-runs the SQL as dab_agent and renders the result. The question's own validate.py judges the answer; the run folder keeps the results and the trace; the central MLflow indexes the run.">
+  <title>One Opus session, three tools, one statement: the harness re-runs the SQL, so the result is known exactly</title>
+  <defs><marker id="ar-dataagentbench" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="currentColor"/></marker></defs>
+
+  <g><title>the user message: the benchmark question, verbatim, nothing else — src/dab_bench/agent/prompt.py</title>
+    <rect class="nd" x="4" y="30" width="48" height="24" rx="6"/>
+    <text class="tx" x="28" y="41">query</text><text class="tx s" x="28" y="50">user msg</text></g>
+  <g><title>the Agent SDK session: a claude child on the subscription, claude-opus-5-5 at medium effort, at most 30 turns and 900 s; it starts in an empty directory with no CLAUDE.md, memory, plugin or built-in tool, and its init message is recorded on the trace — agents/v8_sql/agent.yaml, src/dab_bench/agent/session.py, isolation.py</title>
+    <rect class="nd hi" x="62" y="22" width="84" height="40" rx="6"/>
+    <text class="tx" x="104" y="38">Agent SDK</text><text class="tx s" x="104" y="50">opus 5.5</text></g>
+  <g><title>the system prompt, composed per dataset: system.md (7,589 characters: how to work, then the seven-step SQL playbook the optimiser writes) + the code-built tables map + this dataset's notes (agents/v8_sql/datasets/&lt;ds&gt;.md, 1,384–1,928 characters) + the upstream description and hints verbatim; the curated pack is off — src/dab_bench/agent/prompt.py</title>
+    <rect class="nd" x="66" y="72" width="76" height="26" rx="6"/>
+    <text class="tx" x="104" y="83">system prompt</text><text class="tx s" x="104" y="93">system.md + notes</text></g>
+  <g><title>one in-process MCP server per trial, named dab, with a strict config: the version's three tools and nothing else — src/dab_bench/agent/tools.py</title>
+    <rect class="nd" x="156" y="30" width="54" height="24" rx="6"/>
+    <text class="tx" x="183" y="41">mcp "dab"</text><text class="tx s" x="183" y="50">in-process</text></g>
+
+  <g><title>query_db(sql, limit): one SELECT as dab_agent, read-only, a 60 s statement timeout, rows back cut at 10,000 characters; the work of the trial</title>
+    <rect class="nd" x="222" y="10" width="74" height="18" rx="4"/>
+    <text class="tx" x="259" y="22">query_db</text></g>
+  <g><title>describe_table(table): types, null rates and top values from the code-built profile, in one call</title>
+    <rect class="nd" x="222" y="34" width="74" height="18" rx="4"/>
+    <text class="tx" x="259" y="46">describe_table</text></g>
+  <g><title>submit_answer(sql, mode, plan, answer?, step?): the final statement, re-run by the harness as dab_agent and rendered; mode pass_through makes that render the answer, mode derived keeps the model's answer and its one-line step; plan is the statement's seven steps; ends the trial — tools.py, plan s06 D27 and s08 D34</title>
+    <rect class="nd hi" x="222" y="58" width="74" height="18" rx="4"/>
+    <text class="tx" x="259" y="70">submit_answer</text></g>
+  <g><title>Postgres 16, the central platform's database dab: every table of the 12 datasets in one schema, 2,811 tables; dab_agent has SELECT on that schema only, a 60 s timeout, and no privilege on the schema that holds gold and goldens — infra/roles.sql</title>
+    <rect class="nd" x="222" y="92" width="74" height="26" rx="6"/>
+    <text class="tx" x="259" y="103">Postgres</text><text class="tx s" x="259" y="113">read-only role</text></g>
+
+  <g><title>the judge: the question's own validate.py from upstream, alarm-bounded, over the submitted answer; pass or fail with the validator's reason — src/dab_bench/eval/validators.py</title>
+    <rect class="nd" x="62" y="112" width="84" height="26" rx="6"/>
+    <text class="tx" x="104" y="123">validate.py</text><text class="tx s" x="104" y="133">the judge</text></g>
+  <g><title>the run folder is the record: runs/&lt;id&gt;/run.json, results.jsonl with agent_sql, agent_result, mode, step and plan, one trace per trial</title>
+    <rect class="nd" x="4" y="112" width="48" height="26" rx="6"/>
+    <text class="tx" x="28" y="123">runs/</text><text class="tx s" x="28" y="133">record</text></g>
+  <g><title>the central MLflow, experiment dataagentbench/evals: one run per eval, one trace per trial; linked, never read back inside a trial — src/dab_bench/tracking/mlflow_log.py</title>
+    <rect class="nd ext" x="156" y="112" width="54" height="26" rx="6"/>
+    <text class="tx" x="183" y="123">MLflow</text><text class="tx s" x="183" y="133">the index</text></g>
+
+  <path class="ed" d="M52,42 H60" marker-end="url(#ar-dataagentbench)"/>
+  <path class="ed" d="M146,42 H154" marker-end="url(#ar-dataagentbench)"/>
+  <path class="ed dash" d="M104,72 V64" marker-end="url(#ar-dataagentbench)"/>
+  <path class="ed" d="M210,40 C216,40 214,19 220,19" marker-end="url(#ar-dataagentbench)"/>
+  <path class="ed" d="M210,42 C216,42 214,43 220,43" marker-end="url(#ar-dataagentbench)"/>
+  <path class="ed" d="M210,46 C216,46 214,67 220,67" marker-end="url(#ar-dataagentbench)"/>
+  <path class="ed dash" d="M296,19 C306,19 306,105 298,105" marker-end="url(#ar-dataagentbench)"/>
+  <path class="ed dash" d="M296,43 C304,43 304,101 298,101" marker-end="url(#ar-dataagentbench)"/>
+  <path class="ed dash" d="M259,76 V90" marker-end="url(#ar-dataagentbench)"/>
+  <path class="ed" d="M222,70 C190,70 170,125 148,125" marker-end="url(#ar-dataagentbench)"/>
+  <path class="ed" d="M62,125 H54" marker-end="url(#ar-dataagentbench)"/>
+  <path class="ed dash" d="M146,131 H154" marker-end="url(#ar-dataagentbench)"/>
+  <text class="cap" x="4" y="149">3 tools · read-only role · hints on · pack off</text>
+</svg>

@@ -2,33 +2,34 @@
 layout: page
 title: About
 permalink: /about/
-summary: Data scientist working in gen AI — four gen-AI systems live on AWS, each with evals in CI, guardrails between the model and the data, and a cost ceiling.
+summary: Data scientist working in gen AI — four gen-AI systems live on AWS and one optimisation loop on a public benchmark, each with evals in CI, guardrails between the model and the data, and a cost ceiling.
 ---
 
 I'm **Nathan Phillips**, a data scientist working in gen AI, in Sydney.
 
 - **End-to-end** — data layer, agent loop, eval harness; then I run them.
-- **Four live on AWS** — all open from the [home page](/).
+- **Four live on AWS, one on a public benchmark** — all open from the [home page](/).
 - **The eval is part of the product** — each system says what it scores, on which fixed set, graded by whom, and what would have stopped a worse version shipping.
 
-**If you only read one thing:** the [production rubric](/#rubric) and its four scorecards — 6/9, 9/9, 5/9 and 6/9, gaps named with reasons.
+**If you only read one thing:** the [production rubric](/#rubric) and its five scorecards — 6/9, 5/9, 9/9, 5/9 and 6/9, gaps named with reasons.
 
 <figure class="fig">
-  <p class="fig-title">Figure · the production rubric, scored across the four live systems</p>
+  <p class="fig-title">Figure · the production rubric, scored across the five systems</p>
   <div class="dia-frame">{% include diagrams/chart/portfolio-scorecards.svg %}</div>
-  <figcaption><b>Twenty-six of thirty-six dimensions shipped, and the other ten say why not.</b>
+  <figcaption><b>Thirty-one of forty-five dimensions shipped, and the other fourteen say why not.</b>
   Source: each case study's <code>production.rubric</code>, recomputed by
   <code>scripts/lint_case_study.py</code>.</figcaption>
 </figure>
 
-## The four systems — all four live on AWS, in demo mode
+## The five systems — four live on AWS, one loop on a public benchmark
 
 - **[ConvFinQA Agent](/projects/convfinqa-agent/)** — multi-turn financial Q&A over report text and tables; four typed agents, prompts promoted like releases; seven of nine challengers refused, and one Claude session at 90.5%.
+- **[DataAgentBench Loop](/projects/dataagentbench/)** — an SQL-writing agent on a public data benchmark; 49 hand-made golden statements score the SQL, an optimiser writes one prompt per dataset under four leak guards; 0.440 → 0.904 Pass@1 in five days, one trial, no public URL.
 - **[Data Pilot](/projects/data-pilot/)** — a conversational data agent over ~3.2M rows of NSW property data; natural language in, governed SQL out, Postgres row-level security per user; 9/9.
 - **[Transcript RAG](/projects/transcript-rag/)** — an evaluation-first retrieval workbench; eight configurations on one chunk-labelled golden set; parity at 6.1× fewer tokens.
 - **[DABstep Loop](/projects/dabstep-loop/)** — a Haiku agent on a tabular-QA benchmark, optimised by two loops: supervised on the ten gold tasks (v2 promoted at p 0.031) and unsupervised on the 440 without answers (v3 held when every gold-free signal improved but two gold tasks broke).
 
-All four run in **demo mode** — read-only, keyless, no inference — because a no-login app with a live model has an unbounded abuse bill.
+The four public ones run in **demo mode** — read-only, keyless, no inference — because a no-login app with a live model has an unbounded abuse bill. DataAgentBench runs locally on the shared platform and is scored, not served.
 
 ## How they were built — three practices, one path
 

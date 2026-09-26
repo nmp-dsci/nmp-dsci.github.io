@@ -1,9 +1,10 @@
 name: Nathan Phillips
 role: Data Science & Gen AI
 strapline: >-
-  Four systems live on AWS — each with evals in CI, guardrails between the model and the
-  data, per-request traces, cost caps and a push-button deploy. Every one is scored against
-  the same production rubric, and you can walk straight into the live app.
+  Four systems live on AWS and one optimisation loop on a public benchmark — each with evals
+  in CI, guardrails between the model and the data, per-request traces and cost caps. Every
+  one is scored against the same production rubric, and you can walk straight into the live
+  apps.
 tagline: AI projects, <em>scored</em> against a production rubric.
 github: "https://github.com/nmp-dsci"
 linkedin: "https://www.linkedin.com/in/nmp-dsci"

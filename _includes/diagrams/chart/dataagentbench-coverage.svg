@@ -1,0 +1,105 @@
+<svg class="dia" viewBox="0 0 330 214" role="img" aria-label="The DataAgentBench leaderboard set and its golden SQL coverage: 54 questions over 12 datasets in four engines, 8.4 GB loaded into one Postgres schema of 2,811 tables. One cell per question, filled where the golden recreates the gold answer exactly (36), grey where it passes the validator but differs from the gold text (8) or is an evidence golden for a judgment question (5), hollow where no golden exists yet (5: agnews 1 to 4 and crmarenapro 7). Written by hand in the Golden tab, run as the agent role and judged by each question's own validator.">
+  <title>49 of 54 questions have a golden statement; 36 recreate the gold exactly, and agnews has none</title>
+  <g><title>the data: 12 datasets, 54 leaderboard questions, four engines upstream (SQLite 10 datasets, DuckDB 8, PostgreSQL 5, MongoDB 2), 8.35 GB, all loaded into one Postgres 16 schema of 2,811 tables · data/index/datasets.json, source.json, make data</title>
+    <text class="tx s" x="4" y="10" style="text-anchor:start">54 questions · 12 datasets · 4 engines</text>
+    <text class="tx s" x="4" y="20" style="text-anchor:start">8.4 GB → one Postgres schema · 2,811 tables</text></g>
+  <g><title>all 54 · 36 exact · 8 pass but differ from the gold text · 5 evidence · 5 none · written 49 of 54, passing 44, exact 36 · /api/golden, dataagentbench_meta.golden_sql</title>
+    <text class="tx k" x="90" y="36" style="text-anchor:end">all 54</text>
+    <rect class="bar pro" x="96.0" y="28" width="86.7" height="10" rx="2"/>
+    <rect class="bar" x="182.7" y="28" width="19.3" height="10" rx="2"/>
+    <rect class="bar" x="201.9" y="28" width="12.0" height="10" rx="2"/>
+    <rect class="nd ext" x="214.0" y="28" width="12.0" height="10" rx="2"/>
+    <text class="tx s" x="232" y="36" style="text-anchor:start">36 · 13 · 5</text></g>
+  <g><title>agnews · 4 questions · MongoDB + SQLite · 2 databases, 0.04 GB · goldens: 0 exact, 0 pass but differ, 0 evidence, 4 none</title>
+    <text class="tx s" x="90" y="55" style="text-anchor:end">agnews</text>
+    <rect class="nd ext" x="96" y="48" width="9" height="8" rx="1.5"><title>agnews/1 · no golden yet · the field: 13% of 270 published trials pass</title></rect>
+    <rect class="nd ext" x="106" y="48" width="9" height="8" rx="1.5"><title>agnews/2 · no golden yet · the field: 6% of 270 published trials pass</title></rect>
+    <rect class="nd ext" x="116" y="48" width="9" height="8" rx="1.5"><title>agnews/3 · no golden yet · the field: 0% of 270 published trials pass</title></rect>
+    <rect class="nd ext" x="126" y="48" width="9" height="8" rx="1.5"><title>agnews/4 · no golden yet · the field: 21% of 270 published trials pass</title></rect>
+    <text class="tx s" x="232" y="55" style="text-anchor:start">0/4 · 0 exact</text></g>
+  <g><title>bookreview · 3 questions · Postgres + SQLite · 2 databases, under 10 MB · goldens: 1 exact, 2 pass but differ, 0 evidence, 0 none</title>
+    <text class="tx s" x="90" y="67" style="text-anchor:end">bookreview</text>
+    <rect class="bar pro" x="96" y="60" width="9" height="8" rx="1.5"><title>bookreview/1 · exact: the golden recreates the gold answer · the field: 36% of 270 published trials pass</title></rect>
+    <rect class="bar" x="106" y="60" width="9" height="8" rx="1.5"><title>bookreview/2 · passes the validator, differs from the gold text · the field: 62% of 270 published trials pass</title></rect>
+    <rect class="bar" x="116" y="60" width="9" height="8" rx="1.5"><title>bookreview/3 · passes the validator, differs from the gold text · the field: 71% of 270 published trials pass</title></rect>
+    <text class="tx s" x="232" y="67" style="text-anchor:start">3/3 · 1 exact</text></g>
+  <g><title>crmarenapro · 13 questions · DuckDB + Postgres + SQLite · 6 databases, 0.03 GB · goldens: 7 exact, 0 pass but differ, 5 evidence, 1 none</title>
+    <text class="tx s" x="90" y="79" style="text-anchor:end">crmarenapro</text>
+    <rect class="bar" x="96" y="72" width="9" height="8" rx="1.5"><title>crmarenapro/1 · evidence golden: the SQL returns what a reader needs; the validator is not applied · the field: 100% of 270 published trials pass</title></rect>
+    <rect class="bar" x="106" y="72" width="9" height="8" rx="1.5"><title>crmarenapro/2 · evidence golden: the SQL returns what a reader needs; the validator is not applied · the field: 27% of 270 published trials pass</title></rect>
+    <rect class="bar" x="116" y="72" width="9" height="8" rx="1.5"><title>crmarenapro/3 · evidence golden: the SQL returns what a reader needs; the validator is not applied · the field: 55% of 270 published trials pass</title></rect>
+    <rect class="bar" x="126" y="72" width="9" height="8" rx="1.5"><title>crmarenapro/4 · evidence golden: the SQL returns what a reader needs; the validator is not applied · the field: 66% of 270 published trials pass</title></rect>
+    <rect class="bar pro" x="136" y="72" width="9" height="8" rx="1.5"><title>crmarenapro/5 · exact: the golden recreates the gold answer · the field: 64% of 270 published trials pass</title></rect>
+    <rect class="bar" x="146" y="72" width="9" height="8" rx="1.5"><title>crmarenapro/6 · evidence golden: the SQL returns what a reader needs; the validator is not applied · the field: 54% of 270 published trials pass</title></rect>
+    <rect class="nd ext" x="156" y="72" width="9" height="8" rx="1.5"><title>crmarenapro/7 · no golden yet · the field: 28% of 270 published trials pass</title></rect>
+    <rect class="bar pro" x="166" y="72" width="9" height="8" rx="1.5"><title>crmarenapro/8 · exact: the golden recreates the gold answer · the field: 8% of 270 published trials pass</title></rect>
+    <rect class="bar pro" x="176" y="72" width="9" height="8" rx="1.5"><title>crmarenapro/9 · exact: the golden recreates the gold answer · the field: 67% of 270 published trials pass</title></rect>
+    <rect class="bar pro" x="186" y="72" width="9" height="8" rx="1.5"><title>crmarenapro/10 · exact: the golden recreates the gold answer · the field: 41% of 270 published trials pass</title></rect>
+    <rect class="bar pro" x="196" y="72" width="9" height="8" rx="1.5"><title>crmarenapro/11 · exact: the golden recreates the gold answer · the field: 89% of 270 published trials pass</title></rect>
+    <rect class="bar pro" x="206" y="72" width="9" height="8" rx="1.5"><title>crmarenapro/12 · exact: the golden recreates the gold answer · the field: 36% of 270 published trials pass</title></rect>
+    <rect class="bar pro" x="216" y="72" width="9" height="8" rx="1.5"><title>crmarenapro/13 · exact: the golden recreates the gold answer · the field: 53% of 270 published trials pass</title></rect>
+    <text class="tx s" x="232" y="79" style="text-anchor:start">12/13 · 7 exact</text></g>
+  <g><title>deps_dev_v1 · 2 questions · DuckDB + SQLite · 2 databases, 0.55 GB · goldens: 0 exact, 2 pass but differ, 0 evidence, 0 none</title>
+    <text class="tx s" x="90" y="91" style="text-anchor:end">deps_dev</text>
+    <rect class="bar" x="96" y="84" width="9" height="8" rx="1.5"><title>deps_dev_v1/1 · passes the validator, differs from the gold text · the field: 7% of 270 published trials pass</title></rect>
+    <rect class="bar" x="106" y="84" width="9" height="8" rx="1.5"><title>deps_dev_v1/2 · passes the validator, differs from the gold text · the field: 5% of 270 published trials pass</title></rect>
+    <text class="tx s" x="232" y="91" style="text-anchor:start">2/2 · 0 exact</text></g>
+  <g><title>github_repos · 4 questions · DuckDB + SQLite · 2 databases, 0.93 GB · goldens: 4 exact, 0 pass but differ, 0 evidence, 0 none</title>
+    <text class="tx s" x="90" y="103" style="text-anchor:end">github_repos</text>
+    <rect class="bar pro" x="96" y="96" width="9" height="8" rx="1.5"><title>github_repos/1 · exact: the golden recreates the gold answer · the field: 1% of 270 published trials pass</title></rect>
+    <rect class="bar pro" x="106" y="96" width="9" height="8" rx="1.5"><title>github_repos/2 · exact: the golden recreates the gold answer · the field: 1% of 270 published trials pass</title></rect>
+    <rect class="bar pro" x="116" y="96" width="9" height="8" rx="1.5"><title>github_repos/3 · exact: the golden recreates the gold answer · the field: 47% of 270 published trials pass</title></rect>
+    <rect class="bar pro" x="126" y="96" width="9" height="8" rx="1.5"><title>github_repos/4 · exact: the golden recreates the gold answer · the field: 40% of 270 published trials pass</title></rect>
+    <text class="tx s" x="232" y="103" style="text-anchor:start">4/4 · 4 exact</text></g>
+  <g><title>googlelocal · 4 questions · Postgres + SQLite · 2 databases, under 10 MB · goldens: 4 exact, 0 pass but differ, 0 evidence, 0 none</title>
+    <text class="tx s" x="90" y="115" style="text-anchor:end">googlelocal</text>
+    <rect class="bar pro" x="96" y="108" width="9" height="8" rx="1.5"><title>googlelocal/1 · exact: the golden recreates the gold answer · the field: 90% of 270 published trials pass</title></rect>
+    <rect class="bar pro" x="106" y="108" width="9" height="8" rx="1.5"><title>googlelocal/2 · exact: the golden recreates the gold answer · the field: 2% of 270 published trials pass</title></rect>
+    <rect class="bar pro" x="116" y="108" width="9" height="8" rx="1.5"><title>googlelocal/3 · exact: the golden recreates the gold answer · the field: 27% of 270 published trials pass</title></rect>
+    <rect class="bar pro" x="126" y="108" width="9" height="8" rx="1.5"><title>googlelocal/4 · exact: the golden recreates the gold answer · the field: 31% of 270 published trials pass</title></rect>
+    <text class="tx s" x="232" y="115" style="text-anchor:start">4/4 · 4 exact</text></g>
+  <g><title>music_brainz_20k · 3 questions · DuckDB + SQLite · 2 databases, under 10 MB · goldens: 3 exact, 0 pass but differ, 0 evidence, 0 none</title>
+    <text class="tx s" x="90" y="127" style="text-anchor:end">music_brainz</text>
+    <rect class="bar pro" x="96" y="120" width="9" height="8" rx="1.5"><title>music_brainz_20k/1 · exact: the golden recreates the gold answer · the field: 17% of 270 published trials pass</title></rect>
+    <rect class="bar pro" x="106" y="120" width="9" height="8" rx="1.5"><title>music_brainz_20k/2 · exact: the golden recreates the gold answer · the field: 66% of 270 published trials pass</title></rect>
+    <rect class="bar pro" x="116" y="120" width="9" height="8" rx="1.5"><title>music_brainz_20k/3 · exact: the golden recreates the gold answer · the field: 14% of 270 published trials pass</title></rect>
+    <text class="tx s" x="232" y="127" style="text-anchor:start">3/3 · 3 exact</text></g>
+  <g><title>pancancer_atlas · 3 questions · DuckDB + Postgres · 2 databases, 0.30 GB · goldens: 3 exact, 0 pass but differ, 0 evidence, 0 none</title>
+    <text class="tx s" x="90" y="139" style="text-anchor:end">pancancer</text>
+    <rect class="bar pro" x="96" y="132" width="9" height="8" rx="1.5"><title>pancancer_atlas/1 · exact: the golden recreates the gold answer · the field: 0% of 270 published trials pass</title></rect>
+    <rect class="bar pro" x="106" y="132" width="9" height="8" rx="1.5"><title>pancancer_atlas/2 · exact: the golden recreates the gold answer · the field: 69% of 220 published trials pass</title></rect>
+    <rect class="bar pro" x="116" y="132" width="9" height="8" rx="1.5"><title>pancancer_atlas/3 · exact: the golden recreates the gold answer · the field: 51% of 220 published trials pass</title></rect>
+    <text class="tx s" x="232" y="139" style="text-anchor:start">3/3 · 3 exact</text></g>
+  <g><title>patents · 3 questions · Postgres + SQLite · 2 databases, 5.56 GB · goldens: 3 exact, 0 pass but differ, 0 evidence, 0 none</title>
+    <text class="tx s" x="90" y="151" style="text-anchor:end">patents</text>
+    <rect class="bar pro" x="96" y="144" width="9" height="8" rx="1.5"><title>patents/1 · exact: the golden recreates the gold answer · the field: 0% of 270 published trials pass</title></rect>
+    <rect class="bar pro" x="106" y="144" width="9" height="8" rx="1.5"><title>patents/2 · exact: the golden recreates the gold answer · the field: 0% of 270 published trials pass</title></rect>
+    <rect class="bar pro" x="116" y="144" width="9" height="8" rx="1.5"><title>patents/3 · exact: the golden recreates the gold answer · the field: 4% of 270 published trials pass</title></rect>
+    <text class="tx s" x="232" y="151" style="text-anchor:start">3/3 · 3 exact</text></g>
+  <g><title>stockindex · 3 questions · DuckDB + SQLite · 2 databases, under 10 MB · goldens: 3 exact, 0 pass but differ, 0 evidence, 0 none</title>
+    <text class="tx s" x="90" y="163" style="text-anchor:end">stockindex</text>
+    <rect class="bar pro" x="96" y="156" width="9" height="8" rx="1.5"><title>stockindex/1 · exact: the golden recreates the gold answer · the field: 78% of 270 published trials pass</title></rect>
+    <rect class="bar pro" x="106" y="156" width="9" height="8" rx="1.5"><title>stockindex/2 · exact: the golden recreates the gold answer · the field: 80% of 270 published trials pass</title></rect>
+    <rect class="bar pro" x="116" y="156" width="9" height="8" rx="1.5"><title>stockindex/3 · exact: the golden recreates the gold answer · the field: 61% of 270 published trials pass</title></rect>
+    <text class="tx s" x="232" y="163" style="text-anchor:start">3/3 · 3 exact</text></g>
+  <g><title>stockmarket · 5 questions · DuckDB + SQLite · 2 databases, 0.97 GB · goldens: 2 exact, 3 pass but differ, 0 evidence, 0 none</title>
+    <text class="tx s" x="90" y="175" style="text-anchor:end">stockmarket</text>
+    <rect class="bar pro" x="96" y="168" width="9" height="8" rx="1.5"><title>stockmarket/1 · exact: the golden recreates the gold answer · the field: 99% of 270 published trials pass</title></rect>
+    <rect class="bar" x="106" y="168" width="9" height="8" rx="1.5"><title>stockmarket/2 · passes the validator, differs from the gold text · the field: 6% of 270 published trials pass</title></rect>
+    <rect class="bar pro" x="116" y="168" width="9" height="8" rx="1.5"><title>stockmarket/3 · exact: the golden recreates the gold answer · the field: 37% of 270 published trials pass</title></rect>
+    <rect class="bar" x="126" y="168" width="9" height="8" rx="1.5"><title>stockmarket/4 · passes the validator, differs from the gold text · the field: 12% of 270 published trials pass</title></rect>
+    <rect class="bar" x="136" y="168" width="9" height="8" rx="1.5"><title>stockmarket/5 · passes the validator, differs from the gold text · the field: 49% of 270 published trials pass</title></rect>
+    <text class="tx s" x="232" y="175" style="text-anchor:start">5/5 · 2 exact</text></g>
+  <g><title>yelp · 7 questions · DuckDB + MongoDB · 2 databases, under 10 MB · goldens: 6 exact, 1 pass but differ, 0 evidence, 0 none</title>
+    <text class="tx s" x="90" y="187" style="text-anchor:end">yelp</text>
+    <rect class="bar pro" x="96" y="180" width="9" height="8" rx="1.5"><title>yelp/1 · exact: the golden recreates the gold answer · the field: 35% of 270 published trials pass</title></rect>
+    <rect class="bar pro" x="106" y="180" width="9" height="8" rx="1.5"><title>yelp/2 · exact: the golden recreates the gold answer · the field: 13% of 270 published trials pass</title></rect>
+    <rect class="bar pro" x="116" y="180" width="9" height="8" rx="1.5"><title>yelp/3 · exact: the golden recreates the gold answer · the field: 11% of 270 published trials pass</title></rect>
+    <rect class="bar" x="126" y="180" width="9" height="8" rx="1.5"><title>yelp/4 · passes the validator, differs from the gold text · the field: 7% of 270 published trials pass</title></rect>
+    <rect class="bar pro" x="136" y="180" width="9" height="8" rx="1.5"><title>yelp/5 · exact: the golden recreates the gold answer · the field: 30% of 270 published trials pass</title></rect>
+    <rect class="bar pro" x="146" y="180" width="9" height="8" rx="1.5"><title>yelp/6 · exact: the golden recreates the gold answer · the field: 77% of 270 published trials pass</title></rect>
+    <rect class="bar pro" x="156" y="180" width="9" height="8" rx="1.5"><title>yelp/7 · exact: the golden recreates the gold answer · the field: 6% of 270 published trials pass</title></rect>
+    <text class="tx s" x="232" y="187" style="text-anchor:start">7/7 · 6 exact</text></g>
+  <text class="cap" x="4" y="200">filled: exact · grey: differs or evidence</text>
+  <text class="cap" x="4" y="210">hollow: no golden</text>
+</svg>

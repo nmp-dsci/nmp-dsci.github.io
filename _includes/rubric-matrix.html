@@ -8,7 +8,9 @@
   abbreviate; the grid never scrolls sideways. The column count is passed to
   the CSS as --nsys so the grid follows the same query as everything else.
 {%- endcomment -%}
-{%- assign live = site.projects | where_exp: "p", "p.production.live == true" | sort: "production.order" -%}
+{%- assign onaws = site.projects | where_exp: "p", "p.production.live == true" -%}
+{%- assign bench = site.projects | where_exp: "p", "p.production.bench == true" -%}
+{%- assign live = onaws | concat: bench | sort: "production.order" -%}
 {%- assign dims = site.data.rubric.dimensions -%}
 {%- assign ndim = dims | size -%}
 {%- if live.size > 0 -%}
@@ -44,7 +46,7 @@
               {%- assign lbl = st.label | default: cell.status -%}
     <div class="cell cell-{{ cell.status }}" role="cell" style="--d:{{ i }}"><a
        href="{{ p.url | relative_url }}#s{{ d[1].section }}"
-       title="{{ p.title | escape }} — {{ d[1].label | escape }}: {{ lbl | escape }}">{{ lbl }}<span class="sr-only"> — {{ p.title | escape }}, {{ d[1].label | escape }}</span></a></div>
+       title="{{ p.title | escape }} — {{ d[1].label | escape }}: {{ lbl | escape }}">{{ st.wrap | default: lbl }}<span class="sr-only"> — {{ p.title | escape }}, {{ d[1].label | escape }}</span></a></div>
             {%- else -%}
     <div class="cell cell-na" role="cell" style="--d:{{ i }}">not scored</div>
             {%- endif -%}

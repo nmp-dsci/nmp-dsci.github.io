@@ -857,7 +857,14 @@ def lint_project(path: Path, repo: Path | None, why: str, no_net: bool) -> Repor
     links = fm.get("links") if isinstance(fm.get("links"), dict) else {}
     rows = production.get("rubric") or []
 
-    check_schema(rep, fm, REQUIRED, OPTIONAL, REQUIRED_NESTED)
+    # A bench system (production.live: false) is scored, not served: an empty
+    # links.demo is not a missing claim there, and the layout renders no button.
+    nested = dict(REQUIRED_NESTED)
+    if production.get("live") is False and is_empty(links.get("demo")):
+        nested["links"] = [k for k in REQUIRED_NESTED["links"] if k != "demo"]
+    check_schema(rep, fm, REQUIRED, OPTIONAL, nested)
+    if "demo" not in nested["links"]:
+        rep.ok("links.demo: none — production.live is false, so no URL is claimed")
     check_skills(rep, fm, load_data("skills.yml"))
     check_rubric(rep, rows, rubric)
     if rows:  # the two row-level checks have nothing to say without a rubric
