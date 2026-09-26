@@ -169,8 +169,8 @@ production:
       status: designed
       how: >-
         Nothing serves users. The eval runner has a worker semaphore and the data is 8.4 GB in the
-        central Postgres; a public read-only explorer would follow DABstep's image-with-evidence
-        pattern, and it is not built.
+        central Postgres; a public read-only explorer would ship as one image with its evidence
+        baked in, and it is not built.
       proof: "src/dab_bench/eval/runner.py · Makefile · AGENTS.md"
 ---
 

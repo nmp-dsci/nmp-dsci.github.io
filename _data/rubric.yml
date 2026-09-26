@@ -110,10 +110,10 @@ dimensions:
     section: 4
 
 # `wrap` is the label with a U+00AD soft hyphen at the one place it may break:
-# with five systems a phone-width matrix cell is about 55px, narrower than
+# with five systems a phone-width matrix cell was about 55px, narrower than
 # "designed" set in mono at 12.8px, and the matrix never side-scrolls (DESIGN.md
-# rule 11). Invisible unless the word actually has to wrap; `label` stays the
-# plain word for titles and screen readers.
+# rule 11). Kept at four systems, because it is invisible unless the word
+# actually has to wrap; `label` stays the plain word for titles and screen readers.
 statuses:
   shipped:
     glyph: "●"

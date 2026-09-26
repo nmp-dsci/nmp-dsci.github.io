@@ -1,4 +1,6 @@
 ---
+published: false   # removed from the site on 2026-09-26 at the author's request.
+                   # Content, diagrams and the deep page stay in git; nothing renders. Reversible.
 title: DABstep Loop
 short: "DABstep"   # the matrix column header on a phone
 headline: "Two loops improve one agent: with gold, then without"
