@@ -226,6 +226,10 @@ a.chip:hover{text-decoration:none;filter:brightness(.97)}
   letter-spacing:var(--track-label);text-transform:uppercase;color:var(--accent)}
 .live::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor;
   flex:0 0 auto}
+/* A bench system is scored, not served: the word changes and the dot goes
+   hollow, in ink rather than accent, because the accent means live. */
+.live.bench{color:var(--muted)}
+.live.bench::before{background:transparent;box-shadow:inset 0 0 0 1.5px currentColor}
 
 /* ------------------------------------------------------------- 5 · the hero */
 .hero{padding-block:var(--sec-gap) var(--sec-pad)}
@@ -263,8 +267,10 @@ a.chip:hover{text-decoration:none;filter:brightness(.97)}
 .matrix .mh-abbr{display:none}
 /* Beside the hero text the panel is ~470px wide; with four systems the full
    titles ("TRANSCRIPT", "CONVFINQA") no longer fit a 72px column even without
-   tracking, so the panel — not the viewport — decides when headers abbreviate. */
-@container star (max-width:600px){
+   tracking, so the panel — not the viewport — decides when headers abbreviate.
+   With five, "DATAAGENTBENCH" needs a ~120px column, which the panel reaches
+   only above ~900px, so the full titles show only there. */
+@container star (max-width:900px){
   .matrix .mh{letter-spacing:0}
   .matrix .mh-full{display:none}
   .matrix .mh-abbr{display:inline}

@@ -1,4 +1,6 @@
 ---
+published: false   # removed from the site on 2026-09-26 at the author's request.
+                   # Content, diagrams and the deep page stay in git; nothing renders. Reversible.
 title: DABstep Loop
 short: "DABstep"   # the matrix column header on a phone
 headline: "Two loops improve one agent: with gold, then without"
@@ -20,7 +22,7 @@ tags: [Agents]
 metric: "5 cycles"
 metric_label: "3 supervised on ten gold · 2 unsupervised on the 450 · one promoted, two held"
 featured: true
-order: 4
+order: 5
 deep: [eval-loop]
 sections:
   - n: 1
@@ -93,7 +95,7 @@ architecture:
 # ---- how and where it runs --------------------------------------------------
 production:
   live: true
-  order: 4
+  order: 5
   surface: >-
     Read-only viewer over the committed evidence. Overview, Architecture and Data describe the
     benchmark and the agent; Tasks lists all 450; Runs, Trace and Compare open every run,

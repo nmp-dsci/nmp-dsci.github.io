@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>s12 · DataAgentBench — the fifth system, led by the journey</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Design source: the subject site's own system — tokens copied from
+   nmp-dsci.github.io/assets/css/tokens.css (light :root + dark override), as s05–s11. */
+:root{
+  --bg:#F7F6F2; --panel:#FFFFFF; --band:#EFEEE8;
+  --ink:#1A1D1B; --ink-2:#3B403D; --muted:#4A514D; --faint:#5C635E;
+  --line:#DCDAD2; --line-2:#C7C5BC; --line-3:#8A8880;
+  --accent:#0A6552; --accent-ink:#FFFFFF; --accent-soft:#DFEFE8;
+  --amber:#8A5006; --amber-soft:#F6E6CF;
+  --sans:'IBM Plex Sans',system-ui,-apple-system,sans-serif;
+  --serif:'IBM Plex Serif',Georgia,'Times New Roman',serif;
+  --mono:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+  --t-2:0.8rem; --t-1:0.875rem; --t0:1rem; --t1:1.125rem; --t2:1.406rem; --t3:1.758rem; --t4:2.197rem;
+  --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:24px; --s6:32px; --s7:48px; --s8:64px; --s9:96px;
+  --r:10px; --r-sm:6px;
+  --shadow:0 1px 2px rgb(20 25 22 / .05), 0 12px 28px -18px rgb(20 25 22 / .22);
+  --w:1140px; --track-label:.08em;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#121614; --panel:#191E1B; --band:#161A18;
+    --ink:#E8EBE7; --ink-2:#C9CFC9; --muted:#AEB6B0; --faint:#98A09A;
+    --line:#28302B; --line-2:#3A443E; --line-3:#727E77;
+    --accent:#43C29A; --accent-ink:#0E1512; --accent-soft:#17382C;
+    --amber:#D99A4E; --amber-soft:#3A2A14;
+    --shadow:0 1px 2px rgb(0 0 0 / .4), 0 12px 28px -18px rgb(0 0 0 / .65);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#121614; --panel:#191E1B; --band:#161A18;
+  --ink:#E8EBE7; --ink-2:#C9CFC9; --muted:#AEB6B0; --faint:#98A09A;
+  --line:#28302B; --line-2:#3A443E; --line-3:#727E77;
+  --accent:#43C29A; --accent-ink:#0E1512; --accent-soft:#17382C;
+  --amber:#D99A4E; --amber-soft:#3A2A14;
+  --shadow:0 1px 2px rgb(0 0 0 / .4), 0 12px 28px -18px rgb(0 0 0 / .65);
+}
+*,*::before,*::after{box-sizing:border-box}
+:where(.grid,.flex,.cards,.slide,.kpi,.tp,.row)>*{min-width:0}
+:where(p,h1,h2,h3,h4,li,dd,figcaption,td,th,.badge,.label){overflow-wrap:anywhere}
+:where(img,svg,video,iframe){max-width:100%;height:auto}
+html{scroll-behavior:smooth;scroll-padding-top:72px}
+body{margin:0;background:var(--bg);color:var(--ink-2);font-family:var(--sans);font-size:var(--t0);line-height:1.55;-webkit-font-smoothing:antialiased}
+h1,h2,h3,h4{color:var(--ink);margin:0;line-height:1.15;font-weight:600;letter-spacing:-.02em;text-wrap:balance}
+h1{font-size:var(--t4);font-family:var(--serif);font-weight:400} h1 em{font-style:italic;color:var(--accent);font-weight:400}
+h2{font-size:var(--t3)} h3{font-size:var(--t1)} h4{font-size:var(--t0)}
+p{margin:0 0 var(--s4);text-wrap:pretty}
+a{color:var(--accent);text-decoration:none} a:hover{text-decoration:underline;text-underline-offset:.2em}
+strong,b{color:var(--ink);font-weight:600}
+code{font-family:var(--mono);font-size:max(var(--t-2),.86em);background:var(--band);padding:.08em .32em;border-radius:var(--r-sm);color:var(--ink-2)}
+.wrap{max-width:var(--w);margin-inline:auto;padding-inline:var(--s5)}
+.label{font-family:var(--mono);font-size:var(--t-2);font-weight:500;letter-spacing:var(--track-label);text-transform:uppercase;color:var(--faint);margin:0}
+.lead{font-family:var(--serif);font-size:var(--t1);line-height:1.5;color:var(--ink-2);max-width:72ch}
+.small{font-size:var(--t-1);color:var(--muted)}
+.top{position:sticky;top:0;z-index:60;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.top-in{max-width:var(--w);margin-inline:auto;padding:var(--s3) var(--s5);display:flex;align-items:center;gap:var(--s4);flex-wrap:wrap}
+.top b{font-family:var(--mono);font-size:var(--t-1);color:var(--ink);white-space:nowrap}
+.top nav{display:flex;gap:var(--s4);margin-left:auto;flex-wrap:wrap;font-size:var(--t-1);font-weight:500}
+.top nav a{color:var(--ink-2)} .top nav a:hover{color:var(--accent);text-decoration:none}
+header.hero{padding:var(--s7) 0 var(--s5)}
+.chips{display:flex;gap:var(--s2);flex-wrap:wrap;margin:var(--s4) 0 0}
+.chip{font-family:var(--mono);font-size:var(--t-2);padding:.3em .6em;border:1px solid var(--line-2);border-radius:var(--r-sm);color:var(--ink-2);background:var(--panel)}
+.chip.ok{border-color:var(--accent);color:var(--accent)} .chip.warn{border-color:var(--amber);color:var(--amber)}
+section.blk{padding-top:var(--s8)} section.blk:last-of-type{padding-bottom:var(--s9)}
+.hd{margin-bottom:var(--s5);max-width:80ch} .hd .label{margin-bottom:var(--s2)} .hd h2{margin-bottom:var(--s3)}
+.panel{background:var(--panel);border-radius:var(--r);box-shadow:var(--shadow);padding:var(--s5)}
+.band{background:var(--band);border-radius:var(--r);padding:var(--s4) var(--s5)}
+.grid{display:grid;gap:var(--s4)} .g3{grid-template-columns:repeat(3,minmax(0,1fr))} .g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+@media (max-width:900px){.g3,.g2{grid-template-columns:minmax(0,1fr)}}
+.card h3{margin-bottom:var(--s2)} .card p{margin-bottom:var(--s2);font-size:var(--t-1)} .card p:last-child{margin:0}
+.tw{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:var(--r);box-shadow:var(--shadow);background:var(--panel)}
+table{border-collapse:collapse;width:100%;min-width:680px;font-size:var(--t-1)}
+caption{text-align:left;padding:var(--s4) var(--s5) var(--s2);color:var(--muted);font-size:var(--t-1);caption-side:top}
+th,td{text-align:left;padding:var(--s3) var(--s4);border-bottom:1px solid var(--line);vertical-align:top;line-height:1.45}
+thead th{font-family:var(--mono);font-size:var(--t-2);font-weight:500;color:var(--faint);letter-spacing:var(--track-label);text-transform:uppercase;border-bottom:1px solid var(--line-2);white-space:nowrap}
+tbody tr:last-child td{border-bottom:0}
+td.sub{font-weight:600;color:var(--ink);white-space:nowrap}
+td.num{font-family:var(--mono);font-size:var(--t-2);font-variant-numeric:tabular-nums;white-space:nowrap}
+td .path{display:block;font-family:var(--mono);font-size:var(--t-2);color:var(--faint);margin-top:2px}
+tr.pro td{background:color-mix(in srgb,var(--accent-soft) 55%,transparent)}
+.v-ok{color:var(--accent);font-weight:600} .v-no{color:var(--muted)} .v-warn{color:var(--amber);font-weight:600}
+/* the slide, as the site renders it (assets/css/main.css .slide) */
+.slide{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:var(--s5);align-items:start;background:var(--panel);border-radius:var(--r);box-shadow:var(--shadow);padding:var(--s5);margin-bottom:var(--s4)}
+.slide .fr{background:var(--band);border-radius:var(--r);padding:var(--s4)}
+.slide .fr svg{display:block;width:100%;height:auto}
+.slide .tx h3{margin-bottom:var(--s2);font-size:var(--t2)} .slide .tx h3 .n{font-family:var(--mono);font-size:var(--t-1);font-weight:500;color:var(--faint);margin-right:.5em}
+.slide .tx p{font-size:var(--t-1);margin-bottom:var(--s2)}
+.slide .tx ul{margin:0 0 var(--s3);padding-left:1.1em;font-size:var(--t-1)} .slide .tx li{margin-bottom:var(--s1)} .slide .tx li b{color:var(--ink)}
+.slide .ft{font-family:var(--mono);font-size:var(--t-2);letter-spacing:var(--track-label);text-transform:uppercase;color:var(--faint);margin:0 0 var(--s2)}
+.slide .ins{font-family:var(--serif);font-size:var(--t0);color:var(--ink);margin:var(--s3) 0 0}
+@media (max-width:820px){.slide{grid-template-columns:minmax(0,1fr)}}
+/* the .dia contract, as main.css declares it */
+.dia{--dia-k:.7;display:block;width:100%;height:auto;color:var(--ink-2);overflow:visible}
+.dia .nd{fill:var(--panel);stroke:currentColor;stroke-width:1;vector-effect:non-scaling-stroke}
+.dia .nd.hi{fill:var(--accent-soft);stroke:var(--accent)}
+.dia .nd.ext{fill:none;stroke:var(--line-3);stroke-dasharray:4 3}
+.dia .tx{font-family:var(--mono);font-size:calc(13px * var(--dia-k));fill:currentColor;text-anchor:middle}
+.dia .tx.s{font-size:calc(11px * var(--dia-k));fill:var(--faint)}
+.dia .tx.k{fill:var(--ink);font-weight:500}
+.dia .ed{stroke:currentColor;stroke-width:1.25;vector-effect:non-scaling-stroke;fill:none}
+.dia .ed.dash{stroke-dasharray:4 3}
+.dia .cap{font-family:var(--mono);font-size:calc(11px * var(--dia-k));fill:var(--faint)}
+.dia .bar{fill:var(--line-3)} .dia .bar.hi{fill:currentColor}
+.dia .bar.pro{fill:var(--accent-soft);stroke:var(--accent);stroke-width:1.2;vector-effect:non-scaling-stroke}
+.dia .ax{stroke:var(--line-3);stroke-width:1;vector-effect:non-scaling-stroke}
+.dia .gl{stroke:var(--line-2);stroke-width:1;vector-effect:non-scaling-stroke}
+.kpi{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:var(--s4)}
+@media(max-width:900px){.kpi{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.kpi .k{background:var(--panel);border-radius:var(--r);box-shadow:var(--shadow);padding:var(--s4)}
+.kpi .k b{display:block;font-family:var(--mono);font-size:var(--t3);color:var(--ink);font-variant-numeric:tabular-nums;line-height:1.1}
+.kpi .k.us b{color:var(--accent)}
+.kpi .k span{display:block;font-size:var(--t-2);color:var(--muted);margin-top:var(--s2);line-height:1.4}
+.callout{border-left:3px solid var(--amber);background:var(--amber-soft);border-radius:0 var(--r) var(--r) 0;padding:var(--s4) var(--s5);margin:0 0 var(--s5)}
+.callout p{margin:0 0 var(--s2)} .callout p:last-child{margin:0}
+.steps{counter-reset:s;list-style:none;padding:0;margin:0;display:grid;gap:var(--s3)}
+.steps li{display:grid;grid-template-columns:2rem minmax(0,1fr);gap:var(--s3);align-items:start;font-size:var(--t-1)}
+.steps li::before{counter-increment:s;content:counter(s,decimal-leading-zero);font-family:var(--mono);color:var(--accent);font-weight:500;padding-top:2px}
+.tp{display:grid;gap:var(--s2)} .tp .row{display:grid;grid-template-columns:9rem minmax(0,1fr) auto;gap:var(--s3);align-items:start;padding:var(--s2) var(--s3);background:var(--panel);border-radius:var(--r-sm);font-size:var(--t-1)}
+.tp .row .k{font-family:var(--mono);font-size:var(--t-2);color:var(--faint)}
+@media (max-width:700px){.tp .row{grid-template-columns:minmax(0,1fr)}}
+.tag{font-family:var(--mono);font-size:var(--t-2);padding:.15em .5em;border-radius:var(--r-sm);border:1px solid var(--line-2);white-space:nowrap}
+.tag.auto{border-color:var(--accent);color:var(--accent)} .tag.edit{border-color:var(--amber);color:var(--amber)} .tag.new{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+form.q{background:var(--panel);border-radius:var(--r);box-shadow:var(--shadow);padding:var(--s5);display:grid;gap:var(--s3)}
+form.q h3{margin:0} form.q .why{font-size:var(--t-1);color:var(--muted);margin:0}
+form.q label{display:grid;grid-template-columns:1.2rem minmax(0,1fr);gap:var(--s2);align-items:start;font-size:var(--t-1);padding:var(--s2) var(--s3);border:1px solid var(--line);border-radius:var(--r-sm);cursor:pointer}
+form.q label:has(input:checked){border-color:var(--accent);background:var(--accent-soft)}
+form.q input[type=radio]{margin:3px 0 0;accent-color:var(--accent)}
+form.q textarea{width:100%;font:inherit;font-size:var(--t-1);padding:var(--s2) var(--s3);border:1px solid var(--line-2);border-radius:var(--r-sm);background:var(--bg);color:var(--ink-2);min-height:3.2rem;resize:vertical}
+form.q .row{display:flex;gap:var(--s3);align-items:center;flex-wrap:wrap}
+.btn{font:500 var(--t-1) var(--sans);background:var(--accent);color:var(--accent-ink);border:0;border-radius:var(--r-sm);padding:.55em 1em;cursor:pointer}
+.queued{font-family:var(--mono);font-size:var(--t-2);color:var(--accent);min-height:1.2em}
+.rec{font-family:var(--mono);font-size:var(--t-2);color:var(--accent);margin-left:.4em}
+ul.tight{margin:0;padding-left:1.1em;font-size:var(--t-1)} ul.tight li{margin-bottom:var(--s1)}
+.fm{font-family:var(--mono);font-size:var(--t-2);line-height:1.6;white-space:pre-wrap;margin:0;color:var(--ink-2)}
+footer{border-top:1px solid var(--line);padding:var(--s5) 0;font-size:var(--t-2);color:var(--faint);font-family:var(--mono)}
+</style>
+</head>
+<body>
+
+<div class="top"><div class="top-in">
+  <b>s12 · DataAgentBench case study — plan</b>
+  <nav>
+    <a href="#rank">The number</a><a href="#page">The page</a><a href="#front">Card lines</a><a href="#score">Scorecard</a><a href="#home">Home page</a><a href="#decide">Decisions</a><a href="#steps">Steps</a>
+  </nav>
+</div></div>
+
+<header class="hero"><div class="wrap">
+  <p class="label">nmp-dsci.github.io · branch <code>dataagentbench</code> · plan before code · 2026-09-26</p>
+  <h1 style="margin:var(--s3) 0">The fifth system: the <em>journey</em> first, then the how</h1>
+  <p class="lead">One case study, home position 2, six slides, four charts from committed files. Every number from <code>../DataAgentBench</code> at <code>43bf267</code>.</p>
+  <div class="chips">
+    <span class="chip ok">Pass@1 0.440 → 0.904 · v0 → v8</span>
+    <span class="chip ok">5 promotions · 4 misses · 5 days</span>
+    <span class="chip ok">49 / 54 golden SQL</span>
+    <span class="chip ok">home position 2 · after ConvFinQA</span>
+    <span class="chip warn">third on the board, not second</span>
+    <span class="chip warn">not deployed — a bench</span>
+    <span class="chip ok">5 / 9 · decided</span>
+  </div>
+</div></header>
+
+<!-- ============================================================ 01 · the number -->
+<section class="blk" id="rank"><div class="wrap">
+  <div class="hd"><p class="label">01 · settle this first</p>
+  <h2>Third, not second — by 0.002, one trial against five</h2></div>
+  <div class="callout">
+    <ul class="tight">
+      <li><b>v8: 0.904</b>, one trial — <code>agents/promotions.jsonl</code></li>
+      <li><b>#2 Scout: 0.906</b>, five trials; #3 Camber 0.879 — <code>data/index/leaderboard.json</code></li>
+      <li>The chart draws both lines; <b>v8's point sits on the second</b>. That is the story.</li>
+      <li>Every top entry is tuned on the 54; so is v8. The page says so.</li>
+    </ul>
+  </div>
+  <div class="kpi">
+    <div class="k"><b>0.947</b><span>#1 Permute EQ · Opus 5 · 5 trials · five prompt variants</span></div>
+    <div class="k"><b>0.906</b><span>#2 Scout · GLM-5.2 · 5 trials · per-question operators</span></div>
+    <div class="k us"><b>0.904</b><span>v8 · Opus 5.5 · <b>1 trial</b> · one prompt per dataset</span></div>
+    <div class="k"><b>0.879</b><span>#3 Camber · Opus 5 · 5 trials · 12 per-dataset agents</span></div>
+  </div>
+</div></section>
+
+<!-- ============================================================ 02 · the page -->
+<section class="blk" id="page"><div class="wrap">
+  <div class="hd"><p class="label">02 · the page, in reading order</p>
+  <h2>Result → the agent → the loop → the data → diagnostics → observability. Six slides.</h2></div>
+
+  <div class="slide" id="s1a">
+    <div>
+      <p class="ft">§1 · slide 1a · <code>chart/dataagentbench-progression.svg</code> · also the home-row figure</p>
+      <div class="fr">
+<svg class="dia" viewBox="0 0 330 184" role="img" aria-label="Pass@1 on the 54 DataAgentBench leaderboard questions by agent version in the order they were built, one trial each, drawn as the Runs tab draws it: one point per version, an accent line joining the versions that held the title, from v0 at 0.440 through v2, v4 and v6 to v8 at 0.904, with the answers gained at each promotion on the line. Open points did not take the title: v1 the SQL rebuild below v0, v3 beaten by the model switch, v5 by round three, v7 tied v6 on answers and lost on SQL. Under each version, how it was made: base, a rebuild, an optimiser round, or a model change to Sonnet or Opus. The public leaderboard's first and second places are dashed lines at 0.947 and 0.906 over five trials; v8's point sits on the second.">
+  <title>0.440 to 0.904 along the champion line; v8 sits on the board's second line, one trial against five</title>
+  <!-- y = 118 - p * 96 · x = 51 + 32 i -->
+  <g><title>gridlines at .25, .5, .75 and 1.0; the axis is 0</title>
+    <line class="gl" x1="36" y1="94" x2="324" y2="94"/><line class="gl" x1="36" y1="70" x2="324" y2="70"/>
+    <line class="gl" x1="36" y1="46" x2="324" y2="46"/><line class="gl" x1="36" y1="22" x2="324" y2="22"/>
+    <text class="tx s" x="31" y="97" style="text-anchor:end">.25</text><text class="tx s" x="31" y="73" style="text-anchor:end">.5</text>
+    <text class="tx s" x="31" y="49" style="text-anchor:end">.75</text><text class="tx s" x="31" y="25" style="text-anchor:end">1</text></g>
+  <line class="ax" x1="36" y1="118" x2="324" y2="118"/>
+
+  <g><title>#1 on the public board · Permute EQ (Claude Opus 5) · Pass@1 0.9467 over five trials · five prompt variants across the 54 · data/index/leaderboard.json</title>
+    <line class="ed dash" style="marker-end:none" x1="36" y1="27.1" x2="324" y2="27.1"/>
+    <text class="tx s" x="38" y="24" style="text-anchor:start">#1 Permute EQ .947</text></g>
+  <g><title>#2 on the public board · Scout (OceanBase Lab, GLM-5.2) · Pass@1 0.9062 over five trials · question-shaped workflow operators · v8's one-trial 0.904 sits 0.002 under this line</title>
+    <line class="ed dash" style="marker-end:none" x1="36" y1="31" x2="324" y2="31"/>
+    <text class="tx s" x="38" y="44" style="text-anchor:start">#2 Scout .906</text></g>
+
+  <g><title>the champion line · the versions that held the title, each crowned by dab promote: v0 → v2 (+3 answers, D30) → v4 (+11, D36) → v6 (+5, D36) → v8 (+2, D46) · agents/promotions.jsonl</title>
+    <polyline class="ci pro" style="stroke-width:2" fill="none" points="51,75.8 115,64.3 179,47.2 243,32.5 307,31.2"/>
+    <text class="tx s" x="83" y="65">+3</text><text class="tx s" x="147" y="50">+11</text>
+    <text class="tx s" x="211" y="51">+5</text><text class="tx s" x="275" y="48">+2</text></g>
+
+  <g><title>v0 · Pass@1 0.440 · 27 of 54 · claude-haiku-4-5, the python analyst with nine tools and a sandbox, no hints · the first champion · run 20260921T064521Z, $8.96</title>
+    <circle class="pt pro" cx="51" cy="75.8" r="3.5"/><text class="tx k" x="51" y="68.8">.440</text>
+    <text class="tx s" x="51" y="130">v0</text><text class="tx s" x="51" y="149">base</text></g>
+  <g><title>v1_sql · 0.425 · 24 of 54 · a rebuild on Haiku: three tools, one SQL statement per question, hints on, the curated pack off · below v0, kept because every failure now had a statement to diff against a golden · SQL 13 of 49 · did not take the title</title>
+    <circle class="nd" cx="83" cy="77.2" r="3"/>
+    <text class="tx s" x="83" y="130">v1</text><line class="ax" style="stroke-dasharray:3 2" x1="71" y1="138" x2="95" y2="138"/><text class="tx s" x="83" y="159">rebuild</text></g>
+  <g><title>v2_sql · 0.559 · 30 of 54 · round 1: eleven Sonnet sessions read v1's failed train questions with their golden diffs and wrote dataset notes, $1.11 · promoted under D30, +3 answers · SQL 18 of 49</title>
+    <circle class="pt pro" cx="115" cy="64.3" r="3.5"/><text class="tx k" x="115" y="57.3">.559</text>
+    <text class="tx s" x="115" y="130">v2</text><line class="ci pro" x1="103" y1="138" x2="127" y2="138"/><text class="tx k" x="115" y="149">round 1</text></g>
+  <g><title>v3_sql · 0.573 · 32 of 54 · round 2: the reader's seven-step ledger, component sessions write the SQL playbook, plan-first, $1.25 · beaten by its own prompt on Sonnet (v4) · SQL 19 of 49 · did not take the title</title>
+    <circle class="nd" cx="147" cy="63" r="3"/>
+    <text class="tx s" x="147" y="130">v3</text><line class="ci pro" x1="135" y1="138" x2="159" y2="138"/><text class="tx k" x="147" y="159">round 2</text></g>
+  <g><title>v4_sql · 0.738 · 41 of 54 · v3's prompt files on claude-sonnet-5, a model change and not a round · promoted under D36, +11 answers · SQL 27 of 49</title>
+    <circle class="pt pro" cx="179" cy="47.2" r="3.5"/><text class="tx k" x="179" y="40.2">.738</text>
+    <text class="tx s" x="179" y="130">v4</text><line class="ax" style="stroke-dasharray:3 2" x1="167" y1="138" x2="191" y2="138"/><text class="tx s" x="179" y="149">sonnet</text></g>
+  <g><title>v5_sql · 0.842 · 45 of 54 · v4's prompt files on claude-opus-5-5, a model change · beaten by round 3 (v6) · SQL 28 of 49 · did not take the title</title>
+    <circle class="nd" cx="211" cy="37.2" r="3"/>
+    <text class="tx s" x="211" y="130">v5</text><line class="ax" style="stroke-dasharray:3 2" x1="199" y1="138" x2="223" y2="138"/><text class="tx s" x="211" y="159">opus</text></g>
+  <g><title>v6_sql · 0.891 · 46 of 54 · round 3 on Opus, reader and optimiser on Opus too, $1.90 · promoted under D36, +5 answers · SQL 33 of 49, the most of any version</title>
+    <circle class="pt pro" cx="243" cy="32.5" r="3.5"/><text class="tx k" x="243" y="25.5">.891</text>
+    <text class="tx s" x="243" y="130">v6</text><line class="ci pro" x1="231" y1="138" x2="255" y2="138"/><text class="tx k" x="243" y="149">round 3</text></g>
+  <g><title>v7_sql · 0.884 · 46 of 54 · round 4: every error of the 54 read, guards G1–G4 on, $4.39 · tied v6 on answers, lost SQL 30 to 33 · held · did not take the title</title>
+    <circle class="nd" cx="275" cy="33.1" r="3"/>
+    <text class="tx s" x="275" y="130">v7</text><line class="ci pro" x1="263" y1="138" x2="287" y2="138"/><text class="tx k" x="275" y="159">round 4</text></g>
+  <g><title>v8_sql · 0.904 · 48 of 54 · round 5: round 4's recipe plus each failed question's history from MLflow, $4.83 · promoted under D46, the leak gate then Pass@1, +2 answers · SQL 31 of 49 · McNemar on answers against v6 +3 −1, p 0.63 · the champion</title>
+    <circle class="pt pro" cx="307" cy="31.2" r="3.5"/><text class="tx k" x="307" y="24.2">.904</text>
+    <text class="tx s" x="307" y="130">v8 ★</text><line class="ci pro" x1="295" y1="138" x2="319" y2="138"/><text class="tx k" x="307" y="149">round 5</text></g>
+
+  <text class="cap" x="36" y="173">line: champions · open: not promoted</text>
+  <text class="cap" x="36" y="182">one trial each · board: five trials</text>
+</svg>
+      </div>
+    </div>
+    <div class="tx">
+      <h3><span class="n">1a</span>Five promotions in five days: 0.440 → 0.904, on the board's second line</h3>
+      <p class="ft">Figure · Pass@1 by version in build order; the champion line; the board's top two</p>
+      <ul>
+        <li><b>Moved it:</b> Sonnet +0.166, Opus +0.104; rounds +0.134, +0.049, +0.013</li>
+        <li><b>Misses:</b> v1 below v0; v3, v5 beaten by the next step; v7 lost on SQL</li>
+        <li><b>Sits:</b> third on the board, 0.002 under second, one trial vs five</li>
+        <li><b>Skill:</b> the target, what the optimiser sees, what it may write, who decides</li>
+      </ul>
+      <p class="ins">The model switches bought more than the rounds; the rounds made every miss a diff.</p>
+      <p class="small">Drawn as the Runs tab does (<code>frontend/src/lib/versions.tsx</code>) · <code>promotions.jsonl</code> · <code>leaderboard.json</code> · <code>v*/optimise.json</code></p>
+    </div>
+  </div>
+
+  <div class="slide" id="s2a">
+    <div>
+      <p class="ft">§2 · slide 2a · <code>agent/dataagentbench.svg</code> · the fig-agent, drawn as the Agent tab draws v8</p>
+      <div class="fr">
+<svg class="dia" viewBox="0 0 320 152" role="img" aria-label="The v8 agent system as the explorer's Agent tab draws it. The benchmark question, alone, enters one Claude Agent SDK session on Opus 5.5 at medium effort, at most 30 turns and 900 seconds, whose system prompt is system.md plus the code-built tables map, the version's notes for this dataset, and the upstream description and hints. The session reaches one in-process MCP server, dab, with three tools: query_db and describe_table run as the read-only dab_agent role on Postgres, and submit_answer takes the final SQL, a mode and the seven-step plan, re-runs the SQL as dab_agent and renders the result. The question's own validate.py judges the answer; the run folder keeps the results and the trace; the central MLflow indexes the run.">
+  <title>One Opus session, three tools, one statement: the harness re-runs the SQL, so the result is known exactly</title>
+  <defs><marker id="ar-dab-agent-plan" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="currentColor"/></marker></defs>
+
+  <g><title>the user message: the benchmark question, verbatim, nothing else — src/dab_bench/agent/prompt.py</title>
+    <rect class="nd" x="4" y="30" width="48" height="24" rx="6"/>
+    <text class="tx" x="28" y="41">question</text><text class="tx s" x="28" y="50">user msg</text></g>
+  <g><title>the Agent SDK session: a claude child on the subscription, claude-opus-5-5 at medium effort, at most 30 turns and 900 s; it starts in an empty directory with no CLAUDE.md, memory, plugin or built-in tool, and its init message is recorded on the trace — agents/v8_sql/agent.yaml, src/dab_bench/agent/session.py, isolation.py</title>
+    <rect class="nd hi" x="62" y="22" width="84" height="40" rx="6"/>
+    <text class="tx" x="104" y="38">Agent SDK</text><text class="tx s" x="104" y="50">opus 5.5 · ≤ 30 turns</text></g>
+  <g><title>the system prompt, composed per dataset: system.md (7,589 characters: how to work, then the seven-step SQL playbook the optimiser writes) + the code-built tables map + this dataset's notes (agents/v8_sql/datasets/&lt;ds&gt;.md, 1,384–1,928 characters) + the upstream description and hints verbatim; the curated pack is off — src/dab_bench/agent/prompt.py</title>
+    <rect class="nd" x="66" y="72" width="76" height="26" rx="6"/>
+    <text class="tx" x="104" y="83">system prompt</text><text class="tx s" x="104" y="93">system.md + notes</text></g>
+  <g><title>one in-process MCP server per trial, named dab, with a strict config: the version's three tools and nothing else — src/dab_bench/agent/tools.py</title>
+    <rect class="nd" x="156" y="30" width="54" height="24" rx="6"/>
+    <text class="tx" x="183" y="41">mcp "dab"</text><text class="tx s" x="183" y="50">in-process</text></g>
+
+  <g><title>query_db(sql, limit): one SELECT as dab_agent, read-only, a 60 s statement timeout, rows back cut at 10,000 characters; the work of the trial</title>
+    <rect class="nd" x="222" y="10" width="74" height="18" rx="4"/>
+    <text class="tx" x="259" y="22">query_db</text></g>
+  <g><title>describe_table(table): types, null rates and top values from the code-built profile, in one call</title>
+    <rect class="nd" x="222" y="34" width="74" height="18" rx="4"/>
+    <text class="tx" x="259" y="46">describe_table</text></g>
+  <g><title>submit_answer(sql, mode, plan, answer?, step?): the final statement, re-run by the harness as dab_agent and rendered; mode pass_through makes that render the answer, mode derived keeps the model's answer and its one-line step; plan is the statement's seven steps; ends the trial — tools.py, plan s06 D27 and s08 D34</title>
+    <rect class="nd hi" x="222" y="58" width="74" height="18" rx="4"/>
+    <text class="tx" x="259" y="70">submit_answer</text></g>
+  <g><title>Postgres 16, the central platform's database dab: every table of the 12 datasets in one schema, 2,811 tables; dab_agent has SELECT on that schema only, a 60 s timeout, and no privilege on the schema that holds gold and goldens — infra/roles.sql</title>
+    <rect class="nd" x="222" y="92" width="74" height="26" rx="6"/>
+    <text class="tx" x="259" y="103">Postgres</text><text class="tx s" x="259" y="113">dab_agent · read-only</text></g>
+
+  <g><title>the judge: the question's own validate.py from upstream, alarm-bounded, over the submitted answer; pass or fail with the validator's reason — src/dab_bench/eval/validators.py</title>
+    <rect class="nd" x="62" y="112" width="84" height="26" rx="6"/>
+    <text class="tx" x="104" y="123">judge · validate.py</text><text class="tx s" x="104" y="133">pass / fail</text></g>
+  <g><title>the run folder is the record: runs/&lt;id&gt;/run.json, results.jsonl with agent_sql, agent_result, mode, step and plan, one trace per trial</title>
+    <rect class="nd" x="4" y="112" width="48" height="26" rx="6"/>
+    <text class="tx" x="28" y="123">runs/</text><text class="tx s" x="28" y="133">the record</text></g>
+  <g><title>the central MLflow, experiment dataagentbench/evals: one run per eval, one trace per trial; linked, never read back inside a trial — src/dab_bench/tracking/mlflow_log.py</title>
+    <rect class="nd ext" x="156" y="112" width="54" height="26" rx="6"/>
+    <text class="tx" x="183" y="123">MLflow</text><text class="tx s" x="183" y="133">the index</text></g>
+
+  <path class="ed" d="M52,42 H60" marker-end="url(#ar-dab-agent-plan)"/>
+  <path class="ed" d="M146,42 H154" marker-end="url(#ar-dab-agent-plan)"/>
+  <path class="ed dash" d="M104,72 V64" marker-end="url(#ar-dab-agent-plan)"/>
+  <path class="ed" d="M210,40 C216,40 214,19 220,19" marker-end="url(#ar-dab-agent-plan)"/>
+  <path class="ed" d="M210,42 C216,42 214,43 220,43" marker-end="url(#ar-dab-agent-plan)"/>
+  <path class="ed" d="M210,46 C216,46 214,67 220,67" marker-end="url(#ar-dab-agent-plan)"/>
+  <path class="ed dash" d="M296,19 C306,19 306,105 298,105" marker-end="url(#ar-dab-agent-plan)"/>
+  <path class="ed dash" d="M296,43 C304,43 304,101 298,101" marker-end="url(#ar-dab-agent-plan)"/>
+  <path class="ed dash" d="M259,76 V90" marker-end="url(#ar-dab-agent-plan)"/>
+  <path class="ed" d="M222,70 C190,70 170,125 148,125" marker-end="url(#ar-dab-agent-plan)"/>
+  <path class="ed" d="M62,125 H54" marker-end="url(#ar-dab-agent-plan)"/>
+  <path class="ed dash" d="M146,131 H154" marker-end="url(#ar-dab-agent-plan)"/>
+  <text class="cap" x="4" y="149">3 tools · no sandbox · no model tool · hints on · pack off</text>
+</svg>
+      </div>
+    </div>
+    <div class="tx">
+      <h3><span class="n">2a</span>One Opus session, three tools, one statement — the whole agent</h3>
+      <p class="ft">Figure · the v8 agent system: question → Agent SDK → mcp dab → three tools → Postgres → validator</p>
+      <ul>
+        <li><b>Session:</b> Agent SDK claude child · Opus 5.5 medium · ≤ 30 turns · 900 s · empty directory, no built-in tools</li>
+        <li><b>Prompt:</b> <code>system.md</code> 7.6 k (the playbook) + tables map + this dataset's notes ~1.7 k + description + hints ≈ 18 k for crmarenapro; the question alone as the user message</li>
+        <li><b>Tools:</b> <code>query_db</code>, <code>describe_table</code> as <code>dab_agent</code>; <code>submit_answer(sql, mode, plan)</code> re-runs the SQL, so the result is known exactly</li>
+        <li><b>Versus the board:</b> one prompt per dataset, no per-question text or tool; #1 ships five prompt variants, #2 per-question operators</li>
+      </ul>
+      <p class="ins">Small on purpose: a version differs from its parent in one file and twelve notes, so every gain is a diff.</p>
+      <p class="small">As the Agent tab draws it (<code>frontend/src/lib/agent.tsx</code>, <code>/agent/v8_sql</code>) · <code>agents/v8_sql/agent.yaml</code> · <code>src/dab_bench/agent/tools.py</code> · <code>prompt.py</code></p>
+    </div>
+  </div>
+
+  <div class="slide" id="s3a">
+    <div>
+      <p class="ft">§3 · slide 3a · <code>loop/dataagentbench.svg</code> · the fig-loop, drawn as the Optimise tab draws a round</p>
+      <div class="fr">
+<svg class="dia" viewBox="0 0 360 160" role="img" aria-label="One optimisation round as the explorer's Optimise tab draws it, seven stages with round five's own counts. One, the source run: the champion v6 on all 54 questions, one trial each, SQL 33 of 49. Two, diagnose: the scorecard scores every question three ways and the reader ledgers each of the 16 failed statements in seven steps. Three, split: every error of the 54 is read, none held out. Four, sessions: 13 Opus sessions, one per break step and one per dataset, read the golden diffs and each question's history from MLflow. Five, guard: of 28 writes the literal guard and guards G1 to G4 refused 19 and kept 9. Six, the new version v8: three playbook sections and six dataset notes, then 54 trials. Seven, outcome: 48 of 54, Pass at 1 0.904, promoted under D46, the leak gate then Pass at 1. The next round starts only from the champion's run. Off the ring sit the reader and the reviewer, both Opus and never inside a trial, and the history read from MLflow.">
+  <title>Round 5, v6 → v8: 20 misses read, 28 writes, 9 kept, one prompt shipped, promoted on Pass@1</title>
+  <defs><marker id="lp-dab-plan" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="currentColor"/></marker></defs>
+
+  <g><title>1 · source run — the champion's newest full run, v6_sql on all 54 once: answers 46 of 54, SQL 33 of 49, decision 49 of 49, $5.12; from s13 a round starts only here (dab optimise refuses another version's run) · dab eval · runs/20260925T015204Z_v6_sql_all_opus_hints/</title>
+    <rect class="nd" x="6" y="8" width="80" height="34" rx="6"/>
+    <text class="tx" x="46" y="22">1 · run</text><text class="tx s" x="46" y="35">v6 · 54 × 1</text></g>
+  <g><title>2 · diagnose — the scorecard scores every question three ways (answer, SQL, decision); the reader writes both statements as seven steps and names where each failed one breaks: sources 5, parse 5, shape 4, rank 1, filter 1 · 16 SQL fails of 49 goldened · dab diagnose --ledger · eval/scorecard.py, eval/ledger.py</title>
+    <rect class="nd" x="96" y="8" width="80" height="34" rx="6"/>
+    <text class="tx" x="136" y="22">2 · diagnose</text><text class="tx s" x="136" y="35">16 SQL fails</text></g>
+  <g><title>3 · split — from round 4 (D38) every error of the 54 is read, wrong answers without a golden included: 20 questions went to the sessions; none held out, so the score on the 54 is in-sample, as every leaderboard entry's is · data/splits/, dab optimise --train all</title>
+    <rect class="nd" x="186" y="8" width="80" height="34" rx="6"/>
+    <text class="tx" x="226" y="22">3 · split</text><text class="tx s" x="226" y="35">all 54 read</text></g>
+  <g><title>4 · sessions — 13 isolated Opus 5.5 sessions, $4.83 with the reviewer: one per step at which statements break (3: sources, parse, shape) writes that step's playbook section; one per dataset with failures (10) writes its notes; each reads the golden SQL and result diff of the questions it may touch, the ledger's lines, and from round 5 each question's history · agents/optimiser/, src/dab_bench/agent/optimise.py</title>
+    <rect class="nd hi" x="276" y="8" width="80" height="34" rx="6"/>
+    <text class="tx" x="316" y="22">4 · sessions</text><text class="tx s" x="316" y="35">13 · Opus</text></g>
+  <g><title>5 · guard — every write checked: no run of 8 question words, no gold value, no run of 6 golden tokens, under the cap (600 a section, 2,000 a note); G1 an Opus reviewer refuses a decisive value or interpretation, G2 audits every gold value in the finished text, G3 two errors behind a section, G4 no question named · 28 writes, 19 refused (15 leaks, 6 too long), 9 accepted, 4 dropped · eval/guards.py, eval/review.py</title>
+    <rect class="nd hi" x="276" y="60" width="80" height="34" rx="6"/>
+    <text class="tx" x="316" y="74">5 · guard</text><text class="tx s" x="316" y="87">28 → 9 kept</text></g>
+  <g><title>6 · new version — agents/v8_sql/: v6's files plus 3 rewritten playbook sections in system.md (7,560 characters) and 6 dataset notes; agent.yaml unchanged; then dab eval on all 54 once, $5.36 · agents/v8_sql/optimise.json</title>
+    <rect class="nd" x="276" y="112" width="80" height="34" rx="6"/>
+    <text class="tx" x="316" y="126">6 · v8</text><text class="tx s" x="316" y="139">3 § + 6 notes</text></g>
+  <g><title>7 · outcome — v8: answers 48 of 54, SQL 31 of 49, Pass@1 0.904 against v6's 0.891; dab promote (D46): a challenger passes the leak gate (its round ran G1–G4, G2 finds no gold value in its prompt), then the highest Pass@1 wins; promoted 2026-09-25 · agents/promotions.jsonl, eval/promote.py</title>
+    <rect class="nd hi" x="186" y="112" width="80" height="34" rx="6"/>
+    <text class="tx" x="226" y="126">7 · outcome</text><text class="tx s" x="226" y="139">0.904 · won</text></g>
+  <g><title>next round — starts only from the champion's newest full run; a held challenger stays on the record and its round is read by the next one as history · eval/history.py, eval/outcome.py</title>
+    <rect class="nd ext" x="6" y="112" width="80" height="34" rx="6"/>
+    <text class="tx" x="46" y="126">next round</text><text class="tx s" x="46" y="139">champion lock</text></g>
+
+  <g><title>the reader and the reviewer — Opus, never inside a trial: the reader describes goldens and failed statements in seven steps (any gold value it writes is redacted); the reviewer (G1) reads each write beside the questions it could affect and their gold, and refuses text that decides one; its verdicts go to optimise.json, never a prompt · agents/reader/, agents/reviewer/</title>
+    <rect class="nd ext" x="96" y="60" width="170" height="34" rx="6"/>
+    <text class="tx" x="181" y="74">reader · reviewer G1</text><text class="tx s" x="181" y="87">Opus · never in a trial</text></g>
+  <g><title>the history — built from MLflow (D42 A) and parity-checked against the folders: each failed question's answer and SQL under every version, what each round changed, the statement that last passed a regressed question, and every lost round from the champion; read by the sessions only · dab history, eval/history.py, runs/&lt;run&gt;/history.json</title>
+    <rect class="nd ext" x="6" y="60" width="80" height="34" rx="6"/>
+    <text class="tx" x="46" y="74">history</text><text class="tx s" x="46" y="87">from MLflow</text></g>
+
+  <path class="ed" d="M86,25 H94" marker-end="url(#lp-dab-plan)"/>
+  <path class="ed" d="M176,25 H184" marker-end="url(#lp-dab-plan)"/>
+  <path class="ed" d="M266,25 H274" marker-end="url(#lp-dab-plan)"/>
+  <path class="ed" d="M316,42 V58" marker-end="url(#lp-dab-plan)"/>
+  <path class="ed" d="M316,94 V110" marker-end="url(#lp-dab-plan)"/>
+  <path class="ed" d="M276,129 H268" marker-end="url(#lp-dab-plan)"/>
+  <path class="ed" d="M186,129 H88" marker-end="url(#lp-dab-plan)"/>
+  <path class="ed" d="M46,112 V96" marker-end="url(#lp-dab-plan)"/>
+  <path class="ed" d="M46,60 V44" marker-end="url(#lp-dab-plan)"/>
+  <path class="ed dash" d="M266,77 H274" marker-end="url(#lp-dab-plan)"/>
+  <path class="ed dash" d="M86,77 H94" marker-end="url(#lp-dab-plan)"/>
+  <text class="cap" x="6" y="157">round 5 · $4.83 · 19 refused · promoted under D46</text>
+</svg>
+      </div>
+    </div>
+    <div class="tx">
+      <h3><span class="n">3a</span>One round: read every miss, write one prompt, pass four guards, promote on Pass@1</h3>
+      <p class="ft">Figure · round 5 (v6 → v8) on the seven stages, with the round's own counts</p>
+      <ul>
+        <li><b>Read:</b> 20 misses — 16 failed statements, ledgered by step (sources 5, parse 5, shape 4, rank 1, filter 1), and 4 wrong answers</li>
+        <li><b>Write:</b> 13 Opus sessions (3 per break step, 10 per dataset), 28 writes; the guards refused 19, kept 9</li>
+        <li><b>Ship:</b> 3 playbook sections + 6 notes → v8; 54 trials; 48/54, Pass@1 0.904; promoted under D46</li>
+        <li><b>Learns from:</b> the golden diffs and each question's history in MLflow; never a gold value, never a question named</li>
+      </ul>
+      <p class="ins">The optimiser is an agent with a pen; what it may read and write is the design.</p>
+      <p class="small">As the Optimise tab draws it (<code>frontend/src/pages/Optimise.tsx</code>, <code>/optimise/v8_sql</code>) · <code>agents/v8_sql/optimise.json</code> · <code>eval/rounds.py</code> · <code>eval/guards.py</code></p>
+    </div>
+  </div>
+
+  <div class="slide" id="s3b">
+    <div>
+      <p class="ft">§3 · slide 3b · <code>chart/dataagentbench-coverage.svg</code> · the data and the golden set</p>
+      <div class="fr">
+<svg class="dia" viewBox="0 0 330 204" role="img" aria-label="The DataAgentBench leaderboard set and its golden SQL coverage: 54 questions over 12 datasets in four engines, 8.4 GB loaded into one Postgres schema of 2,811 tables. One cell per question, filled where the golden recreates the gold answer exactly (36), grey where it passes the validator but differs from the gold text (8) or is an evidence golden for a judgment question (5), hollow where no golden exists yet (5: agnews 1 to 4 and crmarenapro 7). Written by hand in the Golden tab, run as the agent role and judged by each question's own validator.">
+  <title>49 of 54 questions have a golden statement; 36 recreate the gold exactly, and agnews has none</title>
+  <g><title>the data: 12 datasets, 54 leaderboard questions, four engines upstream (SQLite 10 datasets, DuckDB 8, PostgreSQL 5, MongoDB 2), 8.35 GB, all loaded into one Postgres 16 schema of 2,811 tables · data/index/datasets.json, source.json, make data</title>
+    <text class="tx s" x="4" y="10" style="text-anchor:start">54 questions · 12 datasets · 4 engines</text>
+    <text class="tx s" x="4" y="20" style="text-anchor:start">8.4 GB → one Postgres schema · 2,811 tables</text></g>
+  <g><title>all 54 · 36 exact · 8 pass but differ from the gold text · 5 evidence · 5 none · written 49 of 54, passing 44, exact 36 · /api/golden, dataagentbench_meta.golden_sql</title>
+    <text class="tx k" x="90" y="36" style="text-anchor:end">all 54</text>
+    <rect class="bar pro" x="96.0" y="28" width="86.7" height="10" rx="2"/>
+    <rect class="bar" x="182.7" y="28" width="19.3" height="10" rx="2"/>
+    <rect class="bar" x="201.9" y="28" width="12.0" height="10" rx="2"/>
+    <rect class="nd ext" x="214.0" y="28" width="12.0" height="10" rx="2"/>
+    <text class="tx s" x="232" y="36" style="text-anchor:start">36 · 13 · 5</text></g>
+  <g><title>agnews · 4 questions · MongoDB + SQLite · 2 databases, 0.04 GB · goldens: 0 exact, 0 pass but differ, 0 evidence, 4 none</title>
+    <text class="tx s" x="90" y="55" style="text-anchor:end">agnews</text>
+    <rect class="nd ext" x="96" y="48" width="9" height="8" rx="1.5"><title>agnews/1 · no golden yet · the field: 13% of 270 published trials pass</title></rect>
+    <rect class="nd ext" x="106" y="48" width="9" height="8" rx="1.5"><title>agnews/2 · no golden yet · the field: 6% of 270 published trials pass</title></rect>
+    <rect class="nd ext" x="116" y="48" width="9" height="8" rx="1.5"><title>agnews/3 · no golden yet · the field: 0% of 270 published trials pass</title></rect>
+    <rect class="nd ext" x="126" y="48" width="9" height="8" rx="1.5"><title>agnews/4 · no golden yet · the field: 21% of 270 published trials pass</title></rect>
+    <text class="tx s" x="232" y="55" style="text-anchor:start">0/4 · 0 exact</text></g>
+  <g><title>bookreview · 3 questions · Postgres + SQLite · 2 databases, under 10 MB · goldens: 1 exact, 2 pass but differ, 0 evidence, 0 none</title>
+    <text class="tx s" x="90" y="67" style="text-anchor:end">bookreview</text>
+    <rect class="bar pro" x="96" y="60" width="9" height="8" rx="1.5"><title>bookreview/1 · exact: the golden recreates the gold answer · the field: 36% of 270 published trials pass</title></rect>
+    <rect class="bar" x="106" y="60" width="9" height="8" rx="1.5"><title>bookreview/2 · passes the validator, differs from the gold text · the field: 62% of 270 published trials pass</title></rect>
+    <rect class="bar" x="116" y="60" width="9" height="8" rx="1.5"><title>bookreview/3 · passes the validator, differs from the gold text · the field: 71% of 270 published trials pass</title></rect>
+    <text class="tx s" x="232" y="67" style="text-anchor:start">3/3 · 1 exact</text></g>
+  <g><title>crmarenapro · 13 questions · DuckDB + Postgres + SQLite · 6 databases, 0.03 GB · goldens: 7 exact, 0 pass but differ, 5 evidence, 1 none</title>
+    <text class="tx s" x="90" y="79" style="text-anchor:end">crmarenapro</text>
+    <rect class="bar" x="96" y="72" width="9" height="8" rx="1.5"><title>crmarenapro/1 · evidence golden: the SQL returns what a reader needs; the validator is not applied · the field: 100% of 270 published trials pass</title></rect>
+    <rect class="bar" x="106" y="72" width="9" height="8" rx="1.5"><title>crmarenapro/2 · evidence golden: the SQL returns what a reader needs; the validator is not applied · the field: 27% of 270 published trials pass</title></rect>
+    <rect class="bar" x="116" y="72" width="9" height="8" rx="1.5"><title>crmarenapro/3 · evidence golden: the SQL returns what a reader needs; the validator is not applied · the field: 55% of 270 published trials pass</title></rect>
+    <rect class="bar" x="126" y="72" width="9" height="8" rx="1.5"><title>crmarenapro/4 · evidence golden: the SQL returns what a reader needs; the validator is not applied · the field: 66% of 270 published trials pass</title></rect>
+    <rect class="bar pro" x="136" y="72" width="9" height="8" rx="1.5"><title>crmarenapro/5 · exact: the golden recreates the gold answer · the field: 64% of 270 published trials pass</title></rect>
+    <rect class="bar" x="146" y="72" width="9" height="8" rx="1.5"><title>crmarenapro/6 · evidence golden: the SQL returns what a reader needs; the validator is not applied · the field: 54% of 270 published trials pass</title></rect>
+    <rect class="nd ext" x="156" y="72" width="9" height="8" rx="1.5"><title>crmarenapro/7 · no golden yet · the field: 28% of 270 published trials pass</title></rect>
+    <rect class="bar pro" x="166" y="72" width="9" height="8" rx="1.5"><title>crmarenapro/8 · exact: the golden recreates the gold answer · the field: 8% of 270 published trials pass</title></rect>
+    <rect class="bar pro" x="176" y="72" width="9" height="8" rx="1.5"><title>crmarenapro/9 · exact: the golden recreates the gold answer · the field: 67% of 270 published trials pass</title></rect>
+    <rect class="bar pro" x="186" y="72" width="9" height="8" rx="1.5"><title>crmarenapro/10 · exact: the golden recreates the gold answer · the field: 41% of 270 published trials pass</title></rect>
+    <rect class="bar pro" x="196" y="72" width="9" height="8" rx="1.5"><title>crmarenapro/11 · exact: the golden recreates the gold answer · the field: 89% of 270 published trials pass</title></rect>
+    <rect class="bar pro" x="206" y="72" width="9" height="8" rx="1.5"><title>crmarenapro/12 · exact: the golden recreates the gold answer · the field: 36% of 270 published trials pass</title></rect>
+    <rect class="bar pro" x="216" y="72" width="9" height="8" rx="1.5"><title>crmarenapro/13 · exact: the golden recreates the gold answer · the field: 53% of 270 published trials pass</title></rect>
+    <text class="tx s" x="232" y="79" style="text-anchor:start">12/13 · 7 exact</text></g>
+  <g><title>deps_dev_v1 · 2 questions · DuckDB + SQLite · 2 databases, 0.55 GB · goldens: 0 exact, 2 pass but differ, 0 evidence, 0 none</title>
+    <text class="tx s" x="90" y="91" style="text-anchor:end">deps_dev</text>
+    <rect class="bar" x="96" y="84" width="9" height="8" rx="1.5"><title>deps_dev_v1/1 · passes the validator, differs from the gold text · the field: 7% of 270 published trials pass</title></rect>
+    <rect class="bar" x="106" y="84" width="9" height="8" rx="1.5"><title>deps_dev_v1/2 · passes the validator, differs from the gold text · the field: 5% of 270 published trials pass</title></rect>
+    <text class="tx s" x="232" y="91" style="text-anchor:start">2/2 · 0 exact</text></g>
+  <g><title>github_repos · 4 questions · DuckDB + SQLite · 2 databases, 0.93 GB · goldens: 4 exact, 0 pass but differ, 0 evidence, 0 none</title>
+    <text class="tx s" x="90" y="103" style="text-anchor:end">github_repos</text>
+    <rect class="bar pro" x="96" y="96" width="9" height="8" rx="1.5"><title>github_repos/1 · exact: the golden recreates the gold answer · the field: 1% of 270 published trials pass</title></rect>
+    <rect class="bar pro" x="106" y="96" width="9" height="8" rx="1.5"><title>github_repos/2 · exact: the golden recreates the gold answer · the field: 1% of 270 published trials pass</title></rect>
+    <rect class="bar pro" x="116" y="96" width="9" height="8" rx="1.5"><title>github_repos/3 · exact: the golden recreates the gold answer · the field: 47% of 270 published trials pass</title></rect>
+    <rect class="bar pro" x="126" y="96" width="9" height="8" rx="1.5"><title>github_repos/4 · exact: the golden recreates the gold answer · the field: 40% of 270 published trials pass</title></rect>
+    <text class="tx s" x="232" y="103" style="text-anchor:start">4/4 · 4 exact</text></g>
+  <g><title>googlelocal · 4 questions · Postgres + SQLite · 2 databases, under 10 MB · goldens: 4 exact, 0 pass but differ, 0 evidence, 0 none</title>
+    <text class="tx s" x="90" y="115" style="text-anchor:end">googlelocal</text>
+    <rect class="bar pro" x="96" y="108" width="9" height="8" rx="1.5"><title>googlelocal/1 · exact: the golden recreates the gold answer · the field: 90% of 270 published trials pass</title></rect>
+    <rect class="bar pro" x="106" y="108" width="9" height="8" rx="1.5"><title>googlelocal/2 · exact: the golden recreates the gold answer · the field: 2% of 270 published trials pass</title></rect>
+    <rect class="bar pro" x="116" y="108" width="9" height="8" rx="1.5"><title>googlelocal/3 · exact: the golden recreates the gold answer · the field: 27% of 270 published trials pass</title></rect>
+    <rect class="bar pro" x="126" y="108" width="9" height="8" rx="1.5"><title>googlelocal/4 · exact: the golden recreates the gold answer · the field: 31% of 270 published trials pass</title></rect>
+    <text class="tx s" x="232" y="115" style="text-anchor:start">4/4 · 4 exact</text></g>
+  <g><title>music_brainz_20k · 3 questions · DuckDB + SQLite · 2 databases, under 10 MB · goldens: 3 exact, 0 pass but differ, 0 evidence, 0 none</title>
+    <text class="tx s" x="90" y="127" style="text-anchor:end">music_brainz</text>
+    <rect class="bar pro" x="96" y="120" width="9" height="8" rx="1.5"><title>music_brainz_20k/1 · exact: the golden recreates the gold answer · the field: 17% of 270 published trials pass</title></rect>
+    <rect class="bar pro" x="106" y="120" width="9" height="8" rx="1.5"><title>music_brainz_20k/2 · exact: the golden recreates the gold answer · the field: 66% of 270 published trials pass</title></rect>
+    <rect class="bar pro" x="116" y="120" width="9" height="8" rx="1.5"><title>music_brainz_20k/3 · exact: the golden recreates the gold answer · the field: 14% of 270 published trials pass</title></rect>
+    <text class="tx s" x="232" y="127" style="text-anchor:start">3/3 · 3 exact</text></g>
+  <g><title>pancancer_atlas · 3 questions · DuckDB + Postgres · 2 databases, 0.30 GB · goldens: 3 exact, 0 pass but differ, 0 evidence, 0 none</title>
+    <text class="tx s" x="90" y="139" style="text-anchor:end">pancancer</text>
+    <rect class="bar pro" x="96" y="132" width="9" height="8" rx="1.5"><title>pancancer_atlas/1 · exact: the golden recreates the gold answer · the field: 0% of 270 published trials pass</title></rect>
+    <rect class="bar pro" x="106" y="132" width="9" height="8" rx="1.5"><title>pancancer_atlas/2 · exact: the golden recreates the gold answer · the field: 69% of 220 published trials pass</title></rect>
+    <rect class="bar pro" x="116" y="132" width="9" height="8" rx="1.5"><title>pancancer_atlas/3 · exact: the golden recreates the gold answer · the field: 51% of 220 published trials pass</title></rect>
+    <text class="tx s" x="232" y="139" style="text-anchor:start">3/3 · 3 exact</text></g>
+  <g><title>patents · 3 questions · Postgres + SQLite · 2 databases, 5.56 GB · goldens: 3 exact, 0 pass but differ, 0 evidence, 0 none</title>
+    <text class="tx s" x="90" y="151" style="text-anchor:end">patents</text>
+    <rect class="bar pro" x="96" y="144" width="9" height="8" rx="1.5"><title>patents/1 · exact: the golden recreates the gold answer · the field: 0% of 270 published trials pass</title></rect>
+    <rect class="bar pro" x="106" y="144" width="9" height="8" rx="1.5"><title>patents/2 · exact: the golden recreates the gold answer · the field: 0% of 270 published trials pass</title></rect>
+    <rect class="bar pro" x="116" y="144" width="9" height="8" rx="1.5"><title>patents/3 · exact: the golden recreates the gold answer · the field: 4% of 270 published trials pass</title></rect>
+    <text class="tx s" x="232" y="151" style="text-anchor:start">3/3 · 3 exact</text></g>
+  <g><title>stockindex · 3 questions · DuckDB + SQLite · 2 databases, under 10 MB · goldens: 3 exact, 0 pass but differ, 0 evidence, 0 none</title>
+    <text class="tx s" x="90" y="163" style="text-anchor:end">stockindex</text>
+    <rect class="bar pro" x="96" y="156" width="9" height="8" rx="1.5"><title>stockindex/1 · exact: the golden recreates the gold answer · the field: 78% of 270 published trials pass</title></rect>
+    <rect class="bar pro" x="106" y="156" width="9" height="8" rx="1.5"><title>stockindex/2 · exact: the golden recreates the gold answer · the field: 80% of 270 published trials pass</title></rect>
+    <rect class="bar pro" x="116" y="156" width="9" height="8" rx="1.5"><title>stockindex/3 · exact: the golden recreates the gold answer · the field: 61% of 270 published trials pass</title></rect>
+    <text class="tx s" x="232" y="163" style="text-anchor:start">3/3 · 3 exact</text></g>
+  <g><title>stockmarket · 5 questions · DuckDB + SQLite · 2 databases, 0.97 GB · goldens: 2 exact, 3 pass but differ, 0 evidence, 0 none</title>
+    <text class="tx s" x="90" y="175" style="text-anchor:end">stockmarket</text>
+    <rect class="bar pro" x="96" y="168" width="9" height="8" rx="1.5"><title>stockmarket/1 · exact: the golden recreates the gold answer · the field: 99% of 270 published trials pass</title></rect>
+    <rect class="bar" x="106" y="168" width="9" height="8" rx="1.5"><title>stockmarket/2 · passes the validator, differs from the gold text · the field: 6% of 270 published trials pass</title></rect>
+    <rect class="bar pro" x="116" y="168" width="9" height="8" rx="1.5"><title>stockmarket/3 · exact: the golden recreates the gold answer · the field: 37% of 270 published trials pass</title></rect>
+    <rect class="bar" x="126" y="168" width="9" height="8" rx="1.5"><title>stockmarket/4 · passes the validator, differs from the gold text · the field: 12% of 270 published trials pass</title></rect>
+    <rect class="bar" x="136" y="168" width="9" height="8" rx="1.5"><title>stockmarket/5 · passes the validator, differs from the gold text · the field: 49% of 270 published trials pass</title></rect>
+    <text class="tx s" x="232" y="175" style="text-anchor:start">5/5 · 2 exact</text></g>
+  <g><title>yelp · 7 questions · DuckDB + MongoDB · 2 databases, under 10 MB · goldens: 6 exact, 1 pass but differ, 0 evidence, 0 none</title>
+    <text class="tx s" x="90" y="187" style="text-anchor:end">yelp</text>
+    <rect class="bar pro" x="96" y="180" width="9" height="8" rx="1.5"><title>yelp/1 · exact: the golden recreates the gold answer · the field: 35% of 270 published trials pass</title></rect>
+    <rect class="bar pro" x="106" y="180" width="9" height="8" rx="1.5"><title>yelp/2 · exact: the golden recreates the gold answer · the field: 13% of 270 published trials pass</title></rect>
+    <rect class="bar pro" x="116" y="180" width="9" height="8" rx="1.5"><title>yelp/3 · exact: the golden recreates the gold answer · the field: 11% of 270 published trials pass</title></rect>
+    <rect class="bar" x="126" y="180" width="9" height="8" rx="1.5"><title>yelp/4 · passes the validator, differs from the gold text · the field: 7% of 270 published trials pass</title></rect>
+    <rect class="bar pro" x="136" y="180" width="9" height="8" rx="1.5"><title>yelp/5 · exact: the golden recreates the gold answer · the field: 30% of 270 published trials pass</title></rect>
+    <rect class="bar pro" x="146" y="180" width="9" height="8" rx="1.5"><title>yelp/6 · exact: the golden recreates the gold answer · the field: 77% of 270 published trials pass</title></rect>
+    <rect class="bar pro" x="156" y="180" width="9" height="8" rx="1.5"><title>yelp/7 · exact: the golden recreates the gold answer · the field: 6% of 270 published trials pass</title></rect>
+    <text class="tx s" x="232" y="187" style="text-anchor:start">7/7 · 6 exact</text></g>
+  <text class="cap" x="4" y="200">filled: exact · grey: differs or evidence · hollow: none</text>
+</svg>
+      </div>
+    </div>
+    <div class="tx">
+      <h3><span class="n">3b</span>54 questions over 12 datasets, and a golden statement for 49 of them</h3>
+      <p class="ft">Figure · the benchmark's data and the golden SQL coverage, one cell per question</p>
+      <ul>
+        <li><b>The data:</b> 12 datasets, 4 engines upstream, 8.4 GB → one Postgres schema, 2,811 tables</li>
+        <li><b>Coverage:</b> 49 of 54 — 36 exact, 8 pass but differ from the gold text, 5 evidence; 5 none</li>
+        <li><b>By hand:</b> each run as the agent's role, judged by the question's validator, saved by a person</li>
+        <li><b>agnews has none:</b> its category lives in no column</li>
+      </ul>
+      <p class="ins">A golden is proof the question is answerable in one statement over the loaded data.</p>
+      <p class="small">As the Golden tab draws it (<code>/golden</code>) · <code>/api/golden</code> · <code>data/index/datasets.json</code> · the statuses live in Postgres, not git — see D4</p>
+    </div>
+  </div>
+
+  <div class="slide" id="s3c">
+    <div>
+      <p class="ft">§3 · slide 3c · <code>chart/dataagentbench-breaks.svg</code> · diagnostic</p>
+      <div class="fr">
+<svg class="dia" viewBox="0 0 310 132" role="img" aria-label="v8's 54 questions by scorecard category: 30 solved the golden way; statements break at sources 3, keys 1, parse 4, filter 1, metric 1, rank 2 and shape 6, in the order a statement is built; one right result the validator rejects for its format; five questions have no golden and are scored on the answer only.">
+  <title>30 of 49 statements match the golden; of the rest, shape and parse are where they break</title>
+  <!-- bar length = n * 6.4 from x = 96 -->
+  <g><title>solved · 30 of 49 · the agent's rows equal the golden's, in any order, extra columns allowed</title>
+    <text class="tx s" x="92" y="16" style="text-anchor:end">solved</text><rect class="bar pro" x="96" y="9" width="192" height="8" rx="2"/><text class="tx k" x="292" y="16" style="text-anchor:start">30</text></g>
+  <g><title>breaks at sources · 3 · the wrong table or field for what the question names</title>
+    <text class="tx s" x="92" y="30" style="text-anchor:end">sources</text><rect class="bar" x="96" y="23" width="19.2" height="8" rx="2"/><text class="tx s" x="119" y="30" style="text-anchor:start">3</text></g>
+  <g><title>breaks at keys · 1 · rows joined on the wrong transform of the key</title>
+    <text class="tx s" x="92" y="44" style="text-anchor:end">keys</text><rect class="bar" x="96" y="37" width="6.4" height="8" rx="2"/><text class="tx s" x="106" y="44" style="text-anchor:start">1</text></g>
+  <g><title>breaks at parse · 4 · what is read out of free text or JSON, and a template it missed</title>
+    <text class="tx s" x="92" y="58" style="text-anchor:end">parse</text><rect class="bar" x="96" y="51" width="25.6" height="8" rx="2"/><text class="tx s" x="125" y="58" style="text-anchor:start">4</text></g>
+  <g><title>breaks at filter · 1 · a condition or window read differently</title>
+    <text class="tx s" x="92" y="72" style="text-anchor:end">filter</text><rect class="bar" x="96" y="65" width="6.4" height="8" rx="2"/><text class="tx s" x="106" y="72" style="text-anchor:start">1</text></g>
+  <g><title>breaks at metric · 1 · the formula or the grain</title>
+    <text class="tx s" x="92" y="86" style="text-anchor:end">metric</text><rect class="bar" x="96" y="79" width="6.4" height="8" rx="2"/><text class="tx s" x="106" y="86" style="text-anchor:start">1</text></g>
+  <g><title>breaks at rank · 2 · the order, the tie-break or the limit</title>
+    <text class="tx s" x="92" y="100" style="text-anchor:end">rank</text><rect class="bar" x="96" y="93" width="12.8" height="8" rx="2"/><text class="tx s" x="112" y="100" style="text-anchor:start">2</text></g>
+  <g><title>breaks at shape · 6 · the right rows in the wrong columns, rounding or format; the largest live category after round 5</title>
+    <text class="tx s" x="92" y="114" style="text-anchor:end">shape</text><rect class="bar" x="96" y="107" width="38.4" height="8" rx="2"/><text class="tx s" x="138" y="114" style="text-anchor:start">6</text></g>
+  <g><title>format 1 · the statement matches the golden and the validator still rejects the answer's shape (googlelocal/2) · no golden 5 · agnews/1–4 and crmarenapro/7, scored on the answer only; agnews needs a category no column holds</title>
+    <text class="tx s" x="92" y="128" style="text-anchor:end">format · no golden</text><rect class="nd ext" x="96" y="121" width="38.4" height="8" rx="2"/><text class="tx s" x="138" y="128" style="text-anchor:start">1 + 5</text></g>
+</svg>
+      </div>
+    </div>
+    <div class="tx">
+      <h3><span class="n">3c</span>Where v8 still breaks: shape and parse, not the data</h3>
+      <p class="ft">Figure · v8's 54 by scorecard category, the seven build steps in order</p>
+      <ul>
+        <li><b>A category:</b> the first step where the statement leaves the golden and the result changes</li>
+        <li><b>Largest after five rounds:</b> shape (6) — output columns and format</li>
+        <li><b>Never passed, any version:</b> agnews/2, agnews/3, github_repos/1</li>
+      </ul>
+      <p class="ins">Most remaining misses find the right rows and hand them over in the wrong shape.</p>
+      <p class="small"><code>runs/…v8…/scorecard.json</code> — not in git; see D4</p>
+    </div>
+  </div>
+
+  <div class="slide" id="s6a">
+    <div>
+      <p class="ft">§6 · slide 6a · <code>chart/dataagentbench-cost.svg</code> · observability</p>
+      <div class="fr">
+<svg class="dia" viewBox="0 0 330 178" role="img" aria-label="Three bar panels by agent version on the same 54 questions, one trial each. Tokens billed per run, in millions: v0 18.4, v1 10.2, v2 9.6, v3 11.9, v4 7.0, v5 2.4, v6 2.4, v7 2.3, v8 2.4. Wall time per trial at the 95th percentile, in seconds: v0 911, v1 177, v2 152, v3 237, v4 215, v5 53, v6 44, v7 58, v8 57. Cost per run in US dollars: v0 8.96, v1 4.60, v2 4.51, v3 5.20, v4 6.59, v5 5.04, v6 5.12, v7 5.15, v8 5.36. The champions are filled; the SQL rebuild and the switch to Opus made the agent short.">
+  <title>Tokens per run fell 7.6 times and p95 wall 16 times, v0 to v8, for 40 percent less per run</title>
+  <g><title>tokens billed per run, M · from runs/*/results.jsonl: tokens are input + cache read + cache creation + output; wall is duration_ms per trial; cost is cost_usd summed over the 54</title>
+    <text class="tx s" x="4" y="10" style="text-anchor:start">tokens billed per run, M</text>
+    <line class="ax" x1="36" y1="52" x2="324" y2="52"/></g>
+  <g><title>p95 wall per trial, s · from runs/*/results.jsonl: tokens are input + cache read + cache creation + output; wall is duration_ms per trial; cost is cost_usd summed over the 54</title>
+    <text class="tx s" x="4" y="64" style="text-anchor:start">p95 wall per trial, s</text>
+    <line class="ax" x1="36" y1="106" x2="324" y2="106"/></g>
+  <g><title>USD per run · from runs/*/results.jsonl: tokens are input + cache read + cache creation + output; wall is duration_ms per trial; cost is cost_usd summed over the 54</title>
+    <text class="tx s" x="4" y="118" style="text-anchor:start">USD per run</text>
+    <line class="ax" x1="36" y1="160" x2="324" y2="160"/></g>
+  <g><title>v0 · the Haiku python agent · 4 trials hit the 900 s timeout, 4 errors · 18.43 M tokens billed (9.05 M cache reads, 740 k output) · wall p50 63 s, p95 911 s · turns p50 12, p95 25 · 623 tool calls · $8.96 per run, $0.07 p50 and $0.77 p95 per question</title>
+    <rect class="bar pro" x="40" y="16.0" width="22" height="36.0" rx="2"/>
+    <text class="tx k" x="51" y="13.0">18.4</text>
+    <rect class="bar pro" x="40" y="70.0" width="22" height="36.0" rx="2"/>
+    <text class="tx k" x="51" y="67.0">911</text>
+    <rect class="bar pro" x="40" y="124.0" width="22" height="36.0" rx="2"/>
+    <text class="tx k" x="51" y="121.0">8.96</text>
+    <text class="tx s" x="51" y="171">v0</text></g>
+  <g><title>v1 · the SQL rebuild on Haiku · 7 errors · 10.15 M tokens billed (8.70 M cache reads, 350 k output) · wall p50 64 s, p95 177 s · turns p50 14, p95 31 · 953 tool calls · $4.60 per run, $0.07 p50 and $0.16 p95 per question</title>
+    <rect class="bar" x="72" y="32.2" width="22" height="19.8" rx="2"/>
+    <rect class="nd ext" x="72" y="32.2" width="22" height="19.8" rx="2"/>
+    <text class="tx k" x="83" y="29.2">10.1</text>
+    <rect class="bar" x="72" y="99.0" width="22" height="7.0" rx="2"/>
+    <rect class="nd ext" x="72" y="99.0" width="22" height="7.0" rx="2"/>
+    <text class="tx k" x="83" y="96.0">177</text>
+    <rect class="bar" x="72" y="141.5" width="22" height="18.5" rx="2"/>
+    <rect class="nd ext" x="72" y="141.5" width="22" height="18.5" rx="2"/>
+    <text class="tx k" x="83" y="138.5">4.60</text>
+    <text class="tx s" x="83" y="171">v1</text></g>
+  <g><title>v2 · round 1 · 2 errors · 9.55 M tokens billed (8.20 M cache reads, 375 k output) · wall p50 61 s, p95 152 s · turns p50 16, p95 31 · 868 tool calls · $4.51 per run, $0.07 p50 and $0.16 p95 per question</title>
+    <rect class="bar pro" x="104" y="33.4" width="22" height="18.6" rx="2"/>
+    <text class="tx k" x="115" y="30.4">9.5</text>
+    <rect class="bar pro" x="104" y="100.0" width="22" height="6.0" rx="2"/>
+    <text class="tx k" x="115" y="97.0">152</text>
+    <rect class="bar pro" x="104" y="141.9" width="22" height="18.1" rx="2"/>
+    <text class="tx k" x="115" y="138.9">4.51</text>
+    <text class="tx s" x="115" y="171">v2</text></g>
+  <g><title>v3 · round 2, plan-first · 4 errors · 11.92 M tokens billed (10.58 M cache reads, 471 k output) · wall p50 72 s, p95 237 s · turns p50 16, p95 31 · 849 tool calls · $5.20 per run, $0.08 p50 and $0.21 p95 per question</title>
+    <rect class="bar" x="136" y="28.7" width="22" height="23.3" rx="2"/>
+    <rect class="nd ext" x="136" y="28.7" width="22" height="23.3" rx="2"/>
+    <text class="tx k" x="147" y="25.7">11.9</text>
+    <rect class="bar" x="136" y="96.6" width="22" height="9.4" rx="2"/>
+    <rect class="nd ext" x="136" y="96.6" width="22" height="9.4" rx="2"/>
+    <text class="tx k" x="147" y="93.6">237</text>
+    <rect class="bar" x="136" y="139.1" width="22" height="20.9" rx="2"/>
+    <rect class="nd ext" x="136" y="139.1" width="22" height="20.9" rx="2"/>
+    <text class="tx k" x="147" y="136.1">5.20</text>
+    <text class="tx s" x="147" y="171">v3</text></g>
+  <g><title>v4 · the same prompt on Sonnet 5 · no errors · 6.96 M tokens billed (6.06 M cache reads, 287 k output) · wall p50 44 s, p95 215 s · turns p50 11, p95 25 · 588 tool calls · $6.59 per run, $0.10 p50 and $0.28 p95 per question</title>
+    <rect class="bar pro" x="168" y="38.4" width="22" height="13.6" rx="2"/>
+    <text class="tx k" x="179" y="35.4">7.0</text>
+    <rect class="bar pro" x="168" y="97.5" width="22" height="8.5" rx="2"/>
+    <text class="tx k" x="179" y="94.5">215</text>
+    <rect class="bar pro" x="168" y="133.5" width="22" height="26.5" rx="2"/>
+    <text class="tx k" x="179" y="130.5">6.59</text>
+    <text class="tx s" x="179" y="171">v4</text></g>
+  <g><title>v5 · the same prompt on Opus 5.5 · no errors · 2.42 M tokens billed (2.02 M cache reads, 110 k output) · wall p50 21 s, p95 53 s · turns p50 5, p95 9 · 242 tool calls · $5.04 per run, $0.09 p50 and $0.18 p95 per question</title>
+    <rect class="bar" x="200" y="47.3" width="22" height="4.7" rx="2"/>
+    <rect class="nd ext" x="200" y="47.3" width="22" height="4.7" rx="2"/>
+    <text class="tx k" x="211" y="44.3">2.4</text>
+    <rect class="bar" x="200" y="103.9" width="22" height="2.1" rx="2"/>
+    <rect class="nd ext" x="200" y="103.9" width="22" height="2.1" rx="2"/>
+    <text class="tx k" x="211" y="100.9">53</text>
+    <rect class="bar" x="200" y="139.8" width="22" height="20.2" rx="2"/>
+    <rect class="nd ext" x="200" y="139.8" width="22" height="20.2" rx="2"/>
+    <text class="tx k" x="211" y="136.8">5.04</text>
+    <text class="tx s" x="211" y="171">v5</text></g>
+  <g><title>v6 · round 3 on Opus · no errors · 2.43 M tokens billed (2.01 M cache reads, 114 k output) · wall p50 22 s, p95 44 s · turns p50 5, p95 8 · 217 tool calls · $5.12 per run, $0.08 p50 and $0.18 p95 per question</title>
+    <rect class="bar pro" x="232" y="47.3" width="22" height="4.7" rx="2"/>
+    <text class="tx k" x="243" y="44.3">2.4</text>
+    <rect class="bar pro" x="232" y="104.2" width="22" height="1.8" rx="2"/>
+    <text class="tx k" x="243" y="101.2">44</text>
+    <rect class="bar pro" x="232" y="139.4" width="22" height="20.6" rx="2"/>
+    <text class="tx k" x="243" y="136.4">5.12</text>
+    <text class="tx s" x="243" y="171">v6</text></g>
+  <g><title>v7 · round 4, every error read, guards on · no errors · 2.29 M tokens billed (1.87 M cache reads, 112 k output) · wall p50 21 s, p95 58 s · turns p50 4, p95 7 · 196 tool calls · $5.15 per run, $0.08 p50 and $0.18 p95 per question</title>
+    <rect class="bar" x="264" y="47.5" width="22" height="4.5" rx="2"/>
+    <rect class="nd ext" x="264" y="47.5" width="22" height="4.5" rx="2"/>
+    <text class="tx k" x="275" y="44.5">2.3</text>
+    <rect class="bar" x="264" y="103.7" width="22" height="2.3" rx="2"/>
+    <rect class="nd ext" x="264" y="103.7" width="22" height="2.3" rx="2"/>
+    <text class="tx k" x="275" y="100.7">58</text>
+    <rect class="bar" x="264" y="139.3" width="22" height="20.7" rx="2"/>
+    <rect class="nd ext" x="264" y="139.3" width="22" height="20.7" rx="2"/>
+    <text class="tx k" x="275" y="136.3">5.15</text>
+    <text class="tx s" x="275" y="171">v7</text></g>
+  <g><title>v8 · round 5 with the history · the champion · no errors, timeouts or rate limits · 2.43 M tokens billed (1.99 M cache reads, 120 k output) · wall p50 22 s, p95 57 s · turns p50 5, p95 8 · 215 tool calls · $5.36 per run, $0.09 p50 and $0.17 p95 per question</title>
+    <rect class="bar pro" x="296" y="47.3" width="22" height="4.7" rx="2"/>
+    <text class="tx k" x="307" y="44.3">2.4</text>
+    <rect class="bar pro" x="296" y="103.7" width="22" height="2.3" rx="2"/>
+    <text class="tx k" x="307" y="100.7">57</text>
+    <rect class="bar pro" x="296" y="138.5" width="22" height="21.5" rx="2"/>
+    <text class="tx k" x="307" y="135.5">5.36</text>
+    <text class="tx s" x="307" y="171">v8 ★</text></g>
+</svg>
+      </div>
+    </div>
+    <div class="tx">
+      <h3><span class="n">6a</span>Tokens per run fell 7.6×, p95 wall 16×, cost 40%</h3>
+      <p class="ft">Figure · per run of the 54: tokens billed, p95 wall per trial, cost — by version</p>
+      <ul>
+        <li><b>Tokens billed:</b> 18.4 M (v0) → 2.4 M (v8) per run; cache reads are 82% of v8's</li>
+        <li><b>Time:</b> p95 per trial 911 s → 57 s; p50 63 → 22 s; turns p95 25 → 8; timeouts 4 → 0</li>
+        <li><b>Cost:</b> $8.96 → $5.36 per run; v8 $0.09 p50, $0.17 p95, max $0.32 (agnews/4)</li>
+        <li><b>Trace:</b> one MLflow trace per trial (486), a span per turn and tool call; every optimiser session a trace too</li>
+      </ul>
+      <p class="ins">The SQL rebuild and Opus made the agent short: five turns and 22 s a question at p50.</p>
+      <p class="small"><code>runs/*/results.jsonl</code> (cost_usd, *_tokens, duration_ms, n_turns) · <code>src/dab_bench/tracking/tracing.py</code> · not in git — see D4</p>
+    </div>
+  </div>
+
+  <div class="grid g2" style="margin-top:var(--s5)">
+    <div class="panel card">
+      <h3>The seven headings</h3>
+      <ul class="tight">
+        <li><code>1 · Purpose &amp; benefit</code> — 0.904 on the board's number, trial count stated</li>
+        <li><code>2 · Agent architecture</code> — three tools, one statement, and a mode</li>
+        <li><code>3 · Agent loop &amp; evaluation</code> — the statement is the goal, not the answer</li>
+        <li><code>4 · Deployed architecture</code> — nothing is deployed, and the page says so</li>
+        <li><code>5 · Guardrails &amp; security</code> — the agent cannot read gold, the optimiser cannot write it</li>
+        <li><code>6 · Observability &amp; cost</code> — 486 traces, each priced; about $77 all in</li>
+        <li><code>7 · Production readiness scorecard</code> — five of nine, the learning half in full</li>
+      </ul>
+    </div>
+    <div class="panel card">
+      <h3>The rest, in dot points</h3>
+      <ul class="tight">
+        <li><b>§3</b> slide 3a is the fig-loop; 3b the data and coverage; 3c the diagnostic</li>
+        <li><b>§4</b> local explorer on the central platform; CI on every PR; no deploy, no URL</li>
+        <li><b>§5</b> read-only role, gold schema refused · isolated sessions · sandbox · guards G1–G4 · billing guard</li>
+        <li><b>§6</b> slide 6a, then the whole journey: eval $50.53 · rounds $13.48 · reader $11.45 · ≈ $77</li>
+        <li><b>Budget</b> 1,800 words; the mechanism goes to a deep page (D5)</li>
+      </ul>
+    </div>
+  </div>
+</div></section>
+
+<!-- ============================================================ 03 · card lines -->
+<section class="blk" id="front"><div class="wrap">
+  <div class="hd"><p class="label">03 · card lines and section summaries</p>
+  <h2>What a scanner reads, inside the lint's limits</h2></div>
+  <div class="grid g2">
+    <div class="panel">
+      <pre class="fm">title:    DataAgentBench Loop
+short:    "DAB"
+headline: "Trained on the statement, not the answer: 0.904"   # 8 words
+outcome:  An SQL-writing agent on a public benchmark,
+          improved v0 → v8 by a loop that scores the
+          statement against a golden and refuses leaked
+          answers.                     # 23 words
+proof_line: v8 scores Pass@1 0.904 (48/54, one trial), from
+          v0's 0.440; the board's top two are 0.947 and
+          0.906 over five trials, so this sits third
+          by 0.002.
+metric:   "0.904"
+metric_label: "Pass@1 on the 54, one trial · v0 0.440 · board #2 0.906"
+tags:     [Agents, Data]
+stack:    [claude-agent-sdk, Opus 5.5 · Sonnet 5 · Haiku 4.5,
+           Postgres 16, MLflow 3, sqlglot, FastAPI, React 18, Vite, Docker]
+skills:   [agentic-ai, model-evaluation, prompt-versioning, sql,
+           mlops, prompt-engineering, llms, python]   # all exist
+links:    repo: https://github.com/nmp-dsci/DataAgentBench · demo: ""
+production: live: false · bench: true · rung: 10
+          order: 2        # after ConvFinQA; Data Pilot → 3,
+                          # Transcript RAG → 4, DABstep → 5
+          rung_note: "no public URL — runs locally on the central platform"
+architecture.home_diagram: chart/dataagentbench-progression.svg</pre>
+    </div>
+    <div class="panel">
+      <p class="label" style="margin-bottom:var(--s3)">sections · one sentence each</p>
+      <ol class="steps">
+        <li><span>0.904 on the board's own number, trial count stated.</span></li>
+        <li><span>Three tools, one statement per question: every failure has an SQL to diff.</span></li>
+        <li><span>Golden SQL makes the statement the target; four guards keep the answer out.</span></li>
+        <li><span>Nothing is deployed; the rows say so.</span></li>
+        <li><span>The agent cannot read gold; the optimiser cannot write it.</span></li>
+        <li><span>486 traces, each priced; about $77 from v0 to v8.</span></li>
+        <li><span>Five of nine: the learning half in full, the operating half a bench.</span></li>
+      </ol>
+      <p class="small" style="margin-top:var(--s4)"><code>rung: 10</code> is the schema's only choice; the note says not deployed.</p>
+    </div>
+  </div>
+</div></section>
+
+<!-- ============================================================ 04 · scorecard -->
+<section class="blk" id="score"><div class="wrap">
+  <div class="hd"><p class="label">04 · nine rows, proof paths first</p>
+  <h2>Five of nine — the learning half is the point</h2></div>
+  <div class="tw"><table>
+    <thead><tr><th>ref</th><th>dimension</th><th>status</th><th>how</th><th>proof</th></tr></thead>
+    <tbody>
+      <tr class="pro"><td class="num">R1</td><td class="sub">evals</td><td class="v-ok">shipped ●</td><td>54 with gold and vendored validators; the rescore reproduces the site; 49 goldens score the statement</td><td><span class="path">data/index/queries.json · src/dab_bench/eval/validators.py · src/dab_bench/eval/rescore.py · tests/test_trials.py · src/dab_bench/eval/golden.py · tests/test_golden.py</span></td></tr>
+      <tr><td class="num">R2</td><td class="sub">judge</td><td class="v-no">na —</td><td>Validators grade; the reader and reviewer never score an answer</td><td><span class="path">src/dab_bench/eval/ledger.py · src/dab_bench/eval/review.py</span></td></tr>
+      <tr class="pro"><td class="num">R3</td><td class="sub">gate</td><td class="v-ok">shipped ●</td><td>Leak gate, then Pass@1; the incumbent stands; held v7, barred v2–v5</td><td><span class="path">src/dab_bench/eval/promote.py · agents/promotions.jsonl · tests/test_promote.py · tests/test_s11.py</span></td></tr>
+      <tr class="pro"><td class="num">R4</td><td class="sub">loop</td><td class="v-ok">shipped ●</td><td>Five rounds from the champion's run; history from MLflow; the Optimise tab</td><td><span class="path">src/dab_bench/agent/optimise.py · src/dab_bench/eval/history.py · src/dab_bench/eval/rounds.py · agents/v8_sql/optimise.json · frontend/src/pages/Optimise.tsx</span></td></tr>
+      <tr class="pro"><td class="num">R5</td><td class="sub">guardrails</td><td class="v-ok">shipped ●</td><td>Two roles, isolated sessions, sandbox, guards G1–G4, billing guard; no red-team suite</td><td><span class="path">infra/roles.sql · src/dab_bench/agent/isolation.py · src/dab_bench/agent/sandbox.py · src/dab_bench/eval/guards.py · src/dab_bench/eval/review.py · tests/test_isolation.py · tests/test_meta.py</span></td></tr>
+      <tr class="pro"><td class="num">R6</td><td class="sub">trace</td><td class="v-ok">shipped ●</td><td>486 traces and every optimiser session on MLflow; no SLO</td><td><span class="path">src/dab_bench/tracking/mlflow_log.py · src/dab_bench/tracking/tracing.py · frontend/src/pages/TracePage.tsx · runs/*/traces</span></td></tr>
+      <tr><td class="num">R7</td><td class="sub">cost</td><td class="v-warn">partial ◐</td><td>Priced everywhere; the only cap is the subscription; champion on the dearest tier</td><td><span class="path">runs/*/results.jsonl · agents/v8_sql/optimise.json · src/dab_bench/agent/llm.py</span></td></tr>
+      <tr><td class="num">R8</td><td class="sub">release</td><td class="v-warn">partial ◐</td><td>CI on every PR; nothing deploys</td><td><span class="path">.github/workflows/ci.yml · Makefile · frontend/scripts/design_lint.mjs</span></td></tr>
+      <tr><td class="num">R9</td><td class="sub">scale</td><td class="v-no">designed ○</td><td>Nothing serves users</td><td><span class="path">src/dab_bench/eval/runner.py · Makefile · AGENTS.md</span></td></tr>
+    </tbody>
+  </table></div>
+  <p class="small" style="margin-top:var(--s4)">Decided (D3): 5 / 9 as shown.</p>
+</div></section>
+
+<!-- ============================================================ 05 · home page -->
+<section class="blk" id="home"><div class="wrap">
+  <div class="hd"><p class="label">05 · the home page</p>
+  <h2>Position 2, after ConvFinQA; a <code>bench</code> flag beside <code>live</code></h2>
+  <p>Five includes share one <code>where production.live</code> query. This system has no public URL, so the query gains <code>or bench</code> and the hero splits the count.</p></div>
+  <div class="tp">
+    <div class="row"><span class="k">position 2</span><span><code>production.order: 2</code>; Data Pilot → 3, Transcript RAG → 4, DABstep → 5. One key drives matrix, rows, nav, footer, next-system</span><span class="tag edit">edit</span></div>
+    <div class="row"><span class="k">hero · #work</span><span><code>_layouts/home.html:17,31</code> · "4 in production on AWS · 1 loop on a public benchmark"</span><span class="tag edit">edit</span></div>
+    <div class="row"><span class="k">query ×5</span><span><code>live == true or bench == true</code>, the same string in home, nav, footer, matrix, next-system</span><span class="tag edit">edit</span></div>
+    <div class="row"><span class="k">system row</span><span><code>bench</code> badge · Pass@1 chip · no demo link</span><span class="tag edit">edit</span></div>
+    <div class="row"><span class="k">matrix</span><span>second column, <code>short: DAB</code> · check 390 px at five columns</span><span class="tag auto">auto</span></div>
+    <div class="row"><span class="k">footer · descriptions</span><span>"· bench" in the tree · <code>_config.yml</code>, <code>_data/site.yml</code> say four live + one bench</span><span class="tag edit">edit</span></div>
+    <div class="row"><span class="k">about + chart</span><span>DAB bullet and scorecard row second · 31 of 45 shipped · viewBox 148 → 180</span><span class="tag edit">edit</span></div>
+    <div class="row"><span class="k">next-system · audit</span><span>"All four" reads <code>n</code> · <code>audit_pages.mjs</code> gains the page</span><span class="tag edit">edit</span></div>
+    <div class="row"><span class="k">new files</span><span><code>_projects/dataagentbench.md</code> · <code>diagrams/{agent,topology,loop}/dataagentbench.svg</code> · <code>chart/dataagentbench-{progression,coverage,breaks,cost}.svg</code></span><span class="tag new">new</span></div>
+    <div class="row"><span class="k">practices ×3</span><span>still "In the three systems" — phase 2 from s10, untouched here</span><span class="tag">unchanged</span></div>
+  </div>
+</div></section>
+
+<!-- ============================================================ 06 · decisions -->
+<section class="blk" id="decide"><div class="wrap">
+  <div class="hd"><p class="label">06 · decisions</p>
+  <h2>Four decided, one open</h2></div>
+  <div class="panel" style="margin-bottom:var(--s5)">
+    <ul class="tight">
+      <li><b>D1 · the rank</b> — decided: plainly. "Within 0.002 of second, one trial against five"; the chart draws #1 and #2, v8 sits on the second.</li>
+      <li><b>D2 · admission</b> — decided: a <code>bench</code> flag beside <code>live</code>; the hero reads "4 in production on AWS · 1 loop on a public benchmark"; the row says bench and carries the Pass@1.</li>
+      <li><b>D3 · scorecard</b> — decided: 5 / 9 as proposed.</li>
+      <li><b>D4 · run records</b> — decided: a DAB-repo PR commits <code>run.json</code>, <code>results.jsonl</code>, <code>scorecard.json</code>, <code>ledger.json</code> for the nine full runs (4.5 MB, traces stay out) plus a golden coverage export with no SQL text; then the site lints against it.</li>
+    </ul>
+  </div>
+  <div class="grid g2">
+
+    <form class="q" data-lavish-question="deep" onsubmit="event.preventDefault();const c=new FormData(event.currentTarget).get('a');if(!c)return;window.lavish.queuePrompt('D5 deep page: '+c,{tag:'choice',text:'D5: '+c,element:event.currentTarget,data:{question:'deep',answer:c}});event.currentTarget.querySelector('.queued').textContent='queued: '+c;">
+      <h3>D5 · A deep page for the loop</h3>
+      <p class="why">The mechanism does not fit 1,800 words.</p>
+      <label><input type="radio" name="a" value="Phase 2: ship the case study and the home page now; add _deep/dataagentbench/eval-loop.md with the five rounds as the cycle log on a follow-up branch"> Later, on a follow-up branch (recommended)</label>
+      <label><input type="radio" name="a" value="Phase 1: write _deep/dataagentbench/eval-loop.md on the same branch, five rounds as the cycle log, and link it from section 3"> Now, on this branch</label>
+      <label><input type="radio" name="a" value="No deep page; section 3 links the repo's AGENTS.md section 7 for the mechanism"> No deep page; §3 links <code>AGENTS.md</code> §7</label>
+      <div class="row"><button class="btn" type="submit">Queue answer</button><span class="queued"></span></div>
+    </form>
+
+    <form class="q" data-lavish-question="other" onsubmit="event.preventDefault();const t=event.currentTarget.querySelector('textarea').value.trim();if(!t)return;window.lavish.queuePrompt('Additional direction on the DataAgentBench plan: '+t,{tag:'note',text:'Note: '+t.slice(0,60),element:event.currentTarget,data:{question:'other',answer:t}});event.currentTarget.querySelector('.queued').textContent='queued';">
+      <h3>Anything else</h3>
+      <p class="why">Title ("DataAgentBench Loop" · "DAB"), headline, a chart, a claim.</p>
+      <textarea placeholder="e.g. call it 'DAB Agent'"></textarea>
+      <div class="row"><button class="btn" type="submit">Queue note</button><span class="queued"></span></div>
+    </form>
+  </div>
+</div></section>
+
+<!-- ============================================================ 07 · steps -->
+<section class="blk" id="steps"><div class="wrap">
+  <div class="hd"><p class="label">07 · execution</p>
+  <h2>Fill, score, draw, lint, build, review, gate</h2></div>
+  <div class="grid g2">
+    <div class="panel">
+      <ol class="steps">
+        <li><span>D4 → a DAB-repo PR un-ignoring the four record files per run.</span></li>
+        <li><span><code>_projects/dataagentbench.md</code> from the template; front matter from §03–§04; body on the spine.</span></li>
+        <li><span>Four charts + three structural SVGs: the agent as the Agent tab draws v8, the loop as the Optimise tab draws a round.</span></li>
+        <li><span>The §05 site changes.</span></li>
+        <li><span>Lint <code>--repo ../DataAgentBench</code>, then <code>--all --no-net</code>; container build; <code>audit_pages.mjs</code> at 390 / 768 / 1280, both themes.</span></li>
+        <li><span><code>/review</code> the built page; commit; <code>/no-mistakes</code>.</span></li>
+      </ol>
+    </div>
+    <div>
+      <div class="panel card" style="margin-bottom:var(--s4)">
+        <h3>Risks</h3>
+        <ul class="tight">
+          <li><b>The rank</b> — "second" would not survive a reader opening the board.</li>
+          <li><b>One trial</b> — v6 → v8 is +3 −1, p 0.63; the slide says so.</li>
+          <li><b>Five matrix columns</b> on a phone — needs the 390 px audit.</li>
+          <li><b>A bench among live systems</b> — split the count, never hide it.</li>
+          <li><b>In-sample on the 54</b> — as every top entry; the page says both.</li>
+        </ul>
+      </div>
+      <div class="band">
+        <p class="label" style="margin-bottom:var(--s2)">not in scope</p>
+        <p class="small" style="margin:0">A 54 × 5 run · a public deploy · the practices relabel · a fourth rung · new skill keys · any change to the rubric or the lint.</p>
+      </div>
+    </div>
+  </div>
+</div></section>
+
+<footer><div class="wrap">s12 · design source: the site's own tokens (<code>assets/css/tokens.css</code>) · every number from <code>../DataAgentBench</code> at <code>43bf267</code>, 2026-09-26 · charts in the site's <code>.dia</code> vocabulary, ready to lift into <code>_includes/diagrams/chart/</code></div></footer>
+</body></html>

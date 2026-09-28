@@ -1,0 +1,96 @@
+<svg class="dia" viewBox="0 0 330 178" role="img" aria-label="Three bar panels by agent version on the same 54 questions, one trial each. Tokens billed per run, in millions: v0 18.4, v1 10.2, v2 9.6, v3 11.9, v4 7.0, v5 2.4, v6 2.4, v7 2.3, v8 2.4. Wall time per trial at the 95th percentile, in seconds: v0 911, v1 177, v2 152, v3 237, v4 215, v5 53, v6 44, v7 58, v8 57. Cost per run in US dollars: v0 8.96, v1 4.60, v2 4.51, v3 5.20, v4 6.59, v5 5.04, v6 5.12, v7 5.15, v8 5.36. The champions are filled; the SQL rebuild and the switch to Opus made the agent short.">
+  <title>Tokens per run fell 7.6 times and p95 wall 16 times, v0 to v8, for 40 percent less per run</title>
+  <g><title>tokens billed per run, M · from runs/*/results.jsonl: tokens are input + cache read + cache creation + output; wall is duration_ms per trial; cost is cost_usd summed over the 54</title>
+    <text class="tx s" x="324" y="10" style="text-anchor:end">tokens billed per run, M</text>
+    <line class="ax" x1="36" y1="52" x2="324" y2="52"/></g>
+  <g><title>p95 wall per trial, s · from runs/*/results.jsonl: tokens are input + cache read + cache creation + output; wall is duration_ms per trial; cost is cost_usd summed over the 54</title>
+    <text class="tx s" x="324" y="64" style="text-anchor:end">p95 wall per trial, s</text>
+    <line class="ax" x1="36" y1="106" x2="324" y2="106"/></g>
+  <g><title>USD per run · from runs/*/results.jsonl: tokens are input + cache read + cache creation + output; wall is duration_ms per trial; cost is cost_usd summed over the 54</title>
+    <text class="tx s" x="324" y="118" style="text-anchor:end">USD per run</text>
+    <line class="ax" x1="36" y1="160" x2="324" y2="160"/></g>
+  <g><title>v0 · the Haiku python agent · 4 trials hit the 900 s timeout, 4 errors · 18.43 M tokens billed (9.05 M cache reads, 740 k output) · wall p50 63 s, p95 911 s · turns p50 12, p95 25 · 623 tool calls · $8.96 per run, $0.07 p50 and $0.77 p95 per question</title>
+    <rect class="bar pro" x="40" y="16.0" width="22" height="36.0" rx="2"/>
+    <text class="tx k" x="51" y="13.0">18.4</text>
+    <rect class="bar pro" x="40" y="70.0" width="22" height="36.0" rx="2"/>
+    <text class="tx k" x="51" y="67.0">911</text>
+    <rect class="bar pro" x="40" y="124.0" width="22" height="36.0" rx="2"/>
+    <text class="tx k" x="51" y="121.0">8.96</text>
+    <text class="tx s" x="51" y="171">v0</text></g>
+  <g><title>v1 · the SQL rebuild on Haiku · 7 errors · 10.15 M tokens billed (8.70 M cache reads, 350 k output) · wall p50 64 s, p95 177 s · turns p50 14, p95 31 · 953 tool calls · $4.60 per run, $0.07 p50 and $0.16 p95 per question</title>
+    <rect class="bar" x="72" y="32.2" width="22" height="19.8" rx="2"/>
+    <rect class="nd ext" x="72" y="32.2" width="22" height="19.8" rx="2"/>
+    <text class="tx k" x="83" y="29.2">10.1</text>
+    <rect class="bar" x="72" y="99.0" width="22" height="7.0" rx="2"/>
+    <rect class="nd ext" x="72" y="99.0" width="22" height="7.0" rx="2"/>
+    <text class="tx k" x="83" y="96.0">177</text>
+    <rect class="bar" x="72" y="141.5" width="22" height="18.5" rx="2"/>
+    <rect class="nd ext" x="72" y="141.5" width="22" height="18.5" rx="2"/>
+    <text class="tx k" x="83" y="138.5">4.60</text>
+    <text class="tx s" x="83" y="171">v1</text></g>
+  <g><title>v2 · round 1 · 2 errors · 9.55 M tokens billed (8.20 M cache reads, 375 k output) · wall p50 61 s, p95 152 s · turns p50 16, p95 31 · 868 tool calls · $4.51 per run, $0.07 p50 and $0.16 p95 per question</title>
+    <rect class="bar pro" x="104" y="33.4" width="22" height="18.6" rx="2"/>
+    <text class="tx k" x="115" y="30.4">9.5</text>
+    <rect class="bar pro" x="104" y="100.0" width="22" height="6.0" rx="2"/>
+    <text class="tx k" x="115" y="97.0">152</text>
+    <rect class="bar pro" x="104" y="141.9" width="22" height="18.1" rx="2"/>
+    <text class="tx k" x="115" y="138.9">4.51</text>
+    <text class="tx s" x="115" y="171">v2</text></g>
+  <g><title>v3 · round 2, plan-first · 4 errors · 11.92 M tokens billed (10.58 M cache reads, 471 k output) · wall p50 72 s, p95 237 s · turns p50 16, p95 31 · 849 tool calls · $5.20 per run, $0.08 p50 and $0.21 p95 per question</title>
+    <rect class="bar" x="136" y="28.7" width="22" height="23.3" rx="2"/>
+    <rect class="nd ext" x="136" y="28.7" width="22" height="23.3" rx="2"/>
+    <text class="tx k" x="147" y="25.7">11.9</text>
+    <rect class="bar" x="136" y="96.6" width="22" height="9.4" rx="2"/>
+    <rect class="nd ext" x="136" y="96.6" width="22" height="9.4" rx="2"/>
+    <text class="tx k" x="147" y="93.6">237</text>
+    <rect class="bar" x="136" y="139.1" width="22" height="20.9" rx="2"/>
+    <rect class="nd ext" x="136" y="139.1" width="22" height="20.9" rx="2"/>
+    <text class="tx k" x="147" y="136.1">5.20</text>
+    <text class="tx s" x="147" y="171">v3</text></g>
+  <g><title>v4 · the same prompt on Sonnet 5 · no errors · 6.96 M tokens billed (6.06 M cache reads, 287 k output) · wall p50 44 s, p95 215 s · turns p50 11, p95 25 · 588 tool calls · $6.59 per run, $0.10 p50 and $0.28 p95 per question</title>
+    <rect class="bar pro" x="168" y="38.4" width="22" height="13.6" rx="2"/>
+    <text class="tx k" x="179" y="35.4">7.0</text>
+    <rect class="bar pro" x="168" y="97.5" width="22" height="8.5" rx="2"/>
+    <text class="tx k" x="179" y="94.5">215</text>
+    <rect class="bar pro" x="168" y="133.5" width="22" height="26.5" rx="2"/>
+    <text class="tx k" x="179" y="130.5">6.59</text>
+    <text class="tx s" x="179" y="171">v4</text></g>
+  <g><title>v5 · the same prompt on Opus 5.5 · no errors · 2.42 M tokens billed (2.02 M cache reads, 110 k output) · wall p50 21 s, p95 53 s · turns p50 5, p95 9 · 242 tool calls · $5.04 per run, $0.09 p50 and $0.18 p95 per question</title>
+    <rect class="bar" x="200" y="47.3" width="22" height="4.7" rx="2"/>
+    <rect class="nd ext" x="200" y="47.3" width="22" height="4.7" rx="2"/>
+    <text class="tx k" x="211" y="44.3">2.4</text>
+    <rect class="bar" x="200" y="103.9" width="22" height="2.1" rx="2"/>
+    <rect class="nd ext" x="200" y="103.9" width="22" height="2.1" rx="2"/>
+    <text class="tx k" x="211" y="100.9">53</text>
+    <rect class="bar" x="200" y="139.8" width="22" height="20.2" rx="2"/>
+    <rect class="nd ext" x="200" y="139.8" width="22" height="20.2" rx="2"/>
+    <text class="tx k" x="211" y="136.8">5.04</text>
+    <text class="tx s" x="211" y="171">v5</text></g>
+  <g><title>v6 · round 3 on Opus · no errors · 2.43 M tokens billed (2.01 M cache reads, 114 k output) · wall p50 22 s, p95 44 s · turns p50 5, p95 8 · 217 tool calls · $5.12 per run, $0.08 p50 and $0.18 p95 per question</title>
+    <rect class="bar pro" x="232" y="47.3" width="22" height="4.7" rx="2"/>
+    <text class="tx k" x="243" y="44.3">2.4</text>
+    <rect class="bar pro" x="232" y="104.2" width="22" height="1.8" rx="2"/>
+    <text class="tx k" x="243" y="101.2">44</text>
+    <rect class="bar pro" x="232" y="139.4" width="22" height="20.6" rx="2"/>
+    <text class="tx k" x="243" y="136.4">5.12</text>
+    <text class="tx s" x="243" y="171">v6</text></g>
+  <g><title>v7 · round 4, every error read, guards on · no errors · 2.29 M tokens billed (1.87 M cache reads, 112 k output) · wall p50 21 s, p95 58 s · turns p50 4, p95 7 · 196 tool calls · $5.15 per run, $0.08 p50 and $0.18 p95 per question</title>
+    <rect class="bar" x="264" y="47.5" width="22" height="4.5" rx="2"/>
+    <rect class="nd ext" x="264" y="47.5" width="22" height="4.5" rx="2"/>
+    <text class="tx k" x="275" y="44.5">2.3</text>
+    <rect class="bar" x="264" y="103.7" width="22" height="2.3" rx="2"/>
+    <rect class="nd ext" x="264" y="103.7" width="22" height="2.3" rx="2"/>
+    <text class="tx k" x="275" y="100.7">58</text>
+    <rect class="bar" x="264" y="139.3" width="22" height="20.7" rx="2"/>
+    <rect class="nd ext" x="264" y="139.3" width="22" height="20.7" rx="2"/>
+    <text class="tx k" x="275" y="136.3">5.15</text>
+    <text class="tx s" x="275" y="171">v7</text></g>
+  <g><title>v8 · round 5 with the history · the champion · no errors, timeouts or rate limits · 2.43 M tokens billed (1.99 M cache reads, 120 k output) · wall p50 22 s, p95 57 s · turns p50 5, p95 8 · 215 tool calls · $5.36 per run, $0.09 p50 and $0.17 p95 per question</title>
+    <rect class="bar pro" x="296" y="47.3" width="22" height="4.7" rx="2"/>
+    <text class="tx k" x="307" y="44.3">2.4</text>
+    <rect class="bar pro" x="296" y="103.7" width="22" height="2.3" rx="2"/>
+    <text class="tx k" x="307" y="100.7">57</text>
+    <rect class="bar pro" x="296" y="138.5" width="22" height="21.5" rx="2"/>
+    <text class="tx k" x="307" y="135.5">5.36</text>
+    <text class="tx s" x="307" y="171">v8 ★</text></g>
+</svg>

@@ -170,7 +170,7 @@ uv run --with pyyaml --no-project python scripts/lint_case_study.py \
 docker run --rm -e JEKYLL_NO_BUNDLER_REQUIRE=true -v "$PWD":/site -w /site \
     ghp-jekyll:local jekyll build -d /site/_probeout -q
 
-# layout + axe across 12 pages × 3 widths × 2 themes
+# layout + axe across 11 pages × 3 widths × 2 themes
 node scripts/audit_pages.mjs http://127.0.0.1:8790
 ```
 
@@ -210,9 +210,10 @@ The loop, the selector-to-source table and the close-out checks are in
 | `DESIGN.md` | the visual brief and the never-list |
 | `.lavish/sNN_*.html` | the review artifact written before each change |
 
-Six `_projects/` pages carry `published: false` (decision D4a — the site shows
-only the three production systems). They do not render and the lint skips them;
-do not spend rubric work on them without changing that decision first.
+Seven `_projects/` pages carry `published: false` (decision D4a — the site shows
+only the four systems that are live on AWS or a public benchmark; DABstep Loop came
+off on 2026-09-26, with its deep page). They do not render and the lint skips
+them; do not spend rubric work on them without changing that decision first.
 
 ---
 

@@ -2,7 +2,9 @@
   Never dead-end a case study. Next live system by production.order, wrapping
   round to the first; plus the way back to all of them.
 {%- endcomment -%}
-{%- assign live = site.projects | where_exp: "p", "p.production.live == true" | sort: "production.order" -%}
+{%- assign onaws = site.projects | where_exp: "p", "p.production.live == true" -%}
+{%- assign bench = site.projects | where_exp: "p", "p.production.bench == true" -%}
+{%- assign live = onaws | concat: bench | sort: "production.order" -%}
 {%- assign n = live.size -%}
 {%- if n > 1 -%}
   {%- assign nextp = live.first -%}
@@ -13,7 +15,7 @@
     {%- endif -%}
   {%- endfor -%}
 <nav class="next" aria-label="More systems">
-  <a href="{{ '/#work' | relative_url }}"><span class="label">Back to</span><b>All {% if n == 4 %}four{% elsif n == 3 %}three{% else %}{{ n }}{% endif %} systems</b></a>
+  <a href="{{ '/#work' | relative_url }}"><span class="label">Back to</span><b>All {% if n == 5 %}five{% elsif n == 4 %}four{% elsif n == 3 %}three{% else %}{{ n }}{% endif %} systems</b></a>
   <a href="{{ nextp.url | relative_url }}" style="text-align:right"><span class="label">Next system</span><b>{{ nextp.title }} →</b></a>
 </nav>
 {%- endif -%}

@@ -13,7 +13,7 @@ built page cannot be opened in Lavish as-is. This script:
   5. copies only the assets a page needs (css, js, fonts, favicon, small img),
   6. writes _review/<slug>.html and prints its path.
 
-    python3 scripts/review_page.py projects/dabstep-loop
+    python3 scripts/review_page.py projects/dataagentbench
     python3 scripts/review_page.py index --no-build
     npx -y lavish-axi "$(python3 scripts/review_page.py index)"
 

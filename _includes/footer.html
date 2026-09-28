@@ -5,7 +5,9 @@
   anyone maintaining a list. Glyphs are decorative and aria-hidden; the
   structure a screen reader hears is the nested list, not the box-drawing.
 {%- endcomment -%}
-{%- assign live = site.projects | where_exp: "p", "p.production.live == true" | sort: "production.order" -%}
+{%- assign onaws = site.projects | where_exp: "p", "p.production.live == true" -%}
+{%- assign bench = site.projects | where_exp: "p", "p.production.bench == true" -%}
+{%- assign live = onaws | concat: bench | sort: "production.order" -%}
 {%- assign prac = site.practices | sort: "order" -%}
 {%- assign ndim = site.data.rubric.dimensions | size -%}
 <footer class="footer">
@@ -18,7 +20,7 @@
         {%- for p in live %}
         {%- assign p_scr = p.production.score | default: "" | strip -%}
         {%- assign p_last = forloop.last -%}
-        <li><i aria-hidden="true">│   {% if p_last %}└── {% else %}├── {% endif %}</i><a href="{{ p.url | relative_url }}">{{ p.title | downcase }}</a>{% if p_scr != "" %}<span class="pt-s">{{ p_scr | remove: " " }} · live</span>{% endif %}</li>
+        <li><i aria-hidden="true">│   {% if p_last %}└── {% else %}├── {% endif %}</i><a href="{{ p.url | relative_url }}">{{ p.title | downcase }}</a>{% if p_scr != "" %}<span class="pt-s">{{ p_scr | remove: " " }} · {% if p.production.live %}live{% else %}bench{% endif %}</span>{% endif %}</li>
         {%- comment -%} the deep pages under this system, one level further in {%- endcomment -%}
         {%- assign dd = site.deep | where: "project", p.slug | sort: "order" -%}
         {%- for d in dd %}

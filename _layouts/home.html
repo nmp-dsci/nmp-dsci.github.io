@@ -1,8 +1,19 @@
 ---
 layout: default
 ---
-{%- assign live = site.projects | where_exp: "p", "p.production.live == true" | sort: "production.order" -%}
+{%- comment -%}
+  The systems the home page carries: live on AWS, or a bench — a system with no
+  public URL whose evidence is a benchmark run rather than a deployment. The same
+  `live or bench` query is in nav.html, footer.html, rubric-matrix.html and
+  next-system.html (DESIGN.md rule 17), and the counts below keep the "in
+  production on AWS" claim true by saying which is which.
+{%- endcomment -%}
+{%- assign onaws = site.projects | where_exp: "p", "p.production.live == true" -%}
+{%- assign bench = site.projects | where_exp: "p", "p.production.bench == true" -%}
+{%- assign live = onaws | concat: bench | sort: "production.order" -%}
 {%- assign nsys = live.size -%}
+{%- assign naws = onaws.size -%}
+{%- assign nbench = nsys | minus: naws -%}
 
 {%- comment -%}
   The first viewport carries the claim on the left and the evidence on the
@@ -13,7 +24,7 @@ layout: default
 <section class="hero">
   <div class="wrap hero-grid">
     <div>
-      <p class="label kick">{{ site.data.site.role }} · Sydney · {{ nsys }} systems in production on AWS</p>
+      <p class="label kick">{{ site.data.site.role }} · Sydney · {{ naws }} systems in production on AWS{% if nbench > 0 %} · {{ nbench }} on a public benchmark{% endif %}</p>
       <h1>{{ site.data.site.tagline }}</h1>
       <p class="dek">{{ site.data.site.strapline }}</p>
       <div class="hero-cta">
@@ -28,7 +39,7 @@ layout: default
 <section class="section-band" id="work" aria-labelledby="work-h">
   <div class="wrap">
     <div class="sec-head">
-      <h2 id="work-h">{% if nsys == 3 %}Three{% elsif nsys == 4 %}Four{% else %}{{ nsys }}{% endif %} systems, live on AWS</h2>
+      <h2 id="work-h">{% if naws == 3 %}Three{% elsif naws == 4 %}Four{% else %}{{ naws }}{% endif %} systems live on AWS{% if nbench == 1 %}, and one loop on a public benchmark{% elsif nbench > 1 %}, and {{ nbench }} loops on public benchmarks{% endif %}</h2>
       <span class="aside">demo mode on every public URL — read-only, no keys, no inference</span>
     </div>
     <div class="systems">

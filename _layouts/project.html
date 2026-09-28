@@ -31,10 +31,18 @@ layout: default
     <h1>{{ p_head }}</h1>
     <p class="dek">{{ page.summary }}</p>
 
+    {%- comment -%}
+      `lead: metric` puts the optimisation result first, then cost, then the
+      rubric — the same order the home-page row uses for that system.
+    {%- endcomment -%}
+    {%- assign lead_m = false -%}
+    {%- if page.lead == "metric" and p_metric != "" -%}{%- assign lead_m = true -%}{%- endif %}
     <p class="meta">
+      {%- if lead_m %}<span><b>{{ p_metric }}</b> {{ p_mlabel }}</span>{% endif -%}
+      {%- if lead_m and p_cost != "" %}<span><b>{{ p_cost }}</b></span>{% endif -%}
       {%- if p_score != "" %}<span><b>{{ p_score }}</b> rubric dimensions shipped</span>{% endif -%}
       {%- if page.production.live %}<span><b>live</b>{% if p_region != "" %} · {{ p_region }}{% endif %}</span>{% endif -%}
-      {%- if p_cost != "" %}<span><b>{{ p_cost }}</b></span>{% endif -%}
+      {%- if lead_m == false and p_cost != "" %}<span><b>{{ p_cost }}</b></span>{% endif -%}
       <span><b data-reading-time>—</b> read · 7 sections</span>
     </p>
 
@@ -89,16 +97,24 @@ layout: default
           {%- if page.stack and page.stack != empty %}
           <dt>Stack</dt><dd>{% for s in page.stack %}{{ s }}{% unless forloop.last %} · {% endunless %}{% endfor %}</dd>
           {%- endif %}
+          {%- comment -%}
+            A bench system (production.live: false) has no region and has reached
+            no rung, so the rail says where it runs instead of a rung it does not hold.
+          {%- endcomment -%}
+          {%- if page.production.live %}
           {%- if p_region != "" %}<dt>Region</dt><dd>{{ p_region }}</dd>{% endif %}
           {%- if p_rung != "" %}
           <dt>Rung</dt><dd><a href="{{ '/practices/production-scale/' | relative_url }}">{{ p_rung }} concurrent users →</a>{% if p_rnote != "" %} — {{ p_rnote | markdownify | remove: "<p>" | remove: "</p>" | strip }}{% endif %}</dd>
+          {%- endif %}
+          {%- elsif p_rnote != "" %}
+          <dt>Runs</dt><dd>{{ p_rnote | markdownify | remove: "<p>" | remove: "</p>" | strip }}</dd>
           {%- endif %}
           {%- if p_cost != "" %}<dt>Cost</dt><dd>{{ p_cost }}</dd>{% endif %}
           {%- if l_repo != "" %}<dt>Code</dt><dd><a href="{{ l_repo }}" target="_blank" rel="noopener">Repository ↗</a></dd>{% endif %}
           {%- if l_demo != "" %}<dt>Demo</dt><dd><a href="{{ l_demo }}" target="_blank" rel="noopener">Live demo ↗</a></dd>{% endif %}
         </dl>
-        {%- if p_region != "" or p_cost != "" or p_rung != "" %}
-        <p class="rail-note">measured on the demo-mode deployment · read-only · no public inference</p>
+        {%- if page.production.live and p_region != "" or p_cost != "" or p_rung != "" %}
+        <p class="rail-note">{% if page.production.live %}measured on the demo-mode deployment · read-only · no public inference{% else %}measured on the author's runs · nothing is served{% endif %}</p>
         {%- endif %}
       </div>
     </aside>

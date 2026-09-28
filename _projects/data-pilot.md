@@ -33,7 +33,7 @@ tags: [Agents, Data]
 metric: "9 / 9"
 metric_label: "rubric dimensions shipped · rung-100 sizing measured"
 featured: true
-order: 2
+order: 3
 stack: [pydantic-ai, FastAPI, Aurora Serverless v2, pgvector, React 19, dlt, dbt, Pyodide, Terraform, App Runner, CloudFront]
 
 skills: [agentic-ai, governance, mlops, sql, rag, model-evaluation, product-ui]
@@ -71,7 +71,7 @@ architecture:
 
 production:
   live: true
-  order: 2
+  order: 3
   surface: >-
     No login, no sign-up: Explore and the SQL editor run live against the real marts; chat
     replays eight recorded agent runs as paced SSE (plan, charts, report, ~5–10 s); the Ops

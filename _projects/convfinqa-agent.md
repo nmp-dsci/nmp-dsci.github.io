@@ -1,22 +1,24 @@
 ---
 title: ConvFinQA Agent
-short: "ConvFinQA"   # the matrix column header on a phone
-headline: "Optimised to 90.5%, promoted only on significance"
+short: "Conv\u00ADFinQA"   # the matrix column header on a phone; the soft hyphen lets it break when a column is narrow
+headline: "Optimised from 73.0% to 90.5%, promoted only on significance"
 summary: >-
-  Multi-turn financial Q&A over filings. Four typed agents, an MLflow optimisation loop that
-  promotes only on significance, and a runtime test that put the champion's prompts in one
-  Claude session.
+  Multi-turn financial Q&A over filings, optimised from 73.0% to 90.5% across four gated
+  versions. Four typed agents, a loop that promotes only on significance, then the champion's
+  prompts in one Claude session.
 tldr: >-
   Four typed agents, a teacher that rewrites one prompt per experiment, a significance gate on
   349 unseen questions that promoted v8, and a runtime test that scored 90.5% in one session.
 outcome: >-
-  A multi-turn agent over financial reports, its accuracy maximised through experimentation and
-  optimisation: one prompt changed per cycle, promoted only on significant unseen evidence.
+  Accuracy optimised from 73.0% to 90.5% across four gated versions, each gain traced to a named
+  cause and a p-value.
 proof_line: >-
   sdk_v1 scored 90.5% (316/349) over the v8 pipeline's 81.7% on the same unseen gate questions,
   +8.9 pp with one-sided clustered McNemar p 0.0003; v8 itself was the one campaign promotion
   in seven, +4.6 pp over v2 at p 0.040.
 tags: [Agents]
+# the card and the page header lead with the optimisation result; cost and rubric follow
+lead: metric
 metric: "90.5%"
 metric_label: "unseen gate split (316/349) · one session over the 81.7% pipeline"
 featured: true

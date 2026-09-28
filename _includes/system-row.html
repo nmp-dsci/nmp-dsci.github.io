@@ -24,7 +24,7 @@
   <div class="sys-body">
     <div class="sys-top">
       <h3><a href="{{ p.url | relative_url }}">{{ p.title }}</a></h3>
-      {%- if p.production.live %}<span class="live">live</span>{% endif -%}
+      {%- if p.production.live %}<span class="live">live</span>{% elsif p.production.bench %}<span class="live bench">bench</span>{% endif -%}
     </div>
 
     <p class="sys-out">{{ c_out }}</p>
@@ -35,18 +35,33 @@
       the full topology behind a disclosure. Nothing is deleted — the same words
       are one click away here and in full on the case study.
     {%- endcomment -%}
+    {%- comment -%}
+      A bench system has no region to show and no rung it has reached, so its
+      chips carry the number it is scored on instead — the metric with its
+      baseline — beside the rubric score.
+
+      `lead: metric` is for a system whose story is an optimisation result: the
+      metric leads, then cost, then the rubric — the number first, what it costs
+      and how production-ready it is second.
+    {%- endcomment -%}
+    {%- capture ch_metric -%}{%- if p.metric -%}<li><b>{{ p.metric }}</b> {{ p.metric_label }}</li>{%- endif -%}{%- endcapture -%}
+    {%- capture ch_rubric -%}{%- if c_scr != "" -%}<li><b>{{ c_scr | remove: " " }}</b> rubric{% if p.production.live and p.production.rung %} · rung {{ p.production.rung }}{% endif %}</li>{%- endif -%}{%- endcapture -%}
+    {%- capture ch_region -%}{%- if p.production.live and c_reg != "" -%}<li>{{ c_reg }}</li>{%- endif -%}{%- endcapture -%}
+    {%- capture ch_cost -%}{%- if c_cost != "" -%}<li>{{ c_cost }}</li>{%- endif -%}{%- endcapture -%}
     <ul class="sys-chips">
-      {%- if c_scr != "" %}<li><b>{{ c_scr | remove: " " }}</b> rubric{% if p.production.rung %} · rung {{ p.production.rung }}{% endif %}</li>{% endif -%}
-      {%- if c_reg  != "" %}<li>{{ c_reg }}</li>{% endif -%}
-      {%- if c_cost != "" %}<li>{{ c_cost }}</li>{% endif -%}
+      {%- if p.lead == "metric" -%}
+      {{ ch_metric }}{{ ch_cost }}{{ ch_rubric }}{{ ch_region }}
+      {%- else -%}
+      {{ ch_rubric }}{% if p.production.live != true %}{{ ch_metric }}{% endif %}{{ ch_region }}{{ ch_cost }}
+      {%- endif -%}
     </ul>
 
     {%- if c_surf != "" or c_topo != "" %}
     <details class="sys-more">
-      <summary>What you can actually do in the demo</summary>
+      <summary>{% if p.production.live %}What you can actually do in the demo{% else %}What the explorer shows, locally{% endif %}</summary>
       <dl class="sys-facts">
         {%- if c_surf != "" %}
-        <dt>Demo</dt><dd>{{ c_surf }}</dd>
+        <dt>{% if p.production.live %}Demo{% else %}Explorer{% endif %}</dt><dd>{{ c_surf }}</dd>
         {%- endif %}
         {%- if c_topo != "" %}
         <dt>Runs on</dt><dd>{{ c_topo }}{% if c_reg != "" %} · {{ c_reg }}{% endif %}{% if c_cost != "" %} · {{ c_cost }}{% endif %}</dd>
